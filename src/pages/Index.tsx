@@ -3,6 +3,9 @@ import Header from "@/components/layout/Header";
 import Dashboard from "@/components/dashboard/Dashboard";
 import RankingDashboard from "@/components/ranking/RankingDashboard";
 import SchoolManagement from "@/components/schools/SchoolManagement";
+import UserAnalytics from "@/components/analytics/UserAnalytics";
+import MonitoringPortal from "@/components/monitoring/MonitoringPortal";
+import AIAssistant from "@/components/ai/AIAssistant";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -15,6 +18,12 @@ const Index = () => {
         return <SchoolManagement />;
       case "history":
         return <RankingDashboard />;
+      case "analytics":
+        return <UserAnalytics />;
+      case "monitoring":
+        return <MonitoringPortal />;
+      case "ai":
+        return <AIAssistant />;
       case "settings":
         return (
           <div className="space-y-6">

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, BarChart3, Users, TrendingUp, Settings, User, LogOut } from "lucide-react";
+import { ChevronDown, BarChart3, Users, TrendingUp, Settings, User, LogOut, MessageSquare, Bot } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -69,7 +69,7 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                     <ChevronDown className="w-4 h-4" />
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="w-72 p-2">
+                    <div className="w-80 p-2">
                       <Button
                         variant={activeSection === 'dashboard' ? 'default' : 'ghost'}
                         className="w-full justify-start gap-3 mb-1"
@@ -85,6 +85,30 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                       >
                         <Users className="w-4 h-4" />
                         Gerenciamento
+                      </Button>
+                      <Button
+                        variant={activeSection === 'analytics' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('analytics')}
+                      >
+                        <Users className="w-4 h-4" />
+                        Análise de Usuários
+                      </Button>
+                      <Button
+                        variant={activeSection === 'monitoring' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('monitoring')}
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        Portal de Monitoria
+                      </Button>
+                      <Button
+                        variant={activeSection === 'ai' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('ai')}
+                      >
+                        <Bot className="w-4 h-4" />
+                        Assistente IA
                       </Button>
                       <Button
                         variant={activeSection === 'history' ? 'default' : 'ghost'}
