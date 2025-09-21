@@ -69,7 +69,7 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                     <ChevronDown className="w-4 h-4" />
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="w-80 p-2">
+                    <div className="w-96 p-2">
                       <Button
                         variant={activeSection === 'dashboard' ? 'default' : 'ghost'}
                         className="w-full justify-start gap-3 mb-1"
@@ -84,7 +84,15 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                         onClick={() => onSectionChange('management')}
                       >
                         <Users className="w-4 h-4" />
-                        Gerenciamento
+                        Gerenciamento de Escolas
+                      </Button>
+                      <Button
+                        variant={activeSection === 'users' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('users')}
+                      >
+                        <Users className="w-4 h-4" />
+                        Gerenciamento de Usuários
                       </Button>
                       <Button
                         variant={activeSection === 'analytics' ? 'default' : 'ghost'}
