@@ -62,6 +62,7 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
           <div className="flex items-center space-x-6">
             <NavigationMenu>
               <NavigationMenuList>
+                {/* Portal SAF */}
                 <NavigationMenuItem>
                   <NavigationMenuTrigger className="gap-2 bg-transparent hover:bg-accent">
                     <Shield className="w-4 h-4" />
@@ -70,105 +71,99 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="w-96 p-2 space-y-2">
-                      {/* Seção Principal */}
-                      <div className="border-b pb-2">
-                        <p className="text-xs font-medium text-muted-foreground mb-2 px-2">PRINCIPAL</p>
-                        <Button
-                          variant={activeSection === 'dashboard' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('dashboard')}
-                        >
-                          <BarChart3 className="w-4 h-4" />
-                          Dashboard Geral
-                        </Button>
-                        <Button
-                          variant={activeSection === 'monitoring' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('monitoring')}
-                        >
-                          <MessageSquare className="w-4 h-4" />
-                          Portal de Monitoria
-                        </Button>
-                      </div>
+                      <Button
+                        variant={activeSection === 'dashboard' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('dashboard')}
+                      >
+                        <BarChart3 className="w-4 h-4" />
+                        Dashboard Geral
+                      </Button>
+                      <Button
+                        variant={activeSection === 'monitoring' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('monitoring')}
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        Portal de Monitoria
+                      </Button>
+                      <Button
+                        variant={activeSection === 'ai' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('ai')}
+                      >
+                        <Bot className="w-4 h-4" />
+                        Assistente IA
+                      </Button>
+                      <Button
+                        variant={activeSection === 'knowledge' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('knowledge')}
+                      >
+                        <Brain className="w-4 h-4" />
+                        Base de Conhecimento
+                      </Button>
+                      <Button
+                        variant={activeSection === 'vouchers' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('vouchers')}
+                      >
+                        <CreditCard className="w-4 h-4" />
+                        Gerenciamento de Vouchers
+                      </Button>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
 
-                      {/* Seção IA */}
-                      <div className="border-b pb-2">
-                        <p className="text-xs font-medium text-muted-foreground mb-2 px-2">INTELIGÊNCIA ARTIFICIAL</p>
-                        <Button
-                          variant={activeSection === 'ai' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('ai')}
-                        >
-                          <Bot className="w-4 h-4" />
-                          Assistente de Atendimento
-                        </Button>
-                        <Button
-                          variant={activeSection === 'knowledge' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('knowledge')}
-                        >
-                          <Brain className="w-4 h-4" />
-                          Base de Conhecimento
-                        </Button>
-                      </div>
-
-                      {/* Seção Gestão */}
-                      <div className="border-b pb-2">
-                        <p className="text-xs font-medium text-muted-foreground mb-2 px-2">GESTÃO</p>
-                        <Button
-                          variant={activeSection === 'vouchers' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('vouchers')}
-                        >
-                          <CreditCard className="w-4 h-4" />
-                          Gerenciamento de Vouchers
-                        </Button>
-                        <Button
-                          variant={activeSection === 'management' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('management')}
-                        >
-                          <Users className="w-4 h-4" />
-                          Gerenciamento de Escolas
-                        </Button>
-                        <Button
-                          variant={activeSection === 'users' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('users')}
-                        >
-                          <User className="w-4 h-4" />
-                          Gerenciamento de Usuários
-                        </Button>
-                      </div>
-
-                      {/* Seção Análises */}
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground mb-2 px-2">ANÁLISES</p>
-                        <Button
-                          variant={activeSection === 'analytics' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('analytics')}
-                        >
-                          <FileText className="w-4 h-4" />
-                          Análise de Usuários
-                        </Button>
-                        <Button
-                          variant={activeSection === 'history' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 mb-1"
-                          onClick={() => onSectionChange('history')}
-                        >
-                          <TrendingUp className="w-4 h-4" />
-                          Histórico e Relatórios
-                        </Button>
-                        <Button
-                          variant={activeSection === 'settings' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3"
-                          onClick={() => onSectionChange('settings')}
-                        >
-                          <Settings className="w-4 h-4" />
-                          Configurações
-                        </Button>
-                      </div>
+                {/* Licenças Canva */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="gap-2 bg-transparent hover:bg-accent">
+                    <Users className="w-4 h-4" />
+                    Licenças Canva
+                    <ChevronDown className="w-4 h-4" />
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="w-96 p-2 space-y-2">
+                      <Button
+                        variant={activeSection === 'management' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('management')}
+                      >
+                        <Users className="w-4 h-4" />
+                        Gerenciamento de Escolas
+                      </Button>
+                      <Button
+                        variant={activeSection === 'users' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('users')}
+                      >
+                        <User className="w-4 h-4" />
+                        Gerenciamento de Usuários
+                      </Button>
+                      <Button
+                        variant={activeSection === 'analytics' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('analytics')}
+                      >
+                        <FileText className="w-4 h-4" />
+                        Análise de Usuários
+                      </Button>
+                      <Button
+                        variant={activeSection === 'history' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3 mb-1"
+                        onClick={() => onSectionChange('history')}
+                      >
+                        <TrendingUp className="w-4 h-4" />
+                        Histórico e Relatórios
+                      </Button>
+                      <Button
+                        variant={activeSection === 'settings' ? 'default' : 'ghost'}
+                        className="w-full justify-start gap-3"
+                        onClick={() => onSectionChange('settings')}
+                      >
+                        <Settings className="w-4 h-4" />
+                        Configurações
+                      </Button>
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
