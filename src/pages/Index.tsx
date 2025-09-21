@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Dashboard from "@/components/dashboard/Dashboard";
+import RankingDashboard from "@/components/ranking/RankingDashboard";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -17,12 +18,7 @@ const Index = () => {
           </div>
         );
       case "history":
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Histórico</h1>
-            <p className="text-muted-foreground">Funcionalidade em desenvolvimento...</p>
-          </div>
-        );
+        return <RankingDashboard />;
       case "settings":
         return (
           <div className="space-y-6">
