@@ -19,16 +19,83 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulação de autenticação
-    if (email === "admin@maplebear.com.br" && password === "maplebear2025") {
+    // Validar domínios permitidos
+    const allowedDomains = ['@mbcentral.com.br', '@seb.com.br', '@sebsa.com.br'];
+    const isAllowedDomain = allowedDomains.some(domain => 
+      email.toLowerCase().includes(domain)
+    );
+
+    if (!isAllowedDomain) {
       toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo ao Dashboard Maple Bear SAF",
+        title: "Acesso negado",
+        description: "Acesso permitido apenas para emails corporativos (@mbcentral, @seb, @sebsa)",
+        variant: "destructive",
       });
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulação de autenticação
+    if ((email === "admin@mbcentral.com.br" && password === "maplebear2025") ||
+        (email === "saf@seb.com.br" && password === "saf2025") ||
+        (email === "coordenador@sebsa.com.br" && password === "coord2025")) {
       
-      // Salvar estado de autenticação
+      // Criar sessão com expiração de 1 semana
+      const sessionExpiry = new Date();
+      sessionExpiry.setDate(sessionExpiry.getDate() + 7);
+
+      // Determinar role baseado no email
+      let role = 'user';
+      if (email.includes('admin@')) {
+        role = 'admin';
+      } else if (email.includes('manutencao@')) {
+        role = 'maintenance';
+      }
+
+      // Criar perfil do usuário
+      const userProfile = {
+        id: `user_${Date.now()}`,
+        name: email.split('@')[0].replace('.', ' ').replace(/^\w/, c => c.toUpperCase()),
+        email: email,
+        role,
+        status: 'active',
+        profileImage: '',
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        sessionExpiry: sessionExpiry.toISOString(),
+        approvedBy: 'sistema',
+        approvedAt: new Date().toISOString()
+      };
+
+      // Salvar dados de autenticação
       localStorage.setItem("authenticated", "true");
       localStorage.setItem("userEmail", email);
+      localStorage.setItem("saf_current_user", JSON.stringify(userProfile));
+      localStorage.setItem("sessionExpiry", sessionExpiry.toISOString());
+
+      // Criar dados iniciais se não existirem
+      if (!localStorage.getItem('saf_pending_users')) {
+        const pendingUsers = [
+          {
+            id: 'pending_1',
+            name: 'Maria Silva',
+            email: 'maria.silva@mbcentral.com.br',
+            requestedAt: new Date().toISOString(),
+            status: 'pending'
+          }
+        ];
+        localStorage.setItem('saf_pending_users', JSON.stringify(pendingUsers));
+      }
+
+      if (!localStorage.getItem('saf_all_users')) {
+        const allUsers = [userProfile];
+        localStorage.setItem('saf_all_users', JSON.stringify(allUsers));
+      }
+      
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Bem-vindo ao Portal SAF Maple Bear",
+      });
       
       navigate("/dashboard");
     } else {
@@ -70,7 +137,7 @@ const Login = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="seu.email@maplebear.com.br"
+                placeholder="seu.email@mbcentral.com.br"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -119,8 +186,11 @@ const Login = () => {
           <div className="mt-6 pt-4 border-t border-border/50">
             <p className="text-xs text-center text-muted-foreground">
               Credenciais de teste:<br />
-              <span className="font-mono">admin@maplebear.com.br</span><br />
-              <span className="font-mono">maplebear2025</span>
+              <span className="font-mono">admin@mbcentral.com.br - maplebear2025</span><br />
+              <span className="font-mono">saf@seb.com.br - saf2025</span><br />
+              <span className="font-mono">coordenador@sebsa.com.br - coord2025</span><br />
+              <br />
+              <strong>Acesso válido apenas com emails corporativos</strong>
             </p>
           </div>
         </CardContent>

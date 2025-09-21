@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronDown, BarChart3, Users, TrendingUp, Settings, User, LogOut, MessageSquare, Bot, CreditCard, Brain, FileText, Shield } from "lucide-react";
 import {
   NavigationMenu,
@@ -173,9 +174,12 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                  <User className="w-4 h-4" />
-                  <span className="text-sm hidden sm:inline">{userEmail}</span>
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2 rounded-full">
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                      {userEmail.split('@')[0].slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                   <ChevronDown className="w-3 h-3" />
                 </Button>
               </DropdownMenuTrigger>
@@ -183,6 +187,11 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                 <DropdownMenuItem className="text-sm">
                   <User className="w-4 h-4 mr-2" />
                   {userEmail}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onSectionChange('profile')}>
+                  <User className="w-4 h-4 mr-2" />
+                  Gerenciar Perfil
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">

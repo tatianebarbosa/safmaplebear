@@ -9,6 +9,7 @@ import AIAssistant from "@/components/ai/AIAssistant";
 import UserManagement from "@/components/users/UserManagement";
 import VoucherManagement from "@/components/saf/VoucherManagement";
 import AIKnowledgeBase from "@/components/saf/AIKnowledgeBase";
+import ProfileManagement from "@/components/auth/ProfileManagement";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -31,6 +32,8 @@ const Index = () => {
         return <VoucherManagement />;
       case "knowledge":
         return <AIKnowledgeBase />;
+      case "profile":
+        return <ProfileManagement />;
       case "history":
         return <RankingDashboard />;
       case "settings":
