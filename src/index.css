@@ -2,41 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Maple Bear SAF Design System - Cores em HSL */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Maple Bear Brand Colors */
+    --maple-red: 349 76% 47%;
+    --maple-red-light: 349 76% 65%;
+    --maple-red-dark: 349 76% 35%;
+    --maple-gold: 45 93% 58%;
+    --maple-gold-light: 45 93% 75%;
+    
+    /* Base Colors */
+    --background: 220 13% 97%;
+    --foreground: 220 9% 13%;
+    
+    /* Surface Colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 220 9% 13%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --popover-foreground: 220 9% 13%;
+    
+    /* Brand Primary (Maple Red) */
+    --primary: var(--maple-red);
+    --primary-foreground: 0 0% 100%;
+    --primary-light: var(--maple-red-light);
+    --primary-dark: var(--maple-red-dark);
+    
+    /* Secondary (Maple Gold) */
+    --secondary: var(--maple-gold);
+    --secondary-foreground: 220 9% 13%;
+    --secondary-light: var(--maple-gold-light);
+    
+    /* Success States */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 76% 45%;
+    --success-bg: 142 76% 95%;
+    
+    /* Warning States */
+    --warning: 32 95% 44%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 32 95% 60%;
+    --warning-bg: 32 95% 95%;
+    
+    /* Error States */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-light: 0 84% 70%;
+    --destructive-bg: 0 84% 95%;
+    
+    /* Neutral Colors */
+    --muted: 220 13% 95%;
+    --muted-foreground: 220 9% 46%;
+    
+    --accent: 220 13% 95%;
+    --accent-foreground: 220 9% 13%;
+    
+    /* Border & Input */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: var(--maple-red);
+    
+    /* Gradients */
+    --gradient-maple: linear-gradient(135deg, hsl(var(--maple-red)), hsl(var(--maple-gold)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-light)));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    
+    /* Shadows */
+    --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red) / 0.3);
+    --shadow-card: 0 4px 12px hsl(220 9% 13% / 0.08);
+    --shadow-elevated: 0 8px 24px hsl(220 9% 13% / 0.12);
+    
+    /* Border Radius */
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,41 +96,51 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --background: 220 9% 9%;
+    --foreground: 220 13% 95%;
+    
+    --card: 220 9% 11%;
+    --card-foreground: 220 13% 95%;
+    
+    --popover: 220 9% 11%;
+    --popover-foreground: 220 13% 95%;
+    
+    --primary: var(--maple-red-light);
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: var(--maple-gold-light);
+    --secondary-foreground: 220 9% 9%;
+    
+    --success: 142 76% 45%;
+    --success-bg: 142 76% 15%;
+    
+    --warning: 32 95% 60%;
+    --warning-bg: 32 95% 15%;
+    
+    --destructive: 0 84% 70%;
+    --destructive-bg: 0 84% 15%;
+    
+    --muted: 220 9% 15%;
+    --muted-foreground: 220 9% 65%;
+    
+    --accent: 220 9% 15%;
+    --accent-foreground: 220 13% 95%;
+    
+    --border: 220 9% 20%;
+    --input: 220 9% 20%;
+    
+    --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red-light) / 0.4);
+    --shadow-card: 0 4px 12px hsl(0 0% 0% / 0.3);
+    --shadow-elevated: 0 8px 24px hsl(0 0% 0% / 0.4);
+    
+    --sidebar-background: 220 9% 8%;
+    --sidebar-foreground: 220 13% 95%;
+    --sidebar-primary: var(--maple-red-light);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 220 9% 12%;
+    --sidebar-accent-foreground: 220 13% 95%;
+    --sidebar-border: 220 9% 15%;
+    --sidebar-ring: var(--maple-red-light);
   }
 }
 
@@ -101,5 +151,93 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+}
+
+@layer components {
+  /* Status Components */
+  .status-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide;
+  }
+  
+  .status-active {
+    @apply bg-success-bg text-success border border-success/20;
+  }
+  
+  .status-inactive {
+    @apply bg-muted text-muted-foreground border border-border;
+  }
+  
+  .status-warning {
+    @apply bg-warning-bg text-warning border border-warning/20;
+  }
+  
+  /* Card Variants */
+  .card-maple {
+    @apply bg-card border border-border rounded-lg shadow-[var(--shadow-card)] transition-all duration-300;
+  }
+  
+  .card-elevated {
+    @apply shadow-[var(--shadow-elevated)] hover:shadow-[var(--shadow-maple)] hover:-translate-y-1;
+  }
+  
+  /* Button Variants */
+  .btn-maple {
+    @apply bg-primary text-primary-foreground hover:bg-primary-dark shadow-[var(--shadow-maple)] transition-all duration-200;
+  }
+  
+  .btn-maple-outline {
+    @apply border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground;
+  }
+  
+  /* Priority Indicators */
+  .priority-high {
+    @apply border-l-4 border-l-destructive bg-destructive-bg/50;
+  }
+  
+  .priority-medium {
+    @apply border-l-4 border-l-warning bg-warning-bg/50;
+  }
+  
+  .priority-low {
+    @apply border-l-4 border-l-success bg-success-bg/50;
+  }
+  
+  /* Animations */
+  .animate-maple-pulse {
+    animation: maple-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes maple-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.02);
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+  
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
