@@ -17,6 +17,7 @@ import { CanvaInsights } from './CanvaInsights';
 import { EnhancedSchoolManagement } from './EnhancedSchoolManagement';
 import { SchoolLicenseManagement } from './SchoolLicenseManagement';
 import { CanvaUsageDashboard } from './CanvaUsageDashboard';
+import { CostManagementDashboard } from './CostManagementDashboard';
 import { 
   CanvaUser, 
   CanvaAnalytics,
@@ -202,7 +203,7 @@ const CanvaDashboard = () => {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="management">Gerenciamento</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
@@ -211,6 +212,7 @@ const CanvaDashboard = () => {
           <TabsTrigger value="users">Usuários</TabsTrigger>
           <TabsTrigger value="rankings">Rankings</TabsTrigger>
           <TabsTrigger value="usage">Usos</TabsTrigger>
+          <TabsTrigger value="costs">Custos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -448,8 +450,18 @@ const CanvaDashboard = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="rankings" className="space-y-6">
-          {rankings && <CanvaRankings rankings={rankings} />}
+        <TabsContent value="usage" className="space-y-6">
+          <CanvaUsageDashboard 
+            onNavigateToUsers={() => {
+              const tabsTrigger = document.querySelector('[value="users"]') as HTMLElement;
+              tabsTrigger?.click();
+              toast.info('Navegando para a aba de usuários');
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="costs" className="space-y-6">
+          <CostManagementDashboard />
         </TabsContent>
       </Tabs>
     </div>
