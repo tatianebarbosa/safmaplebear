@@ -15,6 +15,8 @@ import { LicenseManagement } from './LicenseManagement';
 import { LicenseHistory } from './LicenseHistory';
 import { CanvaInsights } from './CanvaInsights';
 import { EnhancedSchoolManagement } from './EnhancedSchoolManagement';
+import { SchoolLicenseManagement } from './SchoolLicenseManagement';
+import { CanvaUsageDashboard } from './CanvaUsageDashboard';
 import { 
   CanvaUser, 
   CanvaAnalytics,
@@ -200,7 +202,7 @@ const CanvaDashboard = () => {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="management">Gerenciamento</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
@@ -208,6 +210,7 @@ const CanvaDashboard = () => {
           <TabsTrigger value="schools">Escolas</TabsTrigger>
           <TabsTrigger value="users">Usuários</TabsTrigger>
           <TabsTrigger value="rankings">Rankings</TabsTrigger>
+          <TabsTrigger value="usage">Usos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -335,11 +338,7 @@ const CanvaDashboard = () => {
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">
-          <EnhancedSchoolManagement 
-            schoolsData={schoolsData}
-            onSchoolSelect={handleSchoolClick}
-            onManageSchool={(school) => setSelectedSchoolForManagement(school)}
-          />
+          <SchoolLicenseManagement />
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
