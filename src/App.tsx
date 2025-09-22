@@ -13,7 +13,7 @@ import VoucherDashboard from "@/components/vouchers/VoucherDashboard";
 import Voucher2026Dashboard from "@/components/vouchers/Voucher2026Dashboard";
 import InsightsAnalytics from "@/components/insights/InsightsAnalytics";
 import MonitoringPortal from "@/components/monitoring/MonitoringPortal";
-import FloatingAIAssistant from "@/components/ai/AIAssistant";
+import FloatingAIChat from "@/components/ai/FloatingAIChat";
 
 const queryClient = new QueryClient();
 
@@ -84,7 +84,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <FloatingAIAssistant />
+        <FloatingAIChat />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

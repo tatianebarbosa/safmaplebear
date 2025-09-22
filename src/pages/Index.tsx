@@ -1,24 +1,22 @@
 import { useState } from "react";
 import Header from "@/components/layout/Header";
-import Dashboard from "@/components/dashboard/Dashboard";
-import RankingDashboard from "@/components/ranking/RankingDashboard";
+import SAFControlCenter from "@/components/saf/SAFControlCenter";
 import SchoolManagement from "@/components/schools/SchoolManagement";
-import SchoolsDashboard from "@/components/schools/SchoolsDashboard";
 import UserAnalytics from "@/components/analytics/UserAnalytics";
 import MonitoringPortal from "@/components/monitoring/MonitoringPortal";
-import AIAssistant from "@/components/ai/AIAssistant";
+import RealAIAssistant from "@/components/ai/RealAIAssistant";
 import UserManagement from "@/components/users/UserManagement";
 import VoucherManagement from "@/components/saf/VoucherManagement";
 import AIKnowledgeBase from "@/components/saf/AIKnowledgeBase";
 import ProfileManagement from "@/components/auth/ProfileManagement";
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState("saf-control");
 
   const renderContent = () => {
     switch (activeSection) {
-      case "dashboard":
-        return <SchoolsDashboard />;
+      case "saf-control":
+        return <SAFControlCenter />;
       case "management":
         return <SchoolManagement />;
       case "users":
@@ -28,24 +26,15 @@ const Index = () => {
       case "monitoring":
         return <MonitoringPortal />;
       case "ai":
-        return <AIAssistant />;
+        return <RealAIAssistant />;
       case "vouchers":
         return <VoucherManagement />;
       case "knowledge":
         return <AIKnowledgeBase />;
       case "profile":
         return <ProfileManagement />;
-      case "history":
-        return <RankingDashboard />;
-      case "settings":
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Configurações do Portal SAF</h1>
-            <p className="text-muted-foreground">Configurações avançadas e integração com sistemas externos em desenvolvimento...</p>
-          </div>
-        );
       default:
-        return <SchoolsDashboard />;
+        return <SAFControlCenter />;
     }
   };
 

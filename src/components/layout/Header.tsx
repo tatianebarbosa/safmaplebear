@@ -2,14 +2,22 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronDown, BarChart3, Users, TrendingUp, Settings, User, LogOut, MessageSquare, Bot, CreditCard, Brain, FileText, Shield, Calendar } from "lucide-react";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import { 
+  ChevronDown, 
+  BarChart3, 
+  Users, 
+  TrendingUp, 
+  User, 
+  LogOut, 
+  MessageSquare, 
+  Bot, 
+  CreditCard, 
+  Brain, 
+  Calendar,
+  Activity,
+  Home,
+  Menu
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,147 +51,126 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
     navigate("/login");
   };
   return (
-    <header className="bg-card border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-50">
-      <div className="container mx-auto px-6 py-4">
+    <header className="bg-card border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-40">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <img 
               src={logoMaplebear} 
               alt="Maple Bear SAF" 
-              className="w-12 h-12 rounded-full"
+              className="w-8 h-8 rounded-full"
             />
             <div>
-            <h1 className="text-xl font-bold text-foreground">Maple Bear SAF</h1>
-              <p className="text-sm text-muted-foreground">Maple Bear Management</p>
+              <h1 className="text-lg font-bold text-foreground">Maple Bear SAF</h1>
             </div>
           </div>
 
-          {/* Navigation */}
-          <div className="flex items-center space-x-6">
-            <NavigationMenu>
-              <NavigationMenuList>
-                {/* Portal SAF */}
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="gap-2 bg-transparent hover:bg-accent">
-                    <BarChart3 className="w-4 h-4" />
-                    Centro de Gestão
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="w-96 p-4">
-                      {/* Seção Principal */}
-                       <div className="space-y-2 mb-4">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                          Dashboards
-                        </div>
-                        <Button
-                          variant={activeSection === 'dashboard' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3"
-                          onClick={() => window.location.href = '/dashboard'}
-                        >
-                          <BarChart3 className="w-4 h-4" />
-                          Dashboard Principal
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start gap-3"
-                          onClick={() => window.location.href = '/dashboard/canva'}
-                        >
-                          <Users className="w-4 h-4" />
-                          Dashboard Canva
-                        </Button>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start gap-3"
-                            onClick={() => window.location.href = '/dashboard/vouchers'}
-                          >
-                            <CreditCard className="w-4 h-4" />
-                            Dashboard Vouchers
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start gap-3"
-                            onClick={() => window.location.href = '/dashboard/vouchers-2026'}
-                          >
-                            <Calendar className="w-4 h-4" />
-                            Vouchers 2026
-                          </Button>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start gap-3"
-                          onClick={() => window.location.href = '/insights'}
-                        >
-                          <TrendingUp className="w-4 h-4" />
-                          Insights e Análises
-                        </Button>
-                      </div>
+          {/* Compact Navigation */}
+          <div className="flex items-center space-x-2">
+            {/* Quick Actions */}
+            <div className="hidden md:flex items-center space-x-1">
+              <Button
+                variant={activeSection === 'saf-control' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onSectionChange('saf-control')}
+                className="gap-2"
+              >
+                <Home className="w-4 h-4" />
+                Início
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => window.location.href = '/dashboard/canva'}
+                className="gap-2"
+              >
+                <Users className="w-4 h-4" />
+                Canva
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => window.location.href = '/dashboard/vouchers'}
+                className="gap-2"
+              >
+                <CreditCard className="w-4 h-4" />
+                Vouchers
+              </Button>
+              
+              <Button
+                variant={activeSection === 'monitoring' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onSectionChange('monitoring')}
+                className="gap-2"
+              >
+                <MessageSquare className="w-4 h-4" />
+                Monitoria
+              </Button>
+            </div>
 
-                      {/* Seção de Ferramentas SAF */}
-                      <div className="border-t pt-4">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                          Ferramentas SAF
-                        </div>
-                        <Button
-                          variant={activeSection === 'monitoring' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3"
-                          onClick={() => onSectionChange('monitoring')}
-                        >
-                          <MessageSquare className="w-4 h-4" />
-                          Portal de Monitoria
-                        </Button>
-                        <Button
-                          variant={activeSection === 'ai' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3"
-                          onClick={() => onSectionChange('ai')}
-                        >
-                          <Bot className="w-4 h-4" />
-                          Assistente IA
-                        </Button>
-                        <Button
-                          variant={activeSection === 'knowledge' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3"
-                          onClick={() => onSectionChange('knowledge')}
-                        >
-                          <Brain className="w-4 h-4" />
-                          Base de Conhecimento
-                        </Button>
-                      </div>
-
-                      {/* Seção Licenças Canva */}
-                      <div className="border-t pt-4">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                          Licenças Canva
-                        </div>
-                        <div className="space-y-2">
-                          <Button
-                            variant={activeSection === 'management' ? 'default' : 'ghost'}
-                            className="w-full justify-start gap-3"
-                            onClick={() => onSectionChange('management')}
-                          >
-                            <Users className="w-4 h-4" />
-                            Gerenciamento de Escolas
-                          </Button>
-                          <Button
-                            variant={activeSection === 'users' ? 'default' : 'ghost'}
-                            className="w-full justify-start gap-3"
-                            onClick={() => onSectionChange('users')}
-                          >
-                            <User className="w-4 h-4" />
-                            Gerenciamento de Usuários
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+            {/* More Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Menu className="w-4 h-4" />
+                  <span className="hidden sm:inline">Mais</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Dashboards
+                  </div>
+                </div>
+                <DropdownMenuItem onClick={() => window.location.href = '/insights'}>
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Insights e Análises
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/dashboard/vouchers-2026'}>
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Vouchers 2026
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1.5">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Ferramentas SAF
+                  </div>
+                </div>
+                <DropdownMenuItem onClick={() => onSectionChange('ai')}>
+                  <Bot className="w-4 h-4 mr-2" />
+                  Assistente IA
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onSectionChange('knowledge')}>
+                  <Brain className="w-4 h-4 mr-2" />
+                  Base de Conhecimento
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1.5">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Gerenciamento
+                  </div>
+                </div>
+                <DropdownMenuItem onClick={() => onSectionChange('management')}>
+                  <Users className="w-4 h-4 mr-2" />
+                  Escolas
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onSectionChange('users')}>
+                  <User className="w-4 h-4 mr-2" />
+                  Usuários
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2 rounded-full">
-                  <Avatar className="w-8 h-8">
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <Avatar className="w-7 h-7">
                     <AvatarFallback className="text-xs bg-primary text-primary-foreground">
                       {userEmail.split('@')[0].slice(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -191,7 +178,7 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                   <ChevronDown className="w-3 h-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem className="text-sm">
                   <User className="w-4 h-4 mr-2" />
                   {userEmail}
@@ -199,7 +186,7 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => onSectionChange('profile')}>
                   <User className="w-4 h-4 mr-2" />
-                  Gerenciar Perfil
+                  Perfil
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
