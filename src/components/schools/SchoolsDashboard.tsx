@@ -277,125 +277,154 @@ const SchoolsDashboard = () => {
         />
       </div>
 
-      {/* Filtros */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="w-5 h-5" />
-            Filtros e Busca
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
-              <Label htmlFor="search-school">Buscar escola por nome</Label>
-              <Combobox
-                options={getSchoolOptions()}
-                value={selectedSchool}
-                onValueChange={(value) => {
-                  setSelectedSchool(value);
-                  setSearchTerm(""); // Limpar busca de texto quando selecionar escola
-                }}
-                placeholder="Selecione uma escola..."
-                searchPlaceholder="Digite o nome da escola..."
-                emptyMessage="Nenhuma escola encontrada."
-              />
-            </div>
-            <div className="flex-1">
-              <Label htmlFor="search-text">Ou buscar por texto</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="search-text"
-                  placeholder="Nome, ID ou código do voucher..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    if (e.target.value) setSelectedSchool(""); // Limpar seleção de escola
+      {/* Filtros e Busca */}
+      <div className="space-y-4">
+        {/* Seção de Busca */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Search className="w-5 h-5" />
+              Busca
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Buscar escola por nome
+                </Label>
+                <Combobox
+                  options={getSchoolOptions()}
+                  value={selectedSchool}
+                  onValueChange={(value) => {
+                    setSelectedSchool(value);
+                    setSearchTerm(""); // Limpar busca de texto quando selecionar escola
                   }}
+                  placeholder="Selecione uma escola..."
+                  searchPlaceholder="Digite o nome da escola..."
+                  emptyMessage="Nenhuma escola encontrada."
+                  className="h-10"
                 />
-                <Button onClick={handleVoucherSearch} size="icon">
-                  <Search className="w-4 h-4" />
-                </Button>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Ou buscar por texto
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Nome, ID ou código do voucher..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      if (e.target.value) setSelectedSchool(""); // Limpar seleção de escola
+                    }}
+                    className="h-10"
+                  />
+                  <Button onClick={handleVoucherSearch} size="icon" className="h-10 w-10 shrink-0">
+                    <Search className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div>
-              <Label htmlFor="consultant">Consultor SAF</Label>
-              <Select value={selectedSafConsultant} onValueChange={setSelectedSafConsultant}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos os consultores" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os consultores</SelectItem>
-                  {getSafConsultants().map((consultant) => (
-                    <SelectItem key={consultant} value={consultant}>{consultant}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        {/* Seção de Filtros */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Filter className="w-5 h-5" />
+              Filtros
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Consultor SAF
+                </Label>
+                <Select value={selectedSafConsultant} onValueChange={setSelectedSafConsultant}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Todos os consultores" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-md">
+                    <SelectItem value="all">Todos os consultores</SelectItem>
+                    {getSafConsultants().map((consultant) => (
+                      <SelectItem key={consultant} value={consultant}>{consultant}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label htmlFor="cluster">Cluster</Label>
-              <Select value={selectedCluster} onValueChange={setSelectedCluster}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos os clusters" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os clusters</SelectItem>
-                  {getClusters().map((cluster) => (
-                    <SelectItem key={cluster} value={cluster}>{cluster}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Cluster
+                </Label>
+                <Select value={selectedCluster} onValueChange={setSelectedCluster}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Todos os clusters" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-md">
+                    <SelectItem value="all">Todos os clusters</SelectItem>
+                    {getClusters().map((cluster) => (
+                      <SelectItem key={cluster} value={cluster}>{cluster}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label htmlFor="status">Status</Label>
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos os status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os status</SelectItem>
-                  {getStatuses().map((status) => (
-                    <SelectItem key={status} value={status}>{status}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Status
+                </Label>
+                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Todos os status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-md">
+                    <SelectItem value="all">Todos os status</SelectItem>
+                    {getStatuses().map((status) => (
+                      <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label htmlFor="eligible">Elegível para Voucher</Label>
-              <Select value={voucherEligible} onValueChange={setVoucherEligible}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="true">Elegíveis</SelectItem>
-                  <SelectItem value="false">Não Elegíveis</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Elegível para Voucher
+                </Label>
+                <Select value={voucherEligible} onValueChange={setVoucherEligible}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-md">
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="true">Elegíveis</SelectItem>
+                    <SelectItem value="false">Não Elegíveis</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label htmlFor="sent">Voucher Enviado</Label>
-              <Select value={voucherSent} onValueChange={setVoucherSent}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="true">Enviados</SelectItem>
-                  <SelectItem value="false">Não Enviados</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Voucher Enviado
+                </Label>
+                <Select value={voucherSent} onValueChange={setVoucherSent}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border shadow-md">
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="true">Enviados</SelectItem>
+                    <SelectItem value="false">Não Enviados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Lista de Escolas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
