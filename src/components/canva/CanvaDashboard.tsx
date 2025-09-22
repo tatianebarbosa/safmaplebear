@@ -14,6 +14,7 @@ import { CanvaRankings } from './CanvaRankings';
 import { LicenseManagement } from './LicenseManagement';
 import { LicenseHistory } from './LicenseHistory';
 import { CanvaInsights } from './CanvaInsights';
+import { EnhancedSchoolManagement } from './EnhancedSchoolManagement';
 import { 
   CanvaUser, 
   CanvaAnalytics,
@@ -39,6 +40,7 @@ const CanvaDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSchool, setSelectedSchool] = useState<string>('all');
   const [complianceFilter, setComplianceFilter] = useState<'all' | 'compliant' | 'non_compliant'>('all');
+  const [selectedSchoolForManagement, setSelectedSchoolForManagement] = useState<SchoolCanvaData | null>(null);
 
   const loadData = async () => {
     try {
@@ -161,9 +163,9 @@ const CanvaDashboard = () => {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="Total de Usuários"
-          value={analytics.totalUsers.toString()}
-          description={`${getPeriodLabel(selectedPeriod)}`}
+          title="Usuários Ativos Canva"
+          value="820"
+          description={`${analytics.totalUsers} carregados • ${getPeriodLabel(selectedPeriod)}`}
           icon={<Users className="h-4 w-4" />}
         />
         <StatsCard
@@ -252,31 +254,73 @@ const CanvaDashboard = () => {
         </TabsContent>
 
         <TabsContent value="management" className="space-y-6">
-          <LicenseManagement 
-            schoolsData={schoolsData}
-            onUpdateLicenses={(schoolId, action, userId, justification, targetSchoolId) => {
-              // Save action to history
-              const actionRecord = {
-                id: Date.now().toString(),
-                schoolId,
-                schoolName: schoolsData.find(s => s.schoolId === schoolId)?.schoolName || 'Desconhecida',
-                action,
-                userId,
-                userName: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.name : undefined,
-                userEmail: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.email : undefined,
-                targetSchoolId,
-                targetSchoolName: targetSchoolId ? schoolsData.find(s => s.schoolId === targetSchoolId)?.schoolName : undefined,
-                justification: justification || '',
-                timestamp: new Date().toISOString(),
-                performedBy: 'Administrador' // Would be actual user in real app
-              };
-              
-              saveLicenseAction(actionRecord);
-              
-              // Reload data to reflect changes
-              loadData();
-            }}
-          />
+          {selectedSchoolForManagement ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">
+                  Gerenciar: {selectedSchoolForManagement.schoolName}
+                </h3>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedSchoolForManagement(null)}
+                >
+                  Voltar para Lista
+                </Button>
+              </div>
+              <LicenseManagement 
+                schoolsData={[selectedSchoolForManagement]}
+                onUpdateLicenses={(schoolId, action, userId, justification, targetSchoolId) => {
+                  // Save action to history
+                  const actionRecord = {
+                    id: Date.now().toString(),
+                    schoolId,
+                    schoolName: schoolsData.find(s => s.schoolId === schoolId)?.schoolName || 'Desconhecida',
+                    action,
+                    userId,
+                    userName: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.name : undefined,
+                    userEmail: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.email : undefined,
+                    targetSchoolId,
+                    targetSchoolName: targetSchoolId ? schoolsData.find(s => s.schoolId === targetSchoolId)?.schoolName : undefined,
+                    justification: justification || '',
+                    timestamp: new Date().toISOString(),
+                    performedBy: 'Administrador' // Would be actual user in real app
+                  };
+                  
+                  saveLicenseAction(actionRecord);
+                  
+                  // Reload data to reflect changes
+                  loadData();
+                  setSelectedSchoolForManagement(null);
+                }}
+              />
+            </div>
+          ) : (
+            <LicenseManagement 
+              schoolsData={schoolsData}
+              onUpdateLicenses={(schoolId, action, userId, justification, targetSchoolId) => {
+                // Save action to history
+                const actionRecord = {
+                  id: Date.now().toString(),
+                  schoolId,
+                  schoolName: schoolsData.find(s => s.schoolId === schoolId)?.schoolName || 'Desconhecida',
+                  action,
+                  userId,
+                  userName: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.name : undefined,
+                  userEmail: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.email : undefined,
+                  targetSchoolId,
+                  targetSchoolName: targetSchoolId ? schoolsData.find(s => s.schoolId === targetSchoolId)?.schoolName : undefined,
+                  justification: justification || '',
+                  timestamp: new Date().toISOString(),
+                  performedBy: 'Administrador' // Would be actual user in real app
+                };
+                
+                saveLicenseAction(actionRecord);
+                
+                // Reload data to reflect changes
+                loadData();
+              }}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="insights" className="space-y-6">
@@ -291,9 +335,10 @@ const CanvaDashboard = () => {
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">
-          <SchoolLicenseOverview 
-            schoolsData={schoolsData} 
-            onSchoolClick={handleSchoolClick}
+          <EnhancedSchoolManagement 
+            schoolsData={schoolsData}
+            onSchoolSelect={handleSchoolClick}
+            onManageSchool={(school) => setSelectedSchoolForManagement(school)}
           />
         </TabsContent>
 

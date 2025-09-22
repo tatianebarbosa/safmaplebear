@@ -18,6 +18,7 @@ export interface CanvaUser {
 export interface SchoolCanvaData {
   schoolId: string;
   schoolName: string;
+  cluster?: string;
   maxLicenses: number;
   usedLicenses: number;
   availableLicenses: number;
@@ -31,6 +32,8 @@ export interface SchoolCanvaData {
   };
   performance: 'high' | 'medium' | 'low';
   utilizationRate: number;
+  hasLicenseIssues: boolean;
+  licenseStatus: 'normal' | 'over_limit' | 'needs_attention';
 }
 
 export interface CanvaAnalytics {
@@ -139,9 +142,9 @@ const parseCanvaReportCSV = (csvContent: string, period: '30d' | '3m' | '6m' | '
   return users;
 };
 
-const parseUsersCSV = (csvContent: string): { [email: string]: { school: string; schoolId: string } } => {
+const parseUsersCSV = (csvContent: string): { [email: string]: { school: string; schoolId: string; cluster?: string } } => {
   const lines = csvContent.split('\n');
-  const userSchoolMap: { [email: string]: { school: string; schoolId: string } } = {};
+  const userSchoolMap: { [email: string]: { school: string; schoolId: string; cluster?: string } } = {};
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -154,12 +157,35 @@ const parseUsersCSV = (csvContent: string): { [email: string]: { school: string;
     const school = columns[3]?.trim();
     const schoolId = columns[4]?.trim();
 
-    if (email && school) {
-      userSchoolMap[email] = { school, schoolId: schoolId || 'unknown' };
+    if (email && email.includes('@')) { // Ensure valid email
+      const cluster = extractClusterFromSchool(school);
+      userSchoolMap[email] = { 
+        school: school || 'A definir escola em breve', 
+        schoolId: schoolId || 'unknown',
+        cluster
+      };
     }
   }
 
   return userSchoolMap;
+};
+
+const extractClusterFromSchool = (schoolName: string): string => {
+  if (!schoolName) return 'Indefinido';
+  
+  // Extract cluster from school name patterns
+  if (schoolName.includes('São Paulo') || schoolName.includes('SP')) return 'São Paulo';
+  if (schoolName.includes('Rio de Janeiro') || schoolName.includes('RJ')) return 'Rio de Janeiro';
+  if (schoolName.includes('Belo Horizonte') || schoolName.includes('BH')) return 'Minas Gerais';
+  if (schoolName.includes('Salvador') || schoolName.includes('Bahia')) return 'Bahia';
+  if (schoolName.includes('Recife') || schoolName.includes('Caruaru')) return 'Pernambuco';
+  if (schoolName.includes('Brasília') || schoolName.includes('DF')) return 'Distrito Federal';
+  if (schoolName.includes('Porto Alegre') || schoolName.includes('RS')) return 'Rio Grande do Sul';
+  if (schoolName.includes('Curitiba') || schoolName.includes('PR')) return 'Paraná';
+  if (schoolName.includes('Fortaleza') || schoolName.includes('CE')) return 'Ceará';
+  if (schoolName.includes('Goiânia') || schoolName.includes('GO')) return 'Goiás';
+  
+  return 'Outros Estados';
 };
 
 export const loadCanvaData = async (period: '30d' | '3m' | '6m' | '12m' = '30d'): Promise<CanvaUser[]> => {
@@ -182,6 +208,7 @@ export const loadCanvaData = async (period: '30d' | '3m' | '6m' | '12m' = '30d')
       schoolId: usersMapping[user.email]?.schoolId || 'unknown'
     }));
 
+    console.log(`Loaded ${enrichedUsers.length} Canva users for period ${period}`);
     return enrichedUsers;
   } catch (error) {
     console.error('Error loading Canva data:', error);
@@ -205,6 +232,7 @@ export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] =
 
   schoolMap.forEach((schoolUsers, schoolId) => {
     const schoolName = schoolUsers[0]?.school || 'Escola não definida';
+    const cluster = extractClusterFromSchool(schoolName);
     const nonCompliantUsers = schoolUsers.filter(u => !u.isCompliant);
     
     const totalActivity = schoolUsers.reduce((acc, user) => ({
@@ -221,9 +249,15 @@ export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] =
     if (avgActivity > 100) performance = 'high';
     else if (avgActivity > 50) performance = 'medium';
 
+    const hasLicenseIssues = schoolUsers.length > 2 || nonCompliantUsers.length > 0;
+    const licenseStatus: 'normal' | 'over_limit' | 'needs_attention' = 
+      schoolUsers.length > 2 ? 'over_limit' : 
+      nonCompliantUsers.length > 0 ? 'needs_attention' : 'normal';
+
     schoolsData.push({
       schoolId,
       schoolName,
+      cluster,
       maxLicenses: 2,
       usedLicenses: schoolUsers.length,
       availableLicenses: Math.max(0, 2 - schoolUsers.length),
@@ -231,7 +265,9 @@ export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] =
       nonCompliantUsers,
       totalActivity,
       performance,
-      utilizationRate
+      utilizationRate,
+      hasLicenseIssues,
+      licenseStatus
     });
   });
 
