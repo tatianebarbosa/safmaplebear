@@ -29,7 +29,7 @@ interface TicketDialogProps {
 }
 
 const agentes: Agente[] = ['Tati', 'Rafha', 'Ingrid', 'João', 'Jaque', 'Jessika', 'Fernanda'];
-const watcherOptions = [...agentes, 'Coordinator', 'Admin'];
+const watcherOptions: (Agente | 'Coordinator' | 'Admin')[] = [...agentes, 'Coordinator', 'Admin'];
 const statusOptions: TicketStatus[] = ['Pendente', 'Em andamento', 'Resolvido'];
 
 export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) => {
@@ -94,11 +94,11 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
     });
   };
 
-  const handleWatcherToggle = (watcher: string, checked: boolean) => {
+  const handleWatcherToggle = (watcher: Agente | 'Coordinator' | 'Admin', checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       watchers: checked 
-        ? [...prev.watchers, watcher as Agente | 'Coordinator' | 'Admin']
+        ? [...prev.watchers, watcher]
         : prev.watchers.filter(w => w !== watcher)
     }));
   };
@@ -217,7 +217,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
                   <Checkbox
                     id={`watcher-${watcher}`}
                     checked={formData.watchers.includes(watcher)}
-                    onCheckedChange={(checked) => handleWatcherToggle(watcher as Agente | 'Coordinator' | 'Admin', checked as boolean)}
+                    onCheckedChange={(checked) => handleWatcherToggle(watcher, checked as boolean)}
                   />
                   <Label htmlFor={`watcher-${watcher}`} className="text-sm">
                     {watcher}
