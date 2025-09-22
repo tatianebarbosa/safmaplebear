@@ -1,13 +1,23 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { School, Justification, SchoolUser, CanvaUsageData } from '@/types/schoolLicense';
+import { 
+  processSchoolsWithUsers, 
+  generateCanvaOverview,
+  isEmailCompliant 
+} from '@/lib/officialDataProcessor';
+import { ProcessedSchoolData, CanvaOverviewData } from '@/types/officialData';
 
 interface SchoolLicenseState {
   schools: School[];
   justifications: Justification[];
   usageData: CanvaUsageData[];
+  officialData: ProcessedSchoolData[];
+  overviewData: CanvaOverviewData | null;
+  loading: boolean;
   
   // Actions
+  loadOfficialData: () => Promise<void>;
   setSchools: (schools: School[]) => void;
   addSchool: (school: Omit<School, 'id'>) => void;
   updateSchool: (id: string, updates: Partial<School>) => void;
@@ -30,80 +40,8 @@ interface SchoolLicenseState {
   getDomainCounts: () => Array<{ domain: string; count: number }>;
 }
 
-// Seed data
-const seedSchools: School[] = [
-  {
-    id: '1',
-    name: 'A definir escola em breve',
-    status: 'Implantando',
-    cluster: 'Outros/Implantação',
-    totalLicenses: 2,
-    usedLicenses: 0,
-    users: [],
-    hasRecentJustifications: false,
-  },
-  {
-    id: '2',
-    name: 'Maple Bear Centro',
-    status: 'Ativa',
-    city: 'São Paulo',
-    cluster: 'Alta Performance',
-    totalLicenses: 10,
-    usedLicenses: 10,
-    users: [
-      {
-        id: '1',
-        name: 'João Silva',
-        email: 'joao.silva@maplebear.com.br',
-        role: 'Professor',
-        isCompliant: true,
-        createdAt: new Date().toISOString(),
-      },
-      // Add more users to reach 10
-    ],
-    hasRecentJustifications: false,
-  },
-  {
-    id: '3',
-    name: 'Maple Bear Vila Nova',
-    status: 'Ativa',
-    city: 'Rio de Janeiro',
-    cluster: 'Potente',
-    totalLicenses: 8,
-    usedLicenses: 12,
-    users: [
-      {
-        id: '2',
-        name: 'Maria Santos',
-        email: 'maria@gmail.com',
-        role: 'Estudante',
-        isCompliant: false,
-        createdAt: new Date().toISOString(),
-      },
-      // Add more users to simulate excess
-    ],
-    hasRecentJustifications: true,
-  },
-];
-
-// Complete seed users for the schools
-seedSchools[1].users = Array.from({ length: 10 }, (_, i) => ({
-  id: `user-${i + 1}`,
-  name: `Usuario ${i + 1}`,
-  email: `usuario${i + 1}@maplebear.com.br`,
-  role: i < 3 ? 'Professor' : 'Estudante',
-  isCompliant: true,
-  createdAt: new Date().toISOString(),
-}));
-
-seedSchools[2].users = Array.from({ length: 12 }, (_, i) => ({
-  id: `user-${i + 20}`,
-  name: `Usuario ${i + 20}`,
-  email: i < 6 ? `usuario${i + 20}@gmail.com` : `usuario${i + 20}@maplebear.com.br`,
-  role: i < 4 ? 'Professor' : 'Estudante',
-  isCompliant: i >= 6,
-  createdAt: new Date().toISOString(),
-}));
+// Dados iniciais vazios - serão carregados dos dados oficiais
+const seedSchools: School[] = [];
 
 export const useSchoolLicenseStore = create<SchoolLicenseState>()(
   persist(
@@ -111,6 +49,49 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       schools: seedSchools,
       justifications: [],
       usageData: [],
+      officialData: [],
+      overviewData: null,
+      loading: false,
+
+      loadOfficialData: async () => {
+        set({ loading: true });
+        try {
+          const [processedData, overview] = await Promise.all([
+            processSchoolsWithUsers(),
+            generateCanvaOverview()
+          ]);
+          
+          // Converter dados oficiais para formato do sistema
+          const convertedSchools: School[] = processedData.map(data => ({
+            id: data.school.id,
+            name: data.school.name,
+            status: data.school.status,
+            city: data.school.city,
+            cluster: data.school.cluster as any,
+            totalLicenses: data.estimatedLicenses,
+            usedLicenses: data.totalUsers,
+            users: data.users.map(user => ({
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role as any,
+              isCompliant: user.isCompliant,
+              createdAt: new Date().toISOString(),
+            })),
+            hasRecentJustifications: false,
+          }));
+          
+          set({ 
+            officialData: processedData,
+            overviewData: overview,
+            schools: convertedSchools,
+            loading: false
+          });
+        } catch (error) {
+          console.error('Erro ao carregar dados oficiais:', error);
+          set({ loading: false });
+        }
+      },
 
       setSchools: (schools) => set({ schools }),
 
@@ -234,7 +215,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       setUsageData: (data) => set({ usageData: data }),
 
       isEmailValid: (email) => {
-        return email.toLowerCase().includes('maplebear');
+        return isEmailCompliant(email);
       },
 
       getLicenseStatus: (school) => {
@@ -244,28 +225,13 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       },
 
       getNonMapleBearCount: () => {
-        const { schools, isEmailValid } = get();
-        return schools.reduce((count, school) => 
-          count + school.users.filter(user => !isEmailValid(user.email)).length, 0
-        );
+        const { overviewData } = get();
+        return overviewData?.nonMapleBearDomains || 0;
       },
 
       getDomainCounts: () => {
-        const { schools } = get();
-        const domainCounts: { [key: string]: number } = {};
-        
-        schools.forEach(school => {
-          school.users.forEach(user => {
-            const domain = user.email.split('@')[1]?.toLowerCase();
-            if (domain && !domain.includes('maplebear')) {
-              domainCounts[domain] = (domainCounts[domain] || 0) + 1;
-            }
-          });
-        });
-        
-        return Object.entries(domainCounts)
-          .map(([domain, count]) => ({ domain, count }))
-          .sort((a, b) => b.count - a.count);
+        const { overviewData } = get();
+        return overviewData?.topNonCompliantDomains || [];
       },
     }),
     {

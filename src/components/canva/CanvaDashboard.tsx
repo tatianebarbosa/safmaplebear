@@ -1,111 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Download, FileText, Search, Filter, TrendingUp, Users, AlertTriangle, Building2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  Users, 
+  TrendingUp, 
+  AlertTriangle, 
+  Building2,
+  Download,
+  Home
+} from 'lucide-react';
 import { toast } from 'sonner';
 import StatsCard from '@/components/dashboard/StatsCard';
-import { ComplianceAlert } from './ComplianceAlert';
-import { SchoolLicenseOverview } from './SchoolLicenseOverview';
-import { CanvaRankings } from './CanvaRankings';
-import { LicenseManagement } from './LicenseManagement';
-import { LicenseHistory } from './LicenseHistory';
-import { CanvaInsights } from './CanvaInsights';
-import { EnhancedSchoolManagement } from './EnhancedSchoolManagement';
 import { SchoolLicenseManagement } from './SchoolLicenseManagement';
 import { CanvaUsageDashboard } from './CanvaUsageDashboard';
 import { CostManagementDashboard } from './CostManagementDashboard';
-import { 
-  CanvaUser, 
-  CanvaAnalytics,
-  SchoolCanvaData,
-  loadCanvaData, 
-  generateCanvaAnalytics,
-  generateSchoolCanvaData,
-  generateUserRankings,
-  filterCanvaUsers,
-  exportCanvaData,
-  saveLicenseAction,
-  getLicenseHistory
-} from '@/lib/canvaDataProcessor';
+import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 
 const CanvaDashboard = () => {
-  const [users, setUsers] = useState<CanvaUser[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<CanvaUser[]>([]);
-  const [analytics, setAnalytics] = useState<CanvaAnalytics | null>(null);
-  const [schoolsData, setSchoolsData] = useState<SchoolCanvaData[]>([]);
-  const [rankings, setRankings] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { 
+    overviewData, 
+    officialData, 
+    loading,
+    loadOfficialData,
+    getDomainCounts
+  } = useSchoolLicenseStore();
+  
   const [selectedPeriod, setSelectedPeriod] = useState<'30d' | '3m' | '6m' | '12m'>('30d');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSchool, setSelectedSchool] = useState<string>('all');
-  const [complianceFilter, setComplianceFilter] = useState<'all' | 'compliant' | 'non_compliant'>('all');
-  const [selectedSchoolForManagement, setSelectedSchoolForManagement] = useState<SchoolCanvaData | null>(null);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const data = await loadCanvaData(selectedPeriod);
-      const analyticsData = generateCanvaAnalytics(data);
-      const schoolsCanvaData = generateSchoolCanvaData(data);
-      const rankingsData = generateUserRankings(data);
-      
-      setUsers(data);
-      setFilteredUsers(data);
-      setAnalytics(analyticsData);
-      setSchoolsData(schoolsCanvaData);
-      setRankings(rankingsData);
-    } catch (error) {
-      toast.error('Erro ao carregar dados do Canva');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    loadData();
-  }, [selectedPeriod]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [searchTerm, selectedSchool, complianceFilter, users]);
-
-  const applyFilters = () => {
-    const filtered = filterCanvaUsers(users, {
-      search: searchTerm,
-      school: selectedSchool,
-      compliance: complianceFilter
-    });
-    setFilteredUsers(filtered);
-  };
+    loadOfficialData();
+  }, [loadOfficialData]);
 
   const handleExportData = () => {
-    const csvData = exportCanvaData(filteredUsers);
-    const blob = new Blob([csvData], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `canva-usuarios-${selectedPeriod}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    if (!overviewData) return;
+    
+    const csvData = [
+      ['Métrica', 'Valor'],
+      ['Total de Usuários', overviewData.totalUsers.toString()],
+      ['Usuários Conformes', overviewData.compliantUsers.toString()],
+      ['Usuários Não Conformes', overviewData.nonCompliantUsers.toString()],
+      ['Taxa de Conformidade', `${overviewData.complianceRate.toFixed(1)}%`],
+      ['Total de Escolas', overviewData.totalSchools.toString()],
+      ['Escolas com Usuários', overviewData.schoolsWithUsers.toString()],
+    ].map(row => row.join(';')).join('\n');
+    
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `canva-overview-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
     toast.success('Dados exportados com sucesso');
-  };
-
-  const handleViewNonCompliantDetails = () => {
-    setComplianceFilter('non_compliant');
-    toast.info('Filtro aplicado: exibindo apenas usuários fora da política');
-  };
-
-  const handleSchoolClick = (school: SchoolCanvaData) => {
-    setSelectedSchool(school.schoolName);
-    toast.info(`Filtro aplicado para escola: ${school.schoolName}`);
-  };
-
-  const getSchools = () => {
-    return Array.from(new Set(users.map(u => u.school).filter(Boolean))).sort();
   };
 
   const getPeriodLabel = (period: string) => {
@@ -126,10 +74,13 @@ const CanvaDashboard = () => {
     );
   }
 
-  if (!analytics) {
+  if (!overviewData) {
     return (
       <div className="text-center py-8">
         <p className="text-muted-foreground">Erro ao carregar dados do Canva.</p>
+        <Button onClick={loadOfficialData} className="mt-4">
+          Tentar Novamente
+        </Button>
       </div>
     );
   }
@@ -139,9 +90,20 @@ const CanvaDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.location.href = '/dashboard'}
+              className="gap-2"
+            >
+              <Home className="h-4 w-4" />
+              Voltar ao Início
+            </Button>
+          </div>
           <h1 className="text-3xl font-bold tracking-tight">Gestão Canva</h1>
           <p className="text-muted-foreground">
-            Controle de licenças, compliance e analytics do Canva
+            Dados oficiais sincronizados • {overviewData.totalUsers} usuários ativos
           </p>
         </div>
         <div className="flex gap-2">
@@ -164,93 +126,127 @@ const CanvaDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <StatsCard
-          title="Usuários Ativos Canva"
-          value="820"
-          description={`${analytics.totalUsers} carregados • ${getPeriodLabel(selectedPeriod)}`}
+          title="Total de Usuários"
+          value={overviewData.totalUsers.toString()}
+          description={`${overviewData.schoolsWithUsers} escolas ativas`}
           icon={<Users className="h-4 w-4" />}
         />
         <StatsCard
           title="Usuários Conformes"
-          value={analytics.compliantUsers.toString()}
-          description={`${analytics.complianceRate.toFixed(1)}% de conformidade`}
+          value={overviewData.compliantUsers.toString()}
+          description={`${overviewData.complianceRate.toFixed(1)}% de conformidade`}
           icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatsCard
           title="Fora da Política"
-          value={analytics.nonCompliantUsers.toString()}
+          value={overviewData.nonCompliantUsers.toString()}
           description="Usuários com domínio não autorizado"
           icon={<AlertTriangle className="h-4 w-4" />}
-          variant={analytics.nonCompliantUsers > 0 ? "destructive" : "default"}
+          variant={overviewData.nonCompliantUsers > 0 ? "destructive" : "default"}
         />
         <StatsCard
           title="Escolas Ativas"
-          value={analytics.totalSchools.toString()}
-          description={`${analytics.schoolsAtCapacity} em capacidade máxima`}
+          value={overviewData.totalSchools.toString()}
+          description={`${overviewData.schoolsAtCapacity} em capacidade máxima`}
           icon={<Building2 className="h-4 w-4" />}
+        />
+        <StatsCard
+          title="Domínios Não Maple Bear"
+          value={overviewData.nonMapleBearDomains.toString()}
+          description={`${getDomainCounts().length} domínios diferentes`}
+          icon={<AlertTriangle className="h-4 w-4" />}
+          variant={overviewData.nonMapleBearDomains > 0 ? "destructive" : "default"}
         />
       </div>
 
       {/* Compliance Alert */}
-      {analytics.nonCompliantUsers > 0 && (
-        <ComplianceAlert
-          nonCompliantUsers={users.filter(u => !u.isCompliant)}
-          totalUsers={analytics.totalUsers}
-          onViewDetails={handleViewNonCompliantDetails}
-        />
+      {overviewData.nonCompliantUsers > 0 && (
+        <Card className="border-destructive/20 bg-destructive/5">
+          <CardHeader>
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+              <div className="space-y-1">
+                <CardTitle className="text-destructive">
+                  Alerta de Conformidade - Alto Risco
+                </CardTitle>
+                <CardDescription>
+                  {overviewData.nonCompliantUsers} usuários com domínios não autorizados identificados
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {overviewData.topNonCompliantDomains.slice(0, 5).map(({ domain, count }) => (
+                  <span key={domain} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-destructive text-destructive-foreground">
+                    {domain} ({count})
+                  </span>
+                ))}
+                {overviewData.topNonCompliantDomains.length > 5 && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-muted text-muted-foreground">
+                    +{overviewData.topNonCompliantDomains.length - 5} domínios
+                  </span>
+                )}
+              </div>
+              <Button 
+                variant="destructive" 
+                size="sm"
+                onClick={() => toast.info('Navegando para usuários não conformes')}
+              >
+                Ver Detalhes dos Usuários Não Conformes
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-9">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="management">Gerenciamento</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
-          <TabsTrigger value="history">Histórico</TabsTrigger>
           <TabsTrigger value="schools">Escolas</TabsTrigger>
-          <TabsTrigger value="users">Usuários</TabsTrigger>
-          <TabsTrigger value="rankings">Rankings</TabsTrigger>
           <TabsTrigger value="usage">Usos</TabsTrigger>
           <TabsTrigger value="costs">Custos</TabsTrigger>
+          <TabsTrigger value="advanced">Avançado</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <SchoolLicenseOverview 
-              schoolsData={schoolsData.slice(0, 10)} 
-              onSchoolClick={handleSchoolClick}
-            />
+          <div className="grid gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Atividade Total</CardTitle>
-                <CardDescription>Resumo da atividade no período selecionado</CardDescription>
+                <CardTitle>Resumo da Gestão Canva</CardTitle>
+                <CardDescription>
+                  Dados sincronizados das planilhas oficiais • {overviewData.totalUsers} usuários ativos
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <div className="text-2xl font-bold text-primary">
-                      {analytics.totalActivity.designsCreated.toLocaleString()}
+                      {overviewData.totalSchools}
                     </div>
-                    <div className="text-sm text-muted-foreground">Designs Criados</div>
+                    <div className="text-sm text-muted-foreground">Escolas Total</div>
                   </div>
                   <div className="space-y-2">
                     <div className="text-2xl font-bold text-primary">
-                      {analytics.totalActivity.designsPublished.toLocaleString()}
+                      {overviewData.schoolsWithUsers}
                     </div>
-                    <div className="text-sm text-muted-foreground">Designs Publicados</div>
+                    <div className="text-sm text-muted-foreground">Com Usuários</div>
                   </div>
                   <div className="space-y-2">
-                    <div className="text-2xl font-bold text-primary">
-                      {analytics.totalActivity.sharedLinks.toLocaleString()}
+                    <div className="text-2xl font-bold text-green-600">
+                      {overviewData.compliantUsers}
                     </div>
-                    <div className="text-sm text-muted-foreground">Links Compartilhados</div>
+                    <div className="text-sm text-muted-foreground">Conformes</div>
                   </div>
                   <div className="space-y-2">
-                    <div className="text-2xl font-bold text-primary">
-                      {analytics.totalActivity.designsViewed.toLocaleString()}
+                    <div className="text-2xl font-bold text-red-600">
+                      {overviewData.nonCompliantUsers}
                     </div>
-                    <div className="text-sm text-muted-foreground">Visualizações</div>
+                    <div className="text-sm text-muted-foreground">Fora da Política</div>
                   </div>
                 </div>
               </CardContent>
@@ -258,210 +254,80 @@ const CanvaDashboard = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="management" className="space-y-6">
-          {selectedSchoolForManagement ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                  Gerenciar: {selectedSchoolForManagement.schoolName}
-                </h3>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setSelectedSchoolForManagement(null)}
-                >
-                  Voltar para Lista
-                </Button>
-              </div>
-              <LicenseManagement 
-                schoolsData={[selectedSchoolForManagement]}
-                onUpdateLicenses={(schoolId, action, userId, justification, targetSchoolId) => {
-                  // Save action to history
-                  const actionRecord = {
-                    id: Date.now().toString(),
-                    schoolId,
-                    schoolName: schoolsData.find(s => s.schoolId === schoolId)?.schoolName || 'Desconhecida',
-                    action,
-                    userId,
-                    userName: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.name : undefined,
-                    userEmail: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.email : undefined,
-                    targetSchoolId,
-                    targetSchoolName: targetSchoolId ? schoolsData.find(s => s.schoolId === targetSchoolId)?.schoolName : undefined,
-                    justification: justification || '',
-                    timestamp: new Date().toISOString(),
-                    performedBy: 'Administrador' // Would be actual user in real app
-                  };
-                  
-                  saveLicenseAction(actionRecord);
-                  
-                  // Reload data to reflect changes
-                  loadData();
-                  setSelectedSchoolForManagement(null);
-                }}
-              />
-            </div>
-          ) : (
-            <LicenseManagement 
-              schoolsData={schoolsData}
-              onUpdateLicenses={(schoolId, action, userId, justification, targetSchoolId) => {
-                // Save action to history
-                const actionRecord = {
-                  id: Date.now().toString(),
-                  schoolId,
-                  schoolName: schoolsData.find(s => s.schoolId === schoolId)?.schoolName || 'Desconhecida',
-                  action,
-                  userId,
-                  userName: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.name : undefined,
-                  userEmail: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.email : undefined,
-                  targetSchoolId,
-                  targetSchoolName: targetSchoolId ? schoolsData.find(s => s.schoolId === targetSchoolId)?.schoolName : undefined,
-                  justification: justification || '',
-                  timestamp: new Date().toISOString(),
-                  performedBy: 'Administrador' // Would be actual user in real app
-                };
-                
-                saveLicenseAction(actionRecord);
-                
-                // Reload data to reflect changes
-                loadData();
-              }}
-            />
-          )}
-        </TabsContent>
-
-        <TabsContent value="insights" className="space-y-6">
-          <CanvaInsights 
-            analytics={analytics}
-            schoolsData={schoolsData}
-          />
-        </TabsContent>
-
-        <TabsContent value="history" className="space-y-6">
-          <LicenseHistory schoolsData={schoolsData} />
-        </TabsContent>
-
         <TabsContent value="schools" className="space-y-6">
           <SchoolLicenseManagement />
-        </TabsContent>
-
-        <TabsContent value="users" className="space-y-6">
-          {/* Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Filtros de Usuários</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Buscar</label>
-                  <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Nome ou email"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Escola</label>
-                  <Select value={selectedSchool} onValueChange={setSelectedSchool}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a escola" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas as escolas</SelectItem>
-                      {getSchools().map((school) => (
-                        <SelectItem key={school} value={school}>
-                          {school}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Conformidade</label>
-                  <Select value={complianceFilter} onValueChange={(value: any) => setComplianceFilter(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Status de conformidade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="compliant">Conformes</SelectItem>
-                      <SelectItem value="non_compliant">Fora da política</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Users List */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Usuários ({filteredUsers.length})</CardTitle>
-              <CardDescription>
-                Lista de usuários do Canva - {getPeriodLabel(selectedPeriod)}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {filteredUsers.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">Nenhum usuário encontrado com os filtros aplicados.</p>
-                </div>
-              ) : (
-                <div className="grid gap-4">
-                  {filteredUsers.map((user) => (
-                    <Card key={user.id} className={`p-4 ${!user.isCompliant ? 'border-destructive/20 bg-destructive/5' : ''}`}>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-medium">{user.name}</h3>
-                            <Badge variant={user.isCompliant ? "default" : "destructive"}>
-                              {user.isCompliant ? 'Conforme' : 'Fora da política'}
-                            </Badge>
-                            <Badge variant="outline">{user.role}</Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{user.email}</p>
-                          <p className="text-sm text-muted-foreground">{user.school}</p>
-                          {user.complianceIssue && (
-                            <p className="text-xs text-destructive">{user.complianceIssue}</p>
-                          )}
-                        </div>
-                        <div className="text-right space-y-1">
-                          <div className="text-sm">
-                            <span className="font-medium">{user.designsCreated}</span> designs criados
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {user.designsPublished} publicados • {user.designsViewed} visualizações
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            Última atividade: {user.lastActivity}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="usage" className="space-y-6">
           <CanvaUsageDashboard 
             onNavigateToUsers={() => {
-              const tabsTrigger = document.querySelector('[value="users"]') as HTMLElement;
-              tabsTrigger?.click();
-              toast.info('Navegando para a aba de usuários');
+              toast.info('Funcionalidade de usuários integrada na aba Escolas');
             }}
           />
         </TabsContent>
 
         <TabsContent value="costs" className="space-y-6">
           <CostManagementDashboard />
+        </TabsContent>
+
+        <TabsContent value="advanced" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Funcionalidades Avançadas</CardTitle>
+              <CardDescription>
+                Ferramentas para gestão avançada do Canva
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Sincronização de Dados</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Dados atualizados automaticamente das planilhas oficiais
+                    </p>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        onClick={loadOfficialData}
+                        disabled={loading}
+                      >
+                        {loading ? 'Carregando...' : 'Recarregar Dados'}
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={handleExportData}>
+                        <Download className="h-3 w-3 mr-1" />
+                        Exportar
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Estatísticas Rápidas</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Taxa de Conformidade:</span>
+                        <span className="font-medium">{overviewData.complianceRate.toFixed(1)}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Escolas com Usuários:</span>
+                        <span className="font-medium">{overviewData.schoolsWithUsers}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Principais Domínios:</span>
+                        <span className="font-medium">{getDomainCounts().length}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
