@@ -101,13 +101,13 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
               </Button>
               
               <Button
-                variant={activeSection === 'monitoring' ? 'default' : 'ghost'}
+                variant="ghost"
                 size="sm"
-                onClick={() => onSectionChange('monitoring')}
+                onClick={() => window.location.href = '/tickets'}
                 className="gap-2"
               >
                 <MessageSquare className="w-4 h-4" />
-                Monitoria
+                Tickets
               </Button>
             </div>
 
@@ -155,13 +155,13 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                     Gerenciamento
                   </div>
                 </div>
-                <DropdownMenuItem onClick={() => onSectionChange('management')}>
-                  <Users className="w-4 h-4 mr-2" />
-                  Escolas
+                <DropdownMenuItem onClick={() => window.location.href = '/monitoring'}>
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Monitoria
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onSectionChange('users')}>
+                <DropdownMenuItem onClick={() => window.location.href = '/admin'}>
                   <User className="w-4 h-4 mr-2" />
-                  Usuários
+                  Administração
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -13,6 +13,9 @@ import VoucherDashboard from "@/components/vouchers/VoucherDashboard";
 import Voucher2026Dashboard from "@/components/vouchers/Voucher2026Dashboard";
 import InsightsAnalytics from "@/components/insights/InsightsAnalytics";
 import MonitoringPortal from "@/components/monitoring/MonitoringPortal";
+import TicketsPage from "@/pages/TicketsPage";
+import MonitoringPage from "@/pages/MonitoringPage";
+import AdminPage from "@/pages/AdminPage";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
 
 const queryClient = new QueryClient();
@@ -70,6 +73,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <MonitoringPortal />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/tickets" 
+            element={
+              <ProtectedRoute>
+                <TicketsPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminPage />
               </ProtectedRoute>
             } 
           />
