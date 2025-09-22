@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
@@ -7,15 +7,18 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const navigate = useNavigate();
+  const [isChecking, setIsChecking] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkAuth = () => {
-      const isAuthenticated = localStorage.getItem("authenticated") === "true";
+      const authenticated = localStorage.getItem("authenticated") === "true";
       const sessionExpiry = localStorage.getItem("sessionExpiry");
       const currentUser = localStorage.getItem("saf_current_user");
       
-      if (!isAuthenticated || !currentUser) {
+      if (!authenticated || !currentUser) {
         navigate("/login");
+        setIsChecking(false);
         return;
       }
 
@@ -32,6 +35,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           localStorage.removeItem("saf_current_user");
           localStorage.removeItem("sessionExpiry");
           navigate("/login");
+          setIsChecking(false);
           return;
         }
       }
@@ -46,14 +50,25 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       if (!isAllowedDomain) {
         localStorage.clear();
         navigate("/login");
+        setIsChecking(false);
         return;
       }
+
+      // Se chegou até aqui, está autenticado
+      setIsAuthenticated(true);
+      setIsChecking(false);
     };
 
     checkAuth();
   }, [navigate]);
 
-  const isAuthenticated = localStorage.getItem("authenticated") === "true";
+  if (isChecking) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   
   return isAuthenticated ? <>{children}</> : null;
 };
