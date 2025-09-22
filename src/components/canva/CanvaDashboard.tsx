@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner';
 import StatsCard from '@/components/dashboard/StatsCard';
 import { SchoolLicenseManagement } from './SchoolLicenseManagement';
+import { SchoolLicenseOverview } from './SchoolLicenseOverview';
 import { CanvaUsageDashboard } from './CanvaUsageDashboard';
 import { CostManagementDashboard } from './CostManagementDashboard';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
