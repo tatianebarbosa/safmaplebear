@@ -1,359 +1,366 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { Users, Search, Plus, Edit, Trash2, UserPlus, Download, BarChart3 } from "lucide-react";
-import StatsCard from "@/components/dashboard/StatsCard";
+import React, { useState, useEffect } from 'react';
+import { Plus, Download, FileText, Search, Filter, TrendingUp, Users, AlertTriangle, Building2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { StatsCard } from '@/components/dashboard/StatsCard';
+import { ComplianceAlert } from './ComplianceAlert';
+import { SchoolLicenseOverview } from './SchoolLicenseOverview';
+import { CanvaRankings } from './CanvaRankings';
 import { 
   CanvaUser, 
-  UserStats,
-  loadCanvaUsers, 
-  getUserStats, 
+  CanvaAnalytics,
+  SchoolCanvaData,
+  loadCanvaData, 
+  generateCanvaAnalytics,
+  generateSchoolCanvaData,
+  generateUserRankings,
   filterCanvaUsers,
-  saveUserChange
-} from "@/lib/canvaUserProcessor";
+  exportCanvaData
+} from '@/lib/canvaDataProcessor';
 
 const CanvaDashboard = () => {
   const [users, setUsers] = useState<CanvaUser[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<CanvaUser[]>([]);
+  const [analytics, setAnalytics] = useState<CanvaAnalytics | null>(null);
+  const [schoolsData, setSchoolsData] = useState<SchoolCanvaData[]>([]);
+  const [rankings, setRankings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUnit, setSelectedUnit] = useState<string>("all");
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const [selectedRole, setSelectedRole] = useState<string>("all");
-  const [showUserDialog, setShowUserDialog] = useState(false);
-  const [currentUser, setCurrentUser] = useState<CanvaUser | null>(null);
-  const [actionType, setActionType] = useState<'add' | 'edit' | 'remove' | 'deactivate'>('add');
-  const [justification, setJustification] = useState("");
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [users, searchTerm, selectedUnit, selectedStatus, selectedRole]);
+  const [selectedPeriod, setSelectedPeriod] = useState<'30d' | '3m' | '6m' | '12m'>('30d');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSchool, setSelectedSchool] = useState<string>('all');
+  const [complianceFilter, setComplianceFilter] = useState<'all' | 'compliant' | 'non_compliant'>('all');
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const userData = await loadCanvaUsers();
-      setUsers(userData);
-      toast.success("Dados dos usuários carregados!");
+      const data = await loadCanvaData(selectedPeriod);
+      const analyticsData = generateCanvaAnalytics(data);
+      const schoolsCanvaData = generateSchoolCanvaData(data);
+      const rankingsData = generateUserRankings(data);
+      
+      setUsers(data);
+      setFilteredUsers(data);
+      setAnalytics(analyticsData);
+      setSchoolsData(schoolsCanvaData);
+      setRankings(rankingsData);
     } catch (error) {
-      toast.error("Erro ao carregar dados dos usuários");
+      toast.error('Erro ao carregar dados do Canva');
     } finally {
       setLoading(false);
     }
   };
 
-  const applyFilters = () => {
-    const filters = {
-      search: searchTerm,
-      unit: selectedUnit === "all" ? undefined : selectedUnit,
-      status: selectedStatus === "all" ? undefined : selectedStatus,
-      role: selectedRole === "all" ? undefined : selectedRole
-    };
+  useEffect(() => {
+    loadData();
+  }, [selectedPeriod]);
 
-    const filtered = filterCanvaUsers(users, filters);
+  useEffect(() => {
+    applyFilters();
+  }, [searchTerm, selectedSchool, complianceFilter, users]);
+
+  const applyFilters = () => {
+    const filtered = filterCanvaUsers(users, {
+      search: searchTerm,
+      school: selectedSchool,
+      compliance: complianceFilter
+    });
     setFilteredUsers(filtered);
   };
 
-  const handleUserAction = (user: CanvaUser, action: 'edit' | 'remove' | 'deactivate') => {
-    setCurrentUser(user);
-    setActionType(action);
-    setShowUserDialog(true);
+  const handleExportData = () => {
+    const csvData = exportCanvaData(filteredUsers);
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `canva-usuarios-${selectedPeriod}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Dados exportados com sucesso');
   };
 
-  const handleAddUser = () => {
-    setCurrentUser(null);
-    setActionType('add');
-    setShowUserDialog(true);
+  const handleViewNonCompliantDetails = () => {
+    setComplianceFilter('non_compliant');
+    toast.info('Filtro aplicado: exibindo apenas usuários fora da política');
   };
 
-  const submitAction = () => {
-    if (!justification.trim()) {
-      toast.error("Justificativa é obrigatória");
-      return;
-    }
-
-    if (currentUser) {
-      saveUserChange({
-        userId: currentUser.id,
-        unitId: currentUser.unitCode,
-        action: actionType as any,
-        justification,
-        performedBy: "admin@mbcentral.com.br" // Pegar do contexto de auth
-      });
-
-      // Atualizar lista local baseado na ação
-      if (actionType === 'remove' || actionType === 'deactivate') {
-        setUsers(users.filter(u => u.id !== currentUser.id));
-      }
-    }
-
-    toast.success(`Usuário ${actionType === 'add' ? 'adicionado' : actionType === 'edit' ? 'editado' : 'removido'} com sucesso!`);
-    setShowUserDialog(false);
-    setJustification("");
-    setCurrentUser(null);
+  const handleSchoolClick = (school: SchoolCanvaData) => {
+    setSelectedSchool(school.schoolName);
+    toast.info(`Filtro aplicado para escola: ${school.schoolName}`);
   };
 
-  const getUnits = () => {
-    const units = [...new Set(users.map(u => u.unit))].filter(Boolean);
-    return units.sort();
+  const getSchools = () => {
+    return Array.from(new Set(users.map(u => u.school).filter(Boolean))).sort();
   };
 
-  const getRoles = () => {
-    const roles = [...new Set(users.map(u => u.role))].filter(Boolean);
-    return roles.sort();
-  };
-
-  const getActionTitle = () => {
-    switch (actionType) {
-      case 'add': return 'Adicionar Usuário';
-      case 'edit': return 'Editar Usuário';
-      case 'remove': return 'Remover Usuário';
-      case 'deactivate': return 'Desativar Usuário';
-      default: return 'Ação do Usuário';
+  const getPeriodLabel = (period: string) => {
+    switch (period) {
+      case '30d': return 'Últimos 30 dias';
+      case '3m': return 'Últimos 3 meses';
+      case '6m': return 'Últimos 6 meses';
+      case '12m': return 'Últimos 12 meses';
+      default: return period;
     }
   };
-
-  const stats: UserStats = getUserStats(users);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
+  if (!analytics) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">Erro ao carregar dados do Canva.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard Canva</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Gestão Canva</h1>
           <p className="text-muted-foreground">
-            Gerenciamento de usuários e licenças Canva
+            Controle de licenças, compliance e analytics do Canva
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={handleAddUser}>
-            <UserPlus className="w-4 h-4 mr-2" />
-            Adicionar Usuário
-          </Button>
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
+          <Select value={selectedPeriod} onValueChange={(value: any) => setSelectedPeriod(value)}>
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="30d">Últimos 30 dias</SelectItem>
+              <SelectItem value="3m">Últimos 3 meses</SelectItem>
+              <SelectItem value="6m">Últimos 6 meses</SelectItem>
+              <SelectItem value="12m">Últimos 12 meses</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={handleExportData} variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
             Exportar
-          </Button>
-          <Button variant="outline">
-            <BarChart3 className="w-4 h-4 mr-2" />
-            Relatórios
           </Button>
         </div>
       </div>
 
-      {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total de Usuários"
-          value={stats.totalUsers.toString()}
-          icon={Users}
+          value={analytics.totalUsers.toString()}
+          description={`${getPeriodLabel(selectedPeriod)}`}
+          icon={<Users className="h-4 w-4" />}
         />
         <StatsCard
-          title="Usuários Ativos"
-          value={stats.activeUsers.toString()}
-          trend={{ value: (stats.activeUsers / stats.totalUsers) * 100, isPositive: true }}
-          icon={UserPlus}
+          title="Usuários Conformes"
+          value={analytics.compliantUsers.toString()}
+          description={`${analytics.complianceRate.toFixed(1)}% de conformidade`}
+          icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatsCard
-          title="Usuários Inativos"
-          value={stats.inactiveUsers.toString()}
-          icon={Users}
+          title="Fora da Política"
+          value={analytics.nonCompliantUsers.toString()}
+          description="Usuários com domínio não autorizado"
+          icon={<AlertTriangle className="h-4 w-4" />}
+          variant={analytics.nonCompliantUsers > 0 ? "destructive" : "default"}
         />
         <StatsCard
-          title="Unidades"
-          value={Object.keys(stats.usersByUnit).length.toString()}
-          icon={BarChart3}
+          title="Escolas Ativas"
+          value={analytics.totalSchools.toString()}
+          description={`${analytics.schoolsAtCapacity} em capacidade máxima`}
+          icon={<Building2 className="h-4 w-4" />}
         />
       </div>
 
-      {/* Filtros */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div>
-              <Label className="text-sm font-medium">Buscar usuário</Label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Nome ou e-mail..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-sm"
-                />
-                <Button variant="outline" size="icon">
-                  <Search className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
+      {/* Compliance Alert */}
+      {analytics.nonCompliantUsers > 0 && (
+        <ComplianceAlert
+          nonCompliantUsers={users.filter(u => !u.isCompliant)}
+          totalUsers={analytics.totalUsers}
+          onViewDetails={handleViewNonCompliantDetails}
+        />
+      )}
 
-            <div className="flex flex-wrap gap-3">
-              <div className="min-w-[140px]">
-                <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Unidade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas unidades</SelectItem>
-                    {getUnits().map((unit) => (
-                      <SelectItem key={unit} value={unit}>{unit}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="schools">Escolas</TabsTrigger>
+          <TabsTrigger value="users">Usuários</TabsTrigger>
+          <TabsTrigger value="rankings">Rankings</TabsTrigger>
+        </TabsList>
 
-              <div className="min-w-[120px]">
-                <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Função" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas funções</SelectItem>
-                    {getRoles().map((role) => (
-                      <SelectItem key={role} value={role}>{role}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="min-w-[110px]">
-                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos status</SelectItem>
-                    <SelectItem value="active">Ativos</SelectItem>
-                    <SelectItem value="inactive">Inativos</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Lista de Usuários */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredUsers.map((user) => (
-          <Card key={user.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-lg leading-tight">{user.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
-                </div>
-                <Badge variant={user.isActive ? "default" : "secondary"}>
-                  {user.isActive ? "Ativo" : "Inativo"}
-                </Badge>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-3">
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Função: </span>
-                  <span className="font-medium">{user.role}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Unidade: </span>
-                  <span className="font-medium">{user.unit}</span>
-                </div>
-                {user.addedDate && (
-                  <div>
-                    <span className="text-muted-foreground">Adicionado: </span>
-                    <span className="font-medium">{new Date(user.addedDate).toLocaleDateString()}</span>
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <SchoolLicenseOverview 
+              schoolsData={schoolsData.slice(0, 10)} 
+              onSchoolClick={handleSchoolClick}
+            />
+            <Card>
+              <CardHeader>
+                <CardTitle>Atividade Total</CardTitle>
+                <CardDescription>Resumo da atividade no período selecionado</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold text-primary">
+                      {analytics.totalActivity.designsCreated.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Designs Criados</div>
                   </div>
-                )}
-              </div>
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold text-primary">
+                      {analytics.totalActivity.designsPublished.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Designs Publicados</div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold text-primary">
+                      {analytics.totalActivity.sharedLinks.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Links Compartilhados</div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold text-primary">
+                      {analytics.totalActivity.designsViewed.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Visualizações</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
-              <div className="flex gap-2 pt-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleUserAction(user, 'edit')}
-                  className="flex-1"
-                >
-                  <Edit className="w-3 h-3 mr-1" />
-                  Editar
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleUserAction(user, 'remove')}
-                  className="flex-1"
-                >
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  Remover
-                </Button>
+        <TabsContent value="schools" className="space-y-6">
+          <SchoolLicenseOverview 
+            schoolsData={schoolsData} 
+            onSchoolClick={handleSchoolClick}
+          />
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-6">
+          {/* Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Filtros de Usuários</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Buscar</label>
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Nome ou email"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Escola</label>
+                  <Select value={selectedSchool} onValueChange={setSelectedSchool}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a escola" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas as escolas</SelectItem>
+                      {getSchools().map((school) => (
+                        <SelectItem key={school} value={school}>
+                          {school}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Conformidade</label>
+                  <Select value={complianceFilter} onValueChange={(value: any) => setComplianceFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Status de conformidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="compliant">Conformes</SelectItem>
+                      <SelectItem value="non_compliant">Fora da política</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {filteredUsers.length === 0 && !loading && (
-        <Card>
-          <CardContent className="text-center py-8">
-            <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">Nenhum usuário encontrado com os filtros aplicados.</p>
-          </CardContent>
-        </Card>
-      )}
+          {/* Users List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Usuários ({filteredUsers.length})</CardTitle>
+              <CardDescription>
+                Lista de usuários do Canva - {getPeriodLabel(selectedPeriod)}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {filteredUsers.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Nenhum usuário encontrado com os filtros aplicados.</p>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {filteredUsers.map((user) => (
+                    <Card key={user.id} className={`p-4 ${!user.isCompliant ? 'border-destructive/20 bg-destructive/5' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">{user.name}</h3>
+                            <Badge variant={user.isCompliant ? "default" : "destructive"}>
+                              {user.isCompliant ? 'Conforme' : 'Fora da política'}
+                            </Badge>
+                            <Badge variant="outline">{user.role}</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{user.email}</p>
+                          <p className="text-sm text-muted-foreground">{user.school}</p>
+                          {user.complianceIssue && (
+                            <p className="text-xs text-destructive">{user.complianceIssue}</p>
+                          )}
+                        </div>
+                        <div className="text-right space-y-1">
+                          <div className="text-sm">
+                            <span className="font-medium">{user.designsCreated}</span> designs criados
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {user.designsPublished} publicados • {user.designsViewed} visualizações
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Última atividade: {user.lastActivity}
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Dialog de Ação do Usuário */}
-      <Dialog open={showUserDialog} onOpenChange={setShowUserDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{getActionTitle()}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {currentUser && (
-              <div className="p-3 bg-muted rounded-lg">
-                <p className="font-semibold">{currentUser.name}</p>
-                <p className="text-sm text-muted-foreground">{currentUser.email}</p>
-                <p className="text-sm text-muted-foreground">{currentUser.unit}</p>
-              </div>
-            )}
-            
-            <div>
-              <Label htmlFor="justification">Justificativa *</Label>
-              <Textarea
-                id="justification"
-                placeholder="Digite a justificativa para esta ação..."
-                value={justification}
-                onChange={(e) => setJustification(e.target.value)}
-                rows={4}
-              />
-            </div>
-
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setShowUserDialog(false)}>
-                Cancelar
-              </Button>
-              <Button onClick={submitAction}>
-                Confirmar
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+        <TabsContent value="rankings" className="space-y-6">
+          {rankings && <CanvaRankings rankings={rankings} />}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
