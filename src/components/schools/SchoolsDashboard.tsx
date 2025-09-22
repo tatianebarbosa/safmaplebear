@@ -277,78 +277,58 @@ const SchoolsDashboard = () => {
         />
       </div>
 
-      {/* Filtros e Busca */}
-      <div className="space-y-4">
-        {/* Seção de Busca */}
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Search className="w-5 h-5" />
-              Busca
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Busca e Filtros */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          {/* Linha de Busca */}
+          <div className="mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Buscar escola por nome
-                </Label>
+                <Label className="text-sm font-medium">Buscar escola por nome</Label>
                 <Combobox
                   options={getSchoolOptions()}
                   value={selectedSchool}
                   onValueChange={(value) => {
                     setSelectedSchool(value);
-                    setSearchTerm(""); // Limpar busca de texto quando selecionar escola
+                    setSearchTerm("");
                   }}
                   placeholder="Selecione uma escola..."
                   searchPlaceholder="Digite o nome da escola..."
                   emptyMessage="Nenhuma escola encontrada."
-                  className="h-10"
+                  className="h-9"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Ou buscar por texto
-                </Label>
+                <Label className="text-sm font-medium">Ou buscar por texto</Label>
                 <div className="flex gap-2">
                   <Input
                     placeholder="Nome, ID ou código do voucher..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
-                      if (e.target.value) setSelectedSchool(""); // Limpar seleção de escola
+                      if (e.target.value) setSelectedSchool("");
                     }}
-                    className="h-10"
+                    className="h-9"
                   />
-                  <Button onClick={handleVoucherSearch} size="icon" className="h-10 w-10 shrink-0">
+                  <Button onClick={handleVoucherSearch} size="sm" className="h-9 px-3 shrink-0">
                     <Search className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Seção de Filtros */}
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Filter className="w-5 h-5" />
-              Filtros
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Consultor SAF
-                </Label>
+          {/* Linha de Filtros */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-muted-foreground">Filtros</Label>
+            <div className="flex flex-wrap gap-3">
+              <div className="min-w-[140px]">
                 <Select value={selectedSafConsultant} onValueChange={setSelectedSafConsultant}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Todos os consultores" />
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Consultor" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border shadow-md">
-                    <SelectItem value="all">Todos os consultores</SelectItem>
+                    <SelectItem value="all">Todos consultores</SelectItem>
                     {getSafConsultants().map((consultant) => (
                       <SelectItem key={consultant} value={consultant}>{consultant}</SelectItem>
                     ))}
@@ -356,16 +336,13 @@ const SchoolsDashboard = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Cluster
-                </Label>
+              <div className="min-w-[120px]">
                 <Select value={selectedCluster} onValueChange={setSelectedCluster}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Todos os clusters" />
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Cluster" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border shadow-md">
-                    <SelectItem value="all">Todos os clusters</SelectItem>
+                    <SelectItem value="all">Todos clusters</SelectItem>
                     {getClusters().map((cluster) => (
                       <SelectItem key={cluster} value={cluster}>{cluster}</SelectItem>
                     ))}
@@ -373,16 +350,13 @@ const SchoolsDashboard = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Status
-                </Label>
+              <div className="min-w-[110px]">
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Todos os status" />
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border shadow-md">
-                    <SelectItem value="all">Todos os status</SelectItem>
+                    <SelectItem value="all">Todos status</SelectItem>
                     {getStatuses().map((status) => (
                       <SelectItem key={status} value={status}>{status}</SelectItem>
                     ))}
@@ -390,13 +364,10 @@ const SchoolsDashboard = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Elegível para Voucher
-                </Label>
+              <div className="min-w-[120px]">
                 <Select value={voucherEligible} onValueChange={setVoucherEligible}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Todos" />
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Elegível" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border shadow-md">
                     <SelectItem value="all">Todos</SelectItem>
@@ -406,13 +377,10 @@ const SchoolsDashboard = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Voucher Enviado
-                </Label>
+              <div className="min-w-[120px]">
                 <Select value={voucherSent} onValueChange={setVoucherSent}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Todos" />
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Enviado" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border shadow-md">
                     <SelectItem value="all">Todos</SelectItem>
@@ -422,9 +390,9 @@ const SchoolsDashboard = () => {
                 </Select>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Lista de Escolas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">

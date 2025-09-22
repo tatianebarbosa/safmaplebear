@@ -90,8 +90,25 @@ function assignSafConsultant(cluster: string, name: string): string {
     if (name.includes('São Paulo') || name.includes('SP')) return 'Rafhael';
     if (name.includes('Rio de Janeiro') || name.includes('RJ')) return 'Ana Paula';
     if (name.includes('Bahia') || name.includes('BA')) return 'Tatiane';
-    if (name.includes('Minas Gerais') || name.includes('MG')) return 'Ingrid';
+    if (name.includes('Minas Gerais') || name.includes('MG') || name.includes('Belo Horizonte')) return 'Ingrid';
+    if (name.includes('Paraná') || name.includes('PR') || name.includes('Curitiba')) return 'Ingrid';
+    if (name.includes('Santa Catarina') || name.includes('SC') || name.includes('Florianópolis')) return 'Ingrid';
+    if (name.includes('Goiás') || name.includes('GO') || name.includes('Goiânia')) return 'Ingrid';
     return 'João'; // Consultor padrão
+  }
+  
+  // Casos especiais: mesmo que tenha cluster, se for de certas regiões, atribuir à Ingrid
+  if ((name.includes('Belo Horizonte') || name.includes('MG')) && cluster !== 'Desenvolvimento') {
+    return 'Ingrid';
+  }
+  if ((name.includes('Curitiba') || name.includes('PR')) && cluster !== 'Desenvolvimento') {
+    return 'Ingrid';
+  }
+  if ((name.includes('Florianópolis') || name.includes('SC')) && cluster !== 'Desenvolvimento') {
+    return 'Ingrid';
+  }
+  if ((name.includes('Goiânia') || name.includes('GO')) && cluster !== 'Desenvolvimento') {
+    return 'Ingrid';
   }
   
   return consultantMap[cluster] || 'João';
