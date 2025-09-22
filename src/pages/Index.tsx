@@ -3,6 +3,7 @@ import Header from "@/components/layout/Header";
 import Dashboard from "@/components/dashboard/Dashboard";
 import RankingDashboard from "@/components/ranking/RankingDashboard";
 import SchoolManagement from "@/components/schools/SchoolManagement";
+import SchoolsDashboard from "@/components/schools/SchoolsDashboard";
 import UserAnalytics from "@/components/analytics/UserAnalytics";
 import MonitoringPortal from "@/components/monitoring/MonitoringPortal";
 import AIAssistant from "@/components/ai/AIAssistant";
@@ -17,7 +18,7 @@ const Index = () => {
   const renderContent = () => {
     switch (activeSection) {
       case "dashboard":
-        return <Dashboard />;
+        return <SchoolsDashboard />;
       case "management":
         return <SchoolManagement />;
       case "users":
@@ -44,7 +45,7 @@ const Index = () => {
           </div>
         );
       default:
-        return <Dashboard />;
+        return <SchoolsDashboard />;
     }
   };
 

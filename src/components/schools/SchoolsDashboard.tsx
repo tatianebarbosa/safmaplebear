@@ -1,0 +1,436 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { School, Users, Search, Filter, FileText, Plus, Edit, MapPin, Ticket } from "lucide-react";
+import StatsCard from "@/components/dashboard/StatsCard";
+import {
+  VoucherSchool,
+  ExceptionVoucher,
+  VoucherJustification,
+  loadVoucherData,
+  getVoucherStats,
+  filterSchools,
+  searchVoucherByCode,
+  exportVoucherReport
+} from "@/lib/voucherDataProcessor";
+
+const SchoolsDashboard = () => {
+  const [schools, setSchools] = useState<VoucherSchool[]>([]);
+  const [exceptions, setExceptions] = useState<ExceptionVoucher[]>([]);
+  const [filteredSchools, setFilteredSchools] = useState<VoucherSchool[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCluster, setSelectedCluster] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [voucherEligible, setVoucherEligible] = useState<string>("");
+  const [voucherSent, setVoucherSent] = useState<string>("");
+  const [selectedSchool, setSelectedSchool] = useState<VoucherSchool | null>(null);
+  const [showAddVoucher, setShowAddVoucher] = useState(false);
+  const [showJustification, setShowJustification] = useState(false);
+  const [justification, setJustification] = useState("");
+  const [voucherAction, setVoucherAction] = useState<'add' | 'edit' | 'exception'>('add');
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [schools, searchTerm, selectedCluster, selectedStatus, voucherEligible, voucherSent]);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const data = await loadVoucherData();
+      setSchools(data.schools);
+      setExceptions(data.exceptions);
+      toast.success("Dados carregados com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao carregar dados dos vouchers");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const applyFilters = () => {
+    const filters = {
+      search: searchTerm,
+      cluster: selectedCluster || undefined,
+      status: selectedStatus || undefined,
+      voucherEligible: voucherEligible === "true" ? true : voucherEligible === "false" ? false : undefined,
+      voucherSent: voucherSent === "true" ? true : voucherSent === "false" ? false : undefined
+    };
+
+    const filtered = filterSchools(schools, filters);
+    setFilteredSchools(filtered);
+  };
+
+  const handleVoucherSearch = () => {
+    if (!searchTerm.trim()) {
+      toast.error("Digite um código de voucher para buscar");
+      return;
+    }
+
+    const result = searchVoucherByCode(searchTerm, schools, exceptions);
+    
+    if (result.found) {
+      if (result.school) {
+        toast.success(`Voucher encontrado na escola: ${result.school.name}`);
+        setFilteredSchools([result.school]);
+      } else if (result.exception) {
+        toast.success(`Voucher de exceção encontrado: ${result.exception.unit}`);
+      }
+    } else {
+      toast.error("Voucher não encontrado");
+    }
+  };
+
+  const handleAddException = (school: VoucherSchool) => {
+    setSelectedSchool(school);
+    setVoucherAction('exception');
+    setShowJustification(true);
+  };
+
+  const handleEditVoucher = (school: VoucherSchool) => {
+    setSelectedSchool(school);
+    setVoucherAction('edit');
+    setShowJustification(true);
+  };
+
+  const submitJustification = () => {
+    if (!justification.trim()) {
+      toast.error("Justificativa é obrigatória");
+      return;
+    }
+
+    if (!selectedSchool) return;
+
+    const newJustification: VoucherJustification = {
+      id: Date.now().toString(),
+      schoolId: selectedSchool.id,
+      action: voucherAction,
+      justification,
+      createdBy: "admin@mbcentral.com.br", // Pegar do contexto de auth
+      createdAt: new Date().toISOString()
+    };
+
+    // Salvar no localStorage por enquanto
+    const existingJustifications = JSON.parse(localStorage.getItem('voucherJustifications') || '[]');
+    localStorage.setItem('voucherJustifications', JSON.stringify([...existingJustifications, newJustification]));
+
+    toast.success(`${voucherAction === 'exception' ? 'Exceção adicionada' : 'Voucher editado'} com sucesso!`);
+    setShowJustification(false);
+    setJustification("");
+    setSelectedSchool(null);
+  };
+
+  const getClusters = () => {
+    const clusters = [...new Set(schools.map(s => s.cluster))].filter(Boolean);
+    return clusters.sort();
+  };
+
+  const getStatuses = () => {
+    const statuses = [...new Set(schools.map(s => s.status))].filter(Boolean);
+    return statuses.sort();
+  };
+
+  const getStatusBadgeColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'ativa': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'inativa': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'implantando': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
+  };
+
+  const stats = getVoucherStats(schools, exceptions);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard de Escolas</h1>
+          <p className="text-muted-foreground">
+            Gerenciamento de licenças Canva e vouchers por escola
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => exportVoucherReport(filteredSchools, exceptions)}>
+            <FileText className="w-4 h-4 mr-2" />
+            Exportar Relatório
+          </Button>
+          <Button onClick={loadData}>
+            Atualizar Dados
+          </Button>
+        </div>
+      </div>
+
+      {/* Estatísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatsCard
+          title="Total de Escolas"
+          value={stats.totalSchools.toString()}
+          trend={{ value: stats.eligibilityRate, isPositive: stats.eligibilityRate > 50 }}
+          icon={School}
+        />
+        <StatsCard
+          title="Vouchers Totais"
+          value={stats.totalVouchers.toString()}
+          trend={{ value: stats.deliveryRate, isPositive: stats.deliveryRate > 80 }}
+          icon={Ticket}
+        />
+        <StatsCard
+          title="Exceções"
+          value={stats.exceptionVouchers.toString()}
+          icon={Plus}
+        />
+        <StatsCard
+          title="Taxa de Entrega"
+          value={`${stats.deliveryRate.toFixed(1)}%`}
+          trend={{ value: stats.deliveryRate, isPositive: stats.deliveryRate > 90 }}
+          icon={Users}
+        />
+      </div>
+
+      {/* Filtros */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="w-5 h-5" />
+            Filtros e Busca
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-4 items-end">
+            <div className="flex-1">
+              <Label htmlFor="search">Buscar por nome, ID ou código do voucher</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="search"
+                  placeholder="Digite para buscar..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Button onClick={handleVoucherSearch} size="icon">
+                  <Search className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="cluster">Cluster</Label>
+              <Select value={selectedCluster} onValueChange={setSelectedCluster}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os clusters" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos os clusters</SelectItem>
+                  {getClusters().map((cluster) => (
+                    <SelectItem key={cluster} value={cluster}>{cluster}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos os status</SelectItem>
+                  {getStatuses().map((status) => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="eligible">Elegível para Voucher</Label>
+              <Select value={voucherEligible} onValueChange={setVoucherEligible}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="true">Elegíveis</SelectItem>
+                  <SelectItem value="false">Não Elegíveis</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="sent">Voucher Enviado</Label>
+              <Select value={voucherSent} onValueChange={setVoucherSent}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="true">Enviados</SelectItem>
+                  <SelectItem value="false">Não Enviados</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Lista de Escolas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+        {filteredSchools.map((school) => (
+          <Card key={school.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="text-lg leading-tight">{school.name}</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">ID: {school.id}</p>
+                </div>
+                <Badge className={getStatusBadgeColor(school.status)}>
+                  {school.status}
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">Cluster: {school.cluster}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Vendas SLM 2025</p>
+                  <p className="font-semibold">{school.slmSales}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Qtd. Vouchers</p>
+                  <p className="font-semibold">{school.voucherQuantity}</p>
+                </div>
+              </div>
+
+              {school.voucherCode && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Código do Voucher</p>
+                  <code className="text-sm bg-muted px-2 py-1 rounded">{school.voucherCode}</code>
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <Badge variant={school.voucherEligible ? "default" : "secondary"}>
+                  {school.voucherEligible ? "Elegível" : "Não Elegível"}
+                </Badge>
+                {school.voucherSent && (
+                  <Badge variant="outline" className="bg-green-50 text-green-700">
+                    Enviado
+                  </Badge>
+                )}
+                {school.reason && (
+                  <Badge variant="destructive">
+                    {school.reason}
+                  </Badge>
+                )}
+              </div>
+
+              {school.observations && (
+                <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                  {school.observations}
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEditVoucher(school)}
+                  className="flex-1"
+                >
+                  <Edit className="w-3 h-3 mr-1" />
+                  Editar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => handleAddException(school)}
+                  className="flex-1"
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Exceção
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {filteredSchools.length === 0 && !loading && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <School className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">Nenhuma escola encontrada com os filtros aplicados.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Dialog de Justificativa */}
+      <Dialog open={showJustification} onOpenChange={setShowJustification}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {voucherAction === 'exception' ? 'Adicionar Exceção de Voucher' : 'Editar Voucher'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedSchool && (
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="font-semibold">{selectedSchool.name}</p>
+                <p className="text-sm text-muted-foreground">ID: {selectedSchool.id}</p>
+              </div>
+            )}
+            
+            <div>
+              <Label htmlFor="justification">Justificativa *</Label>
+              <Textarea
+                id="justification"
+                placeholder="Digite a justificativa para esta ação..."
+                value={justification}
+                onChange={(e) => setJustification(e.target.value)}
+                rows={4}
+              />
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setShowJustification(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={submitJustification}>
+                Confirmar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default SchoolsDashboard;
