@@ -97,10 +97,8 @@ const Login = () => {
         description: "Bem-vindo ao Portal SAF Maple Bear",
       });
       
-      // Pequeno delay para garantir que os dados sejam salvos
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 100);
+      // Redirecionar imediatamente para dashboard
+      navigate("/dashboard", { replace: true });
     } else {
       toast({
         title: "Erro de autenticação",
