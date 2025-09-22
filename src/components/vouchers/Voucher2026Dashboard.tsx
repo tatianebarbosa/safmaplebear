@@ -131,23 +131,23 @@ const Voucher2026Dashboard = () => {
           title="Total de Escolas"
           value={stats.totalSchools.toString()}
           trend={{ value: stats.eligibilityRate, isPositive: stats.eligibilityRate > 50 }}
-          icon={School}
+          icon={<School className="h-4 w-4" />}
         />
         <StatsCard
           title="Escolas Elegíveis"
           value={stats.eligibleSchools.toString()}
           trend={{ value: stats.deliveryRate, isPositive: stats.deliveryRate > 80 }}
-          icon={Gift}
+          icon={<Gift className="h-4 w-4" />}
         />
         <StatsCard
           title="Taxa de Elegibilidade"
           value={`${stats.eligibilityRate}%`}
-          icon={TrendingUp}
+          icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatsCard
           title="Vouchers Enviados"
           value={stats.sentVouchers.toString()}
-          icon={FileText}
+          icon={<FileText className="h-4 w-4" />}
         />
       </div>
 

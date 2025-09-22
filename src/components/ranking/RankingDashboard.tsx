@@ -158,23 +158,23 @@ const RankingDashboard = () => {
           <StatsCard
             title="Total de Usuários"
             value={stats.totalUsers}
-            icon={Users}
+            icon={<Users className="h-4 w-4" />}
           />
           <StatsCard
             title="Usuários Ativos"
             value={stats.activeUsers}
-            icon={TrendingUp}
+            icon={<TrendingUp className="h-4 w-4" />}
           />
           <StatsCard
             title="Em Crescimento"
             value={stats.topPerformers}
-            icon={Trophy}
+            icon={<Trophy className="h-4 w-4" />}
             className="priority-low"
           />
           <StatsCard
             title="Novos Usuários"
             value={stats.newUsers}
-            icon={Star}
+            icon={<Star className="h-4 w-4" />}
             className="priority-medium"
           />
         </div>

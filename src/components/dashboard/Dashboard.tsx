@@ -95,25 +95,25 @@ const Dashboard = () => {
         <StatsCard
           title="Total de Escolas"
           value={mockStats.totalSchools}
-          icon={School}
+          icon={<School className="h-4 w-4" />}
           trend={{ value: 4.2, isPositive: true }}
         />
         <StatsCard
           title="Total de Usuários"
           value={mockStats.totalUsers.toLocaleString()}
-          icon={Users}
+          icon={<Users className="h-4 w-4" />}
           trend={{ value: 7.8, isPositive: true }}
         />
         <StatsCard
           title="Usuários Ativos"
           value={mockStats.activeUsers.toLocaleString()}
-          icon={Zap}
+          icon={<Zap className="h-4 w-4" />}
           trend={{ value: 5.3, isPositive: true }}
         />
         <StatsCard
           title="Taxa de Utilização"
           value={`${mockStats.utilizationRate}%`}
-          icon={TrendingUp}
+          icon={<TrendingUp className="h-4 w-4" />}
           trend={{ value: -1.2, isPositive: false }}
         />
       </div>

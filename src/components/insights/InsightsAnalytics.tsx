@@ -139,25 +139,25 @@ const InsightsAnalytics = () => {
           title="Taxa de Uso Vouchers"
           value={`${analyticsData.voucherUsage.rate}%`}
           trend={{ value: analyticsData.trends.voucherGrowth, isPositive: true }}
-          icon={Target}
+          icon={<Target className="h-4 w-4" />}
         />
         <StatsCard
           title="Usuários Ativos"
           value={analyticsData.canvaUsers.active.toString()}
           trend={{ value: analyticsData.trends.userGrowth, isPositive: true }}
-          icon={Users}
+          icon={<Users className="h-4 w-4" />}
         />
         <StatsCard
           title="Escolas Ativas"
           value={analyticsData.schoolPerformance.activeSchools.toString()}
           trend={{ value: analyticsData.trends.schoolGrowth, isPositive: true }}
-          icon={School}
+          icon={<School className="h-4 w-4" />}
         />
         <StatsCard
           title="Crescimento Geral"
           value={`${((analyticsData.trends.voucherGrowth + analyticsData.trends.userGrowth + analyticsData.trends.schoolGrowth) / 3).toFixed(1)}%`}
           trend={{ value: 8.3, isPositive: true }}
-          icon={TrendingUp}
+          icon={<TrendingUp className="h-4 w-4" />}
         />
       </div>
 

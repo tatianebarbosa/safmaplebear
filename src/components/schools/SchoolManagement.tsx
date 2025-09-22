@@ -125,25 +125,25 @@ const SchoolManagement = () => {
         <StatsCard
           title="Total de Escolas"
           value={stats.totalSchools}
-          icon={School}
+          icon={<School className="h-4 w-4" />}
           trend={{ value: 5.2, isPositive: true }}
         />
         <StatsCard
           title="Licenças Utilizadas"
           value={`${stats.usedLicenses}/${stats.totalLicenses}`}
-          icon={Users}
+          icon={<Users className="h-4 w-4" />}
           trend={{ value: Math.round(stats.utilizationRate), isPositive: stats.utilizationRate < 90 }}
         />
         <StatsCard
           title="Escolas com Excesso"
           value={stats.schoolsWithExcess}
-          icon={AlertTriangle}
+          icon={<AlertTriangle className="h-4 w-4" />}
           className={stats.schoolsWithExcess > 0 ? "border-destructive/20 bg-destructive-bg/10" : ""}
         />
         <StatsCard
           title="Taxa de Utilização"
           value={`${Math.round(stats.utilizationRate)}%`}
-          icon={CheckCircle}
+          icon={<CheckCircle className="h-4 w-4" />}
           trend={{ value: 8.5, isPositive: stats.utilizationRate < 85 }}
         />
       </div>
