@@ -67,11 +67,15 @@ const Login = () => {
         approvedAt: new Date().toISOString()
       };
 
+      console.log("LOGIN: Salvando dados de autenticação...");
+      
       // Salvar dados de autenticação
       localStorage.setItem("authenticated", "true");
       localStorage.setItem("userEmail", email);
       localStorage.setItem("saf_current_user", JSON.stringify(userProfile));
       localStorage.setItem("sessionExpiry", sessionExpiry.toISOString());
+
+      console.log("LOGIN: Dados salvos, authenticated =", localStorage.getItem("authenticated"));
 
       // Criar dados iniciais se não existirem
       if (!localStorage.getItem('saf_pending_users')) {
@@ -97,7 +101,9 @@ const Login = () => {
         description: "Bem-vindo ao Portal SAF Maple Bear",
       });
       
+      console.log("LOGIN: Tentando navegar para /dashboard...");
       navigate("/dashboard");
+      console.log("LOGIN: Navigate chamado!");
     } else {
       toast({
         title: "Erro de autenticação",
