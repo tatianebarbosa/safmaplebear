@@ -8,8 +8,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { School, Users, Search, Filter, FileText, Plus, Edit, MapPin, Ticket } from "lucide-react";
+import { School, Users, Search, Filter, FileText, Plus, Edit, MapPin, Ticket, Download } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
+import ExceptionVoucherDialog from "./ExceptionVoucherDialog";
+import { generateVoucherReport, generateUserReport } from "@/lib/pdfGenerator";
+import { loadSchoolData } from "@/lib/schoolDataProcessor";
 import {
   VoucherSchool,
   ExceptionVoucher,
@@ -36,6 +39,8 @@ const SchoolsDashboard = () => {
   const [showJustification, setShowJustification] = useState(false);
   const [justification, setJustification] = useState("");
   const [voucherAction, setVoucherAction] = useState<'add' | 'edit' | 'exception'>('add');
+  const [showExceptionDialog, setShowExceptionDialog] = useState(false);
+  const [totalUsers, setTotalUsers] = useState(0);
 
   useEffect(() => {
     loadData();
@@ -48,9 +53,18 @@ const SchoolsDashboard = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const data = await loadVoucherData();
-      setSchools(data.schools);
-      setExceptions(data.exceptions);
+      const [voucherData, schoolData] = await Promise.all([
+        loadVoucherData(),
+        loadSchoolData()
+      ]);
+      
+      setSchools(voucherData.schools);
+      setExceptions(voucherData.exceptions);
+      
+      // Calcular total de usuários dos dados reais
+      const totalUsersCount = schoolData.reduce((sum, school) => sum + school.users.length, 0);
+      setTotalUsers(totalUsersCount);
+      
       toast.success("Dados carregados com sucesso!");
     } catch (error) {
       toast.error("Erro ao carregar dados dos vouchers");
@@ -94,8 +108,31 @@ const SchoolsDashboard = () => {
 
   const handleAddException = (school: VoucherSchool) => {
     setSelectedSchool(school);
-    setVoucherAction('exception');
-    setShowJustification(true);
+    setShowExceptionDialog(true);
+  };
+
+  const handleSaveException = (exception: Partial<ExceptionVoucher>) => {
+    // Salvar exceção no localStorage por enquanto
+    const existingExceptions = JSON.parse(localStorage.getItem('voucherExceptions') || '[]');
+    const newException = {
+      ...exception,
+      id: Date.now().toString(),
+    };
+    
+    localStorage.setItem('voucherExceptions', JSON.stringify([...existingExceptions, newException]));
+    setExceptions([...exceptions, newException as ExceptionVoucher]);
+  };
+
+  const generatePDFReport = () => {
+    generateVoucherReport(filteredSchools, exceptions);
+    toast.success("Relatório PDF gerado com sucesso!");
+  };
+
+  const generateUsersPDFReport = () => {
+    loadSchoolData().then(schoolData => {
+      generateUserReport(totalUsers, schoolData);
+      toast.success("Relatório de usuários PDF gerado com sucesso!");
+    });
   };
 
   const handleEditVoucher = (school: VoucherSchool) => {
@@ -170,9 +207,17 @@ const SchoolsDashboard = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => exportVoucherReport(filteredSchools, exceptions)}>
+          <Button onClick={generatePDFReport}>
             <FileText className="w-4 h-4 mr-2" />
-            Exportar Relatório
+            Relatório PDF
+          </Button>
+          <Button variant="outline" onClick={generateUsersPDFReport}>
+            <Users className="w-4 h-4 mr-2" />
+            Relatório Usuários
+          </Button>
+          <Button variant="outline" onClick={() => exportVoucherReport(filteredSchools, exceptions)}>
+            <Download className="w-4 h-4 mr-2" />
+            Exportar CSV
           </Button>
           <Button onClick={loadData}>
             Atualizar Dados
@@ -200,9 +245,9 @@ const SchoolsDashboard = () => {
           icon={Plus}
         />
         <StatsCard
-          title="Taxa de Entrega"
-          value={`${stats.deliveryRate.toFixed(1)}%`}
-          trend={{ value: stats.deliveryRate, isPositive: stats.deliveryRate > 90 }}
+          title="Total de Usuários"
+          value={totalUsers.toString()}
+          trend={{ value: totalUsers > 800 ? 2.5 : -1.2, isPositive: totalUsers > 800 }}
           icon={Users}
         />
       </div>
@@ -391,7 +436,15 @@ const SchoolsDashboard = () => {
         </Card>
       )}
 
-      {/* Dialog de Justificativa */}
+      {/* Dialog de Exceção */}
+      <ExceptionVoucherDialog
+        isOpen={showExceptionDialog}
+        onClose={() => setShowExceptionDialog(false)}
+        school={selectedSchool}
+        onSave={handleSaveException}
+      />
+
+      {/* Dialog de Justificativa (para edição) */}
       <Dialog open={showJustification} onOpenChange={setShowJustification}>
         <DialogContent>
           <DialogHeader>

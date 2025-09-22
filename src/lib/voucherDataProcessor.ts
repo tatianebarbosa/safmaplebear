@@ -27,6 +27,14 @@ export interface ExceptionVoucher {
   emailTitle: string;
   requestedBy: string;
   usageCount: number;
+  // Novos campos
+  voucherCode: string;
+  expiryDate: string;
+  requester: string;
+  requestSource: 'email' | 'ticket';
+  emailTitle2?: string;
+  ticketNumber?: string;
+  createdAt: string;
 }
 
 export interface VoucherJustification {
@@ -87,7 +95,13 @@ export function parseExceptionVouchersCSV(csvContent: string): ExceptionVoucher[
         createdBy: values[6] || '',
         emailTitle: values[7] || '',
         requestedBy: values[8] || '',
-        usageCount: parseInt(values[9]) || 0
+        usageCount: parseInt(values[9]) || 0,
+        // Novos campos com valores padrão
+        voucherCode: values[4] || '',
+        expiryDate: '',
+        requester: values[8] || '',
+        requestSource: 'email' as 'email' | 'ticket',
+        createdAt: new Date().toISOString()
       };
     });
 }

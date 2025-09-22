@@ -184,7 +184,7 @@ export async function loadSchoolData(): Promise<School[]> {
   try {
     const [schoolsResponse, usersResponse] = await Promise.all([
       fetch('/data/escolas.csv'),
-      fetch('/data/usuarios.csv')
+      fetch('/data/usuarios_updated.csv')
     ]);
     
     const schoolsCSV = await schoolsResponse.text();
