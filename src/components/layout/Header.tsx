@@ -72,18 +72,49 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                   <NavigationMenuContent>
                     <div className="w-96 p-4">
                       {/* Seção Principal */}
-                      <div className="space-y-2 mb-4">
+                       <div className="space-y-2 mb-4">
                         <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                          Sistema Principal
+                          Dashboards
                         </div>
                         <Button
                           variant={activeSection === 'dashboard' ? 'default' : 'ghost'}
                           className="w-full justify-start gap-3"
-                          onClick={() => onSectionChange('dashboard')}
+                          onClick={() => window.location.href = '/dashboard'}
                         >
                           <BarChart3 className="w-4 h-4" />
-                          Dashboard Geral
+                          Dashboard Principal
                         </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start gap-3"
+                          onClick={() => window.location.href = '/dashboard/canva'}
+                        >
+                          <Users className="w-4 h-4" />
+                          Dashboard Canva
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start gap-3"
+                          onClick={() => window.location.href = '/dashboard/vouchers'}
+                        >
+                          <CreditCard className="w-4 h-4" />
+                          Dashboard Vouchers
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start gap-3"
+                          onClick={() => window.location.href = '/insights'}
+                        >
+                          <TrendingUp className="w-4 h-4" />
+                          Insights e Análises
+                        </Button>
+                      </div>
+
+                      {/* Seção de Ferramentas SAF */}
+                      <div className="border-t pt-4">
+                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                          Ferramentas SAF
+                        </div>
                         <Button
                           variant={activeSection === 'monitoring' ? 'default' : 'ghost'}
                           className="w-full justify-start gap-3"
@@ -108,14 +139,6 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                           <Brain className="w-4 h-4" />
                           Base de Conhecimento
                         </Button>
-                        <Button
-                          variant={activeSection === 'vouchers' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3"
-                          onClick={() => onSectionChange('vouchers')}
-                        >
-                          <CreditCard className="w-4 h-4" />
-                          Gerenciamento de Vouchers
-                        </Button>
                       </div>
 
                       {/* Seção Licenças Canva */}
@@ -139,30 +162,6 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                           >
                             <User className="w-4 h-4" />
                             Gerenciamento de Usuários
-                          </Button>
-                          <Button
-                            variant={activeSection === 'analytics' ? 'default' : 'ghost'}
-                            className="w-full justify-start gap-3"
-                            onClick={() => onSectionChange('analytics')}
-                          >
-                            <FileText className="w-4 h-4" />
-                            Análise de Usuários
-                          </Button>
-                          <Button
-                            variant={activeSection === 'history' ? 'default' : 'ghost'}
-                            className="w-full justify-start gap-3"
-                            onClick={() => onSectionChange('history')}
-                          >
-                            <TrendingUp className="w-4 h-4" />
-                            Histórico e Relatórios
-                          </Button>
-                          <Button
-                            variant={activeSection === 'settings' ? 'default' : 'ghost'}
-                            className="w-full justify-start gap-3"
-                            onClick={() => onSectionChange('settings')}
-                          >
-                            <Settings className="w-4 h-4" />
-                            Configurações
                           </Button>
                         </div>
                       </div>
