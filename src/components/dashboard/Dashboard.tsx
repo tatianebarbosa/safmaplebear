@@ -83,7 +83,7 @@ const Dashboard = () => {
           <div className="p-2 rounded-lg bg-primary/10">
             <TrendingUp className="w-6 h-6 text-primary" />
           </div>
-          Dashboard Principal
+          Maple Bear SAF - Dashboard Principal
         </h1>
         <p className="text-muted-foreground">
           Visão geral das operações e performance das escolas

@@ -54,7 +54,7 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
               className="w-12 h-12 rounded-full"
             />
             <div>
-            <h1 className="text-xl font-bold text-foreground">Centro de Gestão</h1>
+            <h1 className="text-xl font-bold text-foreground">Maple Bear SAF</h1>
               <p className="text-sm text-muted-foreground">Maple Bear Management</p>
             </div>
           </div>

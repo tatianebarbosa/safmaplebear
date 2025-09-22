@@ -12,6 +12,8 @@ import CanvaDashboard from "@/components/canva/CanvaDashboard";
 import VoucherDashboard from "@/components/vouchers/VoucherDashboard";
 import Voucher2026Dashboard from "@/components/vouchers/Voucher2026Dashboard";
 import InsightsAnalytics from "@/components/insights/InsightsAnalytics";
+import MonitoringPortal from "@/components/monitoring/MonitoringPortal";
+import FloatingAIAssistant from "@/components/ai/AIAssistant";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +66,14 @@ const App = () => (
             } 
           />
           <Route 
+            path="/monitoring" 
+            element={
+              <ProtectedRoute>
+                <MonitoringPortal />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/access-control" 
             element={<AccessControl />} 
           />
@@ -74,6 +84,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <FloatingAIAssistant />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
