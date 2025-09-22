@@ -14,6 +14,7 @@ export interface VoucherSchool {
   voucherCode: string;
   voucherSent: boolean;
   observations: string;
+  safConsultant?: string; // Novo campo para consultor SAF
 }
 
 export interface ExceptionVoucher {
@@ -48,6 +49,54 @@ export interface VoucherJustification {
   newValue?: any;
 }
 
+// Função para corrigir encoding
+function fixEncoding(text: string): string {
+  if (!text) return text;
+  
+  const encodingMap: { [key: string]: string } = {
+    'Cama�ari': 'Camaçari',
+    'Paul�nia': 'Paulínia',
+    'Cambu�': 'Cambuí', 
+    'Adimpl�ncia': 'Adimplência',
+    'Utiliza��o': 'Utilização',
+    'C�digo': 'Código',
+    'Observa��o': 'Observação',
+    'B�rbara': 'Bárbara',
+    'orienta��es': 'orientações',
+    'Andr�': 'André',
+    'Jo�o': 'João'
+  };
+  
+  let fixedText = text;
+  Object.keys(encodingMap).forEach(broken => {
+    fixedText = fixedText.replace(new RegExp(broken, 'g'), encodingMap[broken]);
+  });
+  
+  return fixedText;
+}
+
+// Função para atribuir consultor SAF baseado no cluster/região
+function assignSafConsultant(cluster: string, name: string): string {
+  const consultantMap: { [key: string]: string } = {
+    'Desenvolvimento': 'Tatiane',
+    'Potente': 'Rafhael', 
+    'Alerta': 'João',
+    'Crescimento': 'Ingrid',
+    'Fortalecimento': 'Ana Paula'
+  };
+  
+  // Se não encontrar por cluster, atribuir por região/estado
+  if (!consultantMap[cluster]) {
+    if (name.includes('São Paulo') || name.includes('SP')) return 'Rafhael';
+    if (name.includes('Rio de Janeiro') || name.includes('RJ')) return 'Ana Paula';
+    if (name.includes('Bahia') || name.includes('BA')) return 'Tatiane';
+    if (name.includes('Minas Gerais') || name.includes('MG')) return 'Ingrid';
+    return 'João'; // Consultor padrão
+  }
+  
+  return consultantMap[cluster] || 'João';
+}
+
 export function parseVouchersCSV(csvContent: string): VoucherSchool[] {
   const lines = csvContent.split('\n');
   
@@ -56,22 +105,29 @@ export function parseVouchersCSV(csvContent: string): VoucherSchool[] {
     .map(line => {
       const values = line.split(';');
       
+      const rawName = values[1] || '';
+      const rawCluster = values[2] || '';
+      
+      const fixedName = fixEncoding(rawName);
+      const fixedCluster = fixEncoding(rawCluster);
+      
       return {
         id: values[0] || '',
-        name: values[1] || '',
-        cluster: values[2] || '',
-        status: values[3] || '',
-        contractualCompliance: values[4] || '',
-        financialCompliance: values[5] || '',
-        lexUsage: values[6] || '',
+        name: fixedName,
+        cluster: fixedCluster,
+        status: fixEncoding(values[3] || ''),
+        contractualCompliance: fixEncoding(values[4] || ''),
+        financialCompliance: fixEncoding(values[5] || ''),
+        lexUsage: fixEncoding(values[6] || ''),
         slmSales: parseInt(values[7]) || 0,
         voucherEligible: values[8] === 'Sim',
-        reason: values[9] || '',
-        voucherEnable: values[10] || '',
+        reason: fixEncoding(values[9] || ''),
+        voucherEnable: fixEncoding(values[10] || ''),
         voucherQuantity: parseInt(values[11]) || 0,
         voucherCode: values[12] || '',
         voucherSent: values[13] === 'SIM',
-        observations: values[14] || ''
+        observations: fixEncoding(values[14] || ''),
+        safConsultant: assignSafConsultant(fixedCluster, fixedName)
       };
     })
     .filter(school => school.id && school.name);
@@ -174,6 +230,7 @@ export function filterSchools(
     status?: string;
     voucherEligible?: boolean;
     voucherSent?: boolean;
+    safConsultant?: string;
   }
 ) {
   return schools.filter(school => {
@@ -190,6 +247,7 @@ export function filterSchools(
     if (filters.status && school.status !== filters.status) return false;
     if (filters.voucherEligible !== undefined && school.voucherEligible !== filters.voucherEligible) return false;
     if (filters.voucherSent !== undefined && school.voucherSent !== filters.voucherSent) return false;
+    if (filters.safConsultant && school.safConsultant !== filters.safConsultant) return false;
     
     return true;
   });

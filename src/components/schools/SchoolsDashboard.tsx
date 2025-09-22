@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Combobox } from "@/components/ui/combobox";
 import { toast } from "sonner";
-import { School, Users, Search, Filter, FileText, Plus, Edit, MapPin, Ticket, Download } from "lucide-react";
+import { School, Users, Search, Filter, FileText, Plus, Edit, MapPin, Ticket, Download, UserCheck } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import ExceptionVoucherDialog from "./ExceptionVoucherDialog";
 import { generateVoucherReport, generateUserReport } from "@/lib/pdfGenerator";
@@ -30,11 +31,13 @@ const SchoolsDashboard = () => {
   const [filteredSchools, setFilteredSchools] = useState<VoucherSchool[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSchool, setSelectedSchool] = useState<string>("");
   const [selectedCluster, setSelectedCluster] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [voucherEligible, setVoucherEligible] = useState<string>("all");
   const [voucherSent, setVoucherSent] = useState<string>("all");
-  const [selectedSchool, setSelectedSchool] = useState<VoucherSchool | null>(null);
+  const [selectedSafConsultant, setSelectedSafConsultant] = useState<string>("all");
+  const [currentSchool, setCurrentSchool] = useState<VoucherSchool | null>(null);
   const [showAddVoucher, setShowAddVoucher] = useState(false);
   const [showJustification, setShowJustification] = useState(false);
   const [justification, setJustification] = useState("");
@@ -48,7 +51,7 @@ const SchoolsDashboard = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [schools, searchTerm, selectedCluster, selectedStatus, voucherEligible, voucherSent]);
+  }, [schools, searchTerm, selectedSchool, selectedCluster, selectedStatus, voucherEligible, voucherSent, selectedSafConsultant]);
 
   const loadData = async () => {
     try {
@@ -74,15 +77,26 @@ const SchoolsDashboard = () => {
   };
 
   const applyFilters = () => {
-    const filters = {
-      search: searchTerm,
-      cluster: selectedCluster === "all" ? undefined : selectedCluster,
-      status: selectedStatus === "all" ? undefined : selectedStatus,
-      voucherEligible: voucherEligible === "true" ? true : voucherEligible === "false" ? false : undefined,
-      voucherSent: voucherSent === "true" ? true : voucherSent === "false" ? false : undefined
-    };
+    let filtered = schools;
+    
+    // Se uma escola específica foi selecionada, mostrar apenas ela
+    if (selectedSchool) {
+      const school = schools.find(s => s.id === selectedSchool);
+      filtered = school ? [school] : [];
+    } else {
+      // Aplicar filtros normais
+      const filters = {
+        search: searchTerm,
+        cluster: selectedCluster === "all" ? undefined : selectedCluster,
+        status: selectedStatus === "all" ? undefined : selectedStatus,
+        voucherEligible: voucherEligible === "true" ? true : voucherEligible === "false" ? false : undefined,
+        voucherSent: voucherSent === "true" ? true : voucherSent === "false" ? false : undefined,
+        safConsultant: selectedSafConsultant === "all" ? undefined : selectedSafConsultant
+      };
 
-    const filtered = filterSchools(schools, filters);
+      filtered = filterSchools(schools, filters);
+    }
+    
     setFilteredSchools(filtered);
   };
 
@@ -107,7 +121,7 @@ const SchoolsDashboard = () => {
   };
 
   const handleAddException = (school: VoucherSchool) => {
-    setSelectedSchool(school);
+    setCurrentSchool(school);
     setShowExceptionDialog(true);
   };
 
@@ -136,7 +150,7 @@ const SchoolsDashboard = () => {
   };
 
   const handleEditVoucher = (school: VoucherSchool) => {
-    setSelectedSchool(school);
+    setCurrentSchool(school);
     setVoucherAction('edit');
     setShowJustification(true);
   };
@@ -147,11 +161,11 @@ const SchoolsDashboard = () => {
       return;
     }
 
-    if (!selectedSchool) return;
+    if (!currentSchool) return;
 
     const newJustification: VoucherJustification = {
       id: Date.now().toString(),
-      schoolId: selectedSchool.id,
+      schoolId: currentSchool.id,
       action: voucherAction,
       justification,
       createdBy: "admin@mbcentral.com.br", // Pegar do contexto de auth
@@ -165,7 +179,7 @@ const SchoolsDashboard = () => {
     toast.success(`${voucherAction === 'exception' ? 'Exceção adicionada' : 'Voucher editado'} com sucesso!`);
     setShowJustification(false);
     setJustification("");
-    setSelectedSchool(null);
+    setCurrentSchool(null);
   };
 
   const getClusters = () => {
@@ -176,6 +190,17 @@ const SchoolsDashboard = () => {
   const getStatuses = () => {
     const statuses = [...new Set(schools.map(s => s.status))].filter(Boolean);
     return statuses.sort();
+  };
+
+  const getSafConsultants = () => {
+    return ['Tatiane', 'Rafhael', 'João', 'Ingrid', 'Ana Paula'];
+  };
+
+  const getSchoolOptions = () => {
+    return schools.map(school => ({
+      value: school.id,
+      label: `${school.name} (ID: ${school.id})`
+    }));
   };
 
   const getStatusBadgeColor = (status: string) => {
@@ -263,13 +288,30 @@ const SchoolsDashboard = () => {
         <CardContent className="space-y-4">
           <div className="flex gap-4 items-end">
             <div className="flex-1">
-              <Label htmlFor="search">Buscar por nome, ID ou código do voucher</Label>
+              <Label htmlFor="search-school">Buscar escola por nome</Label>
+              <Combobox
+                options={getSchoolOptions()}
+                value={selectedSchool}
+                onValueChange={(value) => {
+                  setSelectedSchool(value);
+                  setSearchTerm(""); // Limpar busca de texto quando selecionar escola
+                }}
+                placeholder="Selecione uma escola..."
+                searchPlaceholder="Digite o nome da escola..."
+                emptyMessage="Nenhuma escola encontrada."
+              />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="search-text">Ou buscar por texto</Label>
               <div className="flex gap-2">
                 <Input
-                  id="search"
-                  placeholder="Digite para buscar..."
+                  id="search-text"
+                  placeholder="Nome, ID ou código do voucher..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    if (e.target.value) setSelectedSchool(""); // Limpar seleção de escola
+                  }}
                 />
                 <Button onClick={handleVoucherSearch} size="icon">
                   <Search className="w-4 h-4" />
@@ -278,7 +320,22 @@ const SchoolsDashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+              <Label htmlFor="consultant">Consultor SAF</Label>
+              <Select value={selectedSafConsultant} onValueChange={setSelectedSafConsultant}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os consultores" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os consultores</SelectItem>
+                  {getSafConsultants().map((consultant) => (
+                    <SelectItem key={consultant} value={consultant}>{consultant}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <Label htmlFor="cluster">Cluster</Label>
               <Select value={selectedCluster} onValueChange={setSelectedCluster}>
@@ -362,6 +419,11 @@ const SchoolsDashboard = () => {
                 <span className="text-sm">Cluster: {school.cluster}</span>
               </div>
 
+              <div className="flex items-center gap-2">
+                <UserCheck className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">Consultor: {school.safConsultant}</span>
+              </div>
+
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Vendas SLM 2025</p>
@@ -436,11 +498,10 @@ const SchoolsDashboard = () => {
         </Card>
       )}
 
-      {/* Dialog de Exceção */}
       <ExceptionVoucherDialog
         isOpen={showExceptionDialog}
         onClose={() => setShowExceptionDialog(false)}
-        school={selectedSchool}
+        school={currentSchool}
         onSave={handleSaveException}
       />
 
@@ -453,10 +514,10 @@ const SchoolsDashboard = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {selectedSchool && (
+            {currentSchool && (
               <div className="p-3 bg-muted rounded-lg">
-                <p className="font-semibold">{selectedSchool.name}</p>
-                <p className="text-sm text-muted-foreground">ID: {selectedSchool.id}</p>
+                <p className="font-semibold">{currentSchool.name}</p>
+                <p className="text-sm text-muted-foreground">ID: {currentSchool.id}</p>
               </div>
             )}
             
