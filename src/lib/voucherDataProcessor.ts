@@ -77,41 +77,39 @@ function fixEncoding(text: string): string {
 
 // Função para atribuir consultor SAF baseado no cluster/região
 function assignSafConsultant(cluster: string, name: string): string {
-  const consultantMap: { [key: string]: string } = {
-    'Desenvolvimento': 'Tatiane',
-    'Potente': 'Rafhael', 
-    'Alerta': 'João',
-    'Crescimento': 'Ingrid',
-    'Fortalecimento': 'Ana Paula'
-  };
+  const cleanCluster = cluster?.toLowerCase().trim() || '';
+  const cleanName = name?.toLowerCase() || '';
   
-  // Se não encontrar por cluster, atribuir por região/estado
-  if (!consultantMap[cluster]) {
-    if (name.includes('São Paulo') || name.includes('SP')) return 'Rafhael';
-    if (name.includes('Rio de Janeiro') || name.includes('RJ')) return 'Ana Paula';
-    if (name.includes('Bahia') || name.includes('BA')) return 'Tatiane';
-    if (name.includes('Minas Gerais') || name.includes('MG') || name.includes('Belo Horizonte')) return 'Ingrid';
-    if (name.includes('Paraná') || name.includes('PR') || name.includes('Curitiba')) return 'Ingrid';
-    if (name.includes('Santa Catarina') || name.includes('SC') || name.includes('Florianópolis')) return 'Ingrid';
-    if (name.includes('Goiás') || name.includes('GO') || name.includes('Goiânia')) return 'Ingrid';
-    return 'João'; // Consultor padrão
+  // Ingrid - MG, PR, SC, GO, DF, AM e escolas específicas
+  if (cleanName.includes('minas gerais') || cleanName.includes('belo horizonte') || cleanName.includes('mg') ||
+      cleanName.includes('paraná') || cleanName.includes('curitiba') || cleanName.includes('pr') ||
+      cleanName.includes('santa catarina') || cleanName.includes('florianópolis') || cleanName.includes('sc') ||
+      cleanName.includes('goiás') || cleanName.includes('goiânia') || cleanName.includes('go') ||
+      cleanName.includes('marista') || cleanName.includes('águas claras') || 
+      cleanName.includes('brasília') || cleanName.includes('manaus') || cleanName.includes('df') ||
+      cleanName.includes('amazonas') || cleanName.includes('am') ||
+      (cleanCluster === 'alerta' && (cleanName.includes('goiânia') || cleanName.includes('marista') || 
+       cleanName.includes('águas claras') || cleanName.includes('brasília') || cleanName.includes('manaus')))) {
+    return 'INGRID VANIA MAZZEI';
   }
   
-  // Casos especiais: mesmo que tenha cluster, se for de certas regiões, atribuir à Ingrid
-  if ((name.includes('Belo Horizonte') || name.includes('MG')) && cluster !== 'Desenvolvimento') {
-    return 'Ingrid';
-  }
-  if ((name.includes('Curitiba') || name.includes('PR')) && cluster !== 'Desenvolvimento') {
-    return 'Ingrid';
-  }
-  if ((name.includes('Florianópolis') || name.includes('SC')) && cluster !== 'Desenvolvimento') {
-    return 'Ingrid';
-  }
-  if ((name.includes('Goiânia') || name.includes('GO')) && cluster !== 'Desenvolvimento') {
-    return 'Ingrid';
+  // Rafael - SP Interior, Campinas  
+  if ((cleanName.includes('são paulo') && !cleanName.includes('capital')) || 
+      cleanName.includes('campinas') || cleanName.includes('ribeirão') || 
+      cleanName.includes('piracicaba') || cleanName.includes('sorocaba') ||
+      cleanName.includes('limeira') || cleanName.includes('rio branco')) {
+    return 'RAFAEL COSTA';
   }
   
-  return consultantMap[cluster] || 'João';
+  // João - SP Capital, ABC, RJ
+  if (cleanName.includes('capital') || cleanName.includes('abc') || 
+      (cleanName.includes('são paulo') && (cleanName.includes('vila') || cleanName.includes('jardim') || 
+       cleanName.includes('alto') || cleanName.includes('pinheiros'))) ||
+      cleanName.includes('rio de janeiro') || cleanName.includes('rj')) {
+    return 'JOÃO SILVA';
+  }
+  
+  return 'SAF TEAM';
 }
 
 export function parseVouchersCSV(csvContent: string): VoucherSchool[] {

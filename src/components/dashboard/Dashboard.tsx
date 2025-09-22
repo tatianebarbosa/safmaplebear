@@ -83,10 +83,10 @@ const Dashboard = () => {
           <div className="p-2 rounded-lg bg-primary/10">
             <TrendingUp className="w-6 h-6 text-primary" />
           </div>
-          Dashboard de Licenças
+          Dashboard Principal
         </h1>
         <p className="text-muted-foreground">
-          Visão geral das licenças da Plataforma de Marketing (Canva)
+          Visão geral das operações e performance das escolas
         </p>
       </div>
 
@@ -96,25 +96,25 @@ const Dashboard = () => {
           title="Total de Escolas"
           value={mockStats.totalSchools}
           icon={School}
-          trend={{ value: 8.2, isPositive: true }}
+          trend={{ value: 4.2, isPositive: true }}
         />
         <StatsCard
           title="Total de Usuários"
           value={mockStats.totalUsers.toLocaleString()}
           icon={Users}
-          trend={{ value: 12.5, isPositive: true }}
+          trend={{ value: 7.8, isPositive: true }}
         />
         <StatsCard
           title="Usuários Ativos"
           value={mockStats.activeUsers.toLocaleString()}
           icon={Zap}
-          trend={{ value: 15.3, isPositive: true }}
+          trend={{ value: 5.3, isPositive: true }}
         />
         <StatsCard
           title="Taxa de Utilização"
           value={`${mockStats.utilizationRate}%`}
           icon={TrendingUp}
-          trend={{ value: -2.1, isPositive: false }}
+          trend={{ value: -1.2, isPositive: false }}
         />
       </div>
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronDown, BarChart3, Users, TrendingUp, Settings, User, LogOut, MessageSquare, Bot, CreditCard, Brain, FileText, Shield } from "lucide-react";
+import { ChevronDown, BarChart3, Users, TrendingUp, Settings, User, LogOut, MessageSquare, Bot, CreditCard, Brain, FileText, Shield, Calendar } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -54,8 +54,8 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
               className="w-12 h-12 rounded-full"
             />
             <div>
-              <h1 className="text-xl font-bold text-foreground">Maple Bear SAF</h1>
-              <p className="text-sm text-muted-foreground">Sistema de Gestão</p>
+            <h1 className="text-xl font-bold text-foreground">Centro de Gestão</h1>
+              <p className="text-sm text-muted-foreground">Maple Bear Management</p>
             </div>
           </div>
 
@@ -66,8 +66,8 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                 {/* Portal SAF */}
                 <NavigationMenuItem>
                   <NavigationMenuTrigger className="gap-2 bg-transparent hover:bg-accent">
-                    <Shield className="w-4 h-4" />
-                    Portal SAF
+                    <BarChart3 className="w-4 h-4" />
+                    Centro de Gestão
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="w-96 p-4">
@@ -92,14 +92,22 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                           <Users className="w-4 h-4" />
                           Dashboard Canva
                         </Button>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start gap-3"
-                          onClick={() => window.location.href = '/dashboard/vouchers'}
-                        >
-                          <CreditCard className="w-4 h-4" />
-                          Dashboard Vouchers
-                        </Button>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-3"
+                            onClick={() => window.location.href = '/dashboard/vouchers'}
+                          >
+                            <CreditCard className="w-4 h-4" />
+                            Dashboard Vouchers
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-3"
+                            onClick={() => window.location.href = '/dashboard/vouchers-2026'}
+                          >
+                            <Calendar className="w-4 h-4" />
+                            Vouchers 2026
+                          </Button>
                         <Button
                           variant="ghost"
                           className="w-full justify-start gap-3"

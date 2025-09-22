@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AccessControl from "@/components/auth/AccessControl";
 import CanvaDashboard from "@/components/canva/CanvaDashboard";
 import VoucherDashboard from "@/components/vouchers/VoucherDashboard";
+import Voucher2026Dashboard from "@/components/vouchers/Voucher2026Dashboard";
 import InsightsAnalytics from "@/components/insights/InsightsAnalytics";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <VoucherDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/dashboard/vouchers-2026" 
+            element={
+              <ProtectedRoute>
+                <Voucher2026Dashboard />
               </ProtectedRoute>
             } 
           />
