@@ -27,10 +27,10 @@ const SchoolsDashboard = () => {
   const [filteredSchools, setFilteredSchools] = useState<VoucherSchool[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCluster, setSelectedCluster] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const [voucherEligible, setVoucherEligible] = useState<string>("");
-  const [voucherSent, setVoucherSent] = useState<string>("");
+  const [selectedCluster, setSelectedCluster] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [voucherEligible, setVoucherEligible] = useState<string>("all");
+  const [voucherSent, setVoucherSent] = useState<string>("all");
   const [selectedSchool, setSelectedSchool] = useState<VoucherSchool | null>(null);
   const [showAddVoucher, setShowAddVoucher] = useState(false);
   const [showJustification, setShowJustification] = useState(false);
@@ -62,8 +62,8 @@ const SchoolsDashboard = () => {
   const applyFilters = () => {
     const filters = {
       search: searchTerm,
-      cluster: selectedCluster || undefined,
-      status: selectedStatus || undefined,
+      cluster: selectedCluster === "all" ? undefined : selectedCluster,
+      status: selectedStatus === "all" ? undefined : selectedStatus,
       voucherEligible: voucherEligible === "true" ? true : voucherEligible === "false" ? false : undefined,
       voucherSent: voucherSent === "true" ? true : voucherSent === "false" ? false : undefined
     };
@@ -241,7 +241,7 @@ const SchoolsDashboard = () => {
                   <SelectValue placeholder="Todos os clusters" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os clusters</SelectItem>
+                  <SelectItem value="all">Todos os clusters</SelectItem>
                   {getClusters().map((cluster) => (
                     <SelectItem key={cluster} value={cluster}>{cluster}</SelectItem>
                   ))}
@@ -256,7 +256,7 @@ const SchoolsDashboard = () => {
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="all">Todos os status</SelectItem>
                   {getStatuses().map((status) => (
                     <SelectItem key={status} value={status}>{status}</SelectItem>
                   ))}
@@ -271,7 +271,7 @@ const SchoolsDashboard = () => {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="true">Elegíveis</SelectItem>
                   <SelectItem value="false">Não Elegíveis</SelectItem>
                 </SelectContent>
@@ -285,7 +285,7 @@ const SchoolsDashboard = () => {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="true">Enviados</SelectItem>
                   <SelectItem value="false">Não Enviados</SelectItem>
                 </SelectContent>
