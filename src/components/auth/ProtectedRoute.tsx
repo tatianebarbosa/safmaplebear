@@ -12,16 +12,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     const checkAuth = () => {
-      console.log("PROTECTED_ROUTE: Verificando autenticação...");
       const authenticated = localStorage.getItem("authenticated") === "true";
       const sessionExpiry = localStorage.getItem("sessionExpiry");
       const currentUser = localStorage.getItem("saf_current_user");
       
-      console.log("PROTECTED_ROUTE: authenticated =", authenticated);
-      console.log("PROTECTED_ROUTE: currentUser exists =", !!currentUser);
-      
       if (!authenticated || !currentUser) {
-        console.log("PROTECTED_ROUTE: Não autenticado, redirecionando para login");
         navigate("/login");
         setIsChecking(false);
         return;
@@ -60,7 +55,6 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       }
 
       // Se chegou até aqui, está autenticado
-      console.log("PROTECTED_ROUTE: Usuário autenticado com sucesso!");
       setIsAuthenticated(true);
       setIsChecking(false);
     };
