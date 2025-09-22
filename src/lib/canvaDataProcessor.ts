@@ -63,6 +63,28 @@ export interface UserRanking {
   category: 'most_active' | 'most_creative' | 'most_shared' | 'most_viewed';
 }
 
+// Allowed domains for compliance check
+const ALLOWED_DOMAINS = [
+  'maplebear.com.br',
+  'seb.com.br', 
+  'sebsa.com.br'
+];
+
+interface LicenseAction {
+  id: string;
+  schoolId: string;
+  schoolName: string;
+  action: 'add' | 'remove' | 'transfer' | 'delete';
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  targetSchoolId?: string;
+  targetSchoolName?: string;
+  justification: string;
+  timestamp: string;
+  performedBy: string;
+}
+
 // Domínios permitidos pela política
 const COMPLIANT_DOMAINS = ['maplebear.com.br', 'sebsa.com.br', 'seb.com.br'];
 
@@ -142,38 +164,28 @@ const parseUsersCSV = (csvContent: string): { [email: string]: { school: string;
 
 export const loadCanvaData = async (period: '30d' | '3m' | '6m' | '12m' = '30d'): Promise<CanvaUser[]> => {
   try {
-    const fileName = {
-      '30d': 'relatorio_canva_30_dias.csv',
-      '3m': 'relatorio_canva_3_meses.csv', 
-      '6m': 'relatorio_canva_6_meses.csv',
-      '12m': 'relatorio_canva_12_meses.csv'
-    }[period];
+    // Load users mapping from CSV (updated file)
+    const usersResponse = await fetch('/data/usuarios_canva_atualizados.csv');
+    const usersText = await usersResponse.text();
+    const usersMapping = parseUsersCSV(usersText);
 
-    const [canvaResponse, usersResponse] = await Promise.all([
-      fetch(`/data/${fileName}`),
-      fetch('/data/usuarios_canva_completos.csv')
-    ]);
-
-    if (!canvaResponse.ok || !usersResponse.ok) {
-      throw new Error('Erro ao carregar dados do Canva');
-    }
-
-    const canvaCSV = await canvaResponse.text();
-    const usersCSV = await usersResponse.text();
-
-    const canvaUsers = parseCanvaReportCSV(canvaCSV, period);
-    const userSchoolMap = parseUsersCSV(usersCSV);
-
-    // Enriquecer dados dos usuários com informações da escola
-    return canvaUsers.map(user => ({
+    // Load Canva activity data
+    const canvaResponse = await fetch(`/data/relatorio_canva_${period === '30d' ? '30_dias' : period === '3m' ? '3_meses' : period === '6m' ? '6_meses' : '12_meses'}.csv`);
+    const canvaText = await canvaResponse.text();
+    
+    const canvaUsers = parseCanvaReportCSV(canvaText, period);
+    
+    // Enrich with school information
+    const enrichedUsers = canvaUsers.map(user => ({
       ...user,
-      school: userSchoolMap[user.email]?.school || 'A preencher em breve',
-      schoolId: userSchoolMap[user.email]?.schoolId || 'unassigned'
+      school: usersMapping[user.email]?.school || 'A definir escola em breve',
+      schoolId: usersMapping[user.email]?.schoolId || 'unknown'
     }));
 
+    return enrichedUsers;
   } catch (error) {
-    console.error('Erro ao carregar dados do Canva:', error);
-    return [];
+    console.error('Error loading Canva data:', error);
+    throw new Error('Failed to load Canva data');
   }
 };
 
@@ -353,4 +365,45 @@ export const exportCanvaData = (users: CanvaUser[]): string => {
   ]);
 
   return [headers, ...rows].map(row => row.join(',')).join('\n');
+};
+
+// License action history management
+export const saveLicenseAction = (action: LicenseAction): void => {
+  const existing = getLicenseHistory();
+  const updated = [action, ...existing].slice(0, 1000); // Keep last 1000 actions
+  localStorage.setItem('canva_license_history', JSON.stringify(updated));
+};
+
+export const getLicenseHistory = (): LicenseAction[] => {
+  try {
+    const stored = localStorage.getItem('canva_license_history');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const filterLicenseHistory = (filters: {
+  schoolId?: string;
+  action?: string;
+  dateRange?: { start: Date; end: Date };
+}): LicenseAction[] => {
+  let history = getLicenseHistory();
+  
+  if (filters.schoolId) {
+    history = history.filter(h => h.schoolId === filters.schoolId);
+  }
+  
+  if (filters.action) {
+    history = history.filter(h => h.action === filters.action);
+  }
+  
+  if (filters.dateRange) {
+    history = history.filter(h => {
+      const actionDate = new Date(h.timestamp);
+      return actionDate >= filters.dateRange!.start && actionDate <= filters.dateRange!.end;
+    });
+  }
+  
+  return history;
 };

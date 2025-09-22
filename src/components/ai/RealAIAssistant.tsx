@@ -130,7 +130,7 @@ Responda apenas com o texto melhorado, sem explicações adicionais.`
               content: `Você é um assistente inteligente do Maple Bear SAF (Sistema de Atendimento às Franquias). Você ajuda com:
 
 - Informações sobre tickets de atendimento
-- Dados de escolas e licenças Canva
+- Dados de escolas e franquias
 - Melhorar textos de comunicação
 - Explicar relatórios e métricas
 - Agendar atividades do SAF

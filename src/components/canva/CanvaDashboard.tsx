@@ -11,6 +11,9 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import { ComplianceAlert } from './ComplianceAlert';
 import { SchoolLicenseOverview } from './SchoolLicenseOverview';
 import { CanvaRankings } from './CanvaRankings';
+import { LicenseManagement } from './LicenseManagement';
+import { LicenseHistory } from './LicenseHistory';
+import { CanvaInsights } from './CanvaInsights';
 import { 
   CanvaUser, 
   CanvaAnalytics,
@@ -20,7 +23,9 @@ import {
   generateSchoolCanvaData,
   generateUserRankings,
   filterCanvaUsers,
-  exportCanvaData
+  exportCanvaData,
+  saveLicenseAction,
+  getLicenseHistory
 } from '@/lib/canvaDataProcessor';
 
 const CanvaDashboard = () => {
@@ -193,8 +198,11 @@ const CanvaDashboard = () => {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="management">Gerenciamento</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
+          <TabsTrigger value="history">Histórico</TabsTrigger>
           <TabsTrigger value="schools">Escolas</TabsTrigger>
           <TabsTrigger value="users">Usuários</TabsTrigger>
           <TabsTrigger value="rankings">Rankings</TabsTrigger>
@@ -241,6 +249,45 @@ const CanvaDashboard = () => {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="management" className="space-y-6">
+          <LicenseManagement 
+            schoolsData={schoolsData}
+            onUpdateLicenses={(schoolId, action, userId, justification, targetSchoolId) => {
+              // Save action to history
+              const actionRecord = {
+                id: Date.now().toString(),
+                schoolId,
+                schoolName: schoolsData.find(s => s.schoolId === schoolId)?.schoolName || 'Desconhecida',
+                action,
+                userId,
+                userName: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.name : undefined,
+                userEmail: userId ? schoolsData.flatMap(s => s.users).find(u => u.id === userId)?.email : undefined,
+                targetSchoolId,
+                targetSchoolName: targetSchoolId ? schoolsData.find(s => s.schoolId === targetSchoolId)?.schoolName : undefined,
+                justification: justification || '',
+                timestamp: new Date().toISOString(),
+                performedBy: 'Administrador' // Would be actual user in real app
+              };
+              
+              saveLicenseAction(actionRecord);
+              
+              // Reload data to reflect changes
+              loadData();
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="insights" className="space-y-6">
+          <CanvaInsights 
+            analytics={analytics}
+            schoolsData={schoolsData}
+          />
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6">
+          <LicenseHistory schoolsData={schoolsData} />
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">

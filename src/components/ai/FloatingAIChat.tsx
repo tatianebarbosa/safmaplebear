@@ -141,7 +141,7 @@ Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacion
     }
     
     if (lowerInput.includes('escola') || lowerInput.includes('unidade')) {
-      return `Posso ajudar com informações sobre escolas! No sistema temos dados de várias unidades. Você gostaria de saber sobre alguma escola específica? Posso mostrar informações como licenças ativas, contatos ou histórico de atendimentos.`;
+      return `Posso ajudar com informações sobre escolas! No sistema temos dados de várias unidades. Você gostaria de saber sobre alguma escola específica? Posso mostrar informações como contatos ou histórico de atendimentos.`;
     }
     
     if (lowerInput.includes('texto') || lowerInput.includes('melhorar') || lowerInput.includes('escrever')) {
@@ -155,7 +155,7 @@ Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacion
     return `Entendi sua pergunta sobre "${input}". Como assistente do Maple Bear SAF, posso ajudar com:
     
 • Informações sobre tickets e atendimentos
-• Dados de escolas e licenças
+• Dados de escolas e franquias
 • Melhorar textos de comunicação
 • Explicar relatórios e métricas
 • Agendar atividades do SAF
