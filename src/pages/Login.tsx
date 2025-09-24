@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
+import { authService } from "@/components/auth/AuthService";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,95 +20,36 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Validar domínios permitidos
-    const allowedDomains = ['@mbcentral.com.br', '@seb.com.br', '@sebsa.com.br'];
-    const isAllowedDomain = allowedDomains.some(domain => 
-      email.toLowerCase().includes(domain)
-    );
+    try {
+      const response = await authService.login({ email, password });
 
-    if (!isAllowedDomain) {
+      if (response.success) {
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo ao Portal SAF Maple Bear",
+        });
+        
+        // Manter compatibilidade com código existente
+        localStorage.setItem("authenticated", "true");
+        localStorage.setItem("userEmail", email);
+        
+        navigate("/dashboard", { replace: true });
+      } else {
+        toast({
+          title: "Erro de autenticação",
+          description: response.message || "Erro desconhecido",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
       toast({
-        title: "Acesso negado",
-        description: "Acesso permitido apenas para emails corporativos (@mbcentral, @seb, @sebsa)",
+        title: "Erro de conexão",
+        description: "Não foi possível conectar ao servidor. Tente novamente.",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // Simulação de autenticação
-    if ((email === "admin@mbcentral.com.br" && password === "maplebear2025") ||
-        (email === "saf@seb.com.br" && password === "saf2025") ||
-        (email === "coordenador@sebsa.com.br" && password === "coord2025")) {
-      
-      // Criar sessão com expiração de 1 semana
-      const sessionExpiry = new Date();
-      sessionExpiry.setDate(sessionExpiry.getDate() + 7);
-
-      // Determinar role baseado no email
-      let role = 'user';
-      if (email.includes('admin@')) {
-        role = 'admin';
-      } else if (email.includes('manutencao@')) {
-        role = 'maintenance';
-      }
-
-      // Criar perfil do usuário
-      const userProfile = {
-        id: `user_${Date.now()}`,
-        name: email.split('@')[0].replace('.', ' ').replace(/^\w/, c => c.toUpperCase()),
-        email: email,
-        role,
-        status: 'active',
-        profileImage: '',
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        sessionExpiry: sessionExpiry.toISOString(),
-        approvedBy: 'sistema',
-        approvedAt: new Date().toISOString()
-      };
-
-      // Salvar dados de autenticação
-      localStorage.setItem("authenticated", "true");
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("saf_current_user", JSON.stringify(userProfile));
-      localStorage.setItem("sessionExpiry", sessionExpiry.toISOString());
-
-      // Criar dados iniciais se não existirem
-      if (!localStorage.getItem('saf_pending_users')) {
-        const pendingUsers = [
-          {
-            id: 'pending_1',
-            name: 'Maria Silva',
-            email: 'maria.silva@mbcentral.com.br',
-            requestedAt: new Date().toISOString(),
-            status: 'pending'
-          }
-        ];
-        localStorage.setItem('saf_pending_users', JSON.stringify(pendingUsers));
-      }
-
-      if (!localStorage.getItem('saf_all_users')) {
-        const allUsers = [userProfile];
-        localStorage.setItem('saf_all_users', JSON.stringify(allUsers));
-      }
-      
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo ao Portal SAF Maple Bear",
-      });
-      
-      // Redirecionar imediatamente para dashboard
-      navigate("/dashboard", { replace: true });
-    } else {
-      toast({
-        title: "Erro de autenticação",
-        description: "Email ou senha incorretos",
-        variant: "destructive",
-      });
-    }
-    
-    setIsLoading(false);
   };
 
   return (
@@ -180,7 +122,14 @@ const Login = () => {
               size="lg"
               disabled={isLoading}
             >
-              {isLoading ? "Entrando..." : "Entrar"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Entrando...
+                </>
+              ) : (
+                "Entrar"
+              )}
             </Button>
           </form>
 
