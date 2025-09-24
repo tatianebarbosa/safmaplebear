@@ -139,7 +139,7 @@ function formatSchoolName(name: string): string {
     'rioclaro': 'Rio Claro',
     'linhares': 'Linhares',
     'sorocaba': 'Sorocaba',
-    'sudoeste': 'Sudoeste',
+    'sudoeste': 'Brasília - Sudoeste',
     'governadorvaladares': 'Governador Valadares',
     'campogrande': 'Campo Grande',
     'te': 'Taubaté',

@@ -1,289 +1,289 @@
-id_escola;Nome;Cluster;Status da Escola;AdimplÍncia Contratual;AdimplÍncia Financeira;UtilizaÁ„o Integral LEX;Vendas SLM 2025;Direito a voucher;Motivo;HabilitaÁ„o Voucher;Qtd. Vouchers;CÛdigo do voucher;Voucher enviado ;ObservaÁ„o
-10;Maple Bear CamaÁari - Busca Vida I;Desenvolvimento;Ativa;Sim;Sim;Sim;157;Sim;;5%;8;MBBA2026204;SIM;
-100;Maple Bear PaulÌnia - Morumbi I;Potente;Ativa;Sim;Sim;Sim;227;Sim;;5%;11;MBSP2026181;SIM;
+id_escola;Nome;Cluster;Status da Escola;Adimpl√™ncia Contratual;Adimpl√™ncia Financeira;Utiliza√ß√£o Integral LEX;Vendas SLM 2025;Direito a voucher;Motivo;Habilita√ß√£o Voucher;Qtd. Vouchers;C√≥digo do voucher;Voucher enviado ;Observa√ß√£o
+10;Maple Bear Cama√ßari - Busca Vida I;Desenvolvimento;Ativa;Sim;Sim;Sim;157;Sim;;5%;8;MBBA2026204;SIM;
+100;Maple Bear Paul√≠nia - Morumbi I;Potente;Ativa;Sim;Sim;Sim;227;Sim;;5%;11;MBSP2026181;SIM;
 101;Maple Bear Piracicaba - Vila Rezende I e II;Potente;Ativa;Sim;Sim;Sim;343;Sim;;5%;17;MBSP2026133;SIM;
 102;Maple Bear Praia Grande - Canto Do Forte I;Alerta;Ativa;Sim;Sim;Sim;174;Sim;;5%;9;MBSP2026199;SIM;
-103;Maple Bear Presidente Prudente - Jardim CambuÌ;Potente;Ativa;Sim;ROY/FDMP;Sim;331;N„o ;Financeiro;5%;17;MBSP2026158;;"e-mail enviado dia 04/08
+103;Maple Bear Presidente Prudente - Jardim Cambu√≠;Potente;Ativa;Sim;ROY/FDMP;Sim;331;N√£o ;Financeiro;5%;17;MBSP2026158;;"e-mail enviado dia 04/08
 Ana 11/08: Cyndi enviou hoje um email com o detalhamento dos valores devidos para a owner Ana Paula."
-104;Maple Bear Ribeir„o Preto - Bonfim Paulista I;Desenvolvimento;Ativa;Sim;Sim;Sim;553;Sim;;5%;28;MBSP2026121;SIM;
-107;Maple Bear Santa B·rbara D'Oeste - Jardim Mollon I;Potente;Ativa;Sim;Sim;Sim;228;Sim;;5%;11;MBSP2026157;SIM;Ana 04/08: Ana respondeu o email peindo o envio de 8 vouchers para filhos de owners. Questionei Ramires e Pantuzza, pois eu n„o tenho registro dessas orientaÁıes. 
-108;Maple Bear Santo AndrÈ - Campestre I;Desenvolvimento;Ativa;Sim;Sim;Sim;115;Sim;;5%;6;MBSP2026221;SIM;
-110;Maple Bear S„o Bernardo Do Campo - Centro;Potente;Ativa;Sim;FDMP;Sim;300;Sim;Financeiro;5%;15;MBSP2026146;SIM;"e-mail enviado dia 04/08.
-Ana 11/08: Cyndi informou no grupo financeiro + SAF que fez uma negociaÁ„o com a escola, ent„o os vouchers podem ser liberados. "
-111;Maple Bear S„o Caetano Do Sul - Santa Paula;Desenvolvimento;Ativa;Sim;ROY;Sim;214;N„o ;Financeiro;5%;11;MBSP2026177;;Ana 05/08: N„o mandei email ainda, pois a Cyndi est· fazendo contato para renegociar com essa escola. Aguardarei atÈ o final do dia. 
-112;Maple Bear S„o JosÈ Do Rio Preto - Jardim Francisco Fernandes I;Desenvolvimento;Ativa;Sim;Sim;Sim;319;Sim;;5%;16;MBSP2026143;SIM;Total 22 vouchers codigo unico MBSP2026143 unidades I e II 
-113;Maple Bear S„o JosÈ Do Rio Preto - Redentora II;Desenvolvimento;Ativa;Sim;Sim;Sim;126;Sim;;5%;6;MBSP2026143;SIM;Total 22 vouchers codigo unico MBSP2026143 unidades I e II 
-114;Maple Bear S„o JosÈ Dos Campos - Serimbura I;Potente;Ativa;Sim;Sim;Sim;308;Sim;;5%;15;MBSP2026160;SIM;
-115;Maple Bear Santana De ParnaÌba - Alphaville I;Alerta;Ativa;Sim;Sim;Sim;537;Sim;;5%;27;MBSP2026115;SIM;
-117;Maple Bear S„o Paulo - Cantareira ;Potente;Ativa;Sim;ROY/FDMP;Sim;385;Sim;Financeiro;5%;19;MBSP2026138;SIM;"e-mail enviado dia 04/08
-Ana 05/08: Enviamos os vouchers pois no grupo Teams que temos com o financeiro, a Cyndi nos informou que Cantareira e Santana est„o adimplentes"
-119;Maple Bear S„o Paulo - Granja Julieta I e II;Potente;Ativa;Sim;ROY;Sim;254;Sim;Financeiro;5%;12;MBSP2026245;SIM;"Total 12 vouchers codigo MBSP2026245 unidades I e II
-Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. "
+104;Maple Bear Ribeir√£o Preto - Bonfim Paulista I;Desenvolvimento;Ativa;Sim;Sim;Sim;553;Sim;;5%;28;MBSP2026121;SIM;
+107;Maple Bear Santa B√°rbara D'Oeste - Jardim Mollon I;Potente;Ativa;Sim;Sim;Sim;228;Sim;;5%;11;MBSP2026157;SIM;Ana 04/08: Ana respondeu o email peindo o envio de 8 vouchers para filhos de owners. Questionei Ramires e Pantuzza, pois eu n√£o tenho registro dessas orienta√ß√µes. 
+108;Maple Bear Santo Andr√© - Campestre I;Desenvolvimento;Ativa;Sim;Sim;Sim;115;Sim;;5%;6;MBSP2026221;SIM;
+110;Maple Bear S√£o Bernardo Do Campo - Centro;Potente;Ativa;Sim;FDMP;Sim;300;Sim;Financeiro;5%;15;MBSP2026146;SIM;"e-mail enviado dia 04/08.
+Ana 11/08: Cyndi informou no grupo financeiro + SAF que fez uma negocia√ß√£o com a escola, ent√£o os vouchers podem ser liberados. "
+111;Maple Bear S√£o Caetano Do Sul - Santa Paula;Desenvolvimento;Ativa;Sim;ROY;Sim;214;N√£o ;Financeiro;5%;11;MBSP2026177;;Ana 05/08: N√£o mandei email ainda, pois a Cyndi est√° fazendo contato para renegociar com essa escola. Aguardarei at√© o final do dia. 
+112;Maple Bear S√£o Jos√© Do Rio Preto - Jardim Francisco Fernandes I;Desenvolvimento;Ativa;Sim;Sim;Sim;319;Sim;;5%;16;MBSP2026143;SIM;Total 22 vouchers codigo unico MBSP2026143 unidades I e II 
+113;Maple Bear S√£o Jos√© Do Rio Preto - Redentora II;Desenvolvimento;Ativa;Sim;Sim;Sim;126;Sim;;5%;6;MBSP2026143;SIM;Total 22 vouchers codigo unico MBSP2026143 unidades I e II 
+114;Maple Bear S√£o Jos√© Dos Campos - Serimbura I;Potente;Ativa;Sim;Sim;Sim;308;Sim;;5%;15;MBSP2026160;SIM;
+115;Maple Bear Santana De Parna√≠ba - Alphaville I;Alerta;Ativa;Sim;Sim;Sim;537;Sim;;5%;27;MBSP2026115;SIM;
+117;Maple Bear S√£o Paulo - Cantareira ;Potente;Ativa;Sim;ROY/FDMP;Sim;385;Sim;Financeiro;5%;19;MBSP2026138;SIM;"e-mail enviado dia 04/08
+Ana 05/08: Enviamos os vouchers pois no grupo Teams que temos com o financeiro, a Cyndi nos informou que Cantareira e Santana est√£o adimplentes"
+119;Maple Bear S√£o Paulo - Granja Julieta I e II;Potente;Ativa;Sim;ROY;Sim;254;Sim;Financeiro;5%;12;MBSP2026245;SIM;"Total 12 vouchers codigo MBSP2026245 unidades I e II
+Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. "
 12;Maple Bear Salvador - Pituba I;Desenvolvimento;Ativa;Sim;Sim;Sim;548;Sim;;5%;27;MBBA2026113;SIM;
 120;Maple Bear Granja Viana - Cotia Jardim Lambreta I;Desenvolvimento;Ativa;Sim;Sim;Sim;219;Sim;;5%;11;MBSP2026147;SIM;
-121;Maple Bear S„o Paulo - JaguarÈ ;Potente;Ativa;N„o;Sim;Sim;139;Sim;Contratual;5%;7;MBSP2026237;SIM;Ana 14/08: Cyndi nos avisou que fez algumas confirmaÁıes com o Ramires e que n„o h· pendÍncias financeiras por parte da escola (conversa feita pessoalmente nesta data). Ainda na mesma conversa, Ramires nos explicou que h· uma atualizaÁ„o contratual devido a mudanÁa no quadro societ·rio da empresa, mas que est· fluindo e nos autorizou a mandar os vouchers.)
-122;Maple Bear S„o Paulo - Jardins I e II;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;750;Sim;Financeiro;5%;38;MBSP2026105;SIM;"e-mail enviado dia 04/08
-Ana 08/08: Vi na planilha da Cyndi que h· um acordo para as pendÍncias financeiras, portanto, estou enviando os vouchers nesta data."
-123;Maple Bear S„o Paulo - Mooca I;Alerta;Ativa;Sim;Sim;Sim;75;Sim;;5%;4;MBSP2532026;SIM;Total 12 vouchers codigo MBSP2532026 unidades I e II
-124;Maple Bear S„o Paulo - Mooca II;Alerta;Ativa;Sim;Sim;Sim;150;Sim;;5%;8;MBSP2532026;SIM;Total 12 vouchers codigo MBSP2532026 unidades I e II
-125;Maple Bear S„o Paulo - Morumbi Paineiras I;Desenvolvimento;Ativa;Sim;Sim;Sim;188;Sim;;5%;9;MBSP2026165;SIM;
-128;Maple Bear S„o Paulo - PompÈia I;Potente;Ativa;Sim;FDMP;Sim;89;Sim;Financeiro;5%;4;MBSP2026156;SIM;"12 vouchers para unidades I e II MBSP2026156 / e-mail enviado dia 04/08
-Ana 04/08: Emerson respondeu que n„o h· pendÍncias e mandou um print do Portal. Mandei uma mensagem para Cyndi e respondoi o Emerson falando que estamos checando com nosso time financeiro. 
-Ana 25/08: Cyndi respondeu e-mail do Emerson informando que n„o h· nenhuma pendÍncia da escola para com a central. Liberei os vouchers nessa data. "
-129;Maple Bear S„o Paulo - Santana I e II;Potente;Ativa;Sim;ROY/FDMP;Sim;296;Sim;Financeiro;5%;15;MBSP2026236;SIM;"15 vouchers unidades I e II codigo MBSP2026236 / e-mail enviado dia 04/08
-Ana 05/08: Enviamos os vouchers pois no grupo Teams que temos com o financeiro, a Cyndi nos informou que Cantareira e Santana est„o adimplentes"
+121;Maple Bear S√£o Paulo - Jaguar√© ;Potente;Ativa;N√£o;Sim;Sim;139;Sim;Contratual;5%;7;MBSP2026237;SIM;Ana 14/08: Cyndi nos avisou que fez algumas confirma√ß√µes com o Ramires e que n√£o h√° pend√™ncias financeiras por parte da escola (conversa feita pessoalmente nesta data). Ainda na mesma conversa, Ramires nos explicou que h√° uma atualiza√ß√£o contratual devido a mudan√ßa no quadro societ√°rio da empresa, mas que est√° fluindo e nos autorizou a mandar os vouchers.)
+122;Maple Bear S√£o Paulo - Jardins I e II;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;750;Sim;Financeiro;5%;38;MBSP2026105;SIM;"e-mail enviado dia 04/08
+Ana 08/08: Vi na planilha da Cyndi que h√° um acordo para as pend√™ncias financeiras, portanto, estou enviando os vouchers nesta data."
+123;Maple Bear S√£o Paulo - Mooca I;Alerta;Ativa;Sim;Sim;Sim;75;Sim;;5%;4;MBSP2532026;SIM;Total 12 vouchers codigo MBSP2532026 unidades I e II
+124;Maple Bear S√£o Paulo - Mooca II;Alerta;Ativa;Sim;Sim;Sim;150;Sim;;5%;8;MBSP2532026;SIM;Total 12 vouchers codigo MBSP2532026 unidades I e II
+125;Maple Bear S√£o Paulo - Morumbi Paineiras I;Desenvolvimento;Ativa;Sim;Sim;Sim;188;Sim;;5%;9;MBSP2026165;SIM;
+128;Maple Bear S√£o Paulo - Pomp√©ia I;Potente;Ativa;Sim;FDMP;Sim;89;Sim;Financeiro;5%;4;MBSP2026156;SIM;"12 vouchers para unidades I e II MBSP2026156 / e-mail enviado dia 04/08
+Ana 04/08: Emerson respondeu que n√£o h√° pend√™ncias e mandou um print do Portal. Mandei uma mensagem para Cyndi e respondoi o Emerson falando que estamos checando com nosso time financeiro. 
+Ana 25/08: Cyndi respondeu e-mail do Emerson informando que n√£o h√° nenhuma pend√™ncia da escola para com a central. Liberei os vouchers nessa data. "
+129;Maple Bear S√£o Paulo - Santana I e II;Potente;Ativa;Sim;ROY/FDMP;Sim;296;Sim;Financeiro;5%;15;MBSP2026236;SIM;"15 vouchers unidades I e II codigo MBSP2026236 / e-mail enviado dia 04/08
+Ana 05/08: Enviamos os vouchers pois no grupo Teams que temos com o financeiro, a Cyndi nos informou que Cantareira e Santana est√£o adimplentes"
 13;Maple Bear Salvador - Canela I;Potente;Ativa;Sim;Sim;Sim;148;Sim;;5%;7;MBBA2026224;SIM;
-131;Maple Bear S„o Paulo - TatuapÈ I e II;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;767;N„o ;Financeiro;5%;38;MBSP2026205;;"38 vouchers unidades I e II MBSP2026205 /
+131;Maple Bear S√£o Paulo - Tatuap√© I e II;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;767;N√£o ;Financeiro;5%;38;MBSP2026205;;"38 vouchers unidades I e II MBSP2026205 /
 Ingrid: e-mail enviado dia 04/08
 Ana 04/8: Monique respondeu pedindo para retirarmos a sra Maria Zelia do circuito de e-mails da escola. "
-132;Maple Bear S„o Paulo - S„o Miguel Paulista;Alerta;Ativa;Sim;ROY/FDMP;Sim;119;N„o ;Financeiro;5%;6;MBSP2026196;;e-mail enviado dia 04/08
-133;Maple Bear S„o Paulo - Vila Madalena I;Alerta;Ativa;Sim;Sim;Sim;24;Sim;;5%;1;MBSP2026276;SIM;
-135;Maple Bear S„o Paulo - Vila Nova ConceiÁ„o I;Potente;Ativa;Sim;Sim;Sim;136;Sim;;5%;7;MBSP2026194;SIM;
-136;Maple Bear S„o Paulo - Vila OlÌmpia;Potente;Ativa;Sim;Sim;Sim;268;Sim;;5%;13;MBSP2026195;SIM;
-137;Maple Bear S„o Paulo - Panamby;Desenvolvimento;Ativa;Sim;FDMP;Sim;322;N„o ;Financeiro;5%;16;MBSP2026148;;e-mail enviado dia 04/08
-138;Maple Bear Sert„ozinho - Centro;Potente;Ativa;Sim;ROY/FDMP;Sim;142;N„o ;Financeiro;5%;7;MBSP2026223;;"Ana 29/07: Cyndi mandou um e-mail para a escola com informaÁıes detalhadas das pendÍncias financeiras, e ressaltando a import‚ncia da regularizaÁ„o (incluindo a entrega dos vouchers) / e-mail enviado dia 04/08
-Ana 04/08: Alexandre respondeu o e-mail falando que est· a disposiÁ„o para renegociar. Eu respondi o email dele, e passei o tel dele para Cyndi pedindo para que ela entre em contato com ele "
-14;Maple Bear Fortaleza - JosÈ De Alencar I;Desenvolvimento;Ativa;Sim;Sim;Sim;460;Sim;;5%;23;MBCE2026119;SIM;
-140;Maple Bear Tabo„o Da Serra - Parque AssunÁ„o;Potente;Ativa;Sim;Sim;Sim;62;Sim;;5%;3;MBSP2026301;SIM;
-141;Maple Bear TaubatÈ - Jardim Das NaÁıes I;Desenvolvimento;Ativa;Sim;Sim;Sim;385;Sim;;5%;19;MBSP2026131;SIM;
+132;Maple Bear S√£o Paulo - S√£o Miguel Paulista;Alerta;Ativa;Sim;ROY/FDMP;Sim;119;N√£o ;Financeiro;5%;6;MBSP2026196;;e-mail enviado dia 04/08
+133;Maple Bear S√£o Paulo - Vila Madalena I;Alerta;Ativa;Sim;Sim;Sim;24;Sim;;5%;1;MBSP2026276;SIM;
+135;Maple Bear S√£o Paulo - Vila Nova Concei√ß√£o I;Potente;Ativa;Sim;Sim;Sim;136;Sim;;5%;7;MBSP2026194;SIM;
+136;Maple Bear S√£o Paulo - Vila Ol√≠mpia;Potente;Ativa;Sim;Sim;Sim;268;Sim;;5%;13;MBSP2026195;SIM;
+137;Maple Bear S√£o Paulo - Panamby;Desenvolvimento;Ativa;Sim;FDMP;Sim;322;N√£o ;Financeiro;5%;16;MBSP2026148;;e-mail enviado dia 04/08
+138;Maple Bear Sert√£ozinho - Centro;Potente;Ativa;Sim;ROY/FDMP;Sim;142;N√£o ;Financeiro;5%;7;MBSP2026223;;"Ana 29/07: Cyndi mandou um e-mail para a escola com informa√ß√µes detalhadas das pend√™ncias financeiras, e ressaltando a import√¢ncia da regulariza√ß√£o (incluindo a entrega dos vouchers) / e-mail enviado dia 04/08
+Ana 04/08: Alexandre respondeu o e-mail falando que est√° a disposi√ß√£o para renegociar. Eu respondi o email dele, e passei o tel dele para Cyndi pedindo para que ela entre em contato com ele "
+14;Maple Bear Fortaleza - Jos√© De Alencar I;Desenvolvimento;Ativa;Sim;Sim;Sim;460;Sim;;5%;23;MBCE2026119;SIM;
+140;Maple Bear Tabo√£o Da Serra - Parque Assun√ß√£o;Potente;Ativa;Sim;Sim;Sim;62;Sim;;5%;3;MBSP2026301;SIM;
+141;Maple Bear Taubat√© - Jardim Das Na√ß√µes I;Desenvolvimento;Ativa;Sim;Sim;Sim;385;Sim;;5%;19;MBSP2026131;SIM;
 142;Maple Bear Valinhos - Joapiranga I;Potente;Ativa;Sim;Sim;Sim;133;Sim;;5%;7;MBSP2026118;SIM;26 vouchers unidades I e II MBSP2026118
 144;Maple Bear Vinhedo - Bosque I;Potente;Ativa;Sim;Sim;Sim;179;Sim;;5%;9;MBSP2026171;SIM;
 145;Maple Bear Palmas - Plano Diretor Sul I;Potente;Ativa;Sim;Sim;Sim;582;Sim;;5%;29;MBTO2026112;SIM;
-146;Maple Bear S„o Paulo - Alto De Pinheiros I e II;Alerta;Ativa;Sim;ROY/FDMP;Sim;242;Sim;Financeiro;5%;12;MBSP2026193;SIM;"12 vouchers unidades I e I MBSP2026193
-Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. "
+146;Maple Bear S√£o Paulo - Alto De Pinheiros I e II;Alerta;Ativa;Sim;ROY/FDMP;Sim;242;Sim;Financeiro;5%;12;MBSP2026193;SIM;"12 vouchers unidades I e I MBSP2026193
+Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. "
 147;Maple Bear Araras - Jardim Piratininga;Desenvolvimento;Ativa;Sim;FDMP;Sim;94;Sim;Financeiro;5%;5;MBSP2026246;SIM;"e-mail enviado dia 04/08
-Ana 04/08 Ariadne entrou em contato atravÈs do ticket  257082 alegando que n„o possui pendÍncias financeiras. Aguardamos o time financeiro atuar. 
+Ana 04/08 Ariadne entrou em contato atrav√©s do ticket  257082 alegando que n√£o possui pend√™ncias financeiras. Aguardamos o time financeiro atuar. 
 Ana 04/08, Cyndi mandou pra mim no Teams que a escola pagou o valor pendente em 25/07. Com isso, fiz o envio dos vouchers e me descupei pelo ocorrido. "
-148;Maple Bear Barreiras - Parque Da Cidade;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;68;N„o ;Financeiro;5%;3;MBBA2026263;;verificar owners
-149;Maple Bear Belo Horizonte - Sagrada FamÌlia I;Potente;Ativa;Sim;Sim;Sim;151;Sim;;5%;8;MBMG2026244;SIM;
+148;Maple Bear Barreiras - Parque Da Cidade;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;68;N√£o ;Financeiro;5%;3;MBBA2026263;;verificar owners
+149;Maple Bear Belo Horizonte - Sagrada Fam√≠lia I;Potente;Ativa;Sim;Sim;Sim;151;Sim;;5%;8;MBMG2026244;SIM;
 150;Maple Bear Campos Dos Goytacazes - Centro I;Alerta;Ativa;Sim;Sim;Sim;347;Sim;;5%;17;MBRJ2026154;SIM;
-151;Maple Bear Imperatriz - TrÍs Poderes;Potente;Ativa;Sim;ROY/FDMP;Sim;121;N„o ;Financeiro;5%;6;MBMA2026228;;"e-mail enviado dia 04/08.
-Ana 12/08: Cyndi mandou dia 08/08 um email para a escola com os detalhes das pendÍncias financeiras e se colocando a disposiÁ„o para conversarem sobre um acordo para pagamento"
-152;Maple Bear Mau· - Bocaina I;Desenvolvimento;Ativa;Sim;Sim;Sim;62;Sim;;5%;3;MBSP2026290;SIM;
-153;Maple Bear Rio De Janeiro - MÈier I;Alerta;Ativa;Sim;Sim;Sim;122;Sim;;5%;6;MBRJ2026231;SIM;
-155;Maple Bear S„o Leopoldo - Cristo Rei;Potente;Ativa;Sim;ROY/FDMP;Sim;54;Sim;Financeiro;5%;3;MBRS2026278;SIM;"e-mail enviado dia 04/08
-Ana 09/09: Joao conversou com a Cyndi e ela informou que podemos liberar os vouchers, pois foi feito acordo e a escola j· pagou a 1™ parcela"
-156;Maple Bear TrÍs Lagoas - Quinta Da Lagoa I;Potente;Ativa;Sim;Sim;Sim;146;Sim;;5%;7;MBMS2026235;SIM;
-157;Maple Bear ValparaÌso De Goi·s - Parque S„o Bernardo;Alerta;Ativa;Sim;ROY/FDMP;Sim;97;Sim;Financeiro;5%;5;MBGO2026262;SIM;"e-mail enviado dia 04/08.
+151;Maple Bear Imperatriz - Tr√™s Poderes;Potente;Ativa;Sim;ROY/FDMP;Sim;121;N√£o ;Financeiro;5%;6;MBMA2026228;;"e-mail enviado dia 04/08.
+Ana 12/08: Cyndi mandou dia 08/08 um email para a escola com os detalhes das pend√™ncias financeiras e se colocando a disposi√ß√£o para conversarem sobre um acordo para pagamento"
+152;Maple Bear Mau√° - Bocaina I;Desenvolvimento;Ativa;Sim;Sim;Sim;62;Sim;;5%;3;MBSP2026290;SIM;
+153;Maple Bear Rio De Janeiro - M√©ier I;Alerta;Ativa;Sim;Sim;Sim;122;Sim;;5%;6;MBRJ2026231;SIM;
+155;Maple Bear S√£o Leopoldo - Cristo Rei;Potente;Ativa;Sim;ROY/FDMP;Sim;54;Sim;Financeiro;5%;3;MBRS2026278;SIM;"e-mail enviado dia 04/08
+Ana 09/09: Joao conversou com a Cyndi e ela informou que podemos liberar os vouchers, pois foi feito acordo e a escola j√° pagou a 1¬™ parcela"
+156;Maple Bear Tr√™s Lagoas - Quinta Da Lagoa I;Potente;Ativa;Sim;Sim;Sim;146;Sim;;5%;7;MBMS2026235;SIM;
+157;Maple Bear Valpara√≠so De Goi√°s - Parque S√£o Bernardo;Alerta;Ativa;Sim;ROY/FDMP;Sim;97;Sim;Financeiro;5%;5;MBGO2026262;SIM;"e-mail enviado dia 04/08.
 Ana 18/09: Cyndi informou nessa data em noss grupo no Teams com o time financeiro, que fez acordo com a escola e que podmeos liberar os vouchers."
-160;Maple Bear S„o Luis - Jardim RenascenÁa I;Alta Performance;Ativa;Sim;Sim;Sim;686;Sim;;5%;34;MBMA2026140;SIM;49 vouchers unidades I e II codigo unico MBMA2026140
+160;Maple Bear S√£o Luis - Jardim Renascen√ßa I;Alta Performance;Ativa;Sim;Sim;Sim;686;Sim;;5%;34;MBMA2026140;SIM;49 vouchers unidades I e II codigo unico MBMA2026140
 162;Maple Bear Rio Claro - Centro I;Alta Performance;Ativa;Sim;Sim;Sim;197;Sim;;5%;10;MBSP2026185;SIM;
-163;Maple Bear BraganÁa Paulista;Alerta;Ativa;Sim;ROY/FDMP;Sim;127;N„o ;Financeiro;5%;6;MBSP2026233;;"e-mail enviado dia 04/08
-Ana 12/08: Cyndi mandou um e-mail para a escola, cobrando retorno da mensagem enviada anteriormente com as pendÍncias financeiras para regularizaÁ„o. "
-164;Maple Bear ChapecÛ - Centro I;Desenvolvimento;Ativa;Sim;Sim;Sim;176;Sim;;5%;9;MBSC2026214;SIM;
-17;Maple Bear Cachoeiro Do Itapemirim - S„o Geraldo I;Desenvolvimento;Ativa;Sim;Sim;Sim;362;Sim;;5%;18;MBES2026127;SIM;
-205;Maple Bear Rio De Janeiro - Tijuca;Alerta;Ativa;Sim;ROY/FDMP;Sim;143;N„o ;Financeiro;5%;7;MBRJ2026300;;e-mail enviado dia 04/08
-21;Maple Bear An·polis - City;Alerta;Ativa;Sim;ROY/FDMP;Sim;187;Sim;Financeiro;5%;9;MBGO2026172;SIM;"e-mail enviado dia 04/08
+163;Maple Bear Bragan√ßa Paulista;Alerta;Ativa;Sim;ROY/FDMP;Sim;127;N√£o ;Financeiro;5%;6;MBSP2026233;;"e-mail enviado dia 04/08
+Ana 12/08: Cyndi mandou um e-mail para a escola, cobrando retorno da mensagem enviada anteriormente com as pend√™ncias financeiras para regulariza√ß√£o. "
+164;Maple Bear Chapec√≥ - Centro I;Desenvolvimento;Ativa;Sim;Sim;Sim;176;Sim;;5%;9;MBSC2026214;SIM;
+17;Maple Bear Cachoeiro Do Itapemirim - S√£o Geraldo I;Desenvolvimento;Ativa;Sim;Sim;Sim;362;Sim;;5%;18;MBES2026127;SIM;
+205;Maple Bear Rio De Janeiro - Tijuca;Alerta;Ativa;Sim;ROY/FDMP;Sim;143;N√£o ;Financeiro;5%;7;MBRJ2026300;;e-mail enviado dia 04/08
+21;Maple Bear An√°polis - City;Alerta;Ativa;Sim;ROY/FDMP;Sim;187;Sim;Financeiro;5%;9;MBGO2026172;SIM;"e-mail enviado dia 04/08
 Ana 18/09: Cyndi informou nessa data em noss grupo no Teams com o time financeiro, que fez acordo com a escola e que podmeos liberar os vouchers."
-23;Maple Bear Goi‚nia - Alphaville;Alta Performance;Ativa;Sim;ROY;Sim;749;Sim;Financeiro;5%;37;MBGO2026103;SIM;"Total 87 vouchers codigo unico MBGO2026103 unidades I, I e III marista e plateau d'or
-Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. "
-24;Maple Bear Goi‚nia - Marista I;Alta Performance;Ativa;Sim;ROY;Sim;253;Sim;Financeiro;5%;13;MBGO2026103;SIM;"Total 87 vouchers codigo unico MBGO2026103 unidades I, I e III marista e plateau d'or
-Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. "
+23;Maple Bear Goi√¢nia - Alphaville;Alta Performance;Ativa;Sim;ROY;Sim;749;Sim;Financeiro;5%;37;MBGO2026103;SIM;"Total 87 vouchers codigo unico MBGO2026103 unidades I, I e III marista e plateau d'or
+Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. "
+24;Maple Bear Goi√¢nia - Marista I;Alta Performance;Ativa;Sim;ROY;Sim;253;Sim;Financeiro;5%;13;MBGO2026103;SIM;"Total 87 vouchers codigo unico MBGO2026103 unidades I, I e III marista e plateau d'or
+Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. "
 25;Maple Bear Rio Verde - Setor Central I;Desenvolvimento;Ativa;Sim;Sim;Sim;165;Sim;;5%;8;MBGO2026167;SIM;
-255;Maple Bear Rio De Janeiro - G·vea;Potente;Ativa;Sim;ROY/FDMP;Sim;85;Sim;Financeiro;5%;4;MBRJ2026251;SIM;"e-mail enviado dia 04/08
-Ana 10/09: Fez o pagamento das pendencias. HistÛrico:FDMP"
-257;Maple Bear Santa Maria - Centro;Potente;Ativa;Sim;ROY/FDMP;Sim;186;N„o ;Financeiro;5%;9;MBRS2026191;;Ana 08/09: Nesta data, a Cyndi mandou para o owner Felipe, um e-mail esclarecendo as cobranÁas e pedindo um retorno sobre o tema
-258;Maple Bear Formosa - Jardim CalifÛrnia I;Potente;Ativa;Sim;Sim;Sim;83;Sim;;5%;4;MBGO2026301;SIM;
-259;Maple Bear Itatiaia - Penedo;Alerta;Ativa;Sim;FDMP;Sim;130;N„o ;Financeiro;5%;7;MBRJ2026226;;e-mail enviado dia 04/08
-265;Maple Bear Feira De Santana - SubaÈ I;Alerta;Ativa;Sim;Sim;Sim;324;Sim;;5%;16;MBBA2026162;SIM;
-267;Maple Bear Caruaru - Universit·rio;Potente;Ativa;Sim;FDMP;Sim;163;Sim;Financeiro;5%;8;MBPE2026247;SIM;Ana 18/08: Cyndi confirmou no grupo Teams financeiro + SAF que essa escola n„o possui nenhuma pendÍncia
+255;Maple Bear Rio De Janeiro - G√°vea;Potente;Ativa;Sim;ROY/FDMP;Sim;85;Sim;Financeiro;5%;4;MBRJ2026251;SIM;"e-mail enviado dia 04/08
+Ana 10/09: Fez o pagamento das pendencias. Hist√≥rico:FDMP"
+257;Maple Bear Santa Maria - Centro;Potente;Ativa;Sim;ROY/FDMP;Sim;186;N√£o ;Financeiro;5%;9;MBRS2026191;;Ana 08/09: Nesta data, a Cyndi mandou para o owner Felipe, um e-mail esclarecendo as cobran√ßas e pedindo um retorno sobre o tema
+258;Maple Bear Formosa - Jardim Calif√≥rnia I;Potente;Ativa;Sim;Sim;Sim;83;Sim;;5%;4;MBGO2026301;SIM;
+259;Maple Bear Itatiaia - Penedo;Alerta;Ativa;Sim;FDMP;Sim;130;N√£o ;Financeiro;5%;7;MBRJ2026226;;e-mail enviado dia 04/08
+265;Maple Bear Feira De Santana - Suba√© I;Alerta;Ativa;Sim;Sim;Sim;324;Sim;;5%;16;MBBA2026162;SIM;
+267;Maple Bear Caruaru - Universit√°rio;Potente;Ativa;Sim;FDMP;Sim;163;Sim;Financeiro;5%;8;MBPE2026247;SIM;Ana 18/08: Cyndi confirmou no grupo Teams financeiro + SAF que essa escola n√£o possui nenhuma pend√™ncia
 268;Maple Bear Dourados - Jardim Das Palmeiras;Potente;Ativa;Sim;ROY/FDMP;Sim;82;Sim;Financeiro;5%;4;MBMS2026236;SIM;"e-mail enviado dia 04/08
-Ana 05/09: Mensagem da Cyndi no grupo financeiro do Teams: Preciso que vocÍs liberem os vouchers de Dourados por gentileza.
+Ana 05/09: Mensagem da Cyndi no grupo financeiro do Teams: Preciso que voc√™s liberem os vouchers de Dourados por gentileza.
  
-Fechamos o acordo e ele est· com pais e m„es na escola precisando desses vouchers.
+Fechamos o acordo e ele est√° com pais e m√£es na escola precisando desses vouchers.
  "
 269;Maple Bear Lavras - Cidade Da Serra I;Desenvolvimento;Ativa;Sim;Sim;Sim;45;Sim;;5%;2;MBMG2026281;SIM;
-27;Maple Bear Belo Horizonte - Gutierrez I;Desenvolvimento;Ativa;Sim;Sim;Sim;75;Sim;;5%;4;MBMG2026238;SIM;Ana 01/08: Fiz um cÛdigo para cada escola do grupo Need, para deixar mais organizado.
-270;Maple Bear Linhares - TrÍs Barras I;Desenvolvimento;Ativa;Sim;Sim;Sim;154;Sim;;5%;8;MBES2026209;SIM;
-271;Maple Bear Hortol‚ndia - Parque Gabriel;Desenvolvimento;Ativa;Sim;ROY;Sim;36;Sim;Financeiro;5%;2;MBSP2026303;SIM;"Ana 05/08: N„o mandei email ainda, pois a Cyndi est· fazendo contato para renegociar com essa escola. Aguardarei atÈ o final do dia. 
-Ana 25/08: Cyndi formalizou atravÈs do email: PEND NCIAS FINANCEIRAS - MB HORTOL¬NDIA/SP que podemos liberar os vouchers. "
-272;Maple Bear Jaguari˙na - Ch·cara Primavera I;Potente;Ativa;Sim;Sim;Sim;62;Sim;;5%;3;MBSP2026350;SIM;
+27;Maple Bear Belo Horizonte - Gutierrez I;Desenvolvimento;Ativa;Sim;Sim;Sim;75;Sim;;5%;4;MBMG2026238;SIM;Ana 01/08: Fiz um c√≥digo para cada escola do grupo Need, para deixar mais organizado.
+270;Maple Bear Linhares - Tr√™s Barras I;Desenvolvimento;Ativa;Sim;Sim;Sim;154;Sim;;5%;8;MBES2026209;SIM;
+271;Maple Bear Hortol√¢ndia - Parque Gabriel;Desenvolvimento;Ativa;Sim;ROY;Sim;36;Sim;Financeiro;5%;2;MBSP2026303;SIM;"Ana 05/08: N√£o mandei email ainda, pois a Cyndi est√° fazendo contato para renegociar com essa escola. Aguardarei at√© o final do dia. 
+Ana 25/08: Cyndi formalizou atrav√©s do email: PEND√äNCIAS FINANCEIRAS - MB HORTOL√ÇNDIA/SP que podemos liberar os vouchers. "
+272;Maple Bear Jaguari√∫na - Ch√°cara Primavera I;Potente;Ativa;Sim;Sim;Sim;62;Sim;;5%;3;MBSP2026350;SIM;
 273;Maple Bear Nova Mutum - Parque Dos Ingas;Alerta;Ativa;Sim;ROY/FDMP;Sim;96;Sim;Financeiro;5%;5;MBMT2026241;SIM;"e-mail enviado dia 04/08.
-Ana 13/08: Identifiquei pela planilha da Cyndi que a escola fez um acordo para regularizaÁ„o, portando, liberei os vouchers nessa data. "
+Ana 13/08: Identifiquei pela planilha da Cyndi que a escola fez um acordo para regulariza√ß√£o, portando, liberei os vouchers nessa data. "
 275;Maple Bear Itapetininga - Jardim Colombo I;Desenvolvimento;Ativa;Sim;Sim;Sim;99;Sim;;5%;5;MBSP2026260;SIM;
-279;Maple Bear MacaÈ - Vale Encantado I e II;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;397;N„o ;Financeiro;5%;20;MBRJ2026200;;20 vouchers unidades I e II codigo MBRJ2026200 / e-mail enviado dia 04/08
-28;Maple Bear Belo Horizonte - Santa L˙cia II;Desenvolvimento;Ativa;Sim;ROY;Sim;488;Sim;Financeiro;5%;24;MBMG2026240;SIM;"Ana 01/08: Fiz um cÛdigo para cada escola do grupo Need, para deixar mais organizado.
-Ana 05/08: N„o mandei email ainda, pois a Cyndi est· fazendo contato para renegociar com essa escola. Aguardarei atÈ o final do dia. 
-Est· um pouco confuso, a owner diz que pagou, ent„o eu mandei os vouchers. 
+279;Maple Bear Maca√© - Vale Encantado I e II;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;397;N√£o ;Financeiro;5%;20;MBRJ2026200;;20 vouchers unidades I e II codigo MBRJ2026200 / e-mail enviado dia 04/08
+28;Maple Bear Belo Horizonte - Santa L√∫cia II;Desenvolvimento;Ativa;Sim;ROY;Sim;488;Sim;Financeiro;5%;24;MBMG2026240;SIM;"Ana 01/08: Fiz um c√≥digo para cada escola do grupo Need, para deixar mais organizado.
+Ana 05/08: N√£o mandei email ainda, pois a Cyndi est√° fazendo contato para renegociar com essa escola. Aguardarei at√© o final do dia. 
+Est√° um pouco confuso, a owner diz que pagou, ent√£o eu mandei os vouchers. 
 "
-282;Maple Bear Rio De Janeiro - Botafogo I e II;Desenvolvimento;Ativa;N„o;FDMP;Sim;351;Sim;Financeiro/Contratual;5%;17;MBRJ2026240;SIM;"17 vouchers unidades I e II codigo MBRJ2026240
-Ana: 11/09 tivemos uma reuni„o com Cyndi e Patricia e ela nos informou que podemos liberar os vouchers, pois havia um acordo de insenÁ„o de cobranÁa de FDMP para essa  escola com a antiga diretoria"
-284;Maple Bear S„o Luis - Jardim RenascenÁa II;Alta Performance;Ativa;Sim;Sim;Sim;290;Sim;;5%;15;MBMA2026140;SIM;49 vouchers unidades I e II codigo unico MBMA2026140
-29;Maple Bear Contagem - TrÍs Barras I;Potente;Ativa;Sim;Sim;Sim;75;Sim;;5%;4;MBMG2026239;SIM;voucher unico unidades I e II MBMG2026239 8 vouchers 
-290;Maple Bear Campinas - HÌpica I;Desenvolvimento;Ativa;Sim;Sim;Sim;136;Sim;;5%;7;MBSP2026302;SIM;
-291;Maple Bear S„o Paulo - Freguesia Do ” I;Potente;Ativa;Sim;Sim;Sim;95;Sim;;5%;5;MBSP2026294;SIM;
-293;Maple Bear DivinÛpolis - Centro I;Alerta;Ativa;Sim;Sim;Sim;79;Sim;;5%;4;MBMG2026274;SIM;
+282;Maple Bear Rio De Janeiro - Botafogo I e II;Desenvolvimento;Ativa;N√£o;FDMP;Sim;351;Sim;Financeiro/Contratual;5%;17;MBRJ2026240;SIM;"17 vouchers unidades I e II codigo MBRJ2026240
+Ana: 11/09 tivemos uma reuni√£o com Cyndi e Patricia e ela nos informou que podemos liberar os vouchers, pois havia um acordo de insen√ß√£o de cobran√ßa de FDMP para essa  escola com a antiga diretoria"
+284;Maple Bear S√£o Luis - Jardim Renascen√ßa II;Alta Performance;Ativa;Sim;Sim;Sim;290;Sim;;5%;15;MBMA2026140;SIM;49 vouchers unidades I e II codigo unico MBMA2026140
+29;Maple Bear Contagem - Tr√™s Barras I;Potente;Ativa;Sim;Sim;Sim;75;Sim;;5%;4;MBMG2026239;SIM;voucher unico unidades I e II MBMG2026239 8 vouchers 
+290;Maple Bear Campinas - H√≠pica I;Desenvolvimento;Ativa;Sim;Sim;Sim;136;Sim;;5%;7;MBSP2026302;SIM;
+291;Maple Bear S√£o Paulo - Freguesia Do √ì I;Potente;Ativa;Sim;Sim;Sim;95;Sim;;5%;5;MBSP2026294;SIM;
+293;Maple Bear Divin√≥polis - Centro I;Alerta;Ativa;Sim;Sim;Sim;79;Sim;;5%;4;MBMG2026274;SIM;
 294;Maple Bear Governador Valadares - Alto Esplanada I;Alerta;Ativa;Sim;Sim;Sim;167;Sim;;5%;8;MBMG2026208;SIM;
 295;Maple Bear Limeira - Bairro da Graminha;Alta Performance;Ativa;Sim;Sim;Sim;188;Sim;;5%;9;MBSP2026222;SIM;
-296;Maple Bear Nova IguaÁu - Centro I;Potente;Ativa;Sim;Sim;Sim;275;Sim;;5%;14;MBRJ2026163;SIM;
-297;Maple Bear Osasco;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;41;N„o ;Financeiro;5%;2;MBSP2026279;;"e-mail enviado dia 04/08
+296;Maple Bear Nova Igua√ßu - Centro I;Potente;Ativa;Sim;Sim;Sim;275;Sim;;5%;14;MBRJ2026163;SIM;
+297;Maple Bear Osasco;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;41;N√£o ;Financeiro;5%;2;MBSP2026279;;"e-mail enviado dia 04/08
 Ana 05/08: Cyndi mandou nesta data um e-mail atualizado com o detalhamento dos valores pendentes da escola "
-299;Maple Bear S„o Roque;Potente;Ativa;Sim;Sim;Sim;95;Sim;;5%;5;MBSP2026248;SIM;
+299;Maple Bear S√£o Roque;Potente;Ativa;Sim;Sim;Sim;95;Sim;;5%;5;MBSP2026248;SIM;
 300;Maple Bear Aracaju - Treze De Julho II;Desenvolvimento;Ativa;Sim;Sim;Sim;132;Sim;;5%;7;MBSE2026195;SIM;unidades I e II codigo unico MBSE2026195 25 vouchers 
-301;Maple Bear Sorocaba - Boa Vista;Potente;Ativa;Sim;FDMP;Sim;31;N„o ;Financeiro;5%;2;MBSP2026305;;"14 vouchers unidades I e II codigo MBSP2026305
+301;Maple Bear Sorocaba - Boa Vista;Potente;Ativa;Sim;FDMP;Sim;31;N√£o ;Financeiro;5%;2;MBSP2026305;;"14 vouchers unidades I e II codigo MBSP2026305
 "
 304;Maple Bear Passo Fundo - Vila Luiza I;Alerta;Ativa;Sim;Sim;Sim;163;Sim;;5%;8;MBRS2026211;SIM;
-305;Maple Bear JacareÌ - Jardim ParaÌba;Alerta;Ativa;Sim;ROY/FDMP;Sim;114;Sim;Financeiro;5%;6;MBSP2026252;;Ana 12/08: Liberamos os vouchers apÛs liberaÁ„o do Visoni (como o processo de repasse ainda n„o foi concluido, n„o È possivel seguir com acordo financeiro, mas como as conversas j· foram iniciadas com a escola, optamos por liberar)
-308;Maple Bear Arax· - Villagio Jardim;Potente;Ativa;Sim;Sim;Sim;108;Sim;;5%;5;MBMG2026300;SIM;
-309;Maple Bear Ipatinga - Cidade Jardim;ImplantaÁ„o;Ativa;Sim;FDMP;Sim;55;Sim;Financeiro;5%;3;MBMG2026320;SIM;Ana 05/08: Saulo questionou sobre Ipatinga no e-mail de Itabira e aÌ eu respondi a ele que tem uma pendÍncia de FDMP de maio.Cyndi mandou o boleto sem juros. Como isso tranforma a situaÁ„o em uma negociaÁ„o, vamos conceder os vouchers 
+305;Maple Bear Jacare√≠ - Jardim Para√≠ba;Alerta;Ativa;Sim;ROY/FDMP;Sim;114;Sim;Financeiro;5%;6;MBSP2026252;;Ana 12/08: Liberamos os vouchers ap√≥s libera√ß√£o do Visoni (como o processo de repasse ainda n√£o foi concluido, n√£o √© possivel seguir com acordo financeiro, mas como as conversas j√° foram iniciadas com a escola, optamos por liberar)
+308;Maple Bear Arax√° - Villagio Jardim;Potente;Ativa;Sim;Sim;Sim;108;Sim;;5%;5;MBMG2026300;SIM;
+309;Maple Bear Ipatinga - Cidade Jardim;Implanta√ß√£o;Ativa;Sim;FDMP;Sim;55;Sim;Financeiro;5%;3;MBMG2026320;SIM;Ana 05/08: Saulo questionou sobre Ipatinga no e-mail de Itabira e a√≠ eu respondi a ele que tem uma pend√™ncia de FDMP de maio.Cyndi mandou o boleto sem juros. Como isso tranforma a situa√ß√£o em uma negocia√ß√£o, vamos conceder os vouchers 
 31;Maple Bear Itabira - Quatorze De Fevereiro I;Potente;Ativa;Sim;Sim;Sim;182;Sim;;5%;9;MBMG2026243;SIM;
 32;Maple Bear Juiz De Fora - Santa Luzia I;Potente;Ativa;Sim;Sim;Sim;209;Sim;;5%;10;MBMG2026212;SIM;
 33;Maple Bear Montes Claros - Ibituruna I;Desenvolvimento;Ativa;Sim;Sim;Sim;132;Sim;;5%;7;MBMG2026227;SIM;
 34;Maple Bear Nova Lima - Alphaville Lagoa Dos Ingleses I;Desenvolvimento;Ativa;Sim;Sim;Sim;164;Sim;;5%;8;MBMG2026188;SIM;
-343;Maple Bear S„o Paulo - Ch·cara Klabin I;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;805;Sim;Financeiro;5%;40;MPSP2026350;SIM;Ana 01/08: De acordo com a planilha que a Cyndi enviou, h· um acordo firmado para essa escola. 
-35;Maple Bear Pouso Alegre - F·tima I;Alerta;Ativa;Sim;Sim;Sim;140;Sim;;5%;7;MBMG2026206;SIM;
-36;Maple Bear Uberaba - S„o Sebasti„o I;Desenvolvimento;Ativa;Sim;Sim;Sim;265;Sim;;5%;13;MBMG2026174;SIM;
-37;Maple Bear Uberl‚ndia - Vigilato Pereira I;Alerta;Ativa;Sim;Sim;Sim;172;Sim;;5%;9;MBMG2026175;SIM;
-38;Maple Bear Campo Grande - Jardim S„o Bento I;Potente;Ativa;Sim;ROY/FDMP;Sim;149;Sim;Financeiro;5%;7;MBMS2026140;SIM;Ana 01/08: De acordo com a planilha que a Cyndi enviou, h· um acordo firmado para essa escola. 
-39;Maple Bear Cuiab· - Ribeir„o Do Lipa;Alerta;Ativa;Sim;ROY/FDMP;Sim;32;N„o ;Financeiro;5%;2;MBMT2026330;;e-mail enviado dia 04/08
-40;Maple Bear Sinop - Recanto SuÌÁo;Alta Performance;Ativa;Sim;ROY;Sim;272;Sim;Financeiro;5%;14;MBMT2026153;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-406;Maple Bear Sorocaba - Jardim S„o Carlos;Potente;Ativa;Sim;ROY/FDMP;Sim;232;N„o ;Financeiro;5%;12;MBSP2026305;;14 vouchers unidades I e II codigo MBSP2026305
-41;Maple Bear Sorriso - Residencial Copenhagen;Alerta;Ativa;Sim;ROY/FDMP;Sim;156;N„o ;Financeiro;5%;8;MBMT2026296;;"e-mail enviado dia 04/08
-Ana 12/08: Cyndi mandou dia 07/08 um email para a escola com os detalhes das pendÍncias financeiras e se colocando a disposiÁ„o para conversarem sobre um acordo para pagamento
-Ana 15/09: Cyndi mandou um novo e-mail com informaÁıes detalhadas sobre as pendÍncias da escola"
-42;Maple Bear BelÈm - Reduto I;Desenvolvimento;Ativa;Sim;Sim;Sim;617;Sim;;5%;31;MBPA2026109;SIM;
-44;Maple Bear Jo„o Pessoa - Bessa I;Potente;Ativa;Sim;Sim;Sim;202;Sim;;6%;12;MBPB2026150;SIM;"30 vouchers unidades I e II codigo MBPB2026150 
-Ana 04/08: Gustavo me chamou para alinhar que o % de vouchers da escola dele È de 6% e n„o 5% como as demais. Questionei o Ramires no grupo Teams ''operaÁıes lideranÁa'' e ele respondeu que È isso mesmo. "
+343;Maple Bear S√£o Paulo - Ch√°cara Klabin I;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;805;Sim;Financeiro;5%;40;MPSP2026350;SIM;Ana 01/08: De acordo com a planilha que a Cyndi enviou, h√° um acordo firmado para essa escola. 
+35;Maple Bear Pouso Alegre - F√°tima I;Alerta;Ativa;Sim;Sim;Sim;140;Sim;;5%;7;MBMG2026206;SIM;
+36;Maple Bear Uberaba - S√£o Sebasti√£o I;Desenvolvimento;Ativa;Sim;Sim;Sim;265;Sim;;5%;13;MBMG2026174;SIM;
+37;Maple Bear Uberl√¢ndia - Vigilato Pereira I;Alerta;Ativa;Sim;Sim;Sim;172;Sim;;5%;9;MBMG2026175;SIM;
+38;Maple Bear Campo Grande - Jardim S√£o Bento I;Potente;Ativa;Sim;ROY/FDMP;Sim;149;Sim;Financeiro;5%;7;MBMS2026140;SIM;Ana 01/08: De acordo com a planilha que a Cyndi enviou, h√° um acordo firmado para essa escola. 
+39;Maple Bear Cuiab√° - Ribeir√£o Do Lipa;Alerta;Ativa;Sim;ROY/FDMP;Sim;32;N√£o ;Financeiro;5%;2;MBMT2026330;;e-mail enviado dia 04/08
+40;Maple Bear Sinop - Recanto Su√≠√ßo;Alta Performance;Ativa;Sim;ROY;Sim;272;Sim;Financeiro;5%;14;MBMT2026153;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+406;Maple Bear Sorocaba - Jardim S√£o Carlos;Potente;Ativa;Sim;ROY/FDMP;Sim;232;N√£o ;Financeiro;5%;12;MBSP2026305;;14 vouchers unidades I e II codigo MBSP2026305
+41;Maple Bear Sorriso - Residencial Copenhagen;Alerta;Ativa;Sim;ROY/FDMP;Sim;156;N√£o ;Financeiro;5%;8;MBMT2026296;;"e-mail enviado dia 04/08
+Ana 12/08: Cyndi mandou dia 07/08 um email para a escola com os detalhes das pend√™ncias financeiras e se colocando a disposi√ß√£o para conversarem sobre um acordo para pagamento
+Ana 15/09: Cyndi mandou um novo e-mail com informa√ß√µes detalhadas sobre as pend√™ncias da escola"
+42;Maple Bear Bel√©m - Reduto I;Desenvolvimento;Ativa;Sim;Sim;Sim;617;Sim;;5%;31;MBPA2026109;SIM;
+44;Maple Bear Jo√£o Pessoa - Bessa I;Potente;Ativa;Sim;Sim;Sim;202;Sim;;6%;12;MBPB2026150;SIM;"30 vouchers unidades I e II codigo MBPB2026150 
+Ana 04/08: Gustavo me chamou para alinhar que o % de vouchers da escola dele √© de 6% e n√£o 5% como as demais. Questionei o Ramires no grupo Teams ''opera√ß√µes lideran√ßa'' e ele respondeu que √© isso mesmo. "
 46;Maple Bear Recife - Aflitos I;Alerta;Ativa;Sim;Sim;Sim;737;Sim;;5%;37;MBPE2026100;SIM;
 47;Maple Bear Teresina - Morada Do Sol I;Potente;Ativa;Sim;Sim;Sim;251;Sim;;5%;13;MBPI2026151;SIM;
-49;Maple Bear Londrina - Nikko;Desenvolvimento;Ativa;Sim;ROY;Sim;219;Sim;Financeiro;5%;11;MBPR2026169;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-490;Maple Bear FlorianÛpolis - Ilha I;Desenvolvimento;Ativa;Sim;Sim;Sim;194;Sim;;5%;10;MBSC2026159;SIM;
-51;Maple Bear Maring·;Potente;Ativa;N„o;Sim;Sim;197;Sim;Contratual;5%;10;MBPR2026218;SIM;Ana 09/09: Rafha conversou com a Vanessa e ela n„o soube explicar se a pendencia do ajuste contratual È Maple ou escola. Portanto, para n„o prejudicar a escola, fiz o envio dos vouchers nesta data. 
+49;Maple Bear Londrina - Nikko;Desenvolvimento;Ativa;Sim;ROY;Sim;219;Sim;Financeiro;5%;11;MBPR2026169;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+490;Maple Bear Florian√≥polis - Ilha I;Desenvolvimento;Ativa;Sim;Sim;Sim;194;Sim;;5%;10;MBSC2026159;SIM;
+51;Maple Bear Maring√°;Potente;Ativa;N√£o;Sim;Sim;197;Sim;Contratual;5%;10;MBPR2026218;SIM;Ana 09/09: Rafha conversou com a Vanessa e ela n√£o soube explicar se a pendencia do ajuste contratual √© Maple ou escola. Portanto, para n√£o prejudicar a escola, fiz o envio dos vouchers nesta data. 
 52;Maple Bear Ponta Grossa - Estrela I;Alerta;Ativa;Sim;Sim;Sim;230;Sim;;5%;12;MBPR2026197;SIM;
-55;Maple Bear NiterÛi - S„o Francisco;Desenvolvimento;Ativa;Sim;ROY;Sim;199;N„o ;Financeiro;5%;10;MBRJ2026202;;12 vouchers unidades I e II santa rosa e s„o francisco codigo MBRJ2026202
-56;Maple Bear Rio De Janeiro - Barra Da Tijuca I;Potente;Ativa;N„o;FDMP;Sim;165;N„o ;Financeiro/Contratual;5%;8;MBRJ2026120;SIM;"31 vouchers unidades I e II codigo MBRJ2026120
-Ana 08/08: Cyndi informou que h· apenas um boleto de junho 25 e que ela j· conversou com a escola e enviou um boleto sem juros para pagamento. Com isso, podemos liberar os vouchers.
-Ana08/08: Cyndi me informou que os valores s„o de 2024, mas que h· uma pendencia da Maple e escola fazer um encontro de contas, pois a forma de apuraÁ„o de valores era feita de uma forma diferente. Com isso, est· liberado mandar os vouchers. 
-Sobre contrato, n„o tenho clareza sobre, mas o Ricardo disse ao Rafhael que podemos liberar os vouchers"
+55;Maple Bear Niter√≥i - S√£o Francisco;Desenvolvimento;Ativa;Sim;ROY;Sim;199;N√£o ;Financeiro;5%;10;MBRJ2026202;;12 vouchers unidades I e II santa rosa e s√£o francisco codigo MBRJ2026202
+56;Maple Bear Rio De Janeiro - Barra Da Tijuca I;Potente;Ativa;N√£o;FDMP;Sim;165;N√£o ;Financeiro/Contratual;5%;8;MBRJ2026120;SIM;"31 vouchers unidades I e II codigo MBRJ2026120
+Ana 08/08: Cyndi informou que h√° apenas um boleto de junho 25 e que ela j√° conversou com a escola e enviou um boleto sem juros para pagamento. Com isso, podemos liberar os vouchers.
+Ana08/08: Cyndi me informou que os valores s√£o de 2024, mas que h√° uma pendencia da Maple e escola fazer um encontro de contas, pois a forma de apura√ß√£o de valores era feita de uma forma diferente. Com isso, est√° liberado mandar os vouchers. 
+Sobre contrato, n√£o tenho clareza sobre, mas o Ricardo disse ao Rafhael que podemos liberar os vouchers"
 59;Maple Bear Rio De Janeiro - Freguesia I;Potente;Ativa;Sim;Sim;Sim;327;Sim;;5%;16;MBRJ2026137;SIM;
-6;Maple Bear Rio Branco - Avi·rio;Alerta;Ativa;N„o;Sim;Sim;93;N„o ;Contratual;5%;5;MBAC2026178;;
-60;Maple Bear Rio De Janeiro - Ilha Do Governador;Potente;Ativa;Sim;ROY;Sim;287;Sim;Financeiro;5%;14;MBRJ2026141;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-615;Maple Bear Ji-Paran· - Centro I;Alta Performance;Ativa;Sim;Sim;Sim;73;Sim;;5%;4;MBRO2026265;SIM;
-618;Maple Bear Jo„o Pessoa - Bessa II;Potente;Ativa;Sim;Sim;Sim;407;Sim;;6%;24;MBPB2026150;SIM;"30 vouchers unidades I e II codigo MBPB2026150 
-Ana 04/08: Gustavo me chamou para alinhar que o % de vouchers da escola dele È de 6% e n„o 5% como as demais. Questionei o Ramires no grupo Teams ''operaÁıes lideranÁa'' e ele respondeu que È isso mesmo. "
-62;Maple Bear Rio De Janeiro - Recreio Dos Bandeirantes;Potente;Ativa;N„o;;Sim;210;Sim;Financeiro/Contratual;5%;11;MBRJ2026152;SIM;"Ana08/08: Cyndi me informou que os valores s„o de 2024, mas que h· uma pendencia da Maple e escola fazer um encontro de contas, pois a forma de apuraÁ„o de valores era feita de uma forma diferente. Com isso, est· liberado mandar os vouchers. 
-Sobre contrato, n„o tenho clareza sobre, mas o Ricardo disse ao Rafhael que podemos liberar os vouchers, ent„o assim o fiz"
-621;Maple Bear Rio De Janeiro - Barra Da Tijuca II;Potente;Ativa;Sim;FDMP;Sim;466;N„o ;Financeiro;5%;23;MBRJ2026120;SIM;"31 vouchers unidades I e II codigo MBRJ2026120
-Ana 08/08: Cyndi informou que h· apenas um boleto de junho 25 e que ela j· conversou com a escola e enviou um boleto sem juros para pagamento. Com isso, podemos liberar os vouchers.
-Ana08/08: Cyndi me informou que os valores s„o de 2024, mas que h· uma pendencia da Maple e escola fazer um encontro de contas, pois a forma de apuraÁ„o de valores era feita de uma forma diferente. Com isso, est· liberado mandar os vouchers. 
-Sobre contrato, n„o tenho clareza sobre, mas o Ricardo disse ao Rafhael que podemos liberar os vouchers"
-63;Maple Bear Rio De Janeiro - Vila Valqueire;Alerta;Ativa;Sim;ROY;Sim;174;Sim;Financeiro;5%;9;MBRJ2026207;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-633;Maple Bear Goi‚nia - Plateau D'Or;Alta Performance;Ativa;N„o;ROY;Sim;;N/A;Financeiro/Contratual;5%;0;;;Ana 05/08: Enviei como plateudor
-639;Maple Bear Brasilia - ¡guas Claras  Sul;Alerta;Ativa;Sim;ROY;Sim;494;Sim;Financeiro;5%;25;MBDF2026114;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-642;Maple Bear S„o Paulo - Casa Verde I;Alerta;Ativa;Sim;Sim;Sim;50;Sim;;5%;3;MBSP2026283;SIM;
+6;Maple Bear Rio Branco - Avi√°rio;Alerta;Ativa;N√£o;Sim;Sim;93;N√£o ;Contratual;5%;5;MBAC2026178;;
+60;Maple Bear Rio De Janeiro - Ilha Do Governador;Potente;Ativa;Sim;ROY;Sim;287;Sim;Financeiro;5%;14;MBRJ2026141;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+615;Maple Bear Ji-Paran√° - Centro I;Alta Performance;Ativa;Sim;Sim;Sim;73;Sim;;5%;4;MBRO2026265;SIM;
+618;Maple Bear Jo√£o Pessoa - Bessa II;Potente;Ativa;Sim;Sim;Sim;407;Sim;;6%;24;MBPB2026150;SIM;"30 vouchers unidades I e II codigo MBPB2026150 
+Ana 04/08: Gustavo me chamou para alinhar que o % de vouchers da escola dele √© de 6% e n√£o 5% como as demais. Questionei o Ramires no grupo Teams ''opera√ß√µes lideran√ßa'' e ele respondeu que √© isso mesmo. "
+62;Maple Bear Rio De Janeiro - Recreio Dos Bandeirantes;Potente;Ativa;N√£o;;Sim;210;Sim;Financeiro/Contratual;5%;11;MBRJ2026152;SIM;"Ana08/08: Cyndi me informou que os valores s√£o de 2024, mas que h√° uma pendencia da Maple e escola fazer um encontro de contas, pois a forma de apura√ß√£o de valores era feita de uma forma diferente. Com isso, est√° liberado mandar os vouchers. 
+Sobre contrato, n√£o tenho clareza sobre, mas o Ricardo disse ao Rafhael que podemos liberar os vouchers, ent√£o assim o fiz"
+621;Maple Bear Rio De Janeiro - Barra Da Tijuca II;Potente;Ativa;Sim;FDMP;Sim;466;N√£o ;Financeiro;5%;23;MBRJ2026120;SIM;"31 vouchers unidades I e II codigo MBRJ2026120
+Ana 08/08: Cyndi informou que h√° apenas um boleto de junho 25 e que ela j√° conversou com a escola e enviou um boleto sem juros para pagamento. Com isso, podemos liberar os vouchers.
+Ana08/08: Cyndi me informou que os valores s√£o de 2024, mas que h√° uma pendencia da Maple e escola fazer um encontro de contas, pois a forma de apura√ß√£o de valores era feita de uma forma diferente. Com isso, est√° liberado mandar os vouchers. 
+Sobre contrato, n√£o tenho clareza sobre, mas o Ricardo disse ao Rafhael que podemos liberar os vouchers"
+63;Maple Bear Rio De Janeiro - Vila Valqueire;Alerta;Ativa;Sim;ROY;Sim;174;Sim;Financeiro;5%;9;MBRJ2026207;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+633;Maple Bear Goi√¢nia - Plateau D'Or;Alta Performance;Ativa;N√£o;ROY;Sim;;N/A;Financeiro/Contratual;5%;0;;;Ana 05/08: Enviei como plateudor
+639;Maple Bear Brasilia - √Åguas Claras  Sul;Alerta;Ativa;Sim;ROY;Sim;494;Sim;Financeiro;5%;25;MBDF2026114;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+642;Maple Bear S√£o Paulo - Casa Verde I;Alerta;Ativa;Sim;Sim;Sim;50;Sim;;5%;3;MBSP2026283;SIM;
 645;Maple Bear Caxias Do Sul - Santa Catarina I;Desenvolvimento;Ativa;Sim;Sim;Sim;158;Sim;;5%;8;MBRS2026256;SIM;
-648;Maple Bear S„o Paulo - Penha De FranÁa;Alerta;Ativa;Sim;ROY/FDMP;Sim;67;Sim;Financeiro;5%;3;MBSP2026271;SIM;"e-mail enviado dia 04/08
-Ana 25/08: Cyndi formalizou e-mail de acordo com a escola e deu o aval para liberaÁ„o dos vouchers"
-65;Maple Bear TeresÛpolis - Bom Retiro I;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;139;N„o ;Financeiro;5%;7;MBRJ2026219;SIM;"Ana 31/07: Cyndi mandou um e-mail em 31/07 falando sobre a quest„o financeira dessa escola. Preciso falar com o Ramires para entender se poderemos ou n„o entregar os vouchers. 
-Ana 08/08: Embora tenham pendencias financeiras, h· um acordo sobre esses valores e o Ramires autorizou a entrega dos vouchers"
-651;Maple Bear S„o Carlos I;Desenvolvimento;Ativa;Sim;Sim;Sim;107;Sim;;5%;5;MBSP2026202;SIM;
-654;Maple Bear PoÁos De Caldas - Centro I;Potente;Ativa;Sim;Sim;Sim;42;Sim;;5%;2;MBMG2026305;SIM;
-657;Maple Bear Porto Alegre - Zona Sul;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;62;N„o ;Financeiro;5%;3;MBRS2026277;;e-mail enviado dia 04/08
+648;Maple Bear S√£o Paulo - Penha De Fran√ßa;Alerta;Ativa;Sim;ROY/FDMP;Sim;67;Sim;Financeiro;5%;3;MBSP2026271;SIM;"e-mail enviado dia 04/08
+Ana 25/08: Cyndi formalizou e-mail de acordo com a escola e deu o aval para libera√ß√£o dos vouchers"
+65;Maple Bear Teres√≥polis - Bom Retiro I;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;139;N√£o ;Financeiro;5%;7;MBRJ2026219;SIM;"Ana 31/07: Cyndi mandou um e-mail em 31/07 falando sobre a quest√£o financeira dessa escola. Preciso falar com o Ramires para entender se poderemos ou n√£o entregar os vouchers. 
+Ana 08/08: Embora tenham pendencias financeiras, h√° um acordo sobre esses valores e o Ramires autorizou a entrega dos vouchers"
+651;Maple Bear S√£o Carlos I;Desenvolvimento;Ativa;Sim;Sim;Sim;107;Sim;;5%;5;MBSP2026202;SIM;
+654;Maple Bear Po√ßos De Caldas - Centro I;Potente;Ativa;Sim;Sim;Sim;42;Sim;;5%;2;MBMG2026305;SIM;
+657;Maple Bear Porto Alegre - Zona Sul;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;62;N√£o ;Financeiro;5%;3;MBRS2026277;;e-mail enviado dia 04/08
 66;Maple Bear Natal - Tirol;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;572;Sim;Financeiro;5%;29;MBRN2026107;SIM;"e-mail enviado dia 04/08
-Ana 19/08: Verifiquei na planilha da Cyndi que foi feito acordo junto a esssa escola para regularizaÁ„o financeira. Liberado voucher nessa data "
-660;Maple Bear S„o Paulo - Belenzinho I;Alerta;Ativa;Sim;Sim;Sim;21;Sim;;5%;1;MBSP2026304;SIM;
-663;Maple Bear S„o JosÈ Dos Pinhais;Desenvolvimento;Ativa;Sim;ROY;Sim;107;N„o ;Financeiro;5%;5;MBPR2026275;;e-mail enviado dia 04/08
-669;Maple Bear BrasÌlia - Asa Norte;Desenvolvimento;Ativa;N„o;FDMP;Sim;541;Sim;Financeiro/Contratual;5%;27;MBDF2026116;SIM;Ana 01/08: Cyndi confirmou via Teams (grupo financeiro) que paras as escolas prÛproas n„o h· cobranÁa e que s„o insentas de cobranÁa
+Ana 19/08: Verifiquei na planilha da Cyndi que foi feito acordo junto a esssa escola para regulariza√ß√£o financeira. Liberado voucher nessa data "
+660;Maple Bear S√£o Paulo - Belenzinho I;Alerta;Ativa;Sim;Sim;Sim;21;Sim;;5%;1;MBSP2026304;SIM;
+663;Maple Bear S√£o Jos√© Dos Pinhais;Desenvolvimento;Ativa;Sim;ROY;Sim;107;N√£o ;Financeiro;5%;5;MBPR2026275;;e-mail enviado dia 04/08
+669;Maple Bear Bras√≠lia - Asa Norte;Desenvolvimento;Ativa;N√£o;FDMP;Sim;541;Sim;Financeiro/Contratual;5%;27;MBDF2026116;SIM;Ana 01/08: Cyndi confirmou via Teams (grupo financeiro) que paras as escolas pr√≥proas n√£o h√° cobran√ßa e que s√£o insentas de cobran√ßa
 67;Maple Bear Parnamirim - Nova Parnamirim;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;195;Sim;Financeiro;5%;10;MBRN2026187;SIM;"e-mail enviado dia 04/08.
 
-Ana 04/08: Paulo solicitou mais informaÁıes e eu pedi a ele para contatar o time financeiro atravÈs do whatsapp. 
-Ana 12/08: Cyndi enviou em 08/08 um e-mail com o detalhamento das pendÍncias financeiras da escola.
+Ana 04/08: Paulo solicitou mais informa√ß√µes e eu pedi a ele para contatar o time financeiro atrav√©s do whatsapp. 
+Ana 12/08: Cyndi enviou em 08/08 um e-mail com o detalhamento das pend√™ncias financeiras da escola.
 Ana 28/08: Cyndi autorizou mandar os vouchers, pois fez acordo com a escoa"
-672;Maple Bear BrasÌlia - Sudoeste;Desenvolvimento;Ativa;Sim;Sim;Sim;524;Sim;;5%;26;MBDF2026117;SIM;
-673;Maple Bear Primavera Do Leste;Potente;Ativa;Sim;ROY/FDMP;Sim;51;N„o ;Financeiro;5%;3;MBSP2026340;;e-mail enviado dia 04/08
+672;Maple Bear Bras√≠lia - Sudoeste;Desenvolvimento;Ativa;Sim;Sim;Sim;524;Sim;;5%;26;MBDF2026117;SIM;
+673;Maple Bear Primavera Do Leste;Potente;Ativa;Sim;ROY/FDMP;Sim;51;N√£o ;Financeiro;5%;3;MBSP2026340;;e-mail enviado dia 04/08
 676;Maple Bear Lagoa Santa - Vila Joana D'Arc I;Potente;Ativa;Sim;Sim;Sim;125;Sim;;5%;6;MBSP2026292;SIM;
 68;Maple Bear Porto Velho - Olaria I;Alta Performance;Ativa;Sim;Sim;Sim;257;Sim;;5%;13;MBRO2026101;SIM;45 vouchers unidades I e II codigo MBRO2026101
 682;Maple Bear Araguari - Miranda I;Potente;Ativa;Sim;Sim;Sim;32;Sim;;5%;2;MBMG2026298;SIM;
-685;Maple Bear Campinas - Bar„o Geraldo I;Potente;Ativa;Sim;Sim;Sim;29;Sim;;5%;1;MBSP2026297;SIM;
+685;Maple Bear Campinas - Bar√£o Geraldo I;Potente;Ativa;Sim;Sim;Sim;29;Sim;;5%;1;MBSP2026297;SIM;
 69;Maple Bear Porto Velho - Olaria II;Alta Performance;Ativa;Sim;Sim;Sim;643;Sim;;5%;32;MBRO2026101;SIM;45 vouchers unidades I e II codigo MBRO2026101
-691;Maple Bear Lucas Do Rio Verde - Alvorada;Alerta;Ativa;Sim;ROY;Sim;86;Sim;Financeiro;5%;4;MBMT2026282;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-694;Maple Bear Jaragu· Do Sul - Vila Baependi I;Potente;Ativa;Sim;Sim;Sim;76;Sim;;5%;4;MBSC2026287;SIM;
-695;Maple Bear S„o Paulo - Vila Mascote I;Desenvolvimento;Ativa;Sim;Sim;Sim;178;Sim;;5%;9;MBSP2026173;SIM;
-698;Maple Bear Guarapari - MuquiÁaba;Desenvolvimento;Ativa;Sim;FDMP;Sim;135;Sim;Financeiro;5%;7;MBES2026242;SIM;"e-mail enviado dia 04/08
-Ana 04/08: Werik respondeu o e-mail perguntando o que est· pendente e eu respondi informando que a Cyndi vai cham·-lo por whatsapp para dar os devidos detalhes. 
-Ana 08/09: Cyndi informou pessoalmente para Ana que essa escola n„o tem pendÍncia "
-70;Maple Bear Boa Vista - CaÁari I;Desenvolvimento;Ativa;Sim;Sim;Sim;194;Sim;;5%;10;MBRR2026161;SIM;
+691;Maple Bear Lucas Do Rio Verde - Alvorada;Alerta;Ativa;Sim;ROY;Sim;86;Sim;Financeiro;5%;4;MBMT2026282;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+694;Maple Bear Jaragu√° Do Sul - Vila Baependi I;Potente;Ativa;Sim;Sim;Sim;76;Sim;;5%;4;MBSC2026287;SIM;
+695;Maple Bear S√£o Paulo - Vila Mascote I;Desenvolvimento;Ativa;Sim;Sim;Sim;178;Sim;;5%;9;MBSP2026173;SIM;
+698;Maple Bear Guarapari - Muqui√ßaba;Desenvolvimento;Ativa;Sim;FDMP;Sim;135;Sim;Financeiro;5%;7;MBES2026242;SIM;"e-mail enviado dia 04/08
+Ana 04/08: Werik respondeu o e-mail perguntando o que est√° pendente e eu respondi informando que a Cyndi vai cham√°-lo por whatsapp para dar os devidos detalhes. 
+Ana 08/09: Cyndi informou pessoalmente para Ana que essa escola n√£o tem pend√™ncia "
+70;Maple Bear Boa Vista - Ca√ßari I;Desenvolvimento;Ativa;Sim;Sim;Sim;194;Sim;;5%;10;MBRR2026161;SIM;
 701;Maple Bear Santos - Campo Grande;Desenvolvimento;Ativa;Sim;Sim;Sim;480;Sim;;5%;24;MBSP2026122;SIM;
 707;Maple Bear Petrolina - Vila Eduardo I;Potente;Ativa;Sim;Sim;Sim;296;Sim;;5%;15;MBPE2026284;SIM;Conforme e-mail do Rodrigo em 29/08: VOUCHER DE DESCONTO - CICLO 2026 MAPLE BEAR PETROLINA ele solicitou o desmembramento de vouchers sendo 9 vouchers de 20% e 5 vouchers de 50%. Por conta da soma do desmembramento, tive que criar um voucher de 70%. 
-71;Maple Bear Porto Alegre - Iguatemi;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;152;N„o ;Financeiro;5%;8;MBRS2026308;;"e-mail enviado dia 04/08
-Ana 12/08: Cyndi mandou dia 08/08 um email para a escola com os detalhes das pendÍncias financeiras e se colocando a disposiÁ„o para conversarem sobre um acordo para pagamento"
-710;Maple Bear Macap· - Centro;ImplantaÁ„o;Ativa;N„o;Sim;Sim;72;Sim;Contratual;5%;4;MBAP2026370;SIM;
-713;Maple Bear Cascavel - Centro;Alerta;Ativa;Sim;ROY/FDMP;Sim;48;N„o ;Financeiro;5%;2;MBPR2026296;;e-mail enviado dia 04/08
-716;Maple Bear Assis - Jardim Morumbi;Alerta;Ativa;Sim;ROY/FDMP;Sim;126;N„o ;Financeiro;5%;6;MBSP2026299;;"e-mail enviado dia 04/08
-Ana 12/08: Ramires mandou um e-mail falando pra suspender as cobranÁas de roy futuras dessa escola, mas a Cyndi respondeu que ok, mas que seguir· com as cobranÁas passadas.
-Ana 12/08: Larissa do time financeiro mandou no dia 30/07  um e-mail com o detalhamento das pendÍncias financeiras por parte da escola. Como n„o obteve retorno, fez um cobranÁa no dia 08/08."
+71;Maple Bear Porto Alegre - Iguatemi;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;152;N√£o ;Financeiro;5%;8;MBRS2026308;;"e-mail enviado dia 04/08
+Ana 12/08: Cyndi mandou dia 08/08 um email para a escola com os detalhes das pend√™ncias financeiras e se colocando a disposi√ß√£o para conversarem sobre um acordo para pagamento"
+710;Maple Bear Macap√° - Centro;Implanta√ß√£o;Ativa;N√£o;Sim;Sim;72;Sim;Contratual;5%;4;MBAP2026370;SIM;
+713;Maple Bear Cascavel - Centro;Alerta;Ativa;Sim;ROY/FDMP;Sim;48;N√£o ;Financeiro;5%;2;MBPR2026296;;e-mail enviado dia 04/08
+716;Maple Bear Assis - Jardim Morumbi;Alerta;Ativa;Sim;ROY/FDMP;Sim;126;N√£o ;Financeiro;5%;6;MBSP2026299;;"e-mail enviado dia 04/08
+Ana 12/08: Ramires mandou um e-mail falando pra suspender as cobran√ßas de roy futuras dessa escola, mas a Cyndi respondeu que ok, mas que seguir√° com as cobran√ßas passadas.
+Ana 12/08: Larissa do time financeiro mandou no dia 30/07  um e-mail com o detalhamento das pend√™ncias financeiras por parte da escola. Como n√£o obteve retorno, fez um cobran√ßa no dia 08/08."
 719;Maple Bear Barretos - Campos Do Conde I;Potente;Ativa;Sim;Sim;Sim;101;Sim;;5%;5;MBSP2026293;SIM;
 722;Maple Bear Duque De Caxias - Jardim 25 De Agosto I;Potente;Ativa;Sim;Sim;Sim;59;Sim;;5%;3;MBRJ2026303;SIM;
-725;Maple Bear Cuiab· - Jardim It·lia;Alta Performance;Ativa;Sim;Sim;Sim;74;Sim;;5%;4;MBMT2026295;SIM;
+725;Maple Bear Cuiab√° - Jardim It√°lia;Alta Performance;Ativa;Sim;Sim;Sim;74;Sim;;5%;4;MBMT2026295;SIM;
 728;Maple Bear Passos - Centro I;Potente;Ativa;Sim;Sim;Sim;36;Sim;;5%;2;MBMG2026301;SIM;
-73;Maple Bear Balne·rio Cambori˙ - Centro;Alerta;Ativa;Sim;ROY;Sim;147;Sim;Financeiro;5%;7;MBSC2026180;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-733;Maple Bear Aracaju - Atalaia;ImplantaÁ„o;Ativa;Sim;ROY/FDMP;Sim;172;N„o ;Financeiro;5%;9;MBSE2026350;;"e-mail enviado dia 04/08
-Ana 19/08: Cyndi mandou em 18/08 um e-mail ao Lauro e ao Victor detalhando os dÈbitos  
-Ana 18/09: Cyndi confirmou no grupo que temos com o financeiro que a escola negociou os dÈbitos que tinha com a central "
-736;Maple Bear Gramado - Planalto I;ImplantaÁ„o;Ativa;Sim;Sim;Sim;34;Sim;;5%;2;MBRS2026310;SIM;
-739;Maple Bear S„o Paulo - PompÈia II;Potente;Ativa;Sim;Sim;Sim;152;Sim;;5%;8;MBSP2026156;SIM;12 vouchers para unidades I e II MBSP2026156
-74;Maple Bear FlorianÛpolis - Continente I;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;284;Sim;Financeiro;5%;14;MBSC2026136;SIM;"Ana 24/07:Cyndi enviou para a escola em 23/07 um relatÛrio detalhado das pendÍncias financeiras.
-Ana 31/07: Cyndi formalizou um e-mail para Edilane no dia 30/07 com informaÁıes sobre o acordo firmado. Conferir os dados para saber se podemos liberar os vouchers no dia 01/08. 
-Ana 01/08: Diante do acordo firmado, fiz a liberaÁ„o dos vouchers da escola"
-742;Maple Bear Conselheiro Lafaiete - Areal;ImplantaÁ„o;Ativa;Sim;Sim;Sim;5;N„o ;Escola em implantaÁ„o;5%;0;;N√O;Ana 01/08: Essa escola ainda n„o possui alunos. Os SLM's comprados s„o de implantaÁ„o, portanto os vouchers de amostra j· foram disponibilizados.
+73;Maple Bear Balne√°rio Cambori√∫ - Centro;Alerta;Ativa;Sim;ROY;Sim;147;Sim;Financeiro;5%;7;MBSC2026180;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+733;Maple Bear Aracaju - Atalaia;Implanta√ß√£o;Ativa;Sim;ROY/FDMP;Sim;172;N√£o ;Financeiro;5%;9;MBSE2026350;;"e-mail enviado dia 04/08
+Ana 19/08: Cyndi mandou em 18/08 um e-mail ao Lauro e ao Victor detalhando os d√©bitos  
+Ana 18/09: Cyndi confirmou no grupo que temos com o financeiro que a escola negociou os d√©bitos que tinha com a central "
+736;Maple Bear Gramado - Planalto I;Implanta√ß√£o;Ativa;Sim;Sim;Sim;34;Sim;;5%;2;MBRS2026310;SIM;
+739;Maple Bear S√£o Paulo - Pomp√©ia II;Potente;Ativa;Sim;Sim;Sim;152;Sim;;5%;8;MBSP2026156;SIM;12 vouchers para unidades I e II MBSP2026156
+74;Maple Bear Florian√≥polis - Continente I;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;284;Sim;Financeiro;5%;14;MBSC2026136;SIM;"Ana 24/07:Cyndi enviou para a escola em 23/07 um relat√≥rio detalhado das pend√™ncias financeiras.
+Ana 31/07: Cyndi formalizou um e-mail para Edilane no dia 30/07 com informa√ß√µes sobre o acordo firmado. Conferir os dados para saber se podemos liberar os vouchers no dia 01/08. 
+Ana 01/08: Diante do acordo firmado, fiz a libera√ß√£o dos vouchers da escola"
+742;Maple Bear Conselheiro Lafaiete - Areal;Implanta√ß√£o;Ativa;Sim;Sim;Sim;5;N√£o ;Escola em implanta√ß√£o;5%;0;;N√ÉO;Ana 01/08: Essa escola ainda n√£o possui alunos. Os SLM's comprados s√£o de implanta√ß√£o, portanto os vouchers de amostra j√° foram disponibilizados.
 745;Maple Bear Blumenau - Velha I;Alerta;Ativa;Sim;Sim;Sim;97;Sim;;5%;5;MBSC2026286;SIM;
-748;Maple Bear VitÛria - Bento Ferreira;Desenvolvimento;Ativa;Sim;ROY;Sim;174;Sim;Financeiro;5%;9;MBES2026189;SIM;Ana 01/08: Cyndi confirmou via Teams (grupo financeiro) que paras as escolas prÛproas n„o h· cobranÁa e que s„o insentas de cobranÁa
-75;Maple Bear Joinville - Atiradores;Desenvolvimento;Ativa;Sim;ROY;Sim;187;Sim;Financeiro;5%;9;MBSC2026213;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-751;Maple Bear Contagem - TrÍs Barras II;Potente;Ativa;Sim;Sim;Sim;71;Sim;;5%;4;MBMG2026239;SIM;voucher unico unidades I e II MBMG2026239 8 vouchers
-757;Maple Bear Jo„o Pessoa - Altiplano I;Potente;Ativa;Sim;Sim;Sim;49;Sim;;6%;3;MBPB2026288;SIM;Ana 04/08: Gustavo me chamou para alinhar que o % de vouchers da escola dele È de 6% e n„o 5% como as demais. Questionei o Ramires no grupo Teams ''operaÁıes lideranÁa'' e ele respondeu que È isso mesmo. 
+748;Maple Bear Vit√≥ria - Bento Ferreira;Desenvolvimento;Ativa;Sim;ROY;Sim;174;Sim;Financeiro;5%;9;MBES2026189;SIM;Ana 01/08: Cyndi confirmou via Teams (grupo financeiro) que paras as escolas pr√≥proas n√£o h√° cobran√ßa e que s√£o insentas de cobran√ßa
+75;Maple Bear Joinville - Atiradores;Desenvolvimento;Ativa;Sim;ROY;Sim;187;Sim;Financeiro;5%;9;MBSC2026213;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+751;Maple Bear Contagem - Tr√™s Barras II;Potente;Ativa;Sim;Sim;Sim;71;Sim;;5%;4;MBMG2026239;SIM;voucher unico unidades I e II MBMG2026239 8 vouchers
+757;Maple Bear Jo√£o Pessoa - Altiplano I;Potente;Ativa;Sim;Sim;Sim;49;Sim;;6%;3;MBPB2026288;SIM;Ana 04/08: Gustavo me chamou para alinhar que o % de vouchers da escola dele √© de 6% e n√£o 5% como as demais. Questionei o Ramires no grupo Teams ''opera√ß√µes lideran√ßa'' e ele respondeu que √© isso mesmo. 
 76;Maple Bear Aracaju - Treze De Julho I;Desenvolvimento;Ativa;Sim;Sim;Sim;352;Sim;;5%;18;MBSE2026195;SIM;unidades I e II codigo unico MBSE2026195 25 vouchers
-760;Maple Bear NiterÛi - Santa Rosa;Desenvolvimento;Ativa;N„o;ROY;Sim;34;N„o ;Financeiro/Contratual;5%;2;MBRJ2025202;;12 vouchers unidades I e II santa rosa e s„o francisco codigo MBRJ2026202
-763;Maple Bear FlorianÛpolis Norte;Desenvolvimento;Ativa;N„o;ROY;Sim;36;N„o ;Financeiro/Contratual;5%;2;MBSC2026289;SIM;"Ana 19/08: Sobre a inadimplencia financeira, est· ok, pois foi feito acordo. Preciso checar sobre o contrato
-Ana 15/09:Jo„o conversou com a Vanessa e ela informou que podemos sim mandar os vouchers, pois a quest„o contratual foi resolvida
-Ana 15/09: Joao confirmou com a Cyndi e essa escola n„o tem pendÍncias financeiras"
-769;Maple Bear Cabo Frio - Palmeiras;ImplantaÁ„o;Ativa;Sim;Sim;Sim;94;Sim;;5%;5;MBRJ2026305;SIM;
+760;Maple Bear Niter√≥i - Santa Rosa;Desenvolvimento;Ativa;N√£o;ROY;Sim;34;N√£o ;Financeiro/Contratual;5%;2;MBRJ2025202;;12 vouchers unidades I e II santa rosa e s√£o francisco codigo MBRJ2026202
+763;Maple Bear Florian√≥polis Norte;Desenvolvimento;Ativa;N√£o;ROY;Sim;36;N√£o ;Financeiro/Contratual;5%;2;MBSC2026289;SIM;"Ana 19/08: Sobre a inadimplencia financeira, est√° ok, pois foi feito acordo. Preciso checar sobre o contrato
+Ana 15/09:Jo√£o conversou com a Vanessa e ela informou que podemos sim mandar os vouchers, pois a quest√£o contratual foi resolvida
+Ana 15/09: Joao confirmou com a Cyndi e essa escola n√£o tem pend√™ncias financeiras"
+769;Maple Bear Cabo Frio - Palmeiras;Implanta√ß√£o;Ativa;Sim;Sim;Sim;94;Sim;;5%;5;MBRJ2026305;SIM;
 77;Maple Bear Aldeia Da Serra - Morada Dos Lagos I;Desenvolvimento;Ativa;Sim;Sim;Sim;126;Sim;;5%;6;MBSP2026220;SIM;
-775;Maple Bear PetrÛpolis - Itaipava;Potente;Ativa;Sim;ROY/FDMP;Sim;64;N„o ;Financeiro;5%;3;;;e-mail enviado dia 04/08
-778;Maple Bear RondonÛpolis - Parque Sagrada Familia I;ImplantaÁ„o;Ativa;Sim;Sim;Sim;84;Sim;;5%;4;MBMT2026297;SIM;
-78;Maple Bear AraÁatuba - HigienÛpolis;Desenvolvimento;Ativa;Sim;FDMP;Sim;146;N„o ;Financeiro;5%;7;;;
-784;Maple Bear Sete Lagoas;ImplantaÁ„o;Ativa;Sim;Sim;Sim;5;N„o ;Escola em implantaÁ„o;5%;0;;N√O;Ana 01/08: Essa escola ainda n„o possui alunos. Os SLM's comprados s„o de implantaÁ„o, portanto os vouchers de amostra j· foram disponibilizados.
+775;Maple Bear Petr√≥polis - Itaipava;Potente;Ativa;Sim;ROY/FDMP;Sim;64;N√£o ;Financeiro;5%;3;;;e-mail enviado dia 04/08
+778;Maple Bear Rondon√≥polis - Parque Sagrada Familia I;Implanta√ß√£o;Ativa;Sim;Sim;Sim;84;Sim;;5%;4;MBMT2026297;SIM;
+78;Maple Bear Ara√ßatuba - Higien√≥polis;Desenvolvimento;Ativa;Sim;FDMP;Sim;146;N√£o ;Financeiro;5%;7;;;
+784;Maple Bear Sete Lagoas;Implanta√ß√£o;Ativa;Sim;Sim;Sim;5;N√£o ;Escola em implanta√ß√£o;5%;0;;N√ÉO;Ana 01/08: Essa escola ainda n√£o possui alunos. Os SLM's comprados s√£o de implanta√ß√£o, portanto os vouchers de amostra j√° foram disponibilizados.
 79;Maple Bear Araraquara - Vila Harmonia I;Desenvolvimento;Ativa;Sim;Sim;Sim;187;Sim;;5%;9;MBSP2026203;SIM;
-790;Maple Bear Pindamonhangaba;ImplantaÁ„o;Q1 2026;Sim;Sim;Sim;5;N„o ;Escola em implantaÁ„o;5%;0;;N√O;Ana 01/08: Essa escola ainda n„o possui alunos. Os SLM's comprados s„o de implantaÁ„o, portanto os vouchers de amostra j· foram disponibilizados.
-793;Maple Bear Arcoverde;ImplantaÁ„o;Ativa;Sim;Sim;Sim;5;N„o ;Escola em implantaÁ„o;5%;0;;N√O;Ana 01/08: Essa escola ainda n„o possui alunos. Os SLM's comprados s„o de implantaÁ„o, portanto os vouchers de amostra j· foram disponibilizados.
-796;Maple Bear Guarapuava;ImplantaÁ„o;Ativa;Sim;ROY/FDMP;Sim;62;Sim;Financeiro;5%;3;;SIM;e-mail enviado dia 04/08
+790;Maple Bear Pindamonhangaba;Implanta√ß√£o;Q1 2026;Sim;Sim;Sim;5;N√£o ;Escola em implanta√ß√£o;5%;0;;N√ÉO;Ana 01/08: Essa escola ainda n√£o possui alunos. Os SLM's comprados s√£o de implanta√ß√£o, portanto os vouchers de amostra j√° foram disponibilizados.
+793;Maple Bear Arcoverde;Implanta√ß√£o;Ativa;Sim;Sim;Sim;5;N√£o ;Escola em implanta√ß√£o;5%;0;;N√ÉO;Ana 01/08: Essa escola ainda n√£o possui alunos. Os SLM's comprados s√£o de implanta√ß√£o, portanto os vouchers de amostra j√° foram disponibilizados.
+796;Maple Bear Guarapuava;Implanta√ß√£o;Ativa;Sim;ROY/FDMP;Sim;62;Sim;Financeiro;5%;3;;SIM;e-mail enviado dia 04/08
 80;Maple Bear Atibaia - Ressaca I;Alta Performance;Ativa;Sim;Sim;Sim;259;Sim;;5%;13;MBSP2026155;SIM;
-808;Maple Bear Boa Viagem;ImplantaÁ„o;Ativa;Sim;Sim;Sim;53;Sim;;5%;3;MBPE2026285;SIM;
-809;Maple Bear Bento GonÁalves;ImplantaÁ„o;Ativa;Sim;Sim;Sim;31;Sim;;5%;2;MBRS2026309;SIM;
-812;Maple Bear MaceiÛ - Jati˙ca;Alta Performance;Ativa;Sim;ROY/FDMP;Sim;809;Sim;Financeiro;5%;40;MBAL2026106;SIM;"Ana 31/07: Cyndi mandou em 30/07 um e-mail para o Alessandro com informaÁıes sobre as pendÍncias financeiras da escola. Aguardando retorno para saber sobre um possivel acordo. 
+808;Maple Bear Boa Viagem;Implanta√ß√£o;Ativa;Sim;Sim;Sim;53;Sim;;5%;3;MBPE2026285;SIM;
+809;Maple Bear Bento Gon√ßalves;Implanta√ß√£o;Ativa;Sim;Sim;Sim;31;Sim;;5%;2;MBRS2026309;SIM;
+812;Maple Bear Macei√≥ - Jati√∫ca;Alta Performance;Ativa;Sim;ROY/FDMP;Sim;809;Sim;Financeiro;5%;40;MBAL2026106;SIM;"Ana 31/07: Cyndi mandou em 30/07 um e-mail para o Alessandro com informa√ß√µes sobre as pend√™ncias financeiras da escola. Aguardando retorno para saber sobre um possivel acordo. 
 Ana 07/08: Tati me falou no Teams que a Cyndi avisou que fez acordo com essa unidade, portanto, liberei os vouchers nesta data"
-82;Maple Bear Bauru - Vila AviaÁ„o I;Desenvolvimento;Ativa;Sim;Sim;Sim;336;Sim;;5%;17;MBSP2026204;SIM;
-821;Maple Bear S„o Paulo - Pacaembu I e  II;Desenvolvimento;Ativa;Sim;Sim;Sim;150;Sim;;5%;8;MBSP2026230;SIM;
-824;Maple Bear Manaus - Flores I;Alerta;Ativa;Sim;ROY/FDMP;Sim;108;Sim;Financeiro;5%;5;MBAM2026215;SIM;Ana 01/08: De acordo com a planilha que a Cyndi enviou, h· um acordo firmado para essa escola. 
+82;Maple Bear Bauru - Vila Avia√ß√£o I;Desenvolvimento;Ativa;Sim;Sim;Sim;336;Sim;;5%;17;MBSP2026204;SIM;
+821;Maple Bear S√£o Paulo - Pacaembu I e  II;Desenvolvimento;Ativa;Sim;Sim;Sim;150;Sim;;5%;8;MBSP2026230;SIM;
+824;Maple Bear Manaus - Flores I;Alerta;Ativa;Sim;ROY/FDMP;Sim;108;Sim;Financeiro;5%;5;MBAM2026215;SIM;Ana 01/08: De acordo com a planilha que a Cyndi enviou, h√° um acordo firmado para essa escola. 
 83;Maple Bear Botucatu - Vila Nogueira I;Desenvolvimento;Ativa;Sim;Sim;Sim;136;Sim;;5%;7;MBSP2026229;SIM;
-830;Maple Bear Goi‚nia - Marista II;Alta Performance;Ativa;Sim;Sim;Sim;345;Sim;;5%;17;MBGO2026103;SIM;Total 87 vouchers codigo unico MBGO2026103 unidades I, I e III marista e plateau d'or
-833;Maple Bear Goi‚nia - Marista III;Alta Performance;Ativa;Sim;Sim;Sim;339;Sim;;5%;17;MBGO2026103;SIM;Total 87 vouchers codigo unico MBGO2026103 unidades I, I e III marista e plateau d'or
-842;Maple Bear Campo Grande - Ch·cara Cachoeira II;Potente;Ativa;Sim;Sim;Sim;248;Sim;;5%;12;MBMS2026139;SIM;
-845;Maple Bear S„o Vicente;ImplantaÁ„o;Ativa;Sim;Sim;Sim;5;N„o ;Escola em implantaÁ„o;5%;1;MBSP2026400;N√O;Ana 01/08: Essa escola ainda n„o possui alunos. Os SLM's comprados s„o de implantaÁ„o, portanto os vouchers de amostra j· foram disponibilizados. concedido 1 de 100% ticket #259409
-848;Maple Bear Goi·s - Mineiros;ImplantaÁ„o;Ativa;Sim;Sim;Sim;5;N„o ;Escola em implantaÁ„o;5%;0;;N√O;Ana 01/08: Essa escola ainda n„o possui alunos. Os SLM's comprados s„o de implantaÁ„o, portanto os vouchers de amostra j· foram disponibilizados.
-856;Maple Bear Itumbiara;ImplantaÁ„o;Ativa;Sim;Sim;Sim;6;N„o ;Escola em implantaÁ„o;5%;0;;N√O;Ana 01/08: Essa escola ainda n„o possui alunos. Os SLM's comprados s„o de implantaÁ„o, portanto os vouchers de amostra j· foram disponibilizados.
+830;Maple Bear Goi√¢nia - Marista II;Alta Performance;Ativa;Sim;Sim;Sim;345;Sim;;5%;17;MBGO2026103;SIM;Total 87 vouchers codigo unico MBGO2026103 unidades I, I e III marista e plateau d'or
+833;Maple Bear Goi√¢nia - Marista III;Alta Performance;Ativa;Sim;Sim;Sim;339;Sim;;5%;17;MBGO2026103;SIM;Total 87 vouchers codigo unico MBGO2026103 unidades I, I e III marista e plateau d'or
+842;Maple Bear Campo Grande - Ch√°cara Cachoeira II;Potente;Ativa;Sim;Sim;Sim;248;Sim;;5%;12;MBMS2026139;SIM;
+845;Maple Bear S√£o Vicente;Implanta√ß√£o;Ativa;Sim;Sim;Sim;5;N√£o ;Escola em implanta√ß√£o;5%;1;MBSP2026400;N√ÉO;Ana 01/08: Essa escola ainda n√£o possui alunos. Os SLM's comprados s√£o de implanta√ß√£o, portanto os vouchers de amostra j√° foram disponibilizados. concedido 1 de 100% ticket #259409
+848;Maple Bear Goi√°s - Mineiros;Implanta√ß√£o;Ativa;Sim;Sim;Sim;5;N√£o ;Escola em implanta√ß√£o;5%;0;;N√ÉO;Ana 01/08: Essa escola ainda n√£o possui alunos. Os SLM's comprados s√£o de implanta√ß√£o, portanto os vouchers de amostra j√° foram disponibilizados.
+856;Maple Bear Itumbiara;Implanta√ß√£o;Ativa;Sim;Sim;Sim;6;N√£o ;Escola em implanta√ß√£o;5%;0;;N√ÉO;Ana 01/08: Essa escola ainda n√£o possui alunos. Os SLM's comprados s√£o de implanta√ß√£o, portanto os vouchers de amostra j√° foram disponibilizados.
 860;Maple Bear Valinhos - Joapiranga II;Potente;Ativa;Sim;FDMP;Sim;376;Sim;Financeiro;5%;19;MBSP2026118;SIM;"26 vouchers unidades I e II MBSP2026118
-Ana 25/08: Cyndi me confirmou nessa data via Teams que a escola n„o possui mais pendÍncias financeiras. Enviei os vouchers nesta data. "
-861;Maple Bear Mogiana - Mogi Mirim - Mogi GuaÁu;Desenvolvimento;Ativa;Sim;ROY;Sim;266;Sim;Financeiro;5%;13;MBSP2026166;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-862;Maple Bear Itu;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;49;N„o ;Financeiro;5%;2;MBSP2026312;;e-mail enviado dia 04/08
-863;Maple Bear Campina Grande - Mirante I;Desenvolvimento;Ativa;Sim;Sim;Sim;171;Sim;Financeiro;5%;9;MBPB2026168;SIM;Ana 24/07: Cyndi formalizou internamente que a escola n„o possui dÈbitos antes do repasse. H· valores de julho em aberto, mas o novo owner j· est· negociando pagamento. Dessa forma, ajustei para ''sim'' o diereito aos vouchers
-864;Maple Bear Vila Velha - Praia Da Costa;Desenvolvimento;Ativa;N„o;Sim;Sim;420;Sim;Contratual;5%;21;MBES2026142;SIM;Ana 01/08: Cyndi confirmou via Teams (grupo financeiro) que paras as escolas prÛproas n„o h· cobranÁa e que s„o insentas de cobranÁa
+Ana 25/08: Cyndi me confirmou nessa data via Teams que a escola n√£o possui mais pend√™ncias financeiras. Enviei os vouchers nesta data. "
+861;Maple Bear Mogiana - Mogi Mirim - Mogi Gua√ßu;Desenvolvimento;Ativa;Sim;ROY;Sim;266;Sim;Financeiro;5%;13;MBSP2026166;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+862;Maple Bear Itu;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;49;N√£o ;Financeiro;5%;2;MBSP2026312;;e-mail enviado dia 04/08
+863;Maple Bear Campina Grande - Mirante I;Desenvolvimento;Ativa;Sim;Sim;Sim;171;Sim;Financeiro;5%;9;MBPB2026168;SIM;Ana 24/07: Cyndi formalizou internamente que a escola n√£o possui d√©bitos antes do repasse. H√° valores de julho em aberto, mas o novo owner j√° est√° negociando pagamento. Dessa forma, ajustei para ''sim'' o diereito aos vouchers
+864;Maple Bear Vila Velha - Praia Da Costa;Desenvolvimento;Ativa;N√£o;Sim;Sim;420;Sim;Contratual;5%;21;MBES2026142;SIM;Ana 01/08: Cyndi confirmou via Teams (grupo financeiro) que paras as escolas pr√≥proas n√£o h√° cobran√ßa e que s√£o insentas de cobran√ßa
 867;Maple Bear Curitiba - Batel;Desenvolvimento;Ativa;Sim;Sim;Sim;163;Sim;;5%;8;MBPR2026254;SIM;
 868;Maple Bear Rio das Ostras - Alphaville;Desenvolvimento;Ativa;Sim;Sim;Sim;79;Sim;;5%;4;MBRJ2026304;SIM;
-87;Maple Bear Franca - Residencial ParaÌso I;Alta Performance;Ativa;Sim;Sim;Sim;216;Sim;;5%;11;MBSP2026176;SIM;
+87;Maple Bear Franca - Residencial Para√≠so I;Alta Performance;Ativa;Sim;Sim;Sim;216;Sim;;5%;11;MBSP2026176;SIM;
 871;Maple Bear Catanduva - Centro I E II;Potente;Ativa;Sim;Sim;Sim;267;Sim;;5%;13;MBSP2026183;SIM;
-873;Maple Bear Rio de Janeiro - Campo Grande - ItaguaÌ;ImplantaÁ„o;Ativa;Sim;Sim;Sim;32;Sim;;5%;2;MBRJ2026306;SIM;
-874;Maple Bear S„o Paulo - Parque dos PrÌncipes;Potente;Ativa;N„o;ROY/FDMP;Sim;82;Sim;Financeiro/Contratual;5%;4;MBSP2026311;SIM;Ana 14/08: Cyndi nos avisou que fez algumas confirmaÁıes com o Ramires e que n„o h· pendÍncias financeiras por parte da escola (conversa feita pessoalmente nesta data). Ainda na mesma conversa, Ramires nos explicou que h· uma atualizaÁ„o contratual devido a mudanÁa no quadro societ·rio da empresa, mas que est· fluindo e nos autorizou a mandar os vouchers.)
-875;Maple Bear Marab· - Belo Horizonte;ImplantaÁ„o;Ativa;Sim;FDMP;Sim;14;N„o ;Financeiro;5%;1;MBPA2026110;;e-mail enviado dia 04/08
-88;Maple Bear Guaratinguet· - Alberto Byington I;Alerta;Ativa;Sim;Sim;Sim;66;Sim;;5%;3;MBSP2025668;SIM;
-89;Maple Bear Guaruj· - Enseada I;Desenvolvimento;Ativa;Sim;Sim;Sim;190;Sim;;5%;10;MBSP2026201;SIM;
-9;Maple Bear Manaus - Ponta Negra II;Alerta;Ativa;Sim;ROY/FDMP;Sim;57;Sim;Financeiro;5%;3;MBAM2026216;SIM;Ana 01/08: De acordo com a planilha que a Cyndi enviou, h· um acordo firmado para essa escola. 
+873;Maple Bear Rio de Janeiro - Campo Grande - Itagua√≠;Implanta√ß√£o;Ativa;Sim;Sim;Sim;32;Sim;;5%;2;MBRJ2026306;SIM;
+874;Maple Bear S√£o Paulo - Parque dos Pr√≠ncipes;Potente;Ativa;N√£o;ROY/FDMP;Sim;82;Sim;Financeiro/Contratual;5%;4;MBSP2026311;SIM;Ana 14/08: Cyndi nos avisou que fez algumas confirma√ß√µes com o Ramires e que n√£o h√° pend√™ncias financeiras por parte da escola (conversa feita pessoalmente nesta data). Ainda na mesma conversa, Ramires nos explicou que h√° uma atualiza√ß√£o contratual devido a mudan√ßa no quadro societ√°rio da empresa, mas que est√° fluindo e nos autorizou a mandar os vouchers.)
+875;Maple Bear Marab√° - Belo Horizonte;Implanta√ß√£o;Ativa;Sim;FDMP;Sim;14;N√£o ;Financeiro;5%;1;MBPA2026110;;e-mail enviado dia 04/08
+88;Maple Bear Guaratinguet√° - Alberto Byington I;Alerta;Ativa;Sim;Sim;Sim;66;Sim;;5%;3;MBSP2025668;SIM;
+89;Maple Bear Guaruj√° - Enseada I;Desenvolvimento;Ativa;Sim;Sim;Sim;190;Sim;;5%;10;MBSP2026201;SIM;
+9;Maple Bear Manaus - Ponta Negra II;Alerta;Ativa;Sim;ROY/FDMP;Sim;57;Sim;Financeiro;5%;3;MBAM2026216;SIM;Ana 01/08: De acordo com a planilha que a Cyndi enviou, h√° um acordo firmado para essa escola. 
 90;Maple Bear Guarulhos - Centro;Desenvolvimento;Ativa;Sim;Sim;Sim;199;Sim;;5%;10;MBSP2026184;SIM;
 91;Maple Bear Indaiatuba - Jardim Esplanada I;Alta Performance;Ativa;Sim;Sim;Sim;426;Sim;;5%;21;MBSP2026123;SIM;
 92;Maple Bear Itatiba - Residencial Fazenda Rosa I;Desenvolvimento;Ativa;Sim;Sim;Sim;84;Sim;;5%;4;MBSP2026255;SIM;
-94;Maple Bear JundiaÌ - Jardim Santa Teresa;Desenvolvimento;Ativa;Sim;FDMP;Sim;436;N„o ;Financeiro;5%;22;MBSP2026310;;e-mail enviado dia 04/08
-97;Maple Bear MarÌlia - Parque Das Esmeraldas;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;329;Sim;Financeiro;5%;16;MBSP2026134;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualizaÁıes sobre negociaÁ„o e/ou quitaÁ„o de pendÍncias das unidades. 
-98;Maple Bear Mogi Das Cruzes - Vila Oliveira I;Alta Performance;Ativa;Sim;ROY/FDMP;Sim;353;Sim;Financeiro;5%;18;MBSP2026129;SIM;"Vinicius (time financeiro) me informou que n„o cobraremos as dÌvidas dessa escola. Portanto, conceder os vouchers
-Ana 01/08: Ao mandar email do voucher, n„o coloquei nenhuma obs no que diz respeito ao financeiro para n„o comprometer ou criar falsas expectativas no que diz respeito a perd„o de dÈbitos. "
+94;Maple Bear Jundia√≠ - Jardim Santa Teresa;Desenvolvimento;Ativa;Sim;FDMP;Sim;436;N√£o ;Financeiro;5%;22;MBSP2026310;;e-mail enviado dia 04/08
+97;Maple Bear Mar√≠lia - Parque Das Esmeraldas;Desenvolvimento;Ativa;Sim;ROY/FDMP;Sim;329;Sim;Financeiro;5%;16;MBSP2026134;SIM;Ana 05/08: Voucher enviado de acordo com o retorno da Cyndi no e-mail Atualizar Status financeiro onde ela nos passou atualiza√ß√µes sobre negocia√ß√£o e/ou quita√ß√£o de pend√™ncias das unidades. 
+98;Maple Bear Mogi Das Cruzes - Vila Oliveira I;Alta Performance;Ativa;Sim;ROY/FDMP;Sim;353;Sim;Financeiro;5%;18;MBSP2026129;SIM;"Vinicius (time financeiro) me informou que n√£o cobraremos as d√≠vidas dessa escola. Portanto, conceder os vouchers
+Ana 01/08: Ao mandar email do voucher, n√£o coloquei nenhuma obs no que diz respeito ao financeiro para n√£o comprometer ou criar falsas expectativas no que diz respeito a perd√£o de d√©bitos. "
 ;;;;;; ;;;;;;;;
 ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;
