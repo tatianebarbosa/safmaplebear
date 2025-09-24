@@ -4,11 +4,20 @@ export interface School {
     name: string;
     cluster: string;
     status: string;
+    city: string;
+    state: string;
+    region: string;
+    carteira_saf: string;
     used: number;
     limit: number;
     badge: {
         tone: 'gray' | 'blue' | 'green' | 'red';
         text: string;
+    };
+    contact: {
+        phone: string;
+        email: string;
+        address: string;
     };
 }
 
@@ -16,7 +25,11 @@ export interface SchoolUser {
     name: string;
     email: string;
     role: string;
+    school_name: string;
+    school_id: string;
+    status_licenca: string;
     has_canva: boolean;
+    is_compliant: boolean;
 }
 
 export interface AuditEntry {

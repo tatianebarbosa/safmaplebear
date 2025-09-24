@@ -277,8 +277,12 @@ export class DashboardPage {
                 subtitle: `ID: ${school.id} • ${school.cluster}`,
                 content: `
                     <div class="mb-4">${badge}</div>
-                    <div class="text-sm text-gray">
-                        <div>Status: ${school.status}</div>
+                    <div class="text-sm text-gray space-y-1">
+                        <div><strong>Status:</strong> ${school.status}</div>
+                        <div><strong>Localização:</strong> ${school.city}/${school.state}</div>
+                        <div><strong>Região:</strong> ${school.region}</div>
+                        <div><strong>SAF:</strong> ${school.carteira_saf}</div>
+                        ${school.contact.phone ? `<div><strong>Telefone:</strong> ${school.contact.phone}</div>` : ''}
                     </div>
                 `,
                 footer: actions
@@ -348,30 +352,41 @@ export class DashboardPage {
                 users.map(user => `
                     <div class="flex justify-between items-center py-2 border-b border-gray-200">
                         <div>
-                            <div class="font-medium">${user.name}</div>
+                            <div class="font-medium">${user.name || 'Nome não informado'}</div>
                             <div class="text-sm text-gray">${user.email}</div>
+                            <div class="text-xs text-gray">
+                                ${user.role} • ${user.is_compliant ? 'Email conforme' : 'Email não conforme'}
+                            </div>
                         </div>
-                        <div>
+                        <div class="text-right">
                             <span class="badge badge-${user.has_canva ? 'green' : 'gray'}">
                                 ${user.has_canva ? 'Com Licença' : 'Sem Licença'}
                             </span>
+                            ${user.status_licenca ? `<div class="text-xs text-gray mt-1">Status: ${user.status_licenca}</div>` : ''}
                         </div>
                     </div>
                 `).join('') :
                 '<p class="text-center text-gray py-4">Nenhum usuário encontrado</p>';
             
+            const compliantUsers = users.filter(u => u.is_compliant);
+            const nonCompliantUsers = users.filter(u => !u.is_compliant);
+            
             Modal.show(
                 `Usuários - ${school.name}`,
                 `
-                    <div class="mb-4">
-                        <strong>Total:</strong> ${users.length} usuários<br>
-                        <strong>Com licença:</strong> ${users.filter(u => u.has_canva).length}
+                    <div class="mb-4 p-3 bg-gray-50 rounded">
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div><strong>Total de usuários:</strong> ${users.length}</div>
+                            <div><strong>Com licença Canva:</strong> ${users.filter(u => u.has_canva).length}</div>
+                            <div><strong>Emails conformes:</strong> ${compliantUsers.length}</div>
+                            <div><strong>Emails não conformes:</strong> ${nonCompliantUsers.length}</div>
+                        </div>
                     </div>
                     <div class="max-h-96 overflow-y-auto">
                         ${usersList}
                     </div>
                 `,
-                { showCancel: false, confirmText: 'Fechar' }
+                { showCancel: false, confirmText: 'Fechar', size: 'lg' }
             );
             
         } catch (error) {
