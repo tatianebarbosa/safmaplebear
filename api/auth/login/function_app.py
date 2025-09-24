@@ -1,6 +1,7 @@
 import azure.functions as func
 import json
-from ..shared.auth import authenticate_user, generate_token
+from ...shared.secure_auth import secure_auth
+from ...shared.config import config
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """Login endpoint - POST /auth/login"""
@@ -33,17 +34,24 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 headers={"Content-Type": "application/json"}
             )
         
-        # Authenticate user
-        user_info = authenticate_user(username, password)
-        if not user_info:
+        # Authenticate user using the secure_auth service
+        auth_result = secure_auth.authenticate_user(username, password)
+        
+        if not auth_result.get("success"):
+            status_code = 401
+            if auth_result.get("error") == "account_locked":
+                status_code = 403 # Forbidden
             return func.HttpResponse(
-                json.dumps({"success": False, "message": "Credenciais inválidas"}),
-                status_code=401,
+                json.dumps({"success": False, "message": auth_result.get("message", "Credenciais inválidas")}),
+                status_code=status_code,
                 headers={"Content-Type": "application/json"}
             )
         
+        user_info = auth_result["user"]
+        
         # Generate JWT token
-        token = generate_token(username, user_info)
+        token = secure_auth.generate_token(username, user_info)
+        
         
         # Return success response
         response_data = {
