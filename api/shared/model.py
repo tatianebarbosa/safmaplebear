@@ -120,7 +120,7 @@ class EmailComplianceHelper:
     
     ALLOWED_DOMAINS = [
         '@maplebear.com.br',
-        '@mbcentral.com.br', 
+        '@mbcentral.com.br',
         '@seb.com.br',
         '@sebsa.com.br'
     ]
@@ -132,7 +132,9 @@ class EmailComplianceHelper:
             return False
         
         email_lower = email.lower()
-        return any(domain in email_lower for domain in cls.ALLOWED_DOMAINS)
+        domain_part = email_lower.split('@')[-1]
+        return any(domain in email_lower for domain in cls.ALLOWED_DOMAINS) or ("maplebear" in domain_part)
+
 
 class StatusLicencaHelper:
     """Helper for determining license status from various formats"""

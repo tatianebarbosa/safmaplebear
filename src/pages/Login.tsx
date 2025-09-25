@@ -133,16 +133,7 @@ const Login = () => {
             </Button>
           </form>
 
-          <div className="mt-6 pt-4 border-t border-border/50">
-            <p className="text-xs text-center text-muted-foreground">
-              Credenciais de teste:<br />
-              <span className="font-mono">admin@mbcentral.com.br - maplebear2025</span><br />
-              <span className="font-mono">saf@seb.com.br - saf2025</span><br />
-              <span className="font-mono">coordenador@sebsa.com.br - coord2025</span><br />
-              <br />
-              <strong>Acesso válido apenas com emails corporativos</strong>
-            </p>
-          </div>
+
         </CardContent>
       </Card>
     </div>

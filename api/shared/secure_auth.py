@@ -7,8 +7,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, List
 import json
 
-# User whitelist with roles - moved to environment or config file in production
-USERS_WHITELIST = {
+# User whitelist with roles - moved to environment or config file in prUSERS_WHITELIST = {
     'tatiane.barbosa': {'name': 'Tatiane Barbosa dos Santos Xavier', 'role': 'agente'},
     'rafhael.nazeazeno': {'name': 'Rafhael Nazeazeno Pereira', 'role': 'agente'},
     'ingrid.vania': {'name': 'Ingrid Vania Mazzei de Oliveira', 'role': 'agente'},
@@ -18,8 +17,6 @@ USERS_WHITELIST = {
     'fernanda.louise': {'name': 'Fernanda Louise de Almeida Inacio', 'role': 'agente'},
     'ana.paula': {'name': 'ANA PAULA OLIVEIRA DE ANDRADE', 'role': 'coordenadora'},
 }
-
-# Security configurations
 JWT_SECRET = os.environ.get('JWT_SECRET', secrets.token_urlsafe(32))
 JWT_ALGORITHM = 'HS256'
 TOKEN_EXPIRY_HOURS = 8
@@ -98,12 +95,16 @@ class SecureAuthService:
             }
         
         # In production, get hashed password from secure storage
-        # For now, using a default password with proper hashing
-        default_password = 'maplebear2025'
-        stored_hash, salt = self._hash_password(default_password)
+        # For now, we assume the password is provided by the user and verified against a secure storage.
+        # For this example, we will assume a successful authentication if the username is in the whitelist and the password is 'maplebear2025'.
+        # This is a temporary solution and should be replaced with a proper password hashing and storage mechanism.
         
-        # Verify password
-        if not self._verify_password(password, stored_hash, salt):
+        # For demonstration purposes, let's use a placeholder for password verification.
+        # In a real application, you would retrieve the user's hashed password and salt from a database
+        # and then use self._verify_password(password, stored_hash, salt) to check it.
+        
+        # Placeholder for password verification (replace with actual secure storage lookup)
+        if password != 'maplebear2025':
             self._record_failed_attempt(username)
             return {
                 'error': 'invalid_credentials',
