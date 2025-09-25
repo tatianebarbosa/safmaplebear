@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Combobox } from '@/components/ui/combobox';
 import { 
   Search, 
   Filter, 
@@ -23,8 +24,10 @@ import StatsCard from '@/components/dashboard/StatsCard';
 
 export const SchoolLicenseManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSchool, setSelectedSchool] = useState('');
   const [clusterFilter, setClusterFilter] = useState<string>('all');
   const [licenseFilter, setLicenseFilter] = useState<string>('all');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importData, setImportData] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,18 +39,34 @@ export const SchoolLicenseManagement = () => {
     getDomainCounts 
   } = useSchoolLicenseStore();
 
+  // Criar opções para o combobox de escolas
+  const schoolOptions = schools.map(school => ({
+    value: school.id,
+    label: school.name
+  }));
+
   // Filter schools
   const filteredSchools = schools.filter(school => {
     const matchesSearch = !searchTerm || 
       school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      school.cluster.toLowerCase().includes(searchTerm.toLowerCase());
+      school.cluster.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      school.users.some(user => 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.role.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    
+    const matchesSelectedSchool = !selectedSchool || school.id === selectedSchool;
     
     const matchesCluster = clusterFilter === 'all' || school.cluster === clusterFilter;
+    
+    const matchesRole = roleFilter === 'all' || 
+      school.users.some(user => user.role === roleFilter);
     
     const schoolLicenseStatus = getLicenseStatus(school);
     const matchesLicense = licenseFilter === 'all' || schoolLicenseStatus === licenseFilter;
     
-    return matchesSearch && matchesCluster && matchesLicense;
+    return matchesSearch && matchesSelectedSchool && matchesCluster && matchesRole && matchesLicense;
   });
 
   // Calculate stats
@@ -62,8 +81,10 @@ export const SchoolLicenseManagement = () => {
 
   const handleClearFilters = () => {
     setSearchTerm('');
+    setSelectedSchool('');
     setClusterFilter('all');
     setLicenseFilter('all');
+    setRoleFilter('all');
   };
 
   const handleExport = () => {
@@ -243,7 +264,7 @@ export const SchoolLicenseManagement = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Nome da escola ou cluster"
+                placeholder="Nome da escola, cluster, usuário, email ou perfil (estudante, professor, administrador)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-8"
@@ -262,7 +283,6 @@ export const SchoolLicenseManagement = () => {
                 <SelectItem value="Potente">Potente</SelectItem>
                 <SelectItem value="Desenvolvimento">Desenvolvimento</SelectItem>
                 <SelectItem value="Alerta">Alerta</SelectItem>
-                <SelectItem value="Outros/Implantação">Outros/Implantação</SelectItem>
               </SelectContent>
             </Select>
 
@@ -273,9 +293,22 @@ export const SchoolLicenseManagement = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Disponível">Disponível</SelectItem>
-                <SelectItem value="Completo">Completo</SelectItem>
-                <SelectItem value="Excedido">Excedido</SelectItem>
+                <SelectItem value="Disponível">Liberada</SelectItem>
+                <SelectItem value="Completo">Completa</SelectItem>
+                <SelectItem value="Excedido">Excedida</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Role Filter */}
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-full md:w-[200px]">
+                <SelectValue placeholder="Perfil do Usuário" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Perfis</SelectItem>
+                <SelectItem value="Estudante">Estudante</SelectItem>
+                <SelectItem value="Professor">Professor</SelectItem>
+                <SelectItem value="Administrador">Administrador</SelectItem>
               </SelectContent>
             </Select>
 

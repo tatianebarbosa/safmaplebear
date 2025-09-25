@@ -10,7 +10,12 @@ const VALID_DOMAINS = ['maplebear.com.br', 'co.maplebear.com.br', 'mbcentral.com
 
 export const isEmailCompliant = (email: string): boolean => {
   const domain = email.toLowerCase().split('@')[1];
-  return VALID_DOMAINS.some(validDomain => domain?.includes('maplebear'));
+  // Verificar domínios específicos válidos
+  if (VALID_DOMAINS.some(validDomain => domain === validDomain)) {
+    return true;
+  }
+  // Verificar se contém "maplebear" para outros subdomínios
+  return domain?.includes('maplebear') || false;
 };
 
 export const parseOfficialSchoolsCSV = async (): Promise<OfficialSchool[]> => {

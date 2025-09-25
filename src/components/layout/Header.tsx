@@ -152,6 +152,25 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                 <DropdownMenuSeparator />
                 <div className="px-2 py-1.5">
                   <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    CHAMADOS N2
+                  </div>
+                </div>
+                <DropdownMenuItem onClick={() => window.open('https://app.clickup.com/31013946/v/fm/xjf1u-92033?nocache=1757937386168', '_blank')}>
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  N2 Digital
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.open('https://app.clickup.com/31013946/v/fm/xjf1u-92033?nocache=1757937386168', '_blank')}>
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  N2 Martech
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.open('https://forms.clickup.com/31013946/f/xjf1u-151073/HL90B0X15O9I1RVR8T', '_blank')}>
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  N2 Mídia
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1.5">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Gerenciamento
                   </div>
                 </div>

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Edit, 
   Trash2, 
@@ -18,6 +19,8 @@ import { School } from '@/types/schoolLicense';
 import { UserDialog } from './UserDialog';
 import { SwapUserDialog } from './SwapUserDialog';
 import { JustificationsDialog } from './JustificationsDialog';
+import { JustificationRequiredDialog } from './JustificationRequiredDialog';
+import { SchoolDetailsDialog } from './SchoolDetailsDialog';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { toast } from 'sonner';
 
@@ -35,6 +38,12 @@ export const SchoolLicenseCard = ({
   const [showUserDialog, setShowUserDialog] = useState(false);
   const [showSwapDialog, setShowSwapDialog] = useState(false);
   const [showJustificationsDialog, setShowJustificationsDialog] = useState(false);
+  const [showJustificationDialog, setShowJustificationDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<{
+    type: 'edit' | 'remove' | 'swap';
+    data?: any;
+  } | null>(null);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [swappingUserId, setSwappingUserId] = useState<string | null>(null);
   
@@ -44,7 +53,8 @@ export const SchoolLicenseCard = ({
     removeUser, 
     swapUser,
     getLicenseStatus,
-    getJustificationsBySchool
+    getJustificationsBySchool,
+    isEmailValid
   } = useSchoolLicenseStore();
 
   const licenseStatus = getLicenseStatus(school);
@@ -52,11 +62,25 @@ export const SchoolLicenseCard = ({
   const nonCompliantUsers = school.users.filter(u => !u.isCompliant);
   const justifications = getJustificationsBySchool(school.id);
 
+  const getNonComplianceReason = (email: string) => {
+    const domain = email.toLowerCase().split('@')[1];
+    if (!domain) return 'Email inválido';
+    
+    if (domain.includes('gmail.com') || domain.includes('hotmail.com') || domain.includes('yahoo.com')) {
+      return 'Email pessoal não autorizado';
+    }
+    
+    if (!domain.includes('maplebear') && domain !== 'mbcentral.com.br') {
+      return 'Domínio não autorizado pela política Maple Bear';
+    }
+    
+    return 'Email fora da política';
+  };
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'Ativa': return 'default';
       case 'Implantando': return 'secondary';
-      case 'Pausa': return 'destructive';
       default: return 'outline';
     }
   };
@@ -77,53 +101,84 @@ export const SchoolLicenseCard = ({
   };
 
   const handleAddUser = (userData: any) => {
+    // Verificar se a escola já tem 2 usuários
+    if (school.users.length >= 2) {
+      toast.error('Esta escola já possui o limite máximo de 2 usuários. Para adicionar um novo usuário, você deve transferir ou excluir um usuário existente.');
+      return;
+    }
+    
     addUser(school.id, userData);
     setShowUserDialog(false);
     toast.success('Usuário adicionado com sucesso');
   };
 
   const handleEditUser = (userData: any) => {
-    if (editingUser) {
-      updateUser(school.id, editingUser.id, userData);
-      setEditingUser(null);
-      setShowUserDialog(false);
-      toast.success('Usuário atualizado com sucesso');
-    }
+    setPendingAction({ type: 'edit', data: userData });
+    setShowJustificationDialog(true);
   };
 
   const handleRemoveUser = (userId: string) => {
-    if (confirm('Tem certeza que deseja remover este usuário?')) {
-      removeUser(school.id, userId);
-      toast.success('Usuário removido com sucesso');
-    }
+    setPendingAction({ type: 'remove', data: { userId } });
+    setShowJustificationDialog(true);
   };
 
   const handleSwapUser = (data: any) => {
-    if (swappingUserId) {
-      const oldUser = school.users.find(u => u.id === swappingUserId);
-      if (oldUser) {
-        swapUser(school.id, swappingUserId, data.newUser, {
-          schoolId: school.id,
-          schoolName: school.name,
-          oldUser: {
-            name: oldUser.name,
-            email: oldUser.email,
-            role: oldUser.role,
-          },
-          newUser: {
-            name: data.newUser.name,
-            email: data.newUser.email,
-            role: data.newUser.role,
-          },
-          reason: data.reason,
-          attachment: data.attachment,
-          performedBy: 'Administrador'
-        });
-      }
-      setSwappingUserId(null);
-      setShowSwapDialog(false);
-      toast.success('Usuário substituído com sucesso');
+    setPendingAction({ type: 'swap', data });
+    setShowJustificationDialog(true);
+  };
+
+  const handleJustificationConfirm = (justificationData: any) => {
+    if (!pendingAction) return;
+
+    const timestamp = new Date().toISOString();
+    
+    switch (pendingAction.type) {
+      case 'edit':
+        if (editingUser) {
+          updateUser(school.id, editingUser.id, pendingAction.data);
+          setEditingUser(null);
+          setShowUserDialog(false);
+          toast.success('Usuário atualizado com sucesso');
+        }
+        break;
+        
+      case 'remove':
+        removeUser(school.id, pendingAction.data.userId);
+        toast.success('Usuário removido com sucesso');
+        break;
+        
+      case 'swap':
+        if (swappingUserId) {
+          const oldUser = school.users.find(u => u.id === swappingUserId);
+          if (oldUser) {
+            swapUser(school.id, swappingUserId, pendingAction.data.newUser, {
+              schoolId: school.id,
+              schoolName: school.name,
+              oldUser: {
+                name: oldUser.name,
+                email: oldUser.email,
+                role: oldUser.role,
+              },
+              newUser: {
+                name: pendingAction.data.newUser.name,
+                email: pendingAction.data.newUser.email,
+                role: pendingAction.data.newUser.role,
+              },
+              reason: justificationData.reason,
+              attachment: justificationData.attachment,
+              performedBy: justificationData.performedBy,
+              timestamp
+            });
+          }
+          setSwappingUserId(null);
+          setShowSwapDialog(false);
+          toast.success('Usuário substituído com sucesso');
+        }
+        break;
     }
+    
+    setPendingAction(null);
+    setShowJustificationDialog(false);
   };
 
   const openEditDialog = (user: any) => {
@@ -211,6 +266,18 @@ export const SchoolLicenseCard = ({
                     <Badge variant={user.isCompliant ? "default" : "destructive"} className="text-xs">
                       {user.role}
                     </Badge>
+                    {!user.isCompliant && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{getNonComplianceReason(user.email)}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </div>
                   <div className="text-xs text-muted-foreground truncate">
                     {user.email}
@@ -243,19 +310,30 @@ export const SchoolLicenseCard = ({
 
           {/* Actions */}
           <div className="flex gap-2 pt-2 border-t">
+            {school.users.length < 2 ? (
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => setShowUserDialog(true)}
+                className="flex-1"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Adicionar
+              </Button>
+            ) : (
+              <Button 
+                size="sm" 
+                variant="secondary" 
+                onClick={() => openSwapDialog(school.users[0].id)}
+                className="flex-1"
+              >
+                Transferir Licença
+              </Button>
+            )}
             <Button 
               size="sm" 
               variant="outline" 
-              onClick={() => setShowUserDialog(true)}
-              className="flex-1"
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              Adicionar
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={() => onViewDetails(school)}
+              onClick={() => setShowDetailsDialog(true)}
             >
               <Eye className="h-3 w-3 mr-1" />
               Detalhes
@@ -317,6 +395,20 @@ export const SchoolLicenseCard = ({
         onOpenChange={setShowJustificationsDialog}
         schoolId={school.id}
         schoolName={school.name}
+      />
+
+      <JustificationRequiredDialog
+        open={showJustificationDialog}
+        onOpenChange={setShowJustificationDialog}
+        onConfirm={handleJustificationConfirm}
+        title="Justificativa Necessária"
+        description="Para realizar esta alteração de licença, é necessário fornecer uma justificativa."
+      />
+
+      <SchoolDetailsDialog
+        open={showDetailsDialog}
+        onOpenChange={setShowDetailsDialog}
+        school={school}
       />
     </>
   );
