@@ -309,39 +309,43 @@ export const SchoolLicenseCard = ({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2 pt-2 border-t">
-            {school.users.length < 2 ? (
+          <div className="flex flex-col gap-2 pt-2 border-t">
+            <div className="flex gap-2">
+              {school.users.length < 2 ? (
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => setShowUserDialog(true)}
+                  className="flex-1"
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Adicionar
+                </Button>
+              ) : (
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  onClick={() => openSwapDialog(school.users[0].id)}
+                  className="flex-1"
+                >
+                  Transferir Licença
+                </Button>
+              )}
               <Button 
                 size="sm" 
                 variant="outline" 
-                onClick={() => setShowUserDialog(true)}
+                onClick={() => setShowDetailsDialog(true)}
                 className="flex-1"
               >
-                <Plus className="h-3 w-3 mr-1" />
-                Adicionar
+                <Eye className="h-3 w-3 mr-1" />
+                Detalhes
               </Button>
-            ) : (
-              <Button 
-                size="sm" 
-                variant="secondary" 
-                onClick={() => openSwapDialog(school.users[0].id)}
-                className="flex-1"
-              >
-                Transferir Licença
-              </Button>
-            )}
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={() => setShowDetailsDialog(true)}
-            >
-              <Eye className="h-3 w-3 mr-1" />
-              Detalhes
-            </Button>
+            </div>
             <Button 
               size="sm" 
               variant="outline" 
               onClick={() => onManage(school)}
+              className="w-full"
             >
               <Settings className="h-3 w-3 mr-1" />
               Gerenciar

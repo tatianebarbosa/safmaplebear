@@ -1,4 +1,4 @@
-export type SchoolStatus = 'Ativa' | 'Implantando' | 'Pausa';
+export type SchoolStatus = 'Ativa' | 'Implantando' | 'Inativa';
 export type UserRole = 'Estudante' | 'Professor' | 'Administrador';
 export type LicenseStatus = 'Disponível' | 'Completo' | 'Excedido';
 export type ClusterType = 'Implantação' | 'Alta Performance' | 'Potente' | 'Desenvolvimento' | 'Alerta' | 'Outros/Implantação';

@@ -1,7 +1,7 @@
 export interface OfficialSchool {
   id: string;
   name: string;
-  status: 'Ativa' | 'Implantando' | 'Pausa';
+  status: 'Ativa' | 'Implantando' | 'Inativa';
   cluster: string;
   cnpj?: string;
   address?: string;

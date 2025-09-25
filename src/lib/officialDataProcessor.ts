@@ -95,11 +95,11 @@ export const parseOfficialUsersCSV = async (): Promise<OfficialUser[]> => {
   }
 };
 
-const mapSchoolStatus = (status: string): 'Ativa' | 'Implantando' | 'Pausa' => {
+const mapSchoolStatus = (status: string): 'Ativa' | 'Implantando' | 'Inativa' => {
   const statusLower = status?.toLowerCase();
   if (statusLower?.includes('ativa')) return 'Ativa';
   if (statusLower?.includes('implant')) return 'Implantando';
-  return 'Pausa';
+  return 'Inativa';
 };
 
 const mapUserRole = (role: string): 'Estudante' | 'Professor' | 'Administrador' => {
@@ -182,7 +182,7 @@ export const processSchoolsWithUsers = async (): Promise<ProcessedSchoolData[]> 
       school: {
         id: 'no-school',
         name: 'Usuários Sem Escola Definida',
-        status: 'Pausa',
+        status: 'Inativa',
         cluster: 'Outros',
       },
       users: usersWithoutSchool,
@@ -206,7 +206,7 @@ const estimateSchoolLicenses = (school: OfficialSchool, userCount: number): numb
     // Escolas implantando: licenças menores
     return Math.max(5, userCount);
   }
-  return userCount; // Pausadas
+  return userCount; // Inativas
 };
 
 const calculateLicenseStatus = (usedLicenses: number, totalLicenses: number): 'Disponível' | 'Completo' | 'Excedido' => {
