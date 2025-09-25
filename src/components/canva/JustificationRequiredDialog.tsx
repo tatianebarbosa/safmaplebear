@@ -118,6 +118,39 @@ export const JustificationRequiredDialog = ({
     onOpenChange(false);
   };
 
+  const handleFileUploadClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error('Arquivo muito grande. Máximo 5MB permitido.');
+          return;
+        }
+        
+        // Validate file type
+        const allowedTypes = [
+          'application/pdf',
+          'image/jpeg',
+          'image/png',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+        
+        if (!allowedTypes.includes(file.type)) {
+          toast.error('Tipo de arquivo não permitido. Use PDF, DOC, DOCX, JPG ou PNG.');
+          return;
+        }
+        
+        setAttachment(file);
+      }
+    };
+    input.click();
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
@@ -215,7 +248,10 @@ export const JustificationRequiredDialog = ({
             <Label>Anexo (Opcional)</Label>
             <div className="space-y-2">
               {!attachment ? (
-                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                <div 
+                  className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={handleFileUploadClick}
+                >
                   <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground mb-2">
                     Clique para adicionar um arquivo
@@ -223,12 +259,6 @@ export const JustificationRequiredDialog = ({
                   <p className="text-xs text-muted-foreground">
                     PDF, DOC, DOCX, JPG, PNG (máx. 5MB)
                   </p>
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
                 </div>
               ) : (
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
