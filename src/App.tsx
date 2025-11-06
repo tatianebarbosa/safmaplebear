@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
+// import ProtectedRoute from "./components/auth/ProtectedRoute"; // Desativado para teste
 import AccessControl from "@/components/auth/AccessControl";
 import CanvaDashboard from "@/components/canva/CanvaDashboard";
 import VoucherDashboard from "@/components/vouchers/VoucherDashboard";
@@ -14,7 +14,6 @@ import Voucher2026Dashboard from "@/components/vouchers/Voucher2026Dashboard";
 import InsightsAnalytics from "@/components/insights/InsightsAnalytics";
 import MonitoringPortal from "@/components/monitoring/MonitoringPortal";
 import TicketsPage from "@/pages/TicketsPage";
-import MonitoringPage from "@/pages/MonitoringPage";
 import AdminPage from "@/pages/AdminPage";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
 
@@ -31,65 +30,49 @@ const App = () => (
           <Route 
             path="/dashboard" 
             element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
+              <Index />
             } 
           />
           <Route 
             path="/dashboard/canva" 
             element={
-              <ProtectedRoute>
-                <CanvaDashboard />
-              </ProtectedRoute>
+              <CanvaDashboard />
             } 
           />
           <Route 
             path="/dashboard/vouchers" 
             element={
-              <ProtectedRoute>
-                <VoucherDashboard />
-              </ProtectedRoute>
+              <VoucherDashboard />
             } 
           />
           <Route 
             path="/dashboard/vouchers-2026" 
             element={
-              <ProtectedRoute>
-                <Voucher2026Dashboard />
-              </ProtectedRoute>
+              <Voucher2026Dashboard />
             } 
           />
           <Route 
             path="/insights" 
             element={
-              <ProtectedRoute>
-                <InsightsAnalytics />
-              </ProtectedRoute>
+              <InsightsAnalytics />
             } 
           />
           <Route 
             path="/monitoring" 
             element={
-              <ProtectedRoute>
-                <MonitoringPortal />
-              </ProtectedRoute>
+              <MonitoringPortal />
             } 
           />
           <Route 
             path="/tickets" 
             element={
-              <ProtectedRoute>
-                <TicketsPage />
-              </ProtectedRoute>
+              <TicketsPage />
             } 
           />
           <Route 
             path="/admin" 
             element={
-              <ProtectedRoute>
-                <AdminPage />
-              </ProtectedRoute>
+              <AdminPage />
             } 
           />
           <Route 
@@ -98,7 +81,7 @@ const App = () => (
           />
           <Route 
             path="/" 
-            element={<Navigate to="/login" replace />} 
+            element={<Navigate to="/dashboard" replace />} 
           />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
