@@ -133,7 +133,7 @@ export const EnhancedSchoolManagement = ({
                 <SelectContent>
                   <SelectItem value="all">Todos os clusters</SelectItem>
                   {clusters.map((cluster) => (
-                    <SelectItem key={cluster} value={cluster}>
+                    <SelectItem key={cluster} value={cluster ?? ''}>
                       {cluster}
                     </SelectItem>
                   ))}

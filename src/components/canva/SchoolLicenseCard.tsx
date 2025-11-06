@@ -167,7 +167,7 @@ export const SchoolLicenseCard = ({
               reason: justificationData.reason,
               attachment: justificationData.attachment,
               performedBy: justificationData.performedBy,
-              timestamp
+              // timestamp
             });
           }
           setSwappingUserId(null);
