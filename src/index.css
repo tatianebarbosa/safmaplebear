@@ -10,8 +10,8 @@
     --maple-red: 349 76% 47%;
     --maple-red-light: 349 76% 65%;
     --maple-red-dark: 349 76% 35%;
-    --maple-gold: 45 93% 58%;
-    --maple-gold-light: 45 93% 75%;
+    /* --maple-gold: 45 93% 58%; */
+    /* --maple-gold-light: 45 93% 75%; */
     
     /* Base Colors */
     --background: 220 13% 97%;
@@ -30,10 +30,10 @@
     --primary-light: var(--maple-red-light);
     --primary-dark: var(--maple-red-dark);
     
-    /* Secondary (Maple Gold) */
-    --secondary: var(--maple-gold);
+    /* Secondary (Redefinido para Primary para remover amarelo) */
+    --secondary: var(--maple-red-light);
     --secondary-foreground: 220 9% 13%;
-    --secondary-light: var(--maple-gold-light);
+    --secondary-light: var(--maple-red-light);
     
     /* Success States */
     --success: 142 76% 36%;
@@ -66,7 +66,7 @@
     --ring: var(--maple-red);
     
     /* Gradients */
-    --gradient-maple: linear-gradient(135deg, hsl(var(--maple-red)), hsl(var(--maple-gold)));
+    --gradient-maple: linear-gradient(135deg, hsl(var(--maple-red)), hsl(var(--maple-red-light)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-light)));
     --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
     
@@ -113,7 +113,7 @@
     --primary: var(--maple-red-light);
     --primary-foreground: 0 0% 100%;
     
-    --secondary: var(--maple-gold-light);
+    --secondary: var(--maple-red-light);
     --secondary-foreground: 220 9% 9%;
     
     --success: 142 76% 45%;

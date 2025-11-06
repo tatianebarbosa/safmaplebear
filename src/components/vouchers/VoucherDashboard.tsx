@@ -77,7 +77,7 @@ const VoucherDashboard = () => {
     switch (status.toLowerCase()) {
       case 'ativa': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'inativa': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'implantando': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'implantando': return 'bg-primary-light/10 text-primary-dark border border-primary-light/20'; // Substituído amarelo por vermelho light
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   };
@@ -117,7 +117,7 @@ const VoucherDashboard = () => {
       </div>
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Total de Escolas"
           value={stats.totalSchools.toString()}
@@ -144,7 +144,7 @@ const VoucherDashboard = () => {
 
       {/* Filtros */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-6">
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium">Buscar escola</Label>
@@ -161,7 +161,7 @@ const VoucherDashboard = () => {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
               <div className="min-w-[120px]">
                 <Select value={selectedCluster} onValueChange={setSelectedCluster}>
                   <SelectTrigger className="h-8 text-sm">
@@ -256,11 +256,11 @@ const VoucherDashboard = () => {
               )}
 
               <div className="flex flex-wrap gap-2">
-                <Badge variant={school.voucherEligible ? "default" : "secondary"}>
+                <Badge variant={school.voucherEligible ? "default" : "destructive"}>
                   {school.voucherEligible ? "Elegível" : "Não Elegível"}
                 </Badge>
                 {school.voucherSent && (
-                  <Badge variant="outline" className="bg-green-50 text-green-700">
+                  <Badge variant="outline" className="bg-success-bg text-success">
                     Enviado
                   </Badge>
                 )}
