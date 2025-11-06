@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,11 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  // FORÇAR REDIRECIONAMENTO PARA TESTE
+  useEffect(() => {
+    navigate("/dashboard", { replace: true });
+  }, [navigate]);
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
