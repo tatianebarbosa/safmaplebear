@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ChevronDown, 
-  BarChart3, 
+  
   Users, 
   TrendingUp, 
   User, 
@@ -29,11 +29,11 @@ import { useToast } from "@/hooks/use-toast";
 import logoMaplebear from "@/assets/logo-maplebear.png";
 
 interface HeaderProps {
-  activeSection: string;
-  onSectionChange: (section: string) => void;
+  // activeSection: string; // Removido
+  // onSectionChange: (section: string) => void; // Removido
 }
 
-const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
+const Header = (props: HeaderProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -68,123 +68,6 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
 
           {/* Compact Navigation */}
           <div className="flex items-center space-x-2">
-            {/* Quick Actions */}
-            <div className="hidden md:flex items-center space-x-1">
-              <Button
-                variant={activeSection === 'saf-control' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onSectionChange('saf-control')}
-                className="gap-2"
-              >
-                <Home className="w-4 h-4" />
-                Início
-              </Button>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.location.href = '/dashboard/canva'}
-                className="gap-2"
-              >
-                <Users className="w-4 h-4" />
-                Canva
-              </Button>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.location.href = '/dashboard/vouchers'}
-                className="gap-2"
-              >
-                <CreditCard className="w-4 h-4" />
-                Vouchers
-              </Button>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.location.href = '/tickets'}
-                className="gap-2"
-              >
-                <MessageSquare className="w-4 h-4" />
-                Tickets
-              </Button>
-            </div>
-
-            {/* More Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Menu className="w-4 h-4" />
-                  <span className="hidden sm:inline">Mais</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="px-2 py-1.5">
-                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Dashboards
-                  </div>
-                </div>
-                <DropdownMenuItem onClick={() => window.location.href = '/insights'}>
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  Insights e Análises
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = '/dashboard/vouchers-2026'}>
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Vouchers 2026
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                <div className="px-2 py-1.5">
-                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Ferramentas SAF
-                  </div>
-                </div>
-                <DropdownMenuItem onClick={() => onSectionChange('ai')}>
-                  <Bot className="w-4 h-4 mr-2" />
-                  Assistente IA
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onSectionChange('knowledge')}>
-                  <Brain className="w-4 h-4 mr-2" />
-                  Base de Conhecimento
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                <div className="px-2 py-1.5">
-                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    CHAMADOS N2
-                  </div>
-                </div>
-                <DropdownMenuItem onClick={() => window.open('https://app.clickup.com/31013946/v/fm/xjf1u-92033?nocache=1757937386168', '_blank')}>
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  N2 Digital
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('https://app.clickup.com/31013946/v/fm/xjf1u-92033?nocache=1757937386168', '_blank')}>
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  N2 Martech
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.open('https://forms.clickup.com/31013946/f/xjf1u-151073/HL90B0X15O9I1RVR8T', '_blank')}>
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  N2 Mídia
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                <div className="px-2 py-1.5">
-                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Gerenciamento
-                  </div>
-                </div>
-                <DropdownMenuItem onClick={() => window.location.href = '/monitoring'}>
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Monitoria
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = '/admin'}>
-                  <User className="w-4 h-4 mr-2" />
-                  Administração
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -203,7 +86,7 @@ const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
                   {userEmail}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => onSectionChange('profile')}>
+                <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
                   <User className="w-4 h-4 mr-2" />
                   Perfil
                 </DropdownMenuItem>
