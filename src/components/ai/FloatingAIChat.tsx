@@ -5,6 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Bot, Send, Minimize2, X, MessageSquare, Key } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { 
+  loadSchoolData, 
+  searchSchoolByName, 
+  searchSchoolsByState,
+  searchSchoolsByCluster,
+  searchSchoolsByStatus,
+  generateSchoolContext,
+  formatSchoolData
+} from "@/lib/schoolDataQuery";
 
 interface ChatMessage {
   id: string;
@@ -19,7 +28,7 @@ const FloatingAIChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      content: 'Olá! Sou seu assistente de IA do Maple Bear SAF powered by ChatGPT. Como posso ajudá-lo hoje?',
+      content: 'Olá! Sou seu assistente de IA do Maple Bear SAF. Como posso ajudá-lo hoje? (Dados das escolas carregados)',
       role: 'assistant',
       timestamp: new Date()
     }
@@ -27,6 +36,21 @@ const FloatingAIChat = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [apiKey, setApiKey] = useState('');
+  const [schoolDataLoaded, setSchoolDataLoaded] = useState(false);
+
+  // Carregar dados das escolas ao montar o componente
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await loadSchoolData();
+        setSchoolDataLoaded(true);
+      } catch (error) {
+        console.error('Erro ao carregar dados das escolas:', error);
+        // Não mostra toast para não poluir a interface flutuante
+      }
+    };
+    loadData();
+  }, []);
 
   useEffect(() => {
     const savedKey = localStorage.getItem('openai_api_key');
@@ -53,12 +77,23 @@ const FloatingAIChat = () => {
     try {
       let response;
       
-      if (apiKey.trim()) {
-        // Usar ChatGPT real
-        response = await callOpenAI(currentInput);
-      } else {
-        // Fallback para resposta simulada
-        response = await simulateAIResponse(currentInput);
+      // 1. Tenta a consulta direta aos dados das escolas (se carregados)
+      if (schoolDataLoaded) {
+        const schoolResponse = await querySchoolData(currentInput);
+        if (schoolResponse) {
+          response = schoolResponse;
+        }
+      }
+      
+      // 2. Se não for uma consulta direta de escola, usa a IA
+      if (!response) {
+        if (apiKey.trim()) {
+          // Usar ChatGPT real
+          response = await callOpenAI(currentInput);
+        } else {
+          // Fallback para resposta simulada
+          response = await simulateAIResponse(currentInput);
+        }
       }
       
       const assistantMessage: ChatMessage = {
@@ -83,7 +118,79 @@ const FloatingAIChat = () => {
     }
   };
 
+  // Função de consulta de dados das escolas (RAG local)
+  const querySchoolData = async (message: string): Promise<string | null> => {
+    const lowerMessage = message.toLowerCase();
+
+    // Detecção de intenção de consulta de escola
+    if (lowerMessage.includes('escola') || lowerMessage.includes('unidade') || lowerMessage.includes('cnpj') || lowerMessage.includes('cluster') || lowerMessage.includes('status')) {
+      
+      // Tenta buscar por nome
+      const schoolNameMatch = lowerMessage.match(/(escola|unidade)\s+([a-z0-9\s]+)/i);
+      if (schoolNameMatch && schoolNameMatch[2]) {
+        const schoolName = schoolNameMatch[2].trim();
+        const school = await searchSchoolByName(schoolName);
+        if (school) {
+          return formatSchoolData(school);
+        }
+      }
+
+      // Tenta buscar por estado
+      const states = ['SP', 'MG', 'RJ', 'BA', 'PE', 'CE', 'RS', 'PR', 'SC', 'GO', 'DF', 'MT', 'MS', 'ES', 'AC', 'AM', 'AP', 'PA', 'RO', 'RR', 'TO', 'MA', 'PI', 'AL', 'SE', 'PB', 'RN'];
+      let foundState = '';
+      for (const state of states) {
+        if (lowerMessage.includes(state.toLowerCase())) {
+          foundState = state;
+          break;
+        }
+      }
+      if (foundState) {
+        const schools = await searchSchoolsByState(foundState);
+        return `Encontradas ${schools.length} escolas em ${foundState}. Por favor, pergunte sobre uma escola específica para mais detalhes.`;
+      }
+
+      // Tenta buscar por cluster
+      const clusters = ['potente', 'desenvolvimento', 'alta performance', 'alerta', 'implantação'];
+      let foundCluster = '';
+      for (const cluster of clusters) {
+        if (lowerMessage.includes(cluster)) {
+          foundCluster = cluster;
+          break;
+        }
+      }
+      if (foundCluster) {
+        const schools = await searchSchoolsByCluster(foundCluster);
+        return `Encontradas ${schools.length} escolas no cluster '${foundCluster}'. Por favor, pergunte sobre uma escola específica para mais detalhes.`;
+      }
+      
+      // Se a intenção é clara, mas a busca falhou, retorna uma mensagem de erro específica
+      return "Desculpe, não consegui encontrar a escola ou o dado específico que você procurou na base de dados. Tente refinar sua busca ou perguntar o nome exato da escola.";
+    }
+
+    return null; // Não é uma consulta de dados de escola, deixa a IA tratar
+  };
+
   const callOpenAI = async (input: string): Promise<string> => {
+    // Gera o contexto das escolas para a IA
+    let schoolContext = "";
+    if (schoolDataLoaded) {
+      schoolContext = await generateSchoolContext();
+    }
+
+    const systemPrompt = `Você é um assistente inteligente do Maple Bear SAF (Sistema de Atendimento às Franquias). Você é especializado em:
+
+- Tickets de atendimento e suporte
+- Informações sobre escolas e franquias (você tem acesso a uma base de dados atualizada)
+- Licenças Canva e recursos educacionais  
+- Vouchers e campanhas promocionais
+- Relatórios e métricas de desempenho
+- Agendamento de visitas e atividades
+- Suporte a coordenadores e franqueados
+
+Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacional do Maple Bear. Responda em português brasileiro.
+
+${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoolContext}` : ''}`;
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -95,17 +202,7 @@ const FloatingAIChat = () => {
         messages: [
           {
             role: 'system',
-            content: `Você é um assistente inteligente do Maple Bear SAF (Sistema de Atendimento às Franquias). Você é especializado em:
-
-- Tickets de atendimento e suporte
-- Informações sobre escolas e franquias
-- Licenças Canva e recursos educacionais  
-- Vouchers e campanhas promocionais
-- Relatórios e métricas de desempenho
-- Agendamento de visitas e atividades
-- Suporte a coordenadores e franqueados
-
-Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacional do Maple Bear. Responda em português brasileiro.`
+            content: systemPrompt
           },
           ...messages.slice(-5).map(msg => ({
             role: msg.role,

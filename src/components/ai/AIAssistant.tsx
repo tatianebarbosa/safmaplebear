@@ -1,16 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Bot, Send, Copy, RotateCcw, Heart, Smile } from "lucide-react";
 import { toast } from "sonner";
+import { 
+  loadSchoolData, 
+  searchSchoolByName, 
+  searchSchoolsByState,
+  searchSchoolsByCluster,
+  searchSchoolsByStatus,
+  generateSchoolContext,
+  formatSchoolData
+} from "@/lib/schoolDataQuery";
 
 interface AIResponse {
   id: string;
   originalText: string;
   improvedText: string;
-  type: 'polite' | 'welcoming' | 'professional';
+  type: 'polite' | 'welcoming' | 'professional' | 'school_query';
   timestamp: string;
 }
 
@@ -18,6 +27,69 @@ const AIAssistant = () => {
   const [inputText, setInputText] = useState('');
   const [responses, setResponses] = useState<AIResponse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [schoolDataLoaded, setSchoolDataLoaded] = useState(false);
+
+  // Carregar dados das escolas ao montar o componente
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await loadSchoolData();
+        setSchoolDataLoaded(true);
+      } catch (error) {
+        console.error('Erro ao carregar dados das escolas:', error);
+        toast.error('Erro ao carregar dados das escolas');
+      }
+    };
+    loadData();
+  }, []);
+
+  // Função para consultar dados de escolas
+  const querySchoolData = async (message: string) => {
+    if (!schoolDataLoaded) {
+      toast.error("Dados das escolas ainda estão sendo carregados");
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      let schoolInfo = "";
+      
+      // Tenta buscar por nome
+      const lowerMessage = message.toLowerCase();
+      const schoolNameMatch = lowerMessage.match(/(escola|unidade)\s+([a-z0-9\s]+)/i);
+      if (schoolNameMatch && schoolNameMatch[2]) {
+        const schoolName = schoolNameMatch[2].trim();
+        const school = await searchSchoolByName(schoolName);
+        if (school) {
+          schoolInfo = formatSchoolData(school);
+        }
+      }
+
+      if (!schoolInfo) {
+        toast.error("Não foi possível encontrar a escola específica. Tente o nome completo.");
+        return;
+      }
+
+      const aiResponse: AIResponse = {
+        id: Date.now().toString(),
+        originalText: message,
+        improvedText: schoolInfo,
+        type: 'school_query',
+        timestamp: new Date().toLocaleString('pt-BR')
+      };
+      
+      setResponses(prev => [aiResponse, ...prev]);
+      setInputText('');
+      toast.success("Dados da escola recuperados com sucesso!");
+      
+    } catch (error: any) {
+      console.error('Erro ao consultar dados das escolas:', error);
+      toast.error(`Erro: ${error.message || 'Falha ao consultar dados'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Simulação de IA - em produção seria uma chamada real para API
   const improveText = async (text: string, type: 'polite' | 'welcoming' | 'professional') => {
@@ -110,14 +182,14 @@ Departamento de Atendimento`;
       {/* Interface de Input */}
       <Card>
         <CardHeader>
-          <CardTitle>Melhore seu texto</CardTitle>
+          <CardTitle>Melhore seu texto ou Consulte Escolas</CardTitle>
           <CardDescription>
-            Digite seu texto e escolha o tom desejado para o atendimento
+            Digite seu texto para melhorar ou o nome de uma escola para consultar
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
-            placeholder="Digite o texto que você gostaria de melhorar..."
+            placeholder="Digite o texto que você gostaria de melhorar ou o nome de uma escola (ex: 'escola São Roque')..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             rows={4}
@@ -150,12 +222,21 @@ Departamento de Atendimento`;
               <Send className="mr-2 h-4 w-4" />
               Mais Profissional
             </Button>
+
+            <Button
+              onClick={() => querySchoolData(inputText)}
+              disabled={!inputText.trim() || loading || !schoolDataLoaded}
+              variant="default"
+            >
+              <Bot className="mr-2 h-4 w-4" />
+              Consultar Escola
+            </Button>
           </div>
           
           {loading && (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <span className="ml-2 text-muted-foreground">Melhorando seu texto...</span>
+              <span className="ml-2 text-muted-foreground">Processando...</span>
             </div>
           )}
         </CardContent>
@@ -164,18 +245,21 @@ Departamento de Atendimento`;
       {/* Histórico de Respostas */}
       {responses.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Histórico de Melhorias</h2>
+          <h2 className="text-2xl font-semibold">Histórico de Interações</h2>
           
           {responses.map((response) => (
             <Card key={response.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Texto Melhorado</CardTitle>
+                  <CardTitle className="text-lg">
+                    {response.type === 'school_query' ? 'Consulta de Escolas' : 'Texto Melhorado'}
+                  </CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">
                       {response.type === 'polite' && 'Educado'}
                       {response.type === 'welcoming' && 'Acolhedor'}
                       {response.type === 'professional' && 'Profissional'}
+                      {response.type === 'school_query' && 'Dados Escola'}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {response.timestamp}
@@ -184,20 +268,20 @@ Departamento de Atendimento`;
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Texto Original */}
+                {/* Pergunta/Texto Original */}
                 <div>
                   <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                    Texto Original:
+                    {response.type === 'school_query' ? 'Sua Consulta:' : 'Texto Original:'}
                   </h4>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm">{response.originalText}</p>
                   </div>
                 </div>
                 
-                {/* Texto Melhorado */}
+                {/* Resposta da IA */}
                 <div>
                   <h4 className="font-medium text-sm text-success mb-2">
-                    Texto Melhorado:
+                    {response.type === 'school_query' ? 'Dados Encontrados:' : 'Texto Melhorado:'}
                   </h4>
                   <div className="p-3 bg-success-bg border border-success/20 rounded-lg">
                     <p className="text-sm whitespace-pre-line">{response.improvedText}</p>
@@ -210,7 +294,7 @@ Departamento de Atendimento`;
                   onClick={() => copyToClipboard(response.improvedText)}
                 >
                   <Copy className="mr-2 h-4 w-4" />
-                  Copiar Texto Melhorado
+                  Copiar Resposta
                 </Button>
               </CardContent>
             </Card>
@@ -236,6 +320,10 @@ Departamento de Atendimento`;
             <li className="flex items-start gap-2">
               <Send className="h-4 w-4 text-primary mt-0.5" />
               <span><strong>Mais Profissional:</strong> Adequa o texto para contextos corporativos</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Bot className="h-4 w-4 text-primary mt-0.5" />
+              <span><strong>Consultar Escola:</strong> Busca todos os dados da escola na planilha unificada</span>
             </li>
           </ul>
         </CardContent>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,21 @@ import { Badge } from "@/components/ui/badge";
 import { Bot, Send, Copy, RotateCcw, Heart, Smile, Key, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { 
+  loadSchoolData, 
+  searchSchoolByName, 
+  searchSchoolsByState,
+  searchSchoolsByCluster,
+  searchSchoolsByStatus,
+  generateSchoolContext,
+  formatSchoolData
+} from "@/lib/schoolDataQuery";
 
 interface AIResponse {
   id: string;
   originalText: string;
   improvedText: string;
-  type: 'polite' | 'welcoming' | 'professional' | 'chat';
+  type: 'polite' | 'welcoming' | 'professional' | 'chat' | 'school_query';
   timestamp: string;
 }
 
@@ -22,6 +31,136 @@ const RealAIAssistant = () => {
   const [responses, setResponses] = useState<AIResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [showApiKeyInput, setShowApiKeyInput] = useState(true);
+  const [schoolDataLoaded, setSchoolDataLoaded] = useState(false);
+
+  // Carregar dados das escolas ao montar o componente
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await loadSchoolData();
+        setSchoolDataLoaded(true);
+      } catch (error) {
+        console.error('Erro ao carregar dados das escolas:', error);
+        toast.error('Erro ao carregar dados das escolas');
+      }
+    };
+    loadData();
+  }, []);
+
+  // Carregar API key salva
+  useEffect(() => {
+    const savedKey = localStorage.getItem('openai_api_key');
+    if (savedKey) {
+      setApiKey(savedKey);
+      setShowApiKeyInput(false);
+    }
+  }, []);
+
+  // Função para consultar dados de escolas
+  const querySchoolData = async (message: string) => {
+    if (!schoolDataLoaded) {
+      toast.error("Dados das escolas ainda estão sendo carregados");
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      let schoolInfo = "";
+      let queryType = "geral";
+
+      // Detecta o tipo de consulta e busca os dados apropriados
+      const lowerMessage = message.toLowerCase();
+
+      if (lowerMessage.includes('qual') && lowerMessage.includes('escola')) {
+        // Busca por nome de escola
+        const schoolName = message.replace(/qual|escola|é|o|da|de|/gi, '').trim();
+        const school = await searchSchoolByName(schoolName);
+        if (school) {
+          schoolInfo = formatSchoolData(school);
+          queryType = "nome";
+        }
+      } else if (lowerMessage.includes('estado') || lowerMessage.includes('sp') || lowerMessage.includes('mg')) {
+        // Busca por estado
+        const states = ['SP', 'MG', 'RJ', 'BA', 'PE', 'CE', 'RS', 'PR', 'SC', 'GO', 'DF', 'MT', 'MS', 'ES', 'AC', 'AM', 'AP', 'PA', 'RO', 'RR', 'TO', 'MA', 'PI', 'AL', 'SE', 'PB', 'RN'];
+        let foundState = '';
+        for (const state of states) {
+          if (lowerMessage.includes(state.toLowerCase())) {
+            foundState = state;
+            break;
+          }
+        }
+        if (foundState) {
+          const schools = await searchSchoolsByState(foundState);
+          schoolInfo = `Encontradas ${schools.length} escolas em ${foundState}:\n\n`;
+          schools.forEach(school => {
+            schoolInfo += `- ${school['Nome da Escola']} (${school['Status da Escola']}, Cluster: ${school['Cluster']})\n`;
+          });
+          queryType = "estado";
+        }
+      } else if (lowerMessage.includes('cluster')) {
+        // Busca por cluster
+        const clusters = ['Potente', 'Desenvolvimento', 'Alta Performance', 'Alerta', 'Implantação'];
+        let foundCluster = '';
+        for (const cluster of clusters) {
+          if (lowerMessage.toLowerCase().includes(cluster.toLowerCase())) {
+            foundCluster = cluster;
+            break;
+          }
+        }
+        if (foundCluster) {
+          const schools = await searchSchoolsByCluster(foundCluster);
+          schoolInfo = `Encontradas ${schools.length} escolas no cluster '${foundCluster}':\n\n`;
+          schools.forEach(school => {
+            schoolInfo += `- ${school['Nome da Escola']} (${school['Cidade da Escola']}, ${school['Estado da Escola']})\n`;
+          });
+          queryType = "cluster";
+        }
+      } else if (lowerMessage.includes('status') || lowerMessage.includes('operando') || lowerMessage.includes('implantando')) {
+        // Busca por status
+        const statuses = ['Operando', 'Implantando'];
+        let foundStatus = '';
+        for (const status of statuses) {
+          if (lowerMessage.toLowerCase().includes(status.toLowerCase())) {
+            foundStatus = status;
+            break;
+          }
+        }
+        if (foundStatus) {
+          const schools = await searchSchoolsByStatus(foundStatus);
+          schoolInfo = `Encontradas ${schools.length} escolas com status '${foundStatus}':\n\n`;
+          schools.forEach(school => {
+            schoolInfo += `- ${school['Nome da Escola']} (${school['Cidade da Escola']}, ${school['Estado da Escola']})\n`;
+          });
+          queryType = "status";
+        }
+      }
+
+      if (!schoolInfo) {
+        // Se não encontrou dados específicos, usa a IA para responder
+        await chatWithAI(message);
+        return;
+      }
+
+      const aiResponse: AIResponse = {
+        id: Date.now().toString(),
+        originalText: message,
+        improvedText: schoolInfo,
+        type: 'school_query',
+        timestamp: new Date().toLocaleString('pt-BR')
+      };
+      
+      setResponses(prev => [aiResponse, ...prev]);
+      setInputText('');
+      toast.success("Dados da escola recuperados com sucesso!");
+      
+    } catch (error: any) {
+      console.error('Erro ao consultar dados das escolas:', error);
+      toast.error(`Erro: ${error.message || 'Falha ao consultar dados'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Função para melhorar texto usando ChatGPT real
   const improveTextWithAI = async (text: string, type: 'polite' | 'welcoming' | 'professional') => {
@@ -105,7 +244,7 @@ Responda apenas com o texto melhorado, sem explicações adicionais.`
     }
   };
 
-  // Chat livre com ChatGPT
+  // Chat livre com ChatGPT, agora com contexto das escolas
   const chatWithAI = async (message: string) => {
     if (!apiKey.trim()) {
       toast.error("Por favor, insira sua chave da API do OpenAI");
@@ -116,6 +255,26 @@ Responda apenas com o texto melhorado, sem explicações adicionais.`
     setLoading(true);
     
     try {
+      // Gera o contexto das escolas para a IA
+      let schoolContext = "";
+      if (schoolDataLoaded) {
+        schoolContext = await generateSchoolContext();
+      }
+
+      const systemPrompt = `Você é um assistente inteligente do Maple Bear SAF (Sistema de Atendimento às Franquias). Você ajuda com:
+
+- Informações sobre escolas e franquias (você tem acesso a uma base de dados atualizada)
+- Dados de tickets de atendimento
+- Melhorar textos de comunicação
+- Explicar relatórios e métricas
+- Agendar atividades do SAF
+- Questões sobre vouchers e campanhas
+- Suporte a coordenadores e franqueados
+
+Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. Responda em português brasileiro.
+
+${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoolContext}` : ''}`;
+
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -127,17 +286,7 @@ Responda apenas com o texto melhorado, sem explicações adicionais.`
           messages: [
             {
               role: 'system',
-              content: `Você é um assistente inteligente do Maple Bear SAF (Sistema de Atendimento às Franquias). Você ajuda com:
-
-- Informações sobre tickets de atendimento
-- Dados de escolas e franquias
-- Melhorar textos de comunicação
-- Explicar relatórios e métricas
-- Agendar atividades do SAF
-- Questões sobre vouchers e campanhas
-- Suporte a coordenadores e franqueados
-
-Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. Responda em português brasileiro.`
+              content: systemPrompt
             },
             {
               role: 'user',
@@ -195,15 +344,6 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
     }
   };
 
-  // Carregar API key salva
-  useState(() => {
-    const savedKey = localStorage.getItem('openai_api_key');
-    if (savedKey) {
-      setApiKey(savedKey);
-      setShowApiKeyInput(false);
-    }
-  });
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -213,7 +353,7 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
             Assistente de IA Avançado
           </h1>
           <p className="text-muted-foreground">
-            IA real powered by ChatGPT para melhorar textos e responder perguntas
+            IA real powered by ChatGPT + Dados das Escolas Maple Bear
           </p>
         </div>
         <div className="flex gap-2">
@@ -229,6 +369,25 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
           )}
         </div>
       </div>
+
+      {/* Status dos Dados das Escolas */}
+      {!schoolDataLoaded && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Carregando dados das escolas...
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {schoolDataLoaded && (
+        <Alert className="bg-green-50 border-green-200">
+          <AlertCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            Dados das escolas carregados com sucesso! Você pode fazer perguntas sobre as escolas.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Configuração da API Key */}
       {showApiKeyInput && (
@@ -273,16 +432,16 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
         <CardHeader>
           <CardTitle>Interaja com a IA</CardTitle>
           <CardDescription>
-            Melhore textos ou faça perguntas sobre o SAF
+            Faça perguntas sobre escolas, melhore textos ou converse com a IA
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
-            placeholder="Digite seu texto para melhorar ou faça uma pergunta..."
+            placeholder="Digite uma pergunta sobre escolas (ex: 'Quais escolas estão em SP?') ou faça outra pergunta..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             rows={4}
-            disabled={!apiKey.trim()}
+            disabled={loading}
           />
           
           <div className="flex gap-2 flex-wrap">
@@ -314,8 +473,17 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
             </Button>
 
             <Button
-              onClick={() => chatWithAI(inputText)}
-              disabled={!inputText.trim() || loading || !apiKey.trim()}
+              onClick={() => {
+                if (inputText.toLowerCase().includes('escola') || 
+                    inputText.toLowerCase().includes('estado') ||
+                    inputText.toLowerCase().includes('cluster') ||
+                    inputText.toLowerCase().includes('status')) {
+                  querySchoolData(inputText);
+                } else {
+                  chatWithAI(inputText);
+                }
+              }}
+              disabled={!inputText.trim() || loading}
               variant="default"
             >
               <Bot className="mr-2 h-4 w-4" />
@@ -326,7 +494,7 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
           {loading && (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <span className="ml-2 text-muted-foreground">Processando com IA...</span>
+              <span className="ml-2 text-muted-foreground">Processando...</span>
             </div>
           )}
         </CardContent>
@@ -342,7 +510,7 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">
-                    {response.type === 'chat' ? 'Pergunta & Resposta' : 'Texto Melhorado'}
+                    {response.type === 'chat' ? 'Pergunta & Resposta' : response.type === 'school_query' ? 'Consulta de Escolas' : 'Texto Melhorado'}
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">
@@ -350,6 +518,7 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
                       {response.type === 'welcoming' && 'Acolhedor'}
                       {response.type === 'professional' && 'Profissional'}
                       {response.type === 'chat' && 'Chat IA'}
+                      {response.type === 'school_query' && 'Escolas'}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {response.timestamp}
@@ -361,7 +530,7 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
                 {/* Pergunta/Texto Original */}
                 <div>
                   <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                    {response.type === 'chat' ? 'Sua Pergunta:' : 'Texto Original:'}
+                    {response.type === 'chat' ? 'Sua Pergunta:' : response.type === 'school_query' ? 'Sua Consulta:' : 'Texto Original:'}
                   </h4>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm">{response.originalText}</p>
@@ -371,7 +540,7 @@ Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. 
                 {/* Resposta da IA */}
                 <div>
                   <h4 className="font-medium text-sm text-success mb-2">
-                    {response.type === 'chat' ? 'Resposta da IA:' : 'Texto Melhorado:'}
+                    {response.type === 'chat' ? 'Resposta da IA:' : response.type === 'school_query' ? 'Dados Encontrados:' : 'Texto Melhorado:'}
                   </h4>
                   <div className="p-3 bg-success-bg border border-success/20 rounded-lg">
                     <p className="text-sm whitespace-pre-line">{response.improvedText}</p>
