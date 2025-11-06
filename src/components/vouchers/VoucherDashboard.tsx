@@ -93,7 +93,7 @@ const VoucherDashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dashboard de Vouchers</h1>
@@ -117,7 +117,7 @@ const VoucherDashboard = () => {
       </div>
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total de Escolas"
           value={stats.totalSchools.toString()}
@@ -221,7 +221,7 @@ const VoucherDashboard = () => {
       </Card>
 
       {/* Lista de Vouchers */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredSchools.map((school) => (
           <Card key={school.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">

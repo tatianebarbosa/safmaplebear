@@ -45,7 +45,7 @@ const Index = () => {
         onSectionChange={setActiveSection}
       />
       
-      <main className="container mx-auto px-6 py-8">
+      <main className="px-6 py-8 max-w-7xl mx-auto">
         {renderContent()}
       </main>
     </div>

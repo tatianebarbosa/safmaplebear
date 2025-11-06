@@ -7,9 +7,9 @@
 @layer base {
   :root {
     /* Maple Bear Brand Colors */
-    --maple-red: 349 76% 47%;
-    --maple-red-light: 349 76% 65%;
-    --maple-red-dark: 349 76% 35%;
+    --maple-red: 349 76% 35%; /* Vermelho mais escuro, próximo ao logo */
+    --maple-red-light: 349 76% 55%;
+    --maple-red-dark: 349 76% 25%;
     /* --maple-gold: 45 93% 58%; */
     /* --maple-gold-light: 45 93% 75%; */
     
