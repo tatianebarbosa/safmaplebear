@@ -1,6 +1,6 @@
 // import { useState } from "react"; // Removido para simplificar
 import Header from "@/components/layout/Header";
-import CanvaManagement from "@/components/canva/CanvaMetricsDisplay";
+import CanvaManagement from "@/components/canva/CanvaDashboard";
 
 const Index = () => {
   return (

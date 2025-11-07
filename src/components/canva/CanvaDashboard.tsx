@@ -18,6 +18,7 @@ import { SchoolLicenseOverview } from './SchoolLicenseOverview';
 import { CanvaUsageDashboard } from './CanvaUsageDashboard';
 import { CostManagementDashboard } from './CostManagementDashboard';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
+import { CanvaMetricsDisplay } from './CanvaMetricsDisplay';
 
 const CanvaDashboard = () => {
   const { 
@@ -215,44 +216,7 @@ const CanvaDashboard = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Resumo da Gestão Canva</CardTitle>
-                <CardDescription>
-                  Dados sincronizados das planilhas oficiais • {overviewData.totalUsers} usuários ativos
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="space-y-2">
-                    <div className="text-2xl font-bold text-primary">
-                      {overviewData.totalSchools}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Escolas Total</div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-2xl font-bold text-primary">
-                      {overviewData.schoolsWithUsers}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Com Usuários</div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-2xl font-bold text-green-600">
-                      {overviewData.compliantUsers}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Conformes</div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-2xl font-bold text-red-600">
-                      {overviewData.nonCompliantUsers}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Fora da Política</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <CanvaMetricsDisplay />
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">
