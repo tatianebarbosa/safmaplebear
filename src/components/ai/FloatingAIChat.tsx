@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bot, Send, Minimize2, X, Key } from "lucide-react";
+import { Mascot } from "@/components/ui/mascot";
+import { BearHappy } from "@/assets/maplebear";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
@@ -240,9 +242,9 @@ Como posso ser mais específico para ajudá-lo?`;
         <Button
           onClick={() => setIsOpen(true)}
           size="lg"
-          className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90"
+          className="rounded-full h-16 w-16 shadow-lg hover:shadow-xl transition-all duration-300 bg-white hover:bg-gray-50 p-0"
         >
-          <Bot className="h-6 w-6" />
+          <Mascot src={BearHappy} size="md" alt="Assistente IA" animated />
         </Button>
       </div>
     );

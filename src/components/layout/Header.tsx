@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import logoMaplebear from "@/assets/logo-maplebear.png";
+import { BearHappy } from "@/assets/maplebear";
 
 interface HeaderProps {
   // activeSection: string; // Removido
@@ -46,9 +46,9 @@ const Header = (props: HeaderProps) => {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <img 
-              src={logoMaplebear} 
+              src={BearHappy} 
               alt="Maple Bear SAF" 
-              className="w-8 h-8 rounded-full"
+              className="w-10 h-10 object-contain"
             />
             <div>
               <h1 className="text-lg font-bold text-foreground">Maple Bear SAF</h1>
