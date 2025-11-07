@@ -7,6 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
 import { authService } from "@/components/auth/AuthService";
+import SEO from "@/components/common/SEO";
+import { sanitizeEmail, sanitizeInput } from "@/utils/sanitization";
+import { isValidEmail } from "@/utils/validation";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -23,10 +26,27 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validação e sanitização
+    const sanitizedEmail = sanitizeEmail(email);
+    const sanitizedPassword = sanitizeInput(password);
+    
+    if (!isValidEmail(sanitizedEmail)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor, insira um email válido",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
-      const response = await authService.login({ email, password });
+      const response = await authService.login({ 
+        email: sanitizedEmail, 
+        password: sanitizedPassword 
+      });
 
       if (response.success) {
         toast({
@@ -58,7 +78,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+    <>
+      <SEO 
+        title="Login"
+        description="Faça login no sistema de gerenciamento de licenças Canva da MapleBear"
+        keywords="login, maplebear, canva, autenticação"
+      />
+      <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-pattern opacity-50" />
       
       <Card className="w-full max-w-md relative backdrop-blur-sm bg-card/95 border-border/50 shadow-2xl">
@@ -141,7 +167,8 @@ const Login = () => {
 
         </CardContent>
       </Card>
-    </div>
+    </main>
+    </>
   );
 };
 

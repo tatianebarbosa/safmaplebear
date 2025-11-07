@@ -17,12 +17,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import logoMaplebear from "@/assets/logo-maplebear.png";
 
-interface HeaderProps {
-  // activeSection: string; // Removido
-  // onSectionChange: (section: string) => void; // Removido
-}
-
-const Header = (props: HeaderProps) => {
+const Header = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -40,23 +35,24 @@ const Header = (props: HeaderProps) => {
     navigate("/login");
   };
   return (
-    <header className="bg-card border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-40">
-      <div className="container mx-auto px-4 py-3">
+    <header className="bg-card border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-40" role="banner">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             <img 
               src={logoMaplebear} 
-              alt="Maple Bear SAF" 
-              className="w-8 h-8 rounded-full"
+              alt="Logo Maple Bear SAF" 
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-contain"
+              loading="eager"
             />
-            <div>
-              <h1 className="text-lg font-bold text-foreground">Maple Bear SAF</h1>
+            <div className="hidden sm:block">
+              <h1 className="text-base sm:text-lg font-bold text-foreground">Maple Bear SAF</h1>
             </div>
           </div>
 
           {/* Compact Navigation */}
-          <div className="flex items-center space-x-2">
+          <nav className="flex items-center space-x-2" role="navigation" aria-label="Menu do usuário">
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -86,7 +82,7 @@ const Header = (props: HeaderProps) => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </nav>
         </div>
       </div>
     </header>
