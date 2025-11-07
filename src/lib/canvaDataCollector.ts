@@ -1,28 +1,83 @@
 /**
- * Módulo de Coleta de Dados do Canva
+ * Módulo de Coleta de Dados do Canva - Versão Expandida
  * 
  * Este módulo é responsável por:
  * 1. Fazer login automaticamente no Canva
- * 2. Coletar o número de pessoas (usuários ativos)
+ * 2. Coletar métricas detalhadas (Pessoas, Designs, Membros, Kits de Marca)
  * 3. Armazenar os dados em um banco de dados
  * 4. Implementar o histórico de alterações
  */
 
-// Tipos de dados
+// Tipos de dados para Kit de Marca
+export interface KitMarca {
+  nome: string;
+  aplicado: string;
+  criado: string;
+  ultimaAtualizacao: string;
+}
+
+// Tipos de dados para Canva (expandido)
 export interface CanvaData {
+  // Dados de Pessoas
   totalPessoas: number;
+  
+  // Dados de Relatório de Uso
+  designsCriados: number;
+  designsCriadosCrescimento: number;
+  membrosAtivos: number;
+  membrosAtivosCrescimento: number;
+  totalPublicado: number;
+  totalCompartilhado: number;
+  
+  // Dados de Membros por Função
+  administradores: number;
+  alunos: number;
+  professores: number;
+  
+  // Dados de Kits de Marca
+  totalKits: number;
+  kits?: KitMarca[];
+  
+  // Metadados
   dataAtualizacao: string;
   horaAtualizacao: string;
   timestamp: number;
+  mudancas?: {
+    totalPessoas?: number;
+    designsCriados?: number;
+    membrosAtivos?: number;
+  };
 }
 
 export interface CanvaHistorico {
   id: string;
+  
+  // Dados de Pessoas
   totalPessoas: number;
+  
+  // Dados de Relatório de Uso
+  designsCriados: number;
+  membrosAtivos: number;
+  totalPublicado: number;
+  totalCompartilhado: number;
+  
+  // Dados de Membros por Função
+  administradores: number;
+  alunos: number;
+  professores: number;
+  
+  // Dados de Kits de Marca
+  totalKits: number;
+  
+  // Metadados
   dataAtualizacao: string;
   horaAtualizacao: string;
   timestamp: number;
-  mudanca: number; // Diferença em relação ao registro anterior
+  mudancas: {
+    totalPessoas?: number;
+    designsCriados?: number;
+    membrosAtivos?: number;
+  };
   usuarioAlteracao: string;
   descricaoAlteracao: string;
 }
@@ -41,7 +96,7 @@ export class CanvaDataCollector {
   }
 
   /**
-   * Coleta o número de pessoas do Canva via API
+   * Coleta os dados detalhados do Canva via API
    * Esta função será chamada por um backend que faz o scraping
    */
   async coletarDadosCanva(): Promise<CanvaData> {
@@ -98,7 +153,7 @@ export class CanvaDataCollector {
    * Registra uma alteração no histórico
    */
   async registrarAlteracao(
-    totalPessoas: number,
+    dados: Partial<CanvaData>,
     usuarioAlteracao: string,
     descricaoAlteracao: string
   ): Promise<CanvaHistorico> {
@@ -109,7 +164,7 @@ export class CanvaDataCollector {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          totalPessoas,
+          dados,
           usuarioAlteracao,
           descricaoAlteracao,
         }),
@@ -168,6 +223,30 @@ export class CanvaDataCollector {
       return data;
     } catch (error) {
       console.error('Erro ao obter dados recentes:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Obtém dados filtrados por tipo de métrica
+   */
+  async obterMetricasPorTipo(tipo: 'pessoas' | 'designs' | 'membros' | 'kits'): Promise<any> {
+    try {
+      const response = await fetch(`${this.apiUrl}/metricas/${tipo}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao obter métricas: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Erro ao obter métricas:', error);
       return null;
     }
   }
