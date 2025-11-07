@@ -36,10 +36,10 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Suspense fallback={<LoadingPage />}>
+
               <AnimatedRoutes />
               <FloatingAIChat />
-            </Suspense>
+
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
