@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { canvaCollector, CanvaData, CanvaHistorico } from '@/lib/canvaDataCollector';
 
 /**
  * Componente para exibir os dados do Canva e o histórico de alterações
  */
-export const CanvaDataDisplay: React.FC = () => {
+export const CanvaDataDisplay = () => {
   const [canvaData, setCanvaData] = useState<CanvaData | null>(null);
   const [historico, setHistorico] = useState<CanvaHistorico[]>([]);
   const [loading, setLoading] = useState(false);

@@ -8,10 +8,6 @@ import { toast } from "sonner";
 import { 
   loadSchoolData, 
   searchSchoolByName, 
-  searchSchoolsByState,
-  searchSchoolsByCluster,
-  searchSchoolsByStatus,
-  generateSchoolContext,
   formatSchoolData
 } from "@/lib/schoolDataQuery";
 

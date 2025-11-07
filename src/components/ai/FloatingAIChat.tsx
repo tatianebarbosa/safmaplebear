@@ -2,16 +2,12 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Send, Minimize2, X, MessageSquare, Key } from "lucide-react";
+import { Bot, Send, Minimize2, X, Key } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   loadSchoolData, 
   searchSchoolByName, 
-  searchSchoolsByState,
-  searchSchoolsByCluster,
-  searchSchoolsByStatus,
-  generateSchoolContext,
   formatSchoolData
 } from "@/lib/schoolDataQuery";
 
@@ -135,33 +131,7 @@ const FloatingAIChat = () => {
         }
       }
 
-      // Tenta buscar por estado
-      const states = ['SP', 'MG', 'RJ', 'BA', 'PE', 'CE', 'RS', 'PR', 'SC', 'GO', 'DF', 'MT', 'MS', 'ES', 'AC', 'AM', 'AP', 'PA', 'RO', 'RR', 'TO', 'MA', 'PI', 'AL', 'SE', 'PB', 'RN'];
-      let foundState = '';
-      for (const state of states) {
-        if (lowerMessage.includes(state.toLowerCase())) {
-          foundState = state;
-          break;
-        }
-      }
-      if (foundState) {
-        const schools = await searchSchoolsByState(foundState);
-        return `Encontradas ${schools.length} escolas em ${foundState}. Por favor, pergunte sobre uma escola específica para mais detalhes.`;
-      }
 
-      // Tenta buscar por cluster
-      const clusters = ['potente', 'desenvolvimento', 'alta performance', 'alerta', 'implantação'];
-      let foundCluster = '';
-      for (const cluster of clusters) {
-        if (lowerMessage.includes(cluster)) {
-          foundCluster = cluster;
-          break;
-        }
-      }
-      if (foundCluster) {
-        const schools = await searchSchoolsByCluster(foundCluster);
-        return `Encontradas ${schools.length} escolas no cluster '${foundCluster}'. Por favor, pergunte sobre uma escola específica para mais detalhes.`;
-      }
       
       // Se a intenção é clara, mas a busca falhou, retorna uma mensagem de erro específica
       return "Desculpe, não consegui encontrar a escola ou o dado específico que você procurou na base de dados. Tente refinar sua busca ou perguntar o nome exato da escola.";
@@ -173,9 +143,6 @@ const FloatingAIChat = () => {
   const callOpenAI = async (input: string): Promise<string> => {
     // Gera o contexto das escolas para a IA
     let schoolContext = "";
-    if (schoolDataLoaded) {
-      schoolContext = await generateSchoolContext();
-    }
 
     const systemPrompt = `Você é um assistente inteligente do Maple Bear SAF (Sistema de Atendimento às Franquias). Você é especializado em:
 
@@ -189,7 +156,7 @@ const FloatingAIChat = () => {
 
 Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacional do Maple Bear. Responda em português brasileiro.
 
-${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoolContext}` : ''}`;
+`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

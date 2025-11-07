@@ -268,7 +268,7 @@ export function filterSchools(
   });
 }
 
-export function exportVoucherReport(schools: VoucherSchool[], exceptions: ExceptionVoucher[]) {
+export function exportVoucherReport(schools: VoucherSchool[]) {
   const headers = [
     'ID', 'Nome', 'Cluster', 'Status', 'Elegível', 'Qtd Vouchers', 
     'Código', 'Enviado', 'Vendas SLM', 'Observações'

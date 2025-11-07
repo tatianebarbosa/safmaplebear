@@ -66,12 +66,7 @@ export interface UserRanking {
   category: 'most_active' | 'most_creative' | 'most_shared' | 'most_viewed';
 }
 
-// Allowed domains for compliance check
-const ALLOWED_DOMAINS = [
-  'maplebear.com.br',
-  'seb.com.br', 
-  'sebsa.com.br'
-];
+
 
 interface LicenseAction {
   id: string;

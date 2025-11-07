@@ -34,7 +34,7 @@ export interface LicenseStatus {
 
 export function parseSchoolsCSV(csvContent: string): School[] {
   const lines = csvContent.split('\n');
-  const headers = lines[0].split(';');
+  lines[0].split(';'); // Ignorando headers não utilizados
   
   return lines.slice(1)
     .filter(line => line.trim())

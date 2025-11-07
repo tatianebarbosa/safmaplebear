@@ -106,7 +106,7 @@ const VoucherDashboard = () => {
             <FileText className="w-4 h-4 mr-2" />
             Relatório PDF
           </Button>
-          <Button variant="outline" onClick={() => exportVoucherReport(filteredSchools, exceptions)}>
+          <Button variant="outline" onClick={() => exportVoucherReport(filteredSchools)}>
             <Download className="w-4 h-4 mr-2" />
             Exportar CSV
           </Button>

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Camera, Key, Users, CheckCircle, Clock, Trash2, Shield } from "lucide-react";
+import { User, Key, Trash2, Users, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -89,17 +89,7 @@ const ProfileManagement = () => {
     return allowedDomains.some(domain => email.toLowerCase().includes(domain));
   };
 
-  // Verificar se sessão expirou (1 semana)
-  const isSessionExpired = (): boolean => {
-    if (!currentUser?.sessionExpiry) return true;
-    
-    const expiry = new Date(currentUser.sessionExpiry);
-    const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 = domingo, 1 = segunda
-    
-    // Se é segunda-feira ou sessão já expirou
-    return dayOfWeek === 1 || now > expiry;
-  };
+
 
   // Atualizar perfil
   const updateProfile = async () => {

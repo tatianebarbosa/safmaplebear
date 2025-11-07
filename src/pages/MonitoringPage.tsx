@@ -27,7 +27,7 @@ import {
 
 const MonitoringPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { tickets, updateTicket, getCriticalTickets, getOverdueTickets } = useTicketStore();
+  const { updateTicket, getCriticalTickets, getOverdueTickets } = useTicketStore();
   const { hasRole } = useAuthStore();
 
   // Redirect if not authorized

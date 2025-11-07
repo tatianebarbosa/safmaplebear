@@ -32,11 +32,11 @@ export interface RankingChange {
 
 export function parseCSV(csvContent: string): CanvaUserData[] {
   const lines = csvContent.split('\n');
-  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+  lines[0].split(',').map(h => h.replace(/"/g, '').trim()); // Ignorando headers não utilizados
   
   return lines.slice(1)
     .filter(line => line.trim())
-    .map((line, index) => {
+    .map((line) => {
       const values = parseCSVLine(line);
       
       const designsCriados = parseInt(values[4]) || 0;

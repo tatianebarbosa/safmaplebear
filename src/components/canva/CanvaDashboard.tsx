@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,16 +15,16 @@ import {
 import { toast } from 'sonner';
 import StatsCard from '@/components/dashboard/StatsCard';
 import { SchoolLicenseManagement } from './SchoolLicenseManagement';
-import { SchoolLicenseOverview } from './SchoolLicenseOverview';
+// import { SchoolLicenseOverview } from './SchoolLicenseOverview'; // Não utilizado diretamente aqui
 import { CanvaUsageDashboard } from './CanvaUsageDashboard';
 import { CostManagementDashboard } from './CostManagementDashboard';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { CanvaMetricsDisplay } from './CanvaMetricsDisplay';
 
 const CanvaDashboard = () => {
+  const navigate = useNavigate();
   const { 
     overviewData, 
-    officialData, 
     loading,
     loadOfficialData,
     getDomainCounts
@@ -58,16 +59,6 @@ const CanvaDashboard = () => {
     toast.success('Dados exportados com sucesso');
   };
 
-  const getPeriodLabel = (period: string) => {
-    switch (period) {
-      case '30d': return 'Últimos 30 dias';
-      case '3m': return 'Últimos 3 meses';
-      case '6m': return 'Últimos 6 meses';
-      case '12m': return 'Últimos 12 meses';
-      default: return period;
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -96,7 +87,7 @@ const CanvaDashboard = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => window.location.href = '/dashboard'}
+              onClick={() => navigate('/dashboard')}
               className="gap-2"
             >
               <Home className="h-4 w-4" />

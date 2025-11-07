@@ -142,4 +142,276 @@ export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
                   </div>
                   <div className="detail-row">
                     <span className="label">Data/Hora:</span>
-                    <span className="value\">{registro.data} às {registro.hora}</span>\n                  </div>\n                  {registro.ipAddress && (\n                    <div className=\"detail-row\">\n                      <span className=\"label\">IP Address:</span>\n                      <span className=\"value\">{registro.ipAddress}</span>\n                    </div>\n                  )}\n                  {registro.camposAlterados && registro.camposAlterados.length > 0 && (\n                    <div className=\"campos-alterados\">\n                      <h4>Campos Alterados:</h4>\n                      <table className=\"campos-table\">\n                        <thead>\n                          <tr>\n                            <th>Campo</th>\n                            <th>Valor Anterior</th>\n                            <th>Valor Novo</th>\n                          </tr>\n                        </thead>\n                        <tbody>\n                          {registro.camposAlterados.map((campo, idx) => (\n                            <tr key={idx}>\n                              <td>{campo.campo}</td>\n                              <td className=\"valor-anterior\">{JSON.stringify(campo.valorAnterior)}</td>\n                              <td className=\"valor-novo\">{JSON.stringify(campo.valorNovo)}</td>\n                            </tr>\n                          ))}\n                        </tbody>\n                      </table>\n                    </div>\n                  )}\n                  {registro.idReversao && (\n                    <div className=\"detail-row revertido\">\n                      <span className=\"label\">Revertido por:</span>\n                      <span className=\"value\">{registro.idReversao}</span>\n                    </div>\n                  )}\n                </div>\n              )}\n            </div>\n          ))}\n        </div>\n      )}\n\n      <style>{`\n        .historico-alteracoes {\n          background-color: white;\n          border-radius: 8px;\n          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n          padding: 20px;\n          margin-top: 20px;\n        }\n\n        .historico-header {\n          display: flex;\n          justify-content: space-between;\n          align-items: center;\n          margin-bottom: 20px;\n          border-bottom: 2px solid #e0e0e0;\n          padding-bottom: 15px;\n        }\n\n        .historico-header h3 {\n          margin: 0;\n          font-size: 18px;\n          color: #333;\n        }\n\n        .btn-refresh {\n          padding: 8px 16px;\n          background-color: #3b82f6;\n          color: white;\n          border: none;\n          border-radius: 4px;\n          cursor: pointer;\n          font-size: 13px;\n          transition: background-color 0.3s;\n        }\n\n        .btn-refresh:hover {\n          background-color: #2563eb;\n        }\n\n        .error-message {\n          padding: 12px;\n          background-color: #fee;\n          color: #c33;\n          border-radius: 4px;\n          margin-bottom: 15px;\n        }\n\n        .no-data {\n          padding: 20px;\n          text-align: center;\n          color: #999;\n          font-size: 14px;\n        }\n\n        .historico-loading {\n          padding: 20px;\n          text-align: center;\n          color: #666;\n        }\n\n        .historico-list {\n          display: flex;\n          flex-direction: column;\n          gap: 10px;\n        }\n\n        .historico-item {\n          border: 1px solid #e0e0e0;\n          border-radius: 6px;\n          overflow: hidden;\n          transition: all 0.3s;\n        }\n\n        .historico-item:hover {\n          border-color: #3b82f6;\n          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);\n        }\n\n        .historico-item-header {\n          display: flex;\n          justify-content: space-between;\n          align-items: center;\n          padding: 12px;\n          cursor: pointer;\n          background-color: #f9f9f9;\n          transition: background-color 0.3s;\n        }\n\n        .historico-item-header:hover {\n          background-color: #f0f0f0;\n        }\n\n        .item-info {\n          display: flex;\n          align-items: flex-start;\n          gap: 12px;\n          flex: 1;\n        }\n\n        .tipo-badge {\n          display: flex;\n          align-items: center;\n          justify-content: center;\n          width: 32px;\n          height: 32px;\n          border-radius: 50%;\n          color: white;\n          font-size: 16px;\n          font-weight: bold;\n          flex-shrink: 0;\n        }\n\n        .item-details {\n          flex: 1;\n        }\n\n        .item-descricao {\n          margin: 0 0 4px 0;\n          font-size: 14px;\n          font-weight: 600;\n          color: #333;\n        }\n\n        .item-meta {\n          margin: 0;\n          font-size: 12px;\n          color: #999;\n        }\n\n        .item-actions {\n          display: flex;\n          align-items: center;\n          gap: 10px;\n        }\n\n        .btn-revert {\n          padding: 6px 12px;\n          background-color: #f59e0b;\n          color: white;\n          border: none;\n          border-radius: 4px;\n          cursor: pointer;\n          font-size: 12px;\n          font-weight: 600;\n          transition: background-color 0.3s;\n        }\n\n        .btn-revert:hover {\n          background-color: #d97706;\n        }\n\n        .expand-icon {\n          color: #999;\n          font-size: 12px;\n        }\n\n        .historico-item-details {\n          padding: 15px;\n          background-color: #fafafa;\n          border-top: 1px solid #e0e0e0;\n        }\n\n        .detail-row {\n          display: flex;\n          margin-bottom: 10px;\n          font-size: 13px;\n        }\n\n        .detail-row.revertido {\n          background-color: #fffbeb;\n          padding: 8px;\n          border-radius: 4px;\n          color: #d97706;\n        }\n\n        .label {\n          font-weight: 600;\n          color: #666;\n          min-width: 150px;\n        }\n\n        .value {\n          color: #333;\n          word-break: break-all;\n        }\n\n        .valor-anterior {\n          color: #ef4444;\n        }\n\n        .valor-novo {\n          color: #22c55e;\n        }\n\n        .campos-alterados {\n          margin-top: 15px;\n          padding-top: 15px;\n          border-top: 1px solid #e0e0e0;\n        }\n\n        .campos-alterados h4 {\n          margin: 0 0 10px 0;\n          font-size: 13px;\n          color: #333;\n        }\n\n        .campos-table {\n          width: 100%;\n          border-collapse: collapse;\n          font-size: 12px;\n        }\n\n        .campos-table th {\n          background-color: #e0e0e0;\n          padding: 8px;\n          text-align: left;\n          font-weight: 600;\n          color: #333;\n        }\n\n        .campos-table td {\n          padding: 8px;\n          border-bottom: 1px solid #e0e0e0;\n        }\n      `}</style>\n    </div>\n  );\n};\n\nexport default HistoricoAlteracoes;\n
+                    <span className="value">{registro.data} às {registro.hora}</span>
+                  </div>
+                  {registro.ipAddress && (
+                    <div className="detail-row">
+                      <span className="label">IP Address:</span>
+                      <span className="value">{registro.ipAddress}</span>
+                    </div>
+                  )}
+                  {registro.camposAlterados && registro.camposAlterados.length > 0 && (
+                    <div className="campos-alterados">
+                      <h4>Campos Alterados:</h4>
+                      <table className="campos-table">
+                        <thead>
+                          <tr>
+                            <th>Campo</th>
+                            <th>Valor Anterior</th>
+                            <th>Valor Novo</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {registro.camposAlterados.map((campo, idx) => (
+                            <tr key={idx}>
+                              <td>{campo.campo}</td>
+                              <td className="valor-anterior">{JSON.stringify(campo.valorAnterior)}</td>
+                              <td className="valor-novo">{JSON.stringify(campo.valorNovo)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  {registro.idReversao && (
+                    <div className="detail-row revertido">
+                      <span className="label">Revertido por:</span>
+                      <span className="value">{registro.idReversao}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      <style>{`
+        .historico-alteracoes {
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          padding: 20px;
+          margin-top: 20px;
+        }
+
+        .historico-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          border-bottom: 2px solid #e0e0e0;
+          padding-bottom: 15px;
+        }
+
+        .historico-header h3 {
+          margin: 0;
+          font-size: 18px;
+          color: #333;
+        }
+
+        .btn-refresh {
+          padding: 8px 16px;
+          background-color: #3b82f6;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 13px;
+          transition: background-color 0.3s;
+        }
+
+        .btn-refresh:hover {
+          background-color: #2563eb;
+        }
+
+        .error-message {
+          padding: 12px;
+          background-color: #fee;
+          color: #c33;
+          border-radius: 4px;
+          margin-bottom: 15px;
+        }
+
+        .no-data {
+          padding: 20px;
+          text-align: center;
+          color: #999;
+          font-size: 14px;
+        }
+
+        .historico-loading {
+          padding: 20px;
+          text-align: center;
+          color: #666;
+        }
+
+        .historico-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .historico-item {
+          border: 1px solid #e0e0e0;
+          border-radius: 6px;
+          overflow: hidden;
+          transition: all 0.3s;
+        }
+
+        .historico-item:hover {
+          border-color: #3b82f6;
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .historico-item-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px;
+          cursor: pointer;
+          background-color: #f9f9f9;
+          transition: background-color 0.3s;
+        }
+
+        .historico-item-header:hover {
+          background-color: #f0f0f0;
+        }
+
+        .item-info {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          flex: 1;
+        }
+
+        .tipo-badge {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          color: white;
+          font-size: 16px;
+          font-weight: bold;
+          flex-shrink: 0;
+        }
+
+        .item-details {
+          flex: 1;
+        }
+
+        .item-descricao {
+          margin: 0 0 4px 0;
+          font-size: 14px;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .item-meta {
+          margin: 0;
+          font-size: 12px;
+          color: #999;
+        }
+
+        .item-actions {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .btn-revert {
+          padding: 6px 12px;
+          background-color: #f59e0b;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 600;
+          transition: background-color 0.3s;
+        }
+
+        .btn-revert:hover {
+          background-color: #d97706;
+        }
+
+        .expand-icon {
+          color: #999;
+          font-size: 12px;
+        }
+
+        .historico-item-details {
+          padding: 15px;
+          background-color: #fafafa;
+          border-top: 1px solid #e0e0e0;
+        }
+
+        .detail-row {
+          display: flex;
+          margin-bottom: 10px;
+          font-size: 13px;
+        }
+
+        .detail-row.revertido {
+          background-color: #fffbeb;
+          padding: 8px;
+          border-radius: 4px;
+          color: #d97706;
+        }
+
+        .label {
+          font-weight: 600;
+          color: #666;
+          min-width: 150px;
+        }
+
+        .value {
+          color: #333;
+          word-break: break-all;
+        }
+
+        .valor-anterior {
+          color: #ef4444;
+        }
+
+        .valor-novo {
+          color: #22c55e;\n        }
+
+        .campos-alterados {
+          margin-top: 15px;
+          padding-top: 15px;
+          border-top: 1px solid #e0e0e0;
+        }
+
+        .campos-alterados h4 {
+          margin: 0 0 10px 0;
+          font-size: 13px;
+          color: #333;
+        }
+
+        .campos-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 12px;
+        }
+
+        .campos-table th {
+          background-color: #e0e0e0;
+          padding: 8px;
+          text-align: left;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .campos-table td {
+          padding: 8px;
+          border-bottom: 1px solid #e0e0e0;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default HistoricoAlteracoes;
+

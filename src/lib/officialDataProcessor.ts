@@ -26,7 +26,7 @@ export const parseOfficialSchoolsCSV = async (): Promise<OfficialSchool[]> => {
     
     if (lines.length < 2) return [];
     
-    const headers = lines[0].split(';');
+    lines[0].split(';'); // Ignorando headers não utilizados
     const schools: OfficialSchool[] = [];
     
     for (let i = 1; i < lines.length; i++) {

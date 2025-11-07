@@ -4,19 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ChevronDown, 
-  
-  Users, 
-  TrendingUp, 
   User, 
-  LogOut, 
-  MessageSquare, 
-  Bot, 
-  CreditCard, 
-  Brain, 
-  Calendar,
-  Activity,
-  Home,
-  Menu
+  LogOut
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -86,7 +75,7 @@ const Header = (props: HeaderProps) => {
                   {userEmail}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
                   <User className="w-4 h-4 mr-2" />
                   Perfil
                 </DropdownMenuItem>
