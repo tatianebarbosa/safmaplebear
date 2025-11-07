@@ -38,7 +38,9 @@ const App = () => (
           <BrowserRouter>
 
               <AnimatedRoutes />
-              <FloatingAIChat />
+              <Suspense fallback={null}>
+                <FloatingAIChat />
+              </Suspense>
 
           </BrowserRouter>
         </TooltipProvider>
