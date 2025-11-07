@@ -53,6 +53,15 @@ export default {
           DEFAULT: "var(--color-secondary)", // Cinza-claro Maple Bear
           foreground: "var(--color-secondary-foreground)", // Preto
         },
+        // Adicionar cores de sucesso e aviso para Dark Mode
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",

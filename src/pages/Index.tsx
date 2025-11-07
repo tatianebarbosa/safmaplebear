@@ -13,7 +13,7 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <Header />
       
-      <main className="px-6 py-8 max-w-7xl mx-auto">
+      <main className="px-4 sm:px-6 py-8 max-w-7xl mx-auto">
         <CanvaManagement />
       </main>
       </div>

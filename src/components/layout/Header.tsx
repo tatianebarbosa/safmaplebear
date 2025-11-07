@@ -5,8 +5,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ChevronDown, 
   User, 
-  LogOut
+  LogOut,
+  Sun,
+  Moon
 } from "lucide-react";
+import useTheme from "@/hooks/use-theme";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +19,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import logoMaplebear from "@/assets/logo-maplebear.png";
+
+const ThemeToggle = () => {
+  const { theme, toggleTheme } = useTheme();
+  
+  return (
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      onClick={toggleTheme}
+      aria-label="Alternar tema"
+      className="transition-all duration-300"
+    >
+      {theme === 'light' ? (
+        <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      ) : (
+        <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      )}
+      <span className="sr-only">Alternar tema</span>
+    </Button>
+  );
+};
 
 const Header = () => {
   const navigate = useNavigate();
@@ -53,6 +77,8 @@ const Header = () => {
 
           {/* Compact Navigation */}
           <nav className="flex items-center space-x-2" role="navigation" aria-label="Menu do usuário">
+            {/* Theme Toggle */}
+            <ThemeToggle />
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

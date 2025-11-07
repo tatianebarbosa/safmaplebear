@@ -52,6 +52,7 @@
     "date-fns": "^3.0.6",
     "dompurify": "^3.3.0",
     "embla-carousel-react": "^8.0.0",
+    "framer-motion": "^12.23.24",
     "input-otp": "^1.2.4",
     "jspdf": "^3.0.3",
     "lucide-react": "^0.544.0",

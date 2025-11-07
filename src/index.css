@@ -116,13 +116,13 @@
     --secondary: 0 0% 20%;
     --secondary-foreground: 0 0% 90%;
     
-    --success: 142 76% 45%;
+    --success: 142 76% 55%; /* Mais claro para contraste */
     --success-bg: 142 76% 15%;
     
-    --warning: 32 95% 60%;
+    --warning: 32 95% 70%; /* Mais claro para contraste */
     --warning-bg: 32 95% 15%;
     
-    --destructive: 0 84% 70%;
+    --destructive: 0 84% 75%; /* Mais claro para contraste */
     --destructive-bg: 0 84% 15%;
     
     --muted: 0 0% 20%;

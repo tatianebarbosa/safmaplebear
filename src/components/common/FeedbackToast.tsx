@@ -19,10 +19,10 @@ const iconMap = {
 };
 
 const colorMap = {
-  success: "text-green-600",
-  error: "text-red-600",
-  warning: "text-yellow-600",
-  info: "text-blue-600",
+  success: "text-success",
+  error: "text-destructive",
+  warning: "text-warning",
+  info: "text-blue-500 dark:text-blue-400",
   loading: "text-primary",
 };
 
@@ -50,6 +50,7 @@ export const useFeedbackToast = () => {
       description,
       duration: type === 'loading' ? Infinity : duration,
       variant: type === 'error' ? 'destructive' : 'default',
+      className: type === 'loading' ? 'bg-card border-border' : '',
     });
   };
 
