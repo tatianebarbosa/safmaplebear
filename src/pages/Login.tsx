@@ -84,20 +84,20 @@ const Login = () => {
         description="Faça login no sistema de gerenciamento de licenças Canva da MapleBear"
         keywords="login, maplebear, canva, autenticação"
       />
-      <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-gradient-pattern opacity-50" />
       
-      <Card className="w-full max-w-md relative backdrop-blur-sm bg-card/95 border-border/50 shadow-2xl">
+      <Card className="w-full max-w-sm relative bg-card shadow-2xl border-none">
         <CardHeader className="text-center space-y-4 pb-6">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/40">
               <LogIn className="w-8 h-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground">
+          <CardTitle className="text-3xl font-heading font-bold text-foreground">
             Maple Bear SAF
           </CardTitle>
-          <CardDescription className="text-muted-foreground">
+          <CardDescription className="text-base text-muted-foreground font-body">
             Sistema de Gestão de Licenças Canva
           </CardDescription>
         </CardHeader>
@@ -105,7 +105,7 @@ const Login = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-foreground">
+              <Label htmlFor="email" className="text-sm font-body font-medium text-foreground">
                 Email
               </Label>
               <Input
@@ -120,7 +120,7 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              <Label htmlFor="password" className="text-sm font-body font-medium text-foreground">
                 Senha
               </Label>
               <div className="relative">
@@ -149,7 +149,7 @@ const Login = () => {
 
             <Button 
               type="submit" 
-              className="w-full mt-6" 
+              className="w-full mt-6 font-heading" 
               size="lg"
               disabled={isLoading}
             >

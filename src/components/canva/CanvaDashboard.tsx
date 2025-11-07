@@ -79,7 +79,7 @@ const CanvaDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+	    <div className="container mx-auto p-4 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -94,7 +94,7 @@ const CanvaDashboard = () => {
               Voltar ao Início
             </Button>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestão Canva</h1>
+	          <h1 className="text-3xl font-heading font-bold tracking-tight">Gestão Canva</h1>
           <p className="text-muted-foreground">
             Dados oficiais sincronizados • {overviewData.totalUsers} usuários ativos
           </p>
@@ -119,7 +119,7 @@ const CanvaDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+	      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         <StatsCard
           title="Total de Usuários"
           value={overviewData.totalUsers.toString()}
@@ -157,19 +157,19 @@ const CanvaDashboard = () => {
       {/* Compliance Alert */}
       {overviewData.nonCompliantUsers > 0 && (
         <Card className="border-destructive/20 bg-destructive/5">
-          <CardHeader>
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
-              <div className="space-y-1">
-                <CardTitle className="text-destructive">
-                  Alerta de Conformidade - Alto Risco
-                </CardTitle>
-                <CardDescription>
-                  {overviewData.nonCompliantUsers} usuários com domínios não autorizados identificados
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
+	          <CardHeader>
+	            <div className="flex items-start gap-2">
+	              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+	              <div className="space-y-1">
+	                <CardTitle className="text-xl font-heading font-bold text-destructive">
+	                  Alerta de Conformidade - Alto Risco
+	                </CardTitle>
+	                <CardDescription className="text-sm font-body">
+	                  {overviewData.nonCompliantUsers} usuários com domínios não autorizados identificados
+	                </CardDescription>
+	              </div>
+	            </div>
+	          </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
@@ -198,7 +198,7 @@ const CanvaDashboard = () => {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+	        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="schools">Escolas</TabsTrigger>
           <TabsTrigger value="usage">Usos</TabsTrigger>
@@ -236,51 +236,51 @@ const CanvaDashboard = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Sincronização de Dados</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Dados atualizados automaticamente das planilhas oficiais
-                    </p>
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        onClick={loadOfficialData}
-                        disabled={loading}
-                      >
-                        {loading ? 'Carregando...' : 'Recarregar Dados'}
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={handleExportData}>
-                        <Download className="h-3 w-3 mr-1" />
-                        Exportar
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+	                <Card className="hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
+	                  <CardHeader className="pb-3">
+	                    <CardTitle className="text-base font-heading font-semibold">Sincronização de Dados</CardTitle>
+	                  </CardHeader>
+	                  <CardContent>
+	                    <p className="text-sm text-muted-foreground mb-3 font-body">
+	                      Dados atualizados automaticamente das planilhas oficiais
+	                    </p>
+	                    <div className="flex gap-2">
+	                      <Button 
+	                        size="sm" 
+	                        onClick={loadOfficialData}
+	                        disabled={loading}
+	                      >
+	                        {loading ? 'Carregando...' : 'Recarregar Dados'}
+	                      </Button>
+	                      <Button size="sm" variant="outline" onClick={handleExportData}>
+	                        <Download className="h-3 w-3 mr-1" />
+	                        Exportar
+	                      </Button>
+	                    </div>
+	                  </CardContent>
+	                </Card>
                 
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Estatísticas Rápidas</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Taxa de Conformidade:</span>
-                        <span className="font-medium">{overviewData.complianceRate.toFixed(1)}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Escolas com Usuários:</span>
-                        <span className="font-medium">{overviewData.schoolsWithUsers}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Principais Domínios:</span>
-                        <span className="font-medium">{getDomainCounts().length}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+	                <Card className="hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
+	                  <CardHeader className="pb-3">
+	                    <CardTitle className="text-base font-heading font-semibold">Estatísticas Rápidas</CardTitle>
+	                  </CardHeader>
+	                  <CardContent>
+	                    <div className="space-y-2 text-sm font-body">
+	                      <div className="flex justify-between">
+	                        <span>Taxa de Conformidade:</span>
+	                        <span className="font-semibold text-primary">{overviewData.complianceRate.toFixed(1)}%</span>
+	                      </div>
+	                      <div className="flex justify-between">
+	                        <span>Escolas com Usuários:</span>
+	                        <span className="font-semibold text-primary">{overviewData.schoolsWithUsers}</span>
+	                      </div>
+	                      <div className="flex justify-between">
+	                        <span>Principais Domínios:</span>
+	                        <span className="font-semibold text-primary">{getDomainCounts().length}</span>
+	                      </div>
+	                    </div>
+	                  </CardContent>
+	                </Card>
               </div>
             </CardContent>
           </Card>

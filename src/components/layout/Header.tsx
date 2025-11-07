@@ -35,7 +35,7 @@ const Header = () => {
     navigate("/login");
   };
   return (
-    <header className="bg-card border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-40" role="banner">
+    <header className="bg-card border-b border-border/50 shadow-md sticky top-0 z-40" role="banner">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -47,7 +47,7 @@ const Header = () => {
               loading="eager"
             />
             <div className="hidden sm:block">
-              <h1 className="text-base sm:text-lg font-bold text-foreground">Maple Bear SAF</h1>
+              <h1 className="text-base sm:text-lg font-heading font-bold text-foreground">Maple Bear SAF</h1>
             </div>
           </div>
 
@@ -58,7 +58,7 @@ const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="flex items-center space-x-2">
                   <Avatar className="w-7 h-7">
-                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                    <AvatarFallback className="text-xs bg-primary text-primary-foreground font-semibold">
                       {userEmail.split('@')[0].slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>

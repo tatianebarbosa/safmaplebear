@@ -6,34 +6,40 @@
 
 @layer base {
   :root {
-    /* Maple Bear Brand Colors */
-    --maple-red: 349 76% 35%; /* Vermelho mais escuro, próximo ao logo */
-    --maple-red-light: 349 76% 55%;
-    --maple-red-dark: 349 76% 25%;
-    /* --maple-gold: 45 93% 58%; */
-    /* --maple-gold-light: 45 93% 75%; */
+    /* Maple Bear Brand Colors - RGB/HEX para HSL */
+    /* #cc1316 -> 359 84% 44% */
+    /* #aa0414 -> 353 93% 34% */
+    /* #ededed -> 0 0% 93% */
     
-    /* Base Colors */
-    --background: 220 13% 97%;
-    --foreground: 220 9% 13%;
+    --maple-red: 359 84% 44%; /* #cc1316 - Primary Button */
+    --maple-red-vivid: 353 93% 34%; /* #aa0414 - Hover/Darker */
+    --maple-gray-light: 0 0% 93%; /* #ededed - Secondary Button/Background */
+    
+    /* Base Colors - Ajustado para o Cinza-claro Maple Bear */
+    --background: var(--maple-gray-light); /* #ededed */
+    --foreground: 0 0% 0%; /* Preto #000000 */
     
     /* Surface Colors */
-    --card: 0 0% 100%;
-    --card-foreground: 220 9% 13%;
+    --card: 0 0% 100%; /* Branco */
+    --card-foreground: 0 0% 0%; /* Preto */
     
     --popover: 0 0% 100%;
-    --popover-foreground: 220 9% 13%;
+    --popover-foreground: 0 0% 0%;
     
     /* Brand Primary (Maple Red) */
     --primary: var(--maple-red);
-    --primary-foreground: 0 0% 100%;
-    --primary-light: var(--maple-red-light);
-    --primary-dark: var(--maple-red-dark);
+    --primary-foreground: 0 0% 100%; /* Branco */
+    --primary-hover: var(--maple-red-vivid);
     
-    /* Secondary (Redefinido para Primary para remover amarelo) */
-    --secondary: var(--maple-red-light);
-    --secondary-foreground: 220 9% 13%;
-    --secondary-light: var(--maple-red-light);
+    /* Secondary (Cinza-claro Maple Bear) */
+    --secondary: var(--maple-gray-light);
+    --secondary-foreground: 0 0% 0%; /* Preto */
+    
+    /* Cores para Tailwind.config.js */
+    --color-primary: var(--maple-red);
+    --color-primary-foreground: 0 0% 100%;
+    --color-secondary: var(--maple-gray-light);
+    --color-secondary-foreground: 0 0% 0%;
     
     /* Success States */
     --success: 142 76% 36%;
@@ -54,67 +60,61 @@
     --destructive-bg: 0 84% 95%;
     
     /* Neutral Colors */
-    --muted: 220 13% 95%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 0 0% 95%; /* Cinza mais neutro */
+    --muted-foreground: 0 0% 46%;
     
-    --accent: 220 13% 95%;
-    --accent-foreground: 220 9% 13%;
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 0% 0%;
     
     /* Border & Input */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: 0 0% 85%; /* Borda mais clara */
+    --input: 0 0% 100%; /* Input branco */
     --ring: var(--maple-red);
     
     /* Gradients */
-    --gradient-maple: linear-gradient(135deg, hsl(var(--maple-red)), hsl(var(--maple-red-light)));
+    --gradient-maple: linear-gradient(135deg, hsl(var(--maple-red)), hsl(var(--maple-red-vivid)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-light)));
     --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
     
     /* Backgrounds & Effects */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
     --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--card)));
     --gradient-pattern: radial-gradient(circle at 20% 50%, hsl(var(--primary) / 0.05) 0%, transparent 50%);
     
     /* Shadows */
     --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red) / 0.3);
-    --shadow-card: 0 4px 12px hsl(220 9% 13% / 0.08);
-    --shadow-elevated: 0 8px 24px hsl(220 9% 13% / 0.12);
+    --shadow-card: 0 4px 12px hsl(0 0% 0% / 0.08); /* Sombra mais sutil */
+    --shadow-elevated: 0 8px 24px hsl(0 0% 0% / 0.12);
     
     /* Border Radius */
-    --radius: 0.75rem;
+    --radius: 0.5rem; /* Bordas mais suaves */
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: var(--maple-red);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--maple-gray-light);
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: var(--maple-red);
   }
 
   .dark {
-    --background: 220 9% 9%;
-    --foreground: 220 13% 95%;
+    /* Modo Escuro - Tons suaves e neutros */
+    --background: 0 0% 10%;
+    --foreground: 0 0% 90%;
     
-    --card: 220 9% 11%;
-    --card-foreground: 220 13% 95%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 90%;
     
-    --popover: 220 9% 11%;
-    --popover-foreground: 220 13% 95%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 90%;
     
-    --primary: var(--maple-red-light);
+    --primary: var(--maple-red);
     --primary-foreground: 0 0% 100%;
     
-    --secondary: var(--maple-red-light);
-    --secondary-foreground: 220 9% 9%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 90%;
     
     --success: 142 76% 45%;
     --success-bg: 142 76% 15%;
@@ -125,27 +125,27 @@
     --destructive: 0 84% 70%;
     --destructive-bg: 0 84% 15%;
     
-    --muted: 220 9% 15%;
-    --muted-foreground: 220 9% 65%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 65%;
     
-    --accent: 220 9% 15%;
-    --accent-foreground: 220 13% 95%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 90%;
     
-    --border: 220 9% 20%;
-    --input: 220 9% 20%;
+    --border: 0 0% 25%;
+    --input: 0 0% 20%;
     
-    --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red-light) / 0.4);
-    --shadow-card: 0 4px 12px hsl(0 0% 0% / 0.3);
-    --shadow-elevated: 0 8px 24px hsl(0 0% 0% / 0.4);
+    --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red) / 0.4);
+    --shadow-card: 0 4px 12px hsl(0 0% 0% / 0.5);
+    --shadow-elevated: 0 8px 24px hsl(0 0% 0% / 0.6);
     
-    --sidebar-background: 220 9% 8%;
-    --sidebar-foreground: 220 13% 95%;
-    --sidebar-primary: var(--maple-red-light);
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: var(--maple-red);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 9% 12%;
-    --sidebar-accent-foreground: 220 13% 95%;
-    --sidebar-border: 220 9% 15%;
-    --sidebar-ring: var(--maple-red-light);
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 25%;
+    --sidebar-ring: var(--maple-red);
   }
 }
 
@@ -161,6 +161,7 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
+    @apply font-heading; /* Usar a fonte heading definida no tailwind.config */
     font-weight: 700;
     letter-spacing: -0.025em;
   }
@@ -193,13 +194,17 @@
     @apply shadow-[var(--shadow-elevated)] hover:shadow-[var(--shadow-maple)] hover:-translate-y-1;
   }
   
-  /* Button Variants */
+  /* Button Variants - Padronização Maple Bear */
   .btn-maple {
-    @apply bg-primary text-primary-foreground hover:bg-primary-dark shadow-[var(--shadow-maple)] transition-all duration-200;
+    @apply bg-primary text-primary-foreground hover:bg-[var(--primary-hover)] shadow-[var(--shadow-maple)] transition-all duration-200 font-semibold;
   }
   
   .btn-maple-outline {
-    @apply border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground;
+    @apply border-2 border-primary text-primary bg-transparent hover:bg-primary/10 hover:text-primary font-semibold;
+  }
+  
+  .btn-maple-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all duration-200 font-semibold;
   }
   
   /* Priority Indicators */

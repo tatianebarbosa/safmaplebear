@@ -26,13 +26,32 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        # Paleta Maple Bear
+        maplebear: {
+          red: {
+            DEFAULT: "#cc1316", // Pantone 186 C
+            vivid: "#aa0414", // Vermelho vívido
+          },
+          gray: {
+            light: "#ededed", // Cinza-claro
+            DEFAULT: "hsl(var(--gray))",
+          },
+          black: "#000000",
+          white: "#ffffff",
+        },
+        # Cores Shadcn/Radix (ajustadas para Maple Bear)
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "var(--color-primary)", // Usar o vermelho Maple Bear
+          foreground: "var(--color-primary-foreground)", // Branco
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "var(--color-secondary)", // Cinza-claro Maple Bear
+          foreground: "var(--color-secondary-foreground)", // Preto
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -62,6 +81,9 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+        # Adicionar fontes para hierarquia visual
+        heading: ["Helvetica Neue LT Std", "Inter", "sans-serif"],
+        body: ["Inter", "Montserrat", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
