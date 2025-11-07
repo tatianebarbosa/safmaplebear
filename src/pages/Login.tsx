@@ -15,10 +15,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // FORÇAR REDIRECIONAMENTO PARA TESTE
-  useEffect(() => {
-    navigate("/dashboard", { replace: true });
-  }, [navigate]);
+  // Redirecionamento automático removido para permitir login normal
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {

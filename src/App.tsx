@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-// import ProtectedRoute from "./components/auth/ProtectedRoute"; // Desativado para teste
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AccessControl from "@/components/auth/AccessControl";
 import CanvaDashboard from "@/components/canva/CanvaDashboard";
 import VoucherDashboard from "@/components/vouchers/VoucherDashboard";
@@ -30,49 +30,65 @@ const App = () => (
           <Route 
             path="/dashboard" 
             element={
-              <Index />
+              <ProtectedRoute>
+                <Index />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/dashboard/canva" 
             element={
-              <CanvaDashboard />
+              <ProtectedRoute>
+                <CanvaDashboard />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/dashboard/vouchers" 
             element={
-              <VoucherDashboard />
+              <ProtectedRoute>
+                <VoucherDashboard />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/dashboard/vouchers-2026" 
             element={
-              <Voucher2026Dashboard />
+              <ProtectedRoute>
+                <Voucher2026Dashboard />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/insights" 
             element={
-              <InsightsAnalytics />
+              <ProtectedRoute>
+                <InsightsAnalytics />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/monitoring" 
             element={
-              <MonitoringPortal />
+              <ProtectedRoute>
+                <MonitoringPortal />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/tickets" 
             element={
-              <TicketsPage />
+              <ProtectedRoute>
+                <TicketsPage />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/admin" 
             element={
-              <AdminPage />
+              <ProtectedRoute>
+                <AdminPage />
+              </ProtectedRoute>
             } 
           />
           <Route 
