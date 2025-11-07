@@ -28,7 +28,6 @@ const ThemeInitializer = () => {
 };
 
 const App = () => (
-  <ErrorBoundary>
     <HelmetProvider>
       <ThemeInitializer />
       <QueryClientProvider client={queryClient}>
@@ -46,7 +45,7 @@ const App = () => (
         </TooltipProvider>
       </QueryClientProvider>
     </HelmetProvider>
-  </ErrorBoundary>
+
 );
 
 export default App;
