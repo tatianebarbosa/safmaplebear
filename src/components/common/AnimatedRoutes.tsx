@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Suspense, lazy } from 'react';
@@ -20,7 +21,7 @@ const AdminPage = lazy(() => import("../../pages/AdminPage"));
 const AnimatedRoutes = () => {
   const location = useLocation();
 
-  const wrapInTransition = (element: JSX.Element) => (
+  const wrapInTransition = (element: React.ReactNode) => (
     <PageTransition key={location.pathname}>
       {element}
     </PageTransition>
@@ -29,49 +30,49 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/login" element={wrapInTransition(<Login />)} />
+        <Route path="/login" element={wrapInTransition(<Suspense fallback={<LoadingPage />}><Login /></Suspense>)} />
         <Route 
           path="/dashboard" 
-          element={wrapInTransition(<Index />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><Index /></Suspense>)} 
         />
         <Route 
           path="/dashboard/canva" 
-          element={wrapInTransition(<CanvaDashboard />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><CanvaDashboard /></Suspense>)} 
         />
         <Route 
           path="/dashboard/vouchers" 
-          element={wrapInTransition(<VoucherDashboard />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><VoucherDashboard /></Suspense>)} 
         />
         <Route 
           path="/dashboard/vouchers-2026" 
-          element={wrapInTransition(<Voucher2026Dashboard />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><Voucher2026Dashboard /></Suspense>)} 
         />
         <Route 
           path="/insights" 
-          element={wrapInTransition(<InsightsAnalytics />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><InsightsAnalytics /></Suspense>)} 
         />
         <Route 
           path="/monitoring" 
-          element={wrapInTransition(<MonitoringPortal />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><MonitoringPortal /></Suspense>)} 
         />
         <Route 
           path="/tickets" 
-          element={wrapInTransition(<TicketsPage />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><TicketsPage /></Suspense>)} 
         />
         <Route 
           path="/admin" 
-          element={wrapInTransition(<AdminPage />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><AdminPage /></Suspense>)} 
         />
         <Route 
           path="/access-control" 
-          element={wrapInTransition(<AccessControl />)} 
+          element={wrapInTransition(<Suspense fallback={<LoadingPage />}><AccessControl /></Suspense>)} 
         />
         <Route 
           path="/" 
           element={<Navigate to="/dashboard" replace />} 
         />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={wrapInTransition(<NotFound />)} />
+        <Route path="*" element={wrapInTransition(<Suspense fallback={<LoadingPage />}><NotFound /></Suspense>)} />
       </Routes>
     </AnimatePresence>
   );

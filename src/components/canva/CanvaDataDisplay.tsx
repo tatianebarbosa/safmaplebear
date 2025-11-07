@@ -104,8 +104,8 @@ export const CanvaDataDisplay = () => {
                   <td>{item.dataAtualizacao}</td>
                   <td>{item.horaAtualizacao}</td>
                   <td>{item.totalPessoas}</td>
-                  <td className={item.mudanca > 0 ? 'positive' : item.mudanca < 0 ? 'negative' : ''}>
-                    {item.mudanca > 0 ? '+' : ''}{item.mudanca}
+                  <td className={item.mudancas.totalPessoas && item.mudancas.totalPessoas > 0 ? 'positive' : item.mudancas.totalPessoas && item.mudancas.totalPessoas < 0 ? 'negative' : ''}>
+                    {item.mudancas.totalPessoas && item.mudancas.totalPessoas > 0 ? '+' : ''}{item.mudancas.totalPessoas}
                   </td>
                   <td>{item.usuarioAlteracao}</td>
                   <td>{item.descricaoAlteracao}</td>

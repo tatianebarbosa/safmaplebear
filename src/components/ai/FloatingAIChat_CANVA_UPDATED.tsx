@@ -83,7 +83,7 @@ export const canvaMetricsContext = {
     
     if (perguntaLower.includes('kit') || perguntaLower.includes('marca')) {
       if (dados.kits && dados.kits.length > 0) {
-        const kitsFormatados = dados.kits.map(k => 
+        const kitsFormatados = dados.kits.map((k: any) => 
           `- **${k.nome}**: ${k.aplicado} (Criado: ${k.criado})`
         ).join('\n');
         
