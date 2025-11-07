@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { authService } from "@/components/auth/AuthService";
 import SEO from "@/components/common/SEO";
 import { sanitizeEmail, sanitizeInput } from "@/utils/sanitization";
@@ -151,16 +151,10 @@ const Login = () => {
               type="submit" 
               className="w-full mt-6 font-heading" 
               size="lg"
-              disabled={isLoading}
+              isLoading={isLoading}
+              loadingText="Entrando..."
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Entrando...
-                </>
-              ) : (
-                "Entrar"
-              )}
+              Entrar
             </Button>
           </form>
 
