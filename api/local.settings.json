@@ -3,6 +3,8 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "python",
+    "CANVA_EMAIL": "SEU_EMAIL_CANVA_AQUI",
+    "CANVA_PASSWORD": "SUA_SENHA_CANVA_AQUI",
     "BLOB_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=your_account;AccountKey=your_key;EndpointSuffix=core.windows.net",
     "JWT_SECRET": "your-jwt-secret-key-change-in-production",
     "ALLOWED_ORIGINS": "http://localhost:3000,https://your-swa-url.azurestaticapps.net"
