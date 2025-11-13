@@ -12,8 +12,11 @@ import logging
 import azure.functions as func
 import os
 import json
+import pandas as pd
 from datetime import datetime
 from shared.canva_collector import CanvaCollector
+from shared.canva_data_processor import integrate_canva_data, load_schools_data
+from io import StringIO
 
 
 def main(mytimer: func.TimerRequest) -> None:
@@ -47,37 +50,65 @@ def main(mytimer: func.TimerRequest) -> None:
         collector = CanvaCollector(canva_email, canva_password, headless=True)
         
         # 3. Executar a sincronização (versão bloqueante para Azure Functions)
-        logging.info("Iniciando coleta de dados...")
-        data = collector.run_sync_blocking()
+        logging.info("Iniciando coleta de dados do Canva...")
+        canva_metrics = collector.run_sync_blocking()
         
         # 4. Log dos dados coletados
-        logging.info("Dados coletados com sucesso:")
-        logging.info(f"  - Designs criados: {data.get('designs_criados', 0)} ({data.get('designs_criados_crescimento', 0)}%)")
-        logging.info(f"  - Total publicado: {data.get('total_publicado', 0)} ({data.get('total_publicado_crescimento', 0)}%)")
-        logging.info(f"  - Total compartilhado: {data.get('total_compartilhado', 0)} ({data.get('total_compartilhado_crescimento', 0)}%)")
-        logging.info(f"  - Alunos: {data.get('alunos', 0)} ({data.get('alunos_crescimento', 0)}%)")
-        logging.info(f"  - Professores: {data.get('professores', 0)} ({data.get('professores_crescimento', 0)}%)")
-        logging.info(f"  - Total de pessoas: {data.get('total_pessoas', 0)}")
-        logging.info(f"  - Modelos na tabela: {len(data.get('modelos', []))}")
+        logging.info("Dados brutos do Canva coletados com sucesso.")
+        logging.info(f"  - Total de usuários encontrados: {len(canva_metrics.get('usuarios', []))}")
         
-        # 5. Salvar os dados (implementar conforme necessário)
-        # Opções:
-        # - Salvar em Cosmos DB
-        # - Salvar em Azure Blob Storage
-        # - Salvar em arquivo JSON local
-        # - Enviar para API do sistema
+        # 5. Processar e integrar os dados com a base de escolas
+        logging.info("Iniciando processamento e alocação de usuários por escola...")
+        
+        # **Atenção:** O arquivo DadosEscolas.csv deve ser carregado de um local persistente
+        # ou de um storage (Azure Blob, etc.). Para simulação, vamos assumir que o CSV
+        # está disponível no diretório da função ou em um local acessível.
+        # No ambiente real do Azure Functions, você precisará adaptar a leitura do CSV.
+        
+        # Para este exemplo, vamos ler o CSV que o usuário forneceu, assumindo que ele 
+        # será o novo "master" de escolas.
+        
+        # Lendo o CSV da base de escolas (substitua pelo método de leitura real em produção)
+        # Assumindo que o CSV está em um local conhecido ou será injetado no deploy.
+        # Para fins de teste, vamos usar um caminho simulado.
+        # **IMPORTANTE:** Em produção, o CSV deve ser lido de um local seguro e persistente.
+        
+        # Lógica para carregar o CSV (simulando a leitura do arquivo fornecido)
+        try:
+            # Tenta ler o arquivo DadosEscolas.csv que foi feito upload
+            schools_csv_path = os.path.join(os.path.dirname(__file__), '..', '..', 'upload', 'DadosEscolas.csv')
+            with open(schools_csv_path, 'r', encoding='utf-8') as f:
+                schools_csv_content = f.read()
+        except FileNotFoundError:
+            logging.error(f"Arquivo DadosEscolas.csv não encontrado em {schools_csv_path}. Usando base de dados simulada.")
+            # Se não encontrar, usa a base simulada do canva_data_processor para não quebrar o fluxo
+            schools_csv_content = load_schools_data.__defaults__[0] 
+        
+        # Carrega e processa a base de escolas
+        schools_df, domain_map_df = load_schools_data(schools_csv_content)
+        
+        # Integra os dados
+        integrated_data = integrate_canva_data(canva_metrics, schools_df, domain_map_df)
+        
+        # 6. Log dos dados processados
+        logging.info("Dados processados e alocados com sucesso.")
+        logging.info(f"  - Total de escolas na base: {len(integrated_data.get('schools_allocation', []))}")
+        logging.info(f"  - Usuários não alocados: {integrated_data.get('unallocated_users_count', 0)}")
+        
+        # 7. Salvar os dados (implementar conforme necessário)
+        # O resultado final é o integrated_data, que contém as métricas e a alocação por escola.
         
         # Exemplo: Salvar em arquivo JSON (para desenvolvimento)
-        output_file = "/tmp/canva_data_latest.json"
+        output_file = "/tmp/canva_data_integrated_latest.json"
         with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-        logging.info(f"Dados salvos em: {output_file}")
+            json.dump(integrated_data, f, indent=2, ensure_ascii=False)
+        logging.info(f"Dados integrados salvos em: {output_file}")
         
         # TODO: Implementar salvamento no Cosmos DB ou outro storage
-        # from shared.service import save_canva_data
-        # save_canva_data(data)
+        # from shared.service import save_integrated_data
+        # save_integrated_data(integrated_data)
         
-        logging.info(f'[{timestamp}] Sincronização do Canva concluída com sucesso.')
+        logging.info(f'[{timestamp}] Sincronização e processamento do Canva concluídos com sucesso.')
     
     except ImportError as e:
         logging.error(f"Erro de importação: {str(e)}")
