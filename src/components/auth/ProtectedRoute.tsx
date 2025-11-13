@@ -8,34 +8,40 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const navigate = useNavigate();
-  const [isChecking, setIsChecking] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Se o login deve estar desativado, o ProtectedRoute deve sempre retornar o children
+  // A lógica de autenticação original foi comentada para desativar o login.
 
-  useEffect(() => {
-    const checkAuthentication = () => {
-      const authenticated = authService.isAuthenticated();
+  // const navigate = useNavigate();
+  // const [isChecking, setIsChecking] = useState(true);
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // useEffect(() => {
+  //   const checkAuthentication = () => {
+  //     const authenticated = authService.isAuthenticated();
       
-      setIsAuthenticated(authenticated);
-      setIsChecking(false);
+  //     setIsAuthenticated(authenticated);
+  //     setIsChecking(false);
 
-      if (!authenticated) {
-        navigate("/login", { replace: true });
-      }
-    };
+  //     if (!authenticated) {
+  //       navigate("/login", { replace: true });
+  //     }
+  //   };
 
-    checkAuthentication();
-  }, [navigate]);
+  //   checkAuthentication();
+  // }, [navigate]);
 
-  if (isChecking) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingMascot message="Verificando autenticação..." size="lg" />
-      </div>
-    );
-  }
+  // if (isChecking) {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-screen">
+  //       <LoadingMascot message="Verificando autenticação..." size="lg" />
+  //     </div>
+  //   );
+  // }
   
-  return isAuthenticated ? <>{children}</> : null;
+  // return isAuthenticated ? <>{children}</> : null;
+
+  // Versão que sempre permite acesso (login desativado)
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

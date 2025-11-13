@@ -61,6 +61,17 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             generateCanvaOverview()
           ]);
           
+          if (!processedData || !overview) {
+            // Se os dados não puderam ser carregados, definimos um estado de erro
+            set({ 
+              officialData: [],
+              overviewData: null,
+              schools: [],
+              loading: false
+            });
+            return;
+          }
+          
           // Converter dados oficiais para formato do sistema
           const convertedSchools: School[] = processedData.map(data => ({
             id: data.school.id,
