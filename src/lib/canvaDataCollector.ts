@@ -254,6 +254,6 @@ export class CanvaDataCollector {
 
 // Exporta uma instância singleton do coletor
 export const canvaCollector = new CanvaDataCollector(
-  process.env.REACT_APP_CANVA_EMAIL || '',
-  process.env.REACT_APP_CANVA_PASSWORD || ''
+  import.meta.env.VITE_CANVA_EMAIL || '',
+  import.meta.env.VITE_CANVA_PASSWORD || ''
 );
