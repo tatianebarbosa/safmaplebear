@@ -16,13 +16,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const checkAuthentication = () => {
       const authenticated = authService.isAuthenticated();
       
+      setIsAuthenticated(authenticated);
+      setIsChecking(false);
+
       if (!authenticated) {
         navigate("/login", { replace: true });
-        return;
       }
-
-      setIsAuthenticated(true);
-      setIsChecking(false);
     };
 
     checkAuthentication();
