@@ -15,7 +15,7 @@ import json
 import pandas as pd
 from datetime import datetime
 from shared.canva_collector import CanvaCollector
-from shared.canva_data_processor import integrate_canva_data, load_schools_data
+from shared.canva_data_processor import integrate_canva_data, load_schools_data, generate_markdown_report
 from io import StringIO
 
 
@@ -98,11 +98,21 @@ def main(mytimer: func.TimerRequest) -> None:
         # 7. Salvar os dados (implementar conforme necessário)
         # O resultado final é o integrated_data, que contém as métricas e a alocação por escola.
         
-        # Exemplo: Salvar em arquivo JSON (para desenvolvimento)
-        output_file = "/tmp/canva_data_integrated_latest.json"
+        # 7.1. Gerar Relatório Markdown
+        logging.info("Gerando relatório Markdown detalhado...")
+        markdown_report = generate_markdown_report(integrated_data)
+        
+        # 7.2. Salvar Relatório Markdown
+        report_file = os.path.join(os.path.dirname(__file__), '..', '..', 'CANVA_REPORT_LATEST.md')
+        with open(report_file, 'w', encoding='utf-8') as f:
+            f.write(markdown_report)
+        logging.info(f"Relatório Markdown salvo em: {report_file}")
+        
+        # 7.3. Salvar em arquivo JSON (para inspeção e uso em outros sistemas)
+        output_file = os.path.join(os.path.dirname(__file__), '..', '..', 'canva_data_integrated_latest.json')
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(integrated_data, f, indent=2, ensure_ascii=False)
-        logging.info(f"Dados integrados salvos em: {output_file}")
+        logging.info(f"Dados integrados (JSON) salvos em: {output_file}")
         
         # TODO: Implementar salvamento no Cosmos DB ou outro storage
         # from shared.service import save_integrated_data

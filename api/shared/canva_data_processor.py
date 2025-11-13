@@ -147,8 +147,100 @@ def process_canva_users(
     
     return schools_list, unallocated_users
 
-def integrate_canva_data(
-    canva_metrics: Dict[str, Any], 
+
+def generate_markdown_report(integrated_data: Dict[str, Any]) -> str:
+    """
+    Gera um relatório detalhado em formato Markdown a partir dos dados integrados.
+    """
+    report = []
+    
+    # --- Cabeçalho e Métricas Gerais ---
+    report.append("# 📊 Relatório de Uso do Canva Integrado")
+    report.append(f"**Data de Geração:** {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+    report.append(f"**Período do Filtro:** {integrated_data.get('periodo_filtro', 'N/A')}")
+    report.append("---")
+    
+    report.append("## 📈 Métricas Gerais do Canva")
+    report.append("| Métrica | Valor | Crescimento |")
+    report.append("| :--- | :--- | :--- |")
+    
+    metrics = [
+        ("Designs Criados", integrated_data.get('designs_criados'), integrated_data.get('designs_criados_crescimento')),
+        ("Total Publicado", integrated_data.get('total_publicado'), integrated_data.get('total_publicado_crescimento')),
+        ("Total Compartilhado", integrated_data.get('total_compartilhado'), integrated_data.get('total_compartilhado_crescimento')),
+        ("Alunos", integrated_data.get('alunos'), integrated_data.get('alunos_crescimento')),
+        ("Professores", integrated_data.get('professores'), integrated_data.get('professores_crescimento')),
+        ("Total de Pessoas", integrated_data.get('total_pessoas'), None),
+    ]
+    
+    for name, value, growth in metrics:
+        growth_str = f"{growth:.1f}%" if growth is not None else "N/A"
+        report.append(f"| {name} | {value} | {growth_str} |")
+        
+    report.append("\n---")
+    
+    # --- Usuários Não Alocados ---
+    unallocated_users = integrated_data.get('unallocated_users_list', [])
+    report.append(f"## ⚠️ Usuários Sem Escola Definida ({len(unallocated_users)})")
+    report.append("Estes usuários possuem e-mails com domínios genéricos ou não mapeados na base de escolas.")
+    
+    if unallocated_users:
+        report.append("| Nome | E-mail | Função |")
+        report.append("| :--- | :--- | :--- |")
+        for user in unallocated_users:
+            report.append(f"| {user.get('nome', 'N/A')} | {user.get('email', 'N/A')} | {user.get('funcao', 'N/A')} |")
+    else:
+        report.append("Nenhum usuário sem escola definida encontrado. ✅")
+        
+    report.append("\n---")
+    
+    # --- Alocação por Escola ---
+    report.append("## 🏫 Alocação de Usuários por Escola")
+    
+    schools_allocation = integrated_data.get('schools_allocation', [])
+    
+    # Filtra escolas com usuários alocados e ordena
+    allocated_schools = sorted(
+        [s for s in schools_allocation if s.get('total_users', 0) > 0 and s.get('school_id') != 0],
+        key=lambda x: x['total_users'],
+        reverse=True
+    )
+    
+    if allocated_schools:
+        report.append("| Escola | ID | Usuários Alocados |")
+        report.append("| :--- | :--- | :--- |")
+        for school in allocated_schools:
+            report.append(f"| {school['school_name']} | {school['school_id']} | {school['total_users']} |")
+            
+        report.append("\n### Detalhe por Escola (Apenas Escolas com Usuários Alocados)")
+        
+        for school in allocated_schools:
+            report.append(f"\n#### {school['school_name']} (ID: {school['school_id']}) - Total: {school['total_users']} Usuários")
+            report.append("| Nome | E-mail | Função |")
+            report.append("| :--- | :--- | :--- |")
+            for user in school['users']:
+                report.append(f"| {user.get('nome', 'N/A')} | {user.get('email', 'N/A')} | {user.get('funcao', 'N/A')} |")
+    else:
+        report.append("Nenhum usuário alocado a uma escola específica. ❌")
+        
+    report.append("\n---")
+    
+    # --- Tabela de Modelos (do primeiro período coletado) ---
+    models = integrated_data.get('modelos', [])
+    report.append("## 🎨 Modelos Mais Utilizados (Dados Brutos do Canva)")
+    
+    if models:
+        report.append("| Modelo | Titular | Usadas | Publicado | Compartilhado |")
+        report.append("| :--- | :--- | :--- | :--- | :--- |")
+        for model in models:
+            report.append(f"| {model.get('modelo', 'N/A')} | {model.get('titular', 'N/A')} | {model.get('usadas', 0)} | {model.get('publicado', 0)} | {model.get('compartilhado', 0)} |")
+    else:
+        report.append("Nenhum dado de modelo encontrado.")
+        
+    return "\n".join(report)
+
+
+def integrate_canva_data(    canva_metrics: Dict[str, Any], 
     schools_df: pd.DataFrame,
     domain_map_df: pd.DataFrame
 ) -> Dict[str, Any]:
