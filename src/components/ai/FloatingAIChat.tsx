@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Send, Minimize2, X, Key } from "lucide-react";
+import { Bot, Send, Minimize2, X } from "lucide-react";
 import { Mascot } from "@/components/ui/mascot";
 import { BearHappy } from "@/assets/maplebear";
 import { Badge } from "@/components/ui/badge";
@@ -26,14 +26,13 @@ const FloatingAIChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      content: 'Olá! Sou seu assistente de IA do Maple Bear SAF. Como posso ajudá-lo hoje? (Dados das escolas carregados)',
+      content: 'Olá! Sou seu assistente de IA do Maple Bear SAF. Posso responder perguntas sobre licenças Canva, escolas, usuários e métricas. Como posso ajudá-lo?',
       role: 'assistant',
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [apiKey, setApiKey] = useState('');
   const [schoolDataLoaded, setSchoolDataLoaded] = useState(false);
 
   // Carregar dados das escolas ao montar o componente
@@ -44,17 +43,9 @@ const FloatingAIChat = () => {
         setSchoolDataLoaded(true);
       } catch (error) {
         console.error('Erro ao carregar dados das escolas:', error);
-        // Não mostra toast para não poluir a interface flutuante
       }
     };
     loadData();
-  }, []);
-
-  useEffect(() => {
-    const savedKey = localStorage.getItem('openai_api_key');
-    if (savedKey) {
-      setApiKey(savedKey);
-    }
   }, []);
 
   const sendMessage = async () => {
@@ -83,12 +74,12 @@ const FloatingAIChat = () => {
         }
       }
       
-      // 2. Se não for uma consulta direta de escola, usa a IA
+      // 2. Se não for uma consulta direta de escola, usa o ChatGPT via backend
       if (!response) {
-        if (apiKey.trim()) {
-          // Usar ChatGPT real
+        try {
           response = await callOpenAI(currentInput);
-        } else {
+        } catch (error) {
+          console.error('Erro ao chamar ChatGPT:', error);
           // Fallback para resposta simulada
           response = await simulateAIResponse(currentInput);
         }
@@ -133,8 +124,6 @@ const FloatingAIChat = () => {
         }
       }
 
-
-      
       // Se a intenção é clara, mas a busca falhou, retorna uma mensagem de erro específica
       return "Desculpe, não consegui encontrar a escola ou o dado específico que você procurou na base de dados. Tente refinar sua busca ou perguntar o nome exato da escola.";
     }
@@ -143,47 +132,14 @@ const FloatingAIChat = () => {
   };
 
   const callOpenAI = async (input: string): Promise<string> => {
-    // Gera o contexto das escolas para a IA
-    let schoolContext = "";
-
-    const systemPrompt = `Você é um assistente inteligente do Maple Bear SAF (Sistema de Atendimento às Franquias). Você é especializado em:
-
-- Tickets de atendimento e suporte
-- Informações sobre escolas e franquias (você tem acesso a uma base de dados atualizada)
-- Licenças Canva e recursos educacionais  
-- Vouchers e campanhas promocionais
-- Relatórios e métricas de desempenho
-- Agendamento de visitas e atividades
-- Suporte a coordenadores e franqueados
-
-Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacional do Maple Bear. Responda em português brasileiro.
-
-`;
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Chama o endpoint seguro do backend que injeta os dados do dashboard
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          ...messages.slice(-5).map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
-          {
-            role: 'user',
-            content: input
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 400
+        question: input,
       }),
     });
 
@@ -193,7 +149,7 @@ Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacion
     }
 
     const data = await response.json();
-    return data.choices[0]?.message?.content?.trim() || "Não consegui processar sua pergunta.";
+    return data.response || "Não consegui processar sua pergunta.";
   };
 
   const simulateAIResponse = async (input: string): Promise<string> => {
@@ -203,7 +159,7 @@ Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacion
     const lowerInput = input.toLowerCase();
     
     if (lowerInput.includes('ticket') || lowerInput.includes('chamado')) {
-      return `Entendi que você está perguntando sobre tickets. No momento temos ${Math.floor(Math.random() * 15 + 5)} tickets pendentes. Os mais críticos são aqueles com mais de 15 dias. Gostaria que eu liste os tickets mais urgentes?`;
+      return `Entendi que você está perguntando sobre tickets. No momento temos vários tickets pendentes. Os mais críticos são aqueles com mais de 15 dias. Gostaria que eu liste os tickets mais urgentes?`;
     }
     
     if (lowerInput.includes('escola') || lowerInput.includes('unidade')) {
@@ -218,13 +174,23 @@ Seja sempre útil, conciso e profissional. Mantenha o foco no contexto educacion
       return `Para relatórios e dashboards, posso ajudar explicando os dados ou sugerindo análises. Qual métrica específica você gostaria de entender melhor? Temos dados de vouchers, licenças, atendimentos e muito mais.`;
     }
     
+    if (lowerInput.includes('licença') || lowerInput.includes('canva')) {
+      return `Posso ajudar com informações sobre licenças Canva! Temos dados atualizados sobre:
+• Licenças ativas por escola
+• Usuários conformes e não conformes
+• Domínios autorizados
+• Métricas de uso
+
+Qual informação específica você gostaria?`;
+    }
+    
     return `Entendi sua pergunta sobre "${input}". Como assistente do Maple Bear SAF, posso ajudar com:
     
-• Informações sobre tickets e atendimentos
+• Informações sobre licenças Canva
 • Dados de escolas e franquias
-• Melhorar textos de comunicação
-• Explicar relatórios e métricas
-• Agendar atividades do SAF
+• Análise de conformidade de usuários
+• Relatórios e métricas
+• Suporte geral
 
 Como posso ser mais específico para ajudá-lo?`;
   };
@@ -257,28 +223,11 @@ Como posso ser mais específico para ajudá-lo?`;
           <div className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
             <CardTitle className="text-sm">Assistente IA - Maple Bear SAF</CardTitle>
-            <Badge variant={apiKey ? "default" : "secondary"} className="text-xs">
-              {apiKey ? "ChatGPT" : "Demo"}
+            <Badge variant="default" className="text-xs">
+              ChatGPT 4.1-mini
             </Badge>
           </div>
-          <div className="flex items-center gap-1">
-            {!apiKey && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  const key = prompt("Cole sua chave da API do OpenAI:");
-                  if (key) {
-                    setApiKey(key);
-                    localStorage.setItem('openai_api_key', key);
-                    toast.success("API Key configurada!");
-                  }
-                }}
-                title="Configurar ChatGPT"
-              >
-                <Key className="h-4 w-4" />
-              </Button>
-            )}
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
