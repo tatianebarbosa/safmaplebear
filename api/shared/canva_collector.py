@@ -169,6 +169,7 @@ class CanvaCollector:
             await self.browser.close()
             logging.info("Navegador fechado")
     
+    @async_retry_with_backoff(max_retries=3, base_delay=5.0, exceptions=(PlaywrightTimeoutError, Exception))
     async def _login(self) -> bool:
         """
         Realiza o login no Canva com tratamento avançado de erros.

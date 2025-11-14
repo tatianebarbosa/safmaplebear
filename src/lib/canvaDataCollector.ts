@@ -86,30 +86,35 @@ export interface CanvaHistorico {
  * Classe para gerenciar a coleta de dados do Canva
  */
 export class CanvaDataCollector {
-  private canvaEmail: string;
-  private canvaPassword: string;
   private apiUrl: string = '/api/canva';
 
-  constructor(email: string, password: string) {
-    this.canvaEmail = email;
-    this.canvaPassword = password;
+  constructor() {
+    // As credenciais não são mais necessárias no frontend,
+    // pois o backend (Azure Function) as obtém das variáveis de ambiente.
+    // O construtor foi simplificado.
   }
 
   /**
    * Coleta os dados detalhados do Canva via API
    * Esta função será chamada por um backend que faz o scraping
    */
-  async coletarDadosCanva(): Promise<CanvaData> {
+  /**
+   * Dispara a coleta de dados do Canva manualmente via API
+   * @param periodoFiltro Opcional. Período a ser coletado.
+   */
+  async coletarDadosCanva(periodoFiltro?: string): Promise<any> {
     try {
-      // Faz uma requisição para o backend que faz o scraping
+      // O backend agora obtém as credenciais das variáveis de ambiente.
+      // O frontend apenas envia o comando de coleta.
       const response = await fetch(`${this.apiUrl}/coletar-dados`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // A function key deve ser adicionada aqui se o endpoint for protegido
+          // 'x-functions-key': 'SUA_FUNCTION_KEY_AQUI'
         },
         body: JSON.stringify({
-          email: this.canvaEmail,
-          password: this.canvaPassword,
+          periodo_filtro: periodoFiltro,
         }),
       });
 
@@ -117,6 +122,7 @@ export class CanvaDataCollector {
         throw new Error(`Erro ao coletar dados do Canva: ${response.statusText}`);
       }
 
+      // O endpoint de coleta retorna o status da operação, não necessariamente os dados
       const data = await response.json();
       return data;
     } catch (error) {
@@ -152,21 +158,32 @@ export class CanvaDataCollector {
   /**
    * Registra uma alteração no histórico
    */
+  /**
+   * Registra uma alteração manual no histórico
+   * @param descricao Descrição da alteração
+   * @param usuario Nome do usuário que fez a alteração
+   * @param tipo Tipo de alteração (ex: 'Manual', 'Configuração')
+   * @param metadados Metadados adicionais
+   */
   async registrarAlteracao(
-    dados: Partial<CanvaData>,
-    usuarioAlteracao: string,
-    descricaoAlteracao: string
-  ): Promise<CanvaHistorico> {
+    descricao: string,
+    usuario: string,
+    tipo: string = 'Manual',
+    metadados: any = {}
+  ): Promise<any> {
     try {
       const response = await fetch(`${this.apiUrl}/registrar-alteracao`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // A function key deve ser adicionada aqui se o endpoint for protegido
+          // 'x-functions-key': 'SUA_FUNCTION_KEY_AQUI'
         },
         body: JSON.stringify({
-          dados,
-          usuarioAlteracao,
-          descricaoAlteracao,
+          descricao,
+          usuario,
+          tipo,
+          metadados,
         }),
       });
 
@@ -253,7 +270,4 @@ export class CanvaDataCollector {
 }
 
 // Exporta uma instância singleton do coletor
-export const canvaCollector = new CanvaDataCollector(
-  import.meta.env.VITE_CANVA_EMAIL || '',
-  import.meta.env.VITE_CANVA_PASSWORD || ''
-);
+export const canvaCollector = new CanvaDataCollector();
