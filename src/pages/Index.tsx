@@ -1,6 +1,7 @@
 // import { useState } from "react"; // Removido para simplificar
 import Header from "@/components/layout/Header";
 import CanvaManagement from "@/components/canva/CanvaDashboard";
+import FloatingAIChat from "@/components/ai/FloatingAIChat";
 
 const Index = () => {
   return (
@@ -10,6 +11,8 @@ const Index = () => {
       <main className="px-6 py-8 max-w-7xl mx-auto">
         <CanvaManagement />
       </main>
+      
+      <FloatingAIChat />
     </div>
   );
 };

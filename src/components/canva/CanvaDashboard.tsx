@@ -21,6 +21,7 @@ import { CanvaUsageDashboard } from './CanvaUsageDashboard';
 import { CostManagementDashboard } from './CostManagementDashboard';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { CanvaMetricsDisplay } from './CanvaMetricsDisplay';
+import FloatingAIChat from '@/components/ai/FloatingAIChat';
 
 const CanvaDashboard = () => {
   const navigate = useNavigate();
@@ -291,6 +292,8 @@ const CanvaDashboard = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <FloatingAIChat />
     </div>
   );
 };
