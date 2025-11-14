@@ -23,6 +23,15 @@ except ImportError:
     logging.warning("Playwright não está instalado. Execute: pip install playwright && playwright install")
     async_playwright = None
 
+try:
+    from .retry_helper import async_retry_with_backoff
+except ImportError:
+    # Fallback se o módulo não estiver disponível
+    def async_retry_with_backoff(*args, **kwargs):
+        def decorator(func):
+            return func
+        return decorator
+
 
 @dataclass
 class CanvaMetrics:
@@ -708,9 +717,14 @@ if __name__ == "__main__":
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
     
-    # Credenciais (em produção, usar variáveis de ambiente)
-    CANVA_EMAIL = os.getenv("CANVA_EMAIL", "tatianebarbosa20166@gmail.com")
-    CANVA_PASSWORD = os.getenv("CANVA_PASSWORD", "Tati2025@")
+    # Credenciais (obrigatório usar variáveis de ambiente)
+    CANVA_EMAIL = os.getenv("CANVA_EMAIL")
+    CANVA_PASSWORD = os.getenv("CANVA_PASSWORD")
+    
+    if not CANVA_EMAIL or not CANVA_PASSWORD:
+        logging.error("❌ ERRO: Variáveis de ambiente CANVA_EMAIL e CANVA_PASSWORD não configuradas!")
+        logging.error("Configure as variáveis de ambiente antes de executar o coletor.")
+        exit(1)
     
     # Executa a coleta para todos os períodos
     periodos = CanvaCollector.FILTROS_PERIODO

@@ -86,12 +86,15 @@ def save_to_csv(data: dict, periodo: str):
 
 def main():
     """Função principal"""
-    # Obtém credenciais
-    email = os.getenv("CANVA_EMAIL", "tatianebarbosa20166@gmail.com")
-    password = os.getenv("CANVA_PASSWORD", "Tati2025@")
+    # Obtém credenciais das variáveis de ambiente
+    email = os.getenv("CANVA_EMAIL")
+    password = os.getenv("CANVA_PASSWORD")
     
     if not email or not password:
-        logging.error("Credenciais não encontradas. Configure CANVA_EMAIL e CANVA_PASSWORD")
+        logging.error("❌ ERRO: Variáveis de ambiente CANVA_EMAIL e CANVA_PASSWORD não configuradas!")
+        logging.error("Configure as variáveis de ambiente antes de executar o script.")
+        logging.error("Exemplo: export CANVA_EMAIL='seu_email@gmail.com'")
+        logging.error("         export CANVA_PASSWORD='sua_senha'")
         sys.exit(1)
     
     # Lista de períodos para coletar
