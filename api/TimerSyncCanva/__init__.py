@@ -29,7 +29,8 @@ def main(mytimer: func.TimerRequest) -> None:
     """
     timestamp = datetime.now().isoformat()
     
-    if mytimer.past_due:
+    # Verifica se mytimer está disponível (pode ser None em testes locais)
+    if mytimer and hasattr(mytimer, 'past_due') and mytimer.past_due:
         logging.warning(f'[{timestamp}] O timer foi atrasado!')
     
     logging.info(f'[{timestamp}] Iniciando a sincronização automática de dados do Canva.')

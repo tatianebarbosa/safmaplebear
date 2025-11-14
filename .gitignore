@@ -27,3 +27,4 @@ dist-ssr
 test_unit_data_service.py
 
 
+venv/
