@@ -7,6 +7,7 @@
     "CANVA_PASSWORD": "Tati2025@",
     "BLOB_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=your_account;AccountKey=your_key;EndpointSuffix=core.windows.net",
     "JWT_SECRET": "your-jwt-secret-key-change-in-production",
-    "ALLOWED_ORIGINS": "http://localhost:3000,https://your-swa-url.azurestaticapps.net"
+    "ALLOWED_ORIGINS": "http://localhost:3000,https://your-swa-url.azurestaticapps.net",
+    "OPENAI_API_KEY": "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" 
   }
 }
