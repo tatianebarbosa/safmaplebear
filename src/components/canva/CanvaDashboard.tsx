@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,9 +33,13 @@ const CanvaDashboard = () => {
   
   const [selectedPeriod, setSelectedPeriod] = useState<'30d' | '3m' | '6m' | '12m'>('30d');
 
-  useEffect(() => {
-    loadOfficialData();
-  }, [loadOfficialData]);
+  // Auto-refresh a cada 5 minutos
+  useAutoRefresh({
+    onRefresh: loadOfficialData,
+    interval: 5 * 60 * 1000, // 5 minutos
+    enabled: true,
+    immediate: true
+  });
 
   const handleExportData = () => {
     if (!overviewData) return;

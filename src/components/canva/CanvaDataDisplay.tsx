@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { canvaCollector, CanvaData, CanvaHistorico } from '@/lib/canvaDataCollector';
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 
 /**
  * Componente para exibir os dados do Canva e o histórico de alterações
@@ -10,12 +11,7 @@ export const CanvaDataDisplay = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Carrega os dados do Canva ao montar o componente
-  useEffect(() => {
-    carregarDados();
-  }, []);
-
-  const carregarDados = async () => {
+  const carregarDados = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -30,7 +26,15 @@ export const CanvaDataDisplay = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Auto-refresh a cada 5 minutos
+  useAutoRefresh({
+    onRefresh: carregarDados,
+    interval: 5 * 60 * 1000, // 5 minutos
+    enabled: true,
+    immediate: true
+  });
 
   const coletarDadosAgora = async () => {
     setLoading(true);
