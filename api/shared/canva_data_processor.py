@@ -132,7 +132,7 @@ def process_canva_users(
             'school_name': school_name,
             'users': [],
             'total_users': 0,
-            'total_licenses': 0 # A ser preenchido com a lógica de licenças
+            'total_licenses': 0 # A ser preenchido com a lógica de licenças (será o total_users)
         }
         
     # Adiciona a "escola" de não alocados (ID 0)
@@ -159,16 +159,14 @@ def process_canva_users(
             if school_id in schools_users:
                 schools_users[school_id]['users'].append(user)
                 schools_users[school_id]['total_users'] += 1
+                schools_users[school_id]['total_licenses'] += 1 # Licença = Usuário Alocado
                 allocated = True
-        
-        if not allocated:
+           if not allocated:
             # Usuário não alocado
             unallocated_users.append(user)
             schools_users[UNALLOCATED_SCHOOL_ID]['users'].append(user)
             schools_users[UNALLOCATED_SCHOOL_ID]['total_users'] += 1
-
-    logging.info(f"✅ Processamento concluído. {len(unallocated_users)} usuários não alocados.")
-    
+            schools_users[UNALLOCATED_SCHOOL_ID]['total_licenses'] += 1 # Licença = Usuário Não Alocado    
     # Converte o dicionário de volta para uma lista de escolas
     schools_list = list(schools_users.values())
     

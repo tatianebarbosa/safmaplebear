@@ -51,6 +51,8 @@ class CanvaMetrics:
     professores_crescimento: float = 0.0
     administradores: int = 0
     total_pessoas: int = 0
+    licencas_utilizadas: int = 0
+    total_licencas_disponiveis: int = 0
     
     # Modelos (tabela)
     modelos: List[Dict[str, Any]] = None
@@ -72,6 +74,9 @@ class CanvaMetrics:
         # Calcula total de pessoas se não foi definido
         if self.total_pessoas == 0:
             self.total_pessoas = self.alunos + self.professores + self.administradores
+        # Licenças utilizadas é o mesmo que total de pessoas (após a filtragem do Canva)
+        if self.licencas_utilizadas == 0:
+            self.licencas_utilizadas = self.total_pessoas
     
     def to_dict(self) -> Dict:
         """Converte para dicionário"""
@@ -583,6 +588,18 @@ class CanvaCollector:
             metrics = CanvaMetrics(periodo_filtro=self.periodo_filtro)
             
             logging.info("📊 Iniciando extração das métricas...")
+            
+            # Tenta extrair Licenças Utilizadas e Total de Licenças Disponíveis
+            try:
+                licenca_text = await self.page.inner_text('text="Licenças Utilizadas" >> xpath=..')
+                # Exemplo: 824/236
+                match = re.search(r'(\d+)\s*/\s*(\d+)', licenca_text)
+                if match:
+                    metrics.licencas_utilizadas = int(match.group(1))
+                    metrics.total_licencas_disponiveis = int(match.group(2))
+                    logging.info(f"✅ Licenças extraídas: {metrics.licencas_utilizadas}/{metrics.total_licencas_disponiveis}")
+            except Exception as e:
+                logging.warning(f"Não foi possível extrair métrica de Licenças Utilizadas/Total: {e}")
             
             # Designs criados
             metrics.designs_criados, metrics.designs_criados_crescimento = \
