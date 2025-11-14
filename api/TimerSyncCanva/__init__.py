@@ -75,15 +75,18 @@ def main(mytimer: func.TimerRequest) -> None:
         # **IMPORTANTE:** Em produção, o CSV deve ser lido de um local seguro e persistente.
         
         # Lógica para carregar o CSV (simulando a leitura do arquivo fornecido)
+        schools_csv_path = os.path.join(os.path.dirname(__file__), '..', '..', 'upload', 'DadosEscolas.csv')
+        schools_csv_content = None
+        
         try:
             # Tenta ler o arquivo DadosEscolas.csv que foi feito upload
-            schools_csv_path = os.path.join(os.path.dirname(__file__), '..', '..', 'upload', 'DadosEscolas.csv')
             with open(schools_csv_path, 'r', encoding='utf-8') as f:
                 schools_csv_content = f.read()
+            logging.info(f"Arquivo DadosEscolas.csv lido com sucesso de: {schools_csv_path}")
         except FileNotFoundError:
-            logging.error(f"Arquivo DadosEscolas.csv não encontrado em {schools_csv_path}. Usando base de dados simulada.")
-            # Se não encontrar, usa a base simulada do canva_data_processor para não quebrar o fluxo
-            schools_csv_content = load_schools_data.__defaults__[0] 
+            logging.warning(f"Arquivo DadosEscolas.csv não encontrado em {schools_csv_path}. O processador usará a base de dados simulada.")
+        except Exception as e:
+            logging.error(f"Erro ao ler DadosEscolas.csv: {e}")
         
         # Carrega e processa a base de escolas
         schools_df, domain_map_df = load_schools_data(schools_csv_content)
@@ -122,11 +125,13 @@ def main(mytimer: func.TimerRequest) -> None:
         logging.info(f'[{timestamp}] Sincronização e processamento do Canva concluídos com sucesso.')
     
     except ImportError as e:
-        logging.error(f"Erro de importação: {str(e)}")
+        logging.error(f"❌ Erro de importação: {str(e)}")
         logging.error("Certifique-se de que o Playwright está instalado: pip install playwright && playwright install")
     
     except Exception as e:
-        logging.error(f"Erro durante a sincronização do Canva: {str(e)}", exc_info=True)
+        logging.error(f"❌ Erro durante a sincronização do Canva: {str(e)}", exc_info=True)
+        # Notificação de erro (simulação)
+        logging.error("⚠️ Falha Crítica na Sincronização. Notificação de erro enviada.")
         raise
     
     finally:

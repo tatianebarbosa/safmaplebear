@@ -162,114 +162,268 @@ class CanvaCollector:
     
     async def _login(self) -> bool:
         """
-        Realiza o login no Canva.
+        Realiza o login no Canva com tratamento avançado de erros.
         
         Returns:
             True se o login foi bem-sucedido, False caso contrário
+            
+        Raises:
+            Exception: Se ocorrer um erro crítico durante o login
         """
-        try:
-            logging.info("Navegando para página de login...")
-            await self.page.goto(self.CANVA_LOGIN_URL, wait_until='networkidle', timeout=self.TIMEOUT_NAVIGATION)
-            
-            # Aguarda e preenche o campo de email
-            logging.info("Preenchendo email...")
-            await self.page.wait_for_selector('input[type="email"]', timeout=self.TIMEOUT_ELEMENT)
-            await self.page.fill('input[type="email"]', self.email)
-            
-            # Aguarda e preenche o campo de senha
-            logging.info("Preenchendo senha...")
-            await self.page.wait_for_selector('input[type="password"]', timeout=self.TIMEOUT_ELEMENT)
-            await self.page.fill('input[type="password"]', self.password)
-            
-            # Clica no botão de login
-            logging.info("Clicando no botão de login...")
-            await self.page.click('button[type="submit"]')
-            
-            # Aguarda a navegação após o login
-            logging.info("Aguardando conclusão do login...")
+        max_retries = 3
+        retry_count = 0
+        
+        while retry_count < max_retries:
             try:
-                await self.page.wait_for_url('**/home', timeout=self.TIMEOUT_LOGIN)
-                logging.info("Login realizado com sucesso!")
-                return True
-            except PlaywrightTimeoutError:
-                # Verifica se já está na página inicial (pode ter redirecionado)
+                logging.info(f"Tentativa {retry_count + 1}/{max_retries}: Navegando para página de login...")
+                
+                # Navega para a página de login
+                try:
+                    await self.page.goto(self.CANVA_LOGIN_URL, wait_until='networkidle', timeout=self.TIMEOUT_NAVIGATION)
+                except PlaywrightTimeoutError:
+                    logging.warning("Timeout ao carregar página de login, tentando com wait_until='load'...")
+                    await self.page.goto(self.CANVA_LOGIN_URL, wait_until='load', timeout=self.TIMEOUT_NAVIGATION)
+                
+                # Aguarda a página estar pronta
+                await asyncio.sleep(2)
+                
+                # Verifica se já está logado
                 current_url = self.page.url
                 if 'canva.com' in current_url and 'login' not in current_url:
-                    logging.info("Login realizado com sucesso (redirecionamento alternativo)!")
+                    logging.info("Usuário já está logado!")
                     return True
+                
+                # Tenta encontrar e preencher o campo de email
+                logging.info("Procurando campo de email...")
+                email_selectors = [
+                    'input[type="email"]',
+                    'input[name="email"]',
+                    'input[placeholder*="email" i]',
+                    'input[id*="email" i]'
+                ]
+                
+                email_field = None
+                for selector in email_selectors:
+                    try:
+                        email_field = await self.page.wait_for_selector(selector, timeout=5000)
+                        if email_field:
+                            logging.info(f"Campo de email encontrado com seletor: {selector}")
+                            break
+                    except:
+                        continue
+                
+                if not email_field:
+                    raise Exception("Campo de email não encontrado na página")
+                
+                logging.info("Preenchendo email...")
+                await email_field.fill(self.email)
+                await asyncio.sleep(1)
+                
+                # Tenta encontrar e preencher o campo de senha
+                logging.info("Procurando campo de senha...")
+                password_selectors = [
+                    'input[type="password"]',
+                    'input[name="password"]',
+                    'input[placeholder*="senha" i]',
+                    'input[placeholder*="password" i]'
+                ]
+                
+                password_field = None
+                for selector in password_selectors:
+                    try:
+                        password_field = await self.page.wait_for_selector(selector, timeout=5000)
+                        if password_field:
+                            logging.info(f"Campo de senha encontrado com seletor: {selector}")
+                            break
+                    except:
+                        continue
+                
+                if not password_field:
+                    raise Exception("Campo de senha não encontrado na página")
+                
+                logging.info("Preenchendo senha...")
+                await password_field.fill(self.password)
+                await asyncio.sleep(1)
+                
+                # Tenta encontrar e clicar no botão de login
+                logging.info("Procurando botão de login...")
+                submit_selectors = [
+                    'button[type="submit"]',
+                    'button:has-text("Log in")',
+                    'button:has-text("Entrar")',
+                    'button:has-text("Login")',
+                    'input[type="submit"]'
+                ]
+                
+                submit_button = None
+                for selector in submit_selectors:
+                    try:
+                        submit_button = await self.page.wait_for_selector(selector, timeout=5000)
+                        if submit_button:
+                            logging.info(f"Botão de login encontrado com seletor: {selector}")
+                            break
+                    except:
+                        continue
+                
+                if not submit_button:
+                    raise Exception("Botão de login não encontrado na página")
+                
+                logging.info("Clicando no botão de login...")
+                await submit_button.click()
+                
+                # Aguarda a navegação após o login
+                logging.info("Aguardando conclusão do login...")
+                await asyncio.sleep(3)
+                
+                # Verifica se há solicitação de 2FA
+                try:
+                    two_fa_indicators = [
+                        'text=two-factor',
+                        'text=2FA',
+                        'text=verification code',
+                        'text=código de verificação',
+                        'input[placeholder*="code" i]',
+                        'input[placeholder*="código" i]'
+                    ]
+                    
+                    for indicator in two_fa_indicators:
+                        try:
+                            element = await self.page.wait_for_selector(indicator, timeout=2000)
+                            if element:
+                                logging.error("Autenticação de dois fatores (2FA) detectada!")
+                                logging.error("Por favor, desabilite 2FA temporariamente ou forneça o código manualmente.")
+                                return False
+                        except:
+                            continue
+                except:
+                    pass
+                
+                # Verifica se há mensagem de erro
+                try:
+                    error_indicators = [
+                        'text=incorrect',
+                        'text=invalid',
+                        'text=wrong',
+                        'text=incorreto',
+                        'text=inválido',
+                        '[role="alert"]'
+                    ]
+                    
+                    for indicator in error_indicators:
+                        try:
+                            element = await self.page.wait_for_selector(indicator, timeout=2000)
+                            if element:
+                                error_text = await element.inner_text()
+                                logging.error(f"Erro de login detectado: {error_text}")
+                                return False
+                        except:
+                            continue
+                except:
+                    pass
+                
+                # Verifica se o login foi bem-sucedido
+                try:
+                    await self.page.wait_for_url('**/home', timeout=self.TIMEOUT_LOGIN)
+                    logging.info("✅ Login realizado com sucesso!")
+                    return True
+                except PlaywrightTimeoutError:
+                    # Verifica URLs alternativas de sucesso
+                    current_url = self.page.url
+                    success_patterns = ['canva.com/home', 'canva.com/design', 'canva.com/folder']
+                    
+                    if any(pattern in current_url for pattern in success_patterns):
+                        logging.info(f"✅ Login realizado com sucesso! URL atual: {current_url}")
+                        return True
+                    elif 'canva.com' in current_url and 'login' not in current_url:
+                        logging.info(f"✅ Login realizado com sucesso (redirecionamento alternativo)! URL: {current_url}")
+                        return True
+                    else:
+                        logging.warning(f"Login pode ter falhado. URL atual: {current_url}")
+                        retry_count += 1
+                        if retry_count < max_retries:
+                            logging.info(f"Tentando novamente em 5 segundos...")
+                            await asyncio.sleep(5)
+                        continue
+            
+            except PlaywrightTimeoutError as e:
+                logging.error(f"Timeout durante o login (tentativa {retry_count + 1}/{max_retries}): {str(e)}")
+                retry_count += 1
+                if retry_count < max_retries:
+                    logging.info(f"Tentando novamente em 5 segundos...")
+                    await asyncio.sleep(5)
                 else:
-                    logging.error("Timeout ao aguardar conclusão do login. Pode ser necessário 2FA.")
+                    logging.error("Número máximo de tentativas excedido.")
+                    return False
+            
+            except Exception as e:
+                logging.error(f"Erro durante o login (tentativa {retry_count + 1}/{max_retries}): {str(e)}")
+                logging.error(f"Tipo do erro: {type(e).__name__}")
+                import traceback
+                logging.error(f"Traceback: {traceback.format_exc()}")
+                retry_count += 1
+                if retry_count < max_retries:
+                    logging.info(f"Tentando novamente em 5 segundos...")
+                    await asyncio.sleep(5)
+                else:
+                    logging.error("Número máximo de tentativas excedido.")
                     return False
         
-        except Exception as e:
-            logging.error(f"Erro durante o login: {str(e)}")
-            return False
+        logging.error("Falha ao realizar login após todas as tentativas.")
+        return False
     
     async def _apply_filter(self, filter_text: str = "Últimos 30 dias"):
         """
-        Aplica o filtro de período no relatório.
+        Aplica o filtro de período no relatório com maior robustez.
         
         Args:
             filter_text: Texto do filtro a ser aplicado (ex: "Últimos 30 dias")
+            
+        Raises:
+            Exception: Se o filtro não puder ser aplicado
         """
         try:
             logging.info(f"Aplicando filtro: {filter_text}...")
             
-            # Aguarda o dropdown de filtro estar visível (procura por qualquer botão de filtro)
-            # Tenta diferentes seletores possíveis
-            selectors = [
-                'button:has-text("Últimos 30 dias")',
-                'button:has-text("Últimos 14 dias")',
-                'button:has-text("Últimos 7 dias")',
-                'button:has-text("12 meses")',
-                'button:has-text("6 meses")',
-                'button:has-text("3 meses")',
-                '[role="button"]:has-text("Últimos")',
-                '[role="button"]:has-text("meses")'
-            ]
+            # 1. Tenta encontrar o botão de filtro atual pelo texto (mais robusto)
+            # Usa o texto do filtro atual como seletor inicial
+            current_filter_text = await self.page.locator('button[aria-haspopup="menu"]').inner_text()
+            if filter_text in current_filter_text:
+                logging.info(f"Filtro '{filter_text}' já está aplicado.")
+                return
+
+            filter_button_selector = 'button[aria-haspopup="menu"]'
             
-            filter_button = None
-            for selector in selectors:
-                try:
-                    filter_button = await self.page.wait_for_selector(selector, timeout=5000)
-                    if filter_button:
-                        logging.info(f"Botão de filtro encontrado com seletor: {selector}")
-                        break
-                except:
-                    continue
-            
-            if not filter_button:
-                logging.warning("Botão de filtro não encontrado, tentando localizar por texto genérico...")
-                # Tenta clicar em qualquer elemento que contenha o texto do filtro atual
-                await self.page.click('button[aria-haspopup="menu"]', timeout=self.TIMEOUT_ELEMENT)
-            else:
-                # Clica no dropdown
-                await filter_button.click()
-            
-            # Aguarda o menu aparecer
-            await asyncio.sleep(2)
-            
-            # Clica na opção desejada
-            # Tenta diferentes formas de localizar a opção
             try:
-                # Método 1: Texto exato
-                await self.page.click(f'text="{filter_text}"', timeout=5000)
-            except:
-                try:
-                    # Método 2: Contém texto
-                    await self.page.click(f'text={filter_text}', timeout=5000)
-                except:
-                    # Método 3: Procura em itens de menu
-                    await self.page.click(f'[role="menuitem"]:has-text("{filter_text}")', timeout=5000)
+                # Tenta encontrar o botão que exibe o filtro atual
+                await self.page.wait_for_selector(filter_button_selector, timeout=self.TIMEOUT_ELEMENT)
+                await self.page.click(filter_button_selector)
+            except PlaywrightTimeoutError:
+                logging.error("Botão de filtro não encontrado.")
+                raise Exception("Não foi possível encontrar o botão de filtro na página.")
             
-            # Aguarda a página recarregar com os novos dados
+            # 2. Aguarda o menu de opções aparecer
+            await asyncio.sleep(1) # Pequena pausa para o menu renderizar
+            
+            # 3. Clica na opção desejada
+            option_selector = f'[role="menuitem"]:has-text("{filter_text}")'
+            
+            try:
+                await self.page.wait_for_selector(option_selector, timeout=self.TIMEOUT_ELEMENT)
+                await self.page.click(option_selector)
+            except PlaywrightTimeoutError:
+                # Tenta seletor de texto simples
+                await self.page.click(f'text="{filter_text}"', timeout=self.TIMEOUT_ELEMENT)
+            
+            # 4. Aguarda a página recarregar com os novos dados
             logging.info("Aguardando atualização dos dados...")
+            # Espera por um indicador de carregamento ou por um tempo fixo
             await asyncio.sleep(5)
             
-            logging.info(f"Filtro '{filter_text}' aplicado com sucesso")
+            logging.info(f"✅ Filtro '{filter_text}' aplicado com sucesso.")
         
         except Exception as e:
-            logging.warning(f"Erro ao aplicar filtro (pode já estar aplicado): {str(e)}")
+            logging.error(f"❌ Erro ao aplicar filtro '{filter_text}': {str(e)}")
+            raise Exception(f"Falha ao aplicar filtro: {filter_text}")
     
     async def _extract_number_with_growth(self, page: Page, label: str) -> tuple[int, float]:
         """
@@ -293,20 +447,54 @@ class CanvaCollector:
             parent = await element.evaluate_handle('el => el.closest("div")')
             parent_text = await parent.inner_text()
             
-            # Extrai o número principal (remove pontos de milhares)
+            # Extrai o número principal (remove pontos de milhares e vírgulas)
             import re
-            numbers = re.findall(r'(\d+(?:\.\d+)?)', parent_text.replace('.', ''))
-            value = int(numbers[0]) if numbers else 0
             
-            # Extrai a porcentagem de crescimento
-            growth_match = re.search(r'↑\s*(\d+)%', parent_text)
-            growth = float(growth_match.group(1)) if growth_match else 0.0
+            # Regex para encontrar o número principal (pode ter vírgula como separador decimal)
+            # Tenta encontrar o número maior e mais proeminente (o valor da métrica)
             
-            # Verifica se é decrescimento
+            # 1. Limpa o texto para extração do valor
+            # Remove o texto de crescimento para não confundir
+            cleaned_text = re.sub(r'(\s*[\↑\↓]\s*[\d\.\,]+%)', '', parent_text)
+            
+            # Tenta encontrar o número principal, tratando separadores de milhar e decimal
+            # Assume formato brasileiro/europeu (ponto para milhar, vírgula para decimal)
+            
+            # Remove separadores de milhar (ponto) e substitui vírgula por ponto decimal
+            value_str = re.sub(r'\.', '', cleaned_text)
+            value_str = re.sub(r',', '.', value_str)
+            
+            # Encontra o primeiro número inteiro ou decimal
+            number_match = re.search(r'(\d+)', value_str)
+            
+            value = 0
+            if number_match:
+                try:
+                    # Tenta converter para inteiro (a maioria das métricas do Canva é inteira)
+                    value = int(number_match.group(1))
+                except ValueError:
+                    # Se falhar, tenta float (embora improvável para métricas principais)
+                    try:
+                        value = int(float(number_match.group(1)))
+                    except:
+                        logging.warning(f"Não foi possível converter o valor para '{label}'")
+            
+            # 2. Extrai a porcentagem de crescimento
+            growth = 0.0
+            growth_match = re.search(r'[\↑\↓]\s*([\d\.\,]+)%', parent_text)
+            
+            if growth_match:
+                growth_str = growth_match.group(1).replace(',', '.')
+                try:
+                    growth = float(growth_str)
+                except ValueError:
+                    logging.warning(f"Não foi possível converter o crescimento para float em '{label}'")
+            
+            # 3. Verifica se é decrescimento
             if '↓' in parent_text:
                 growth = -growth
             
-            logging.info(f"{label}: {value} ({'+' if growth >= 0 else ''}{growth}%)")
+            logging.info(f"✅ {label}: {value} ({'+' if growth >= 0 else ''}{growth}%)")
             return value, growth
         
         except Exception as e:
@@ -331,16 +519,27 @@ class CanvaCollector:
                 const rows = Array.from(document.querySelectorAll('table tbody tr'));
                 return rows.map(row => {
                     const cells = Array.from(row.querySelectorAll('td'));
+                    
+                    // Verifica se a linha tem o número esperado de colunas (ajustar se necessário)
                     if (cells.length < 4) return null;
                     
+                    // Assume a ordem: Nome, Tipo, Uso, Data
+                    const nome = cells[0].innerText.trim();
+                    const tipo = cells[1].innerText.trim();
+                    
+                    // Limpa o texto de uso (remove separadores de milhar e converte para inteiro)
+                    const usoText = cells[2].innerText.trim().replace(/[\.\,]/g, '');
+                    const uso = parseInt(usoText) || 0;
+                    
+                    const data = cells[3].innerText.trim();
+                    
                     return {
-                        modelo: cells[0]?.textContent?.trim() || '',
-                        titular: cells[1]?.textContent?.trim() || '',
-                        usadas: parseInt(cells[2]?.textContent?.trim() || '0'),
-                        publicado: parseInt(cells[3]?.textContent?.trim() || '0'),
-                        compartilhado: parseInt(cells[4]?.textContent?.trim() || '0')
+                        nome: nome,
+                        tipo: tipo,
+                        uso: uso,
+                        data: data
                     };
-                }).filter(item => item !== null && item.modelo !== '');
+                }).filter(item => item !== null);
             }''')
             
             logging.info(f"Extraídos {len(modelos)} modelos da tabela")
@@ -356,9 +555,12 @@ class CanvaCollector:
         
         Returns:
             Objeto CanvaMetrics com os dados coletados
+            
+        Raises:
+            Exception: Se houver falha na navegação ou extração.
         """
         try:
-            logging.info("Navegando para o Relatório de Uso...")
+            logging.info("🧭 Navegando para o Relatório de Uso...")
             await self.page.goto(self.CANVA_REPORTS_URL, wait_until='networkidle', timeout=self.TIMEOUT_NAVIGATION)
             
             # Aguarda a página carregar completamente
@@ -367,12 +569,10 @@ class CanvaCollector:
             # Aplica o filtro configurado
             await self._apply_filter(self.periodo_filtro)
             
-            # Atualiza o período no objeto de métricas
-            metrics.periodo_filtro = self.periodo_filtro
-            
             # Extrai as métricas principais
-            metrics = CanvaMetrics()
-            metrics.periodo_filtro = self.periodo_filtro
+            metrics = CanvaMetrics(periodo_filtro=self.periodo_filtro)
+            
+            logging.info("📊 Iniciando extração das métricas...")
             
             # Designs criados
             metrics.designs_criados, metrics.designs_criados_crescimento = \
@@ -398,25 +598,25 @@ class CanvaCollector:
             try:
                 metrics.administradores, _ = \
                     await self._extract_number_with_growth(self.page, "Administradores")
-            except:
+            except Exception as e:
+                logging.debug(f"Métrica 'Administradores' não encontrada ou erro: {e}")
                 pass
             
             # Extrai dados da tabela de modelos
             metrics.modelos = await self._extract_table_data()
             
-            # Calcula total de pessoas
-            metrics.total_pessoas = metrics.alunos + metrics.professores + metrics.administradores
+            # O cálculo de total_pessoas é feito no __post_init__ do CanvaMetrics
             
-            logging.info("Dados do relatório coletados com sucesso!")
+            logging.info("✅ Dados do relatório coletados com sucesso!")
             return metrics
         
         except Exception as e:
-            logging.error(f"Erro ao coletar dados do relatório: {str(e)}")
+            logging.error(f"❌ Erro ao coletar dados do relatório: {type(e).__name__} - {str(e)}")
             raise
     
     async def run_sync(self) -> Dict[str, Any]:
         """
-        Executa o processo completo de sincronização:
+        Executa a sincronização completa:
         1. Inicializa o navegador
         2. Faz login no Canva
         3. Coleta os dados do Relatório de Uso
@@ -424,30 +624,35 @@ class CanvaCollector:
         
         Returns:
             Dicionário com os dados coletados
+            
+        Raises:
+            Exception: Se ocorrer qualquer falha crítica durante a sincronização.
         """
         try:
-            # Inicializa o navegador
+            logging.info("🚀 Iniciando sincronização do Canva...")
+            
+            # 1. Inicializa o navegador
             await self._init_browser()
             
-            # Faz login
+            # 2. Faz login
             login_success = await self._login()
             if not login_success:
-                raise Exception("Falha no login do Canva")
+                raise Exception("Falha no login do Canva. Verifique as credenciais e o 2FA.")
             
-            # Coleta os dados
+            # 3. Coleta os dados
             metrics = await self._collect_report_data()
             
-            logging.info("Sincronização concluída com sucesso!")
-            logging.info(f"Dados coletados:\n{metrics.to_json()}")
+            logging.info("✅ Sincronização concluída com sucesso!")
+            logging.debug(f"Dados coletados:\n{metrics.to_json()}")
             
             return metrics.to_dict()
         
         except Exception as e:
-            logging.error(f"Erro durante a sincronização: {str(e)}")
+            logging.error(f"❌ Erro crítico durante a sincronização: {type(e).__name__} - {str(e)}", exc_info=True)
             raise
         
         finally:
-            # Sempre fecha o navegador
+            # 4. Sempre fecha o navegador
             await self._close_browser()
     
     def run_sync_blocking(self) -> Dict[str, Any]:

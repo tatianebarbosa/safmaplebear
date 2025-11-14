@@ -13,6 +13,7 @@ import logging
 import pandas as pd
 from typing import List, Dict, Any, Tuple
 from io import StringIO
+from datetime import datetime
 
 # Colunas chave da planilha de escolas
 SCHOOL_ID_COL = 'ID da Escola'
@@ -23,29 +24,54 @@ SCHOOL_EMAIL_COL = 'E-mail da Escola'
 UNALLOCATED_SCHOOL_NAME = "Usuários Sem Escola Definida"
 UNALLOCATED_SCHOOL_ID = 0
 
-def load_schools_data(csv_content: str) -> pd.DataFrame:
+def load_schools_data(csv_content: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Carrega a base de dados de escolas a partir do conteúdo CSV.
+    Carrega a base de dados de escolas a partir do conteúdo CSV e cria o mapeamento de domínio.
     
     Args:
         csv_content: Conteúdo do arquivo CSV das escolas.
         
     Returns:
-        DataFrame do Pandas com os dados das escolas.
+        Tupla contendo:
+        1. DataFrame com os dados de todas as escolas (schools_df).
+        2. DataFrame com o mapeamento único de domínio para escola (domain_map_df).
+        
+    Raises:
+        Exception: Se houver erro na leitura ou processamento do CSV.
     """
     logging.info("Carregando base de dados de escolas...")
-    # O arquivo CSV tem um BOM (Byte Order Mark) no início, por isso o encoding 'utf-8-sig'
-    # E o separador é ponto e vírgula (;)
+    
+    # Base de dados simulada para fallback (se o CSV estiver vazio ou não for encontrado)
+    SIMULATED_SCHOOLS_CSV = """
+ID da Escola;Nome da Escola;E-mail da Escola
+1;Maple Bear Santa Maria;santamaria.maplebear.com.br
+2;Maple Bear Arcoverde;arcoverde.maplebear.com.br
+999;Maple Bear Genérico;maplebear.com.br
+"""
+    
+    if not csv_content or csv_content.isspace():
+        logging.warning("Conteúdo CSV vazio ou nulo. Usando base de dados simulada para continuar o fluxo.")
+        csv_content = SIMULATED_SCHOOLS_CSV
+        
     try:
+        # O arquivo CSV tem um BOM (Byte Order Mark) no início, por isso o encoding 'utf-8-sig'
+        # E o separador é ponto e vírgula (;)
         df = pd.read_csv(StringIO(csv_content), sep=';', encoding='utf-8-sig')
         
+        # Validação básica de colunas
+        required_cols = [SCHOOL_ID_COL, SCHOOL_NAME_COL, SCHOOL_EMAIL_COL]
+        if not all(col in df.columns for col in required_cols):
+            logging.error(f"CSV de escolas não contém todas as colunas obrigatórias: {required_cols}")
+            raise ValueError("Colunas obrigatórias ausentes no CSV de escolas.")
+            
         # Seleciona apenas as colunas relevantes e renomeia para facilitar
-        df = df[[SCHOOL_ID_COL, SCHOOL_NAME_COL, SCHOOL_EMAIL_COL]].copy()
+        df = df[required_cols].copy()
         df.columns = ['school_id', 'school_name', 'school_email']
         
-        # Limpeza de dados
+        # Limpeza e conversão de dados
         df['school_id'] = pd.to_numeric(df['school_id'], errors='coerce').fillna(UNALLOCATED_SCHOOL_ID).astype(int)
-        df['school_email'] = df['school_email'].str.lower().str.strip()
+        df['school_name'] = df['school_name'].astype(str).str.strip()
+        df['school_email'] = df['school_email'].astype(str).str.lower().str.strip()
         
         # Extrai o domínio do e-mail da escola
         # Se o e-mail for um endereço completo (ex: user@domain.com), extrai o domínio.
@@ -54,25 +80,27 @@ def load_schools_data(csv_content: str) -> pd.DataFrame:
             lambda x: x.split('@')[-1] if isinstance(x, str) and '@' in x else (x if isinstance(x, str) else None)
         )
         
+        # Remove linhas onde o domínio não pôde ser extraído
+        df.dropna(subset=['school_domain'], inplace=True)
+        
         # Remove duplicatas de escolas (mantendo a primeira ocorrência)
-        df.drop_duplicates(subset=['school_id'], keep='first', inplace=True)
+        schools_df = df.drop_duplicates(subset=['school_id'], keep='first').copy()
         
-        # Cria um mapeamento de domínio para a primeira escola encontrada com esse domínio.
-        # Isso resolve o problema de domínios duplicados (ex: escolas com o mesmo domínio genérico)
-        # e garante que o índice do dicionário seja único.
-        domain_map = df.drop_duplicates(subset=['school_domain'], keep='first')
+        # Cria o mapeamento de domínio para a primeira escola encontrada com esse domínio.
+        # Isso garante que o índice do dicionário seja único.
+        domain_map_df = schools_df.drop_duplicates(subset=['school_domain'], keep='first').copy()
         
-        logging.info(f"Base de escolas carregada: {len(df)} registros. {len(domain_map)} domínios únicos para mapeamento.")
-        return df, domain_map
+        logging.info(f"✅ Base de escolas carregada: {len(schools_df)} registros. {len(domain_map_df)} domínios únicos para mapeamento.")
+        return schools_df, domain_map_df
     except Exception as e:
-        logging.error(f"Erro ao carregar a base de escolas: {e}")
+        logging.error(f"❌ Erro ao carregar a base de escolas: {e}")
         raise
 
 def process_canva_users(
     users: List[Dict[str, Any]], 
     schools_df: pd.DataFrame,
     domain_map_df: pd.DataFrame
-) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     Processa a lista de usuários do Canva e aloca às escolas.
     
@@ -83,13 +111,13 @@ def process_canva_users(
         
     Returns:
         Tupla contendo:
-        1. Dicionário de escolas com a lista de usuários alocados.
+        1. Lista de escolas com a lista de usuários alocados.
         2. Lista de usuários não alocados.
     """
     logging.info(f"Iniciando processamento de {len(users)} usuários do Canva...")
     
-    # Estrutura para armazenar os usuários por escola
-    schools_users: Dict[str, Any] = {}
+    # Estrutura para armazenar os usuários por escola (usando ID como chave)
+    schools_users: Dict[int, Dict[str, Any]] = {}
     unallocated_users: List[Dict[str, Any]] = []
     
     # Mapeamento de domínio para ID/Nome da escola (agora garantido como único)
@@ -97,7 +125,7 @@ def process_canva_users(
     
     # Inicializa o dicionário de escolas com a estrutura base
     for _, row in schools_df.iterrows():
-        school_id = row['school_id']
+        school_id = int(row['school_id'])
         school_name = row['school_name']
         schools_users[school_id] = {
             'school_id': school_id,
@@ -107,7 +135,7 @@ def process_canva_users(
             'total_licenses': 0 # A ser preenchido com a lógica de licenças
         }
         
-    # Adiciona a "escola" de não alocados
+    # Adiciona a "escola" de não alocados (ID 0)
     schools_users[UNALLOCATED_SCHOOL_ID] = {
         'school_id': UNALLOCATED_SCHOOL_ID,
         'school_name': UNALLOCATED_SCHOOL_NAME,
@@ -125,11 +153,10 @@ def process_canva_users(
         
         if user_domain and user_domain in domain_to_school:
             school_info = domain_to_school[user_domain]
-            school_id = school_info['school_id']
+            school_id = int(school_info['school_id'])
             
             # Aloca o usuário à escola
-            # O ID da escola 0 é reservado para "Usuários Sem Escola Definida"
-            if school_id != UNALLOCATED_SCHOOL_ID and school_id in schools_users:
+            if school_id in schools_users:
                 schools_users[school_id]['users'].append(user)
                 schools_users[school_id]['total_users'] += 1
                 allocated = True
@@ -140,7 +167,7 @@ def process_canva_users(
             schools_users[UNALLOCATED_SCHOOL_ID]['users'].append(user)
             schools_users[UNALLOCATED_SCHOOL_ID]['total_users'] += 1
 
-    logging.info(f"Processamento concluído. {len(unallocated_users)} usuários não alocados.")
+    logging.info(f"✅ Processamento concluído. {len(unallocated_users)} usuários não alocados.")
     
     # Converte o dicionário de volta para uma lista de escolas
     schools_list = list(schools_users.values())
@@ -240,7 +267,8 @@ def generate_markdown_report(integrated_data: Dict[str, Any]) -> str:
     return "\n".join(report)
 
 
-def integrate_canva_data(    canva_metrics: Dict[str, Any], 
+def integrate_canva_data(
+    canva_metrics: Dict[str, Any], 
     schools_df: pd.DataFrame,
     domain_map_df: pd.DataFrame
 ) -> Dict[str, Any]:
@@ -254,32 +282,39 @@ def integrate_canva_data(    canva_metrics: Dict[str, Any],
         
     Returns:
         Dicionário com os dados integrados (métricas e alocação por escola).
+        
+    Raises:
+        Exception: Se houver erro no processamento dos usuários.
     """
     
-    # 1. Processa a lista de usuários
-    schools_with_users, unallocated_users = process_canva_users(
-        canva_metrics.get('usuarios', []), 
-        schools_df,
-        domain_map_df
-    )
-    
-    # 2. Prepara o resultado final
-    integrated_data = {
-        'timestamp': canva_metrics.get('timestamp'),
-        'data_atualizacao': canva_metrics.get('data_atualizacao'),
-        'hora_atualizacao': canva_metrics.get('hora_atualizacao'),
-        'periodo_filtro': canva_metrics.get('periodo_filtro'),
-        'canva_metrics': {
-            k: v for k, v in canva_metrics.items() if k not in ['usuarios', 'modelos']
-        },
-        'schools_allocation': schools_with_users,
-        'unallocated_users_count': len(unallocated_users),
-        'unallocated_users_list': unallocated_users,
-        'modelos': canva_metrics.get('modelos', [])
-    }
-    
-    logging.info("Integração de dados do Canva concluída.")
-    return integrated_data
+    try:
+        # 1. Processa a lista de usuários
+        schools_with_users, unallocated_users = process_canva_users(
+            canva_metrics.get('usuarios', []), 
+            schools_df,
+            domain_map_df
+        )
+        
+        # 2. Prepara o resultado final
+        integrated_data = {
+            'timestamp': canva_metrics.get('timestamp'),
+            'data_atualizacao': canva_metrics.get('data_atualizacao'),
+            'hora_atualizacao': canva_metrics.get('hora_atualizacao'),
+            'periodo_filtro': canva_metrics.get('periodo_filtro'),
+            'canva_metrics': {
+                k: v for k, v in canva_metrics.items() if k not in ['usuarios', 'modelos']
+            },
+            'schools_allocation': schools_with_users,
+            'unallocated_users_list': unallocated_users,
+            'unallocated_users_count': len(unallocated_users), # Adiciona contagem
+            'modelos': canva_metrics.get('modelos', [])
+        }
+        
+        logging.info("✅ Integração de dados do Canva concluída.")
+        return integrated_data
+    except Exception as e:
+        logging.error(f"❌ Erro na integração dos dados do Canva: {e}")
+        raise
 
 # Exemplo de uso (para testes)
 if __name__ == "__main__":
