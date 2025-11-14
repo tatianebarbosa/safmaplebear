@@ -263,6 +263,522 @@ fetch('http://localhost:7071/api/canva/metricas/designs')
 
 ---
 
+### 4. GET `/api/canva/historico`
+
+Retorna o histórico de alterações e coletas de dados do Canva.
+
+**Autenticação:** Não requerida
+
+**Método:** `GET`
+
+**Resposta de Sucesso (200):**
+```json
+[
+  {
+    "id": 1,
+    "timestamp": "2025-11-10T00:00:00Z",
+    "tipo": "Coleta Automática",
+    "descricao": "Sincronização diária de dados do Canva",
+    "usuario": "TimerSyncCanva",
+    "status": "Sucesso",
+    "metadados": {"periodo": "Últimos 30 dias", "usuarios_afetados": 824}
+  },
+  {
+    "id": 2,
+    "timestamp": "2025-11-13T20:26:00Z",
+    "tipo": "Coleta Manual",
+    "descricao": "Coleta de dados sob demanda via API",
+    "usuario": "API Call",
+    "status": "Sucesso",
+    "metadados": {"periodo": "Últimos 30 dias", "usuarios_afetados": 838}
+  }
+]
+```
+
+**Resposta de Erro (500):**
+```json
+{
+  "error": "Erro interno",
+  "message": "Mensagem de erro detalhada"
+}
+```
+
+**Exemplo de Uso:**
+```javascript
+fetch('http://localhost:7071/api/canva/historico')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+```
+
+---
+
+### 5. POST `/api/canva/registrar-alteracao`
+
+Registra uma alteração manual no histórico.
+
+**Autenticação:** Function Key requerida
+
+**Método:** `POST`
+
+**Headers:**
+```
+Content-Type: application/json
+x-functions-key: <sua-function-key>
+```
+
+**Body (obrigatório):**
+```json
+{
+  "descricao": "Alteração manual de licença para o usuário X",
+  "usuario": "Nome do Administrador",
+  "tipo": "Manual",
+  "metadados": {
+    "usuario_afetado": "usuario@email.com",
+    "licenca_antiga": "Estudante",
+    "licenca_nova": "Professor"
+  }
+}
+```
+
+**Resposta de Sucesso (201):**
+```json
+{
+  "id": 3,
+  "timestamp": "2025-11-13T21:00:00Z",
+  "tipo": "Manual",
+  "descricao": "Alteração manual de licença para o usuário X",
+  "usuario": "Nome do Administrador",
+  "status": "Registrado",
+  "metadados": {
+    "usuario_afetado": "usuario@email.com",
+    "licenca_antiga": "Estudante",
+    "licenca_nova": "Professor"
+  }
+}
+```
+
+**Resposta de Erro (400):**
+```json
+{
+  "error": "Campos obrigatórios ausentes",
+  "message": "Os campos 'descricao' e 'usuario' são obrigatórios."
+}
+```
+
+**Exemplo de Uso:**
+```javascript
+fetch('http://localhost:7071/api/canva/registrar-alteracao', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-functions-key': 'sua-function-key'
+  },
+  body: JSON.stringify({
+    descricao: 'Alteração manual de licença para o usuário X',
+    usuario: 'Nome do Administrador',
+    tipo: 'Manual',
+    metadados: {
+      usuario_afetado: 'usuario@email.com',
+      licenca_antiga: 'Estudante',
+      licenca_nova: 'Professor'
+    }
+  })
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+```
+
+---
+
+### 6. POST `/api/canva/reverter-alteracao/{id}`
+
+Marca uma alteração no histórico como revertida.
+
+**Autenticação:** Function Key requerida
+
+**Método:** `POST`
+
+**Headers:**
+```
+x-functions-key: <sua-function-key>
+```
+
+**Parâmetros de Rota:**
+- `id`: ID do registro de alteração a ser revertido.
+
+**Resposta de Sucesso (200):**
+```json
+{
+  "id": 3,
+  "timestamp": "2025-11-13T21:00:00Z",
+  "tipo": "Manual",
+  "descricao": "Alteração manual de licença para o usuário X",
+  "usuario": "Nome do Administrador",
+  "status": "Revertido",
+  "data_reversao": "2025-11-13T21:05:00Z",
+  "metadados": {
+    "usuario_afetado": "usuario@email.com",
+    "licenca_antiga": "Estudante",
+    "licenca_nova": "Professor"
+  }
+}
+```
+
+**Resposta de Erro (404):**
+```json
+{
+  "error": "Registro não encontrado",
+  "message": "Nenhum registro de alteração encontrado com o ID: 99."
+}
+```
+
+**Exemplo de Uso:**
+```javascript
+fetch('http://localhost:7071/api/canva/reverter-alteracao/3', {
+  method: 'POST',
+  headers: {
+    'x-functions-key': 'sua-function-key'
+  }
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+```
+
+---
+
+## 🔐 Autenticação
+
+### Endpoints Públicos (Anonymous)
+- `GET /api/canva/dados-recentes`
+- `GET /api/canva/metricas/{tipo}`
+- `GET /api/canva/historico`
+
+Estes endpoints não requerem autenticação.
+
+### Endpoints Protegidos (Function Key)
+- `POST /api/canva/coletar-dados`
+- `POST /api/canva/registrar-alteracao`
+- `POST /api/canva/reverter-alteracao/{id}`
+
+Estes endpoints requerem uma Function Key no header:
+
+```javascript
+headers: {
+  'x-functions-key': 'sua-function-key-aqui'
+}
+```
+
+**Como obter a Function Key:**
+
+1. Acesse o Azure Portal
+2. Navegue até sua Function App
+3. Vá em Functions → Nome da função → Function Keys
+4. Copie a chave default ou crie uma nova
+
+---
+
+## 🌐 CORS
+
+Todos os endpoints incluem headers CORS para permitir chamadas cross-origin:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Allow-Headers: Content-Type
+```
+
+---
+
+## ⚠️ Códigos de Status HTTP
+
+| Código | Descrição |
+|--------|-----------|
+| 200 | Sucesso |
+| 201 | Criado (para POST) |
+| 400 | Requisição inválida (parâmetros incorretos) |
+| 404 | Recurso não encontrado (dados não disponíveis) |
+| 500 | Erro interno do servidor |
+
+---
+
+## 📊 Estrutura de Dados
+
+### CanvaMetrics
+
+```typescript
+interface CanvaMetrics {
+  designs_criados: number;
+  designs_criados_crescimento: number;
+  total_publicado: number;
+  total_publicado_crescimento: number;
+  total_compartilhado: number;
+  total_compartilhado_crescimento: number;
+  alunos: number;
+  alunos_crescimento: number;
+  professores: number;
+  professores_crescimento: number;
+  administradores: number;
+  total_pessoas: number;
+}
+```
+
+### SchoolAllocation
+
+```typescript
+interface SchoolAllocation {
+  school_id: number;
+  school_name: string;
+  users: CanvaUser[];
+  total_users: number;
+  total_licenses: number;
+}
+```
+
+### CanvaUser
+
+```typescript
+interface CanvaUser {
+  nome: string;
+  email: string;
+  funcao: string; // "Estudante" | "Professor" | "Administrador" | "Titular"
+}
+```
+
+### HistoryRecord (Novo)
+
+```typescript
+interface HistoryRecord {
+  id: number;
+  timestamp: string; // ISO 8601
+  tipo: "Coleta Automática" | "Coleta Manual" | "Manual";
+  descricao: string;
+  usuario: string;
+  status: "Sucesso" | "Falha" | "Registrado" | "Revertido";
+  data_reversao?: string; // ISO 8601 (se status for Revertido)
+  metadados: { [key: string]: any };
+}
+```
+
+---
+
+## 🧪 Testando a API
+
+### Usando cURL
+
+```bash
+# Obter histórico
+curl http://localhost:7071/api/canva/historico
+
+# Registrar alteração (requer function key)
+curl -X POST http://localhost:7071/api/canva/registrar-alteracao \
+  -H "Content-Type: application/json" \
+  -H "x-functions-key: sua-function-key" \
+  -d '{"descricao": "Teste de registro", "usuario": "Admin Teste"}'
+
+# Reverter alteração (requer function key)
+# Substitua 1 pelo ID do registro
+curl -X POST http://localhost:7071/api/canva/reverter-alteracao/1 \
+  -H "x-functions-key: sua-function-key"
+```
+
+---
+
+## 🔄 Fluxo de Atualização de Dados
+
+```
+┌─────────────────────────────────────────┐
+│  Timer Trigger (Automático - 24h)      │
+│  ou                                     │
+│  POST /api/canva/coletar-dados (Manual)│
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  Coleta dados do Canva via Playwright   │
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  Processa e integra com base de escolas │
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  Salva em canva_data_integrated_latest  │
+│  .json                                  │
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  Dados disponíveis via GET endpoints    │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 📝 Notas Importantes
+
+1. **Performance:** A coleta manual pode levar vários minutos para ser concluída
+2. **Rate Limiting:** Evite fazer múltiplas coletas manuais em sequência
+3. **Cache:** Os dados são atualizados automaticamente a cada 24h
+4. **Timeout:** Requisições de coleta têm timeout de 5 minutos
+5. **Credenciais:** Certifique-se de que CANVA_EMAIL e CANVA_PASSWORD estão configurados
+
+---
+
+## 🐛 Troubleshooting
+
+### Erro: "Dados não disponíveis"
+- Execute o TimerSyncCanva manualmente ou aguarde a execução automática
+- Verifique se o arquivo `canva_data_integrated_latest.json` existe
+
+### Erro: "Credenciais não configuradas"
+- Configure as variáveis de ambiente CANVA_EMAIL e CANVA_PASSWORD
+- Reinicie a Function App após configurar
+
+### Erro: "Timeout"
+- A coleta pode estar demorando mais que o esperado
+- Verifique a conectividade com o Canva
+- Verifique os logs da Function App para mais detalhes
+
+---
+
+## 📞 Suporte
+
+Se você encontrar problemas com a configuração das credenciais:
+
+1. Consulte a documentação em `CONFIGURACAO_CANVA.md`
+2. Consulte a documentação da API em `API_CANVA_DOCUMENTATION.md`
+3. Verifique os logs da Azure Function App para debugging
+4. Revise o código dos endpoints para entender a implementação
+
+---
+
+**Última atualização:** 13 de novembro de 2025  
+**Versão da API:** 1.1
+
+
+Retorna métricas específicas filtradas por tipo.
+
+**Autenticação:** Não requerida
+
+**Método:** `GET`
+
+**Parâmetros de Rota:**
+- `tipo`: Tipo de métrica a ser retornada
+  - `pessoas` - Métricas de pessoas (alunos, professores, administradores)
+  - `designs` - Métricas de designs (criados, publicados, compartilhados)
+  - `membros` - Lista de todos os membros com suas escolas
+  - `kits` - Kits de marca disponíveis
+  - `escolas` - Informações de escolas e alocação de usuários
+
+**Exemplos de Requisição:**
+
+#### 3.1. Métricas de Pessoas
+
+**GET** `/api/canva/metricas/pessoas`
+
+**Resposta:**
+```json
+{
+  "total_pessoas": 838,
+  "alunos": 799,
+  "alunos_crescimento": 15.2,
+  "professores": 5,
+  "professores_crescimento": 0.0,
+  "administradores": 15,
+  "periodo_filtro": "Últimos 30 dias",
+  "data_atualizacao": "13/11/2025"
+}
+```
+
+#### 3.2. Métricas de Designs
+
+**GET** `/api/canva/metricas/designs`
+
+**Resposta:**
+```json
+{
+  "designs_criados": 5423,
+  "designs_criados_crescimento": 21.0,
+  "total_publicado": 8234,
+  "total_publicado_crescimento": 12.5,
+  "total_compartilhado": 1523,
+  "total_compartilhado_crescimento": 8.3,
+  "periodo_filtro": "Últimos 30 dias",
+  "data_atualizacao": "13/11/2025"
+}
+```
+
+#### 3.3. Lista de Membros
+
+**GET** `/api/canva/metricas/membros`
+
+**Resposta:**
+```json
+{
+  "total_membros": 838,
+  "membros": [
+    {
+      "nome": "João Silva",
+      "email": "joao.silva@santamaria.maplebear.com.br",
+      "funcao": "Estudante",
+      "escola": "Maple Bear Santa Maria",
+      "escola_id": "1"
+    },
+    ...
+  ],
+  "periodo_filtro": "Últimos 30 dias",
+  "data_atualizacao": "13/11/2025"
+}
+```
+
+#### 3.4. Métricas de Escolas
+
+**GET** `/api/canva/metricas/escolas`
+
+**Resposta:**
+```json
+{
+  "total_escolas": 148,
+  "escolas": [
+    {
+      "escola_id": "1",
+      "escola_nome": "Maple Bear Santa Maria",
+      "total_usuarios": 12,
+      "total_licencas": 2
+    },
+    ...
+  ],
+  "usuarios_nao_alocados": 114,
+  "periodo_filtro": "Últimos 30 dias",
+  "data_atualizacao": "13/11/2025"
+}
+```
+
+**Exemplo de Uso:**
+```javascript
+// Obter métricas de pessoas
+fetch('http://localhost:7071/api/canva/metricas/pessoas')
+  .then(response => response.json())
+  .then(data => {
+    console.log(`Total de pessoas: ${data.total_pessoas}`);
+    console.log(`Alunos: ${data.alunos}`);
+  });
+
+// Obter métricas de designs
+fetch('http://localhost:7071/api/canva/metricas/designs')
+  .then(response => response.json())
+  .then(data => {
+    console.log(`Designs criados: ${data.designs_criados}`);
+  });
+```
+
+---
+
 ## 🔐 Autenticação
 
 ### Endpoints Públicos (Anonymous)
