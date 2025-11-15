@@ -199,7 +199,7 @@ const CanvaDashboard = () => {
           <TabsTrigger value="usage" className="whitespace-nowrap">Usos</TabsTrigger>
           <TabsTrigger value="costs" className="whitespace-nowrap">Custos</TabsTrigger>
           <TabsTrigger value="advanced" className="whitespace-nowrap">Avançado</TabsTrigger>
-        </TabsList>
+</TabsList>
 
         <TabsContent value="overview" className="space-y-6">
           {/* Conteúdo da Visão Geral (vazio ou com outros componentes) */}
@@ -236,14 +236,11 @@ const CanvaDashboard = () => {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
 
       {/* Rodapé de Métricas (Visível em todas as abas) */}
       <CanvaMetricsDisplay />
 
 
-      </Tabs>
-      
       <FloatingAIChat />
     </div>
   );
