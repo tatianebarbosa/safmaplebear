@@ -236,10 +236,10 @@ const CanvaDashboard = () => {
             </CardContent>
           </Card>
         </TabsContent>
+      </Tabs>
 
       {/* Rodapé de Métricas (Visível em todas as abas) */}
       <CanvaMetricsDisplay />
-
 
       <FloatingAIChat />
     </div>
