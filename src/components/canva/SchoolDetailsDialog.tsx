@@ -41,6 +41,7 @@ export const SchoolDetailsDialog = ({
 }: SchoolDetailsDialogProps) => {
   const { 
     getJustificationsBySchool,
+    getHistoryBySchool, // Adicionar a nova função
     getLicenseStatus,
     isEmailValid
   } = useSchoolLicenseStore();
@@ -48,6 +49,7 @@ export const SchoolDetailsDialog = ({
   if (!school) return null;
 
   const justifications = getJustificationsBySchool(school.id);
+  const history = getHistoryBySchool(school.id); // Obter o histórico
   const licenseStatus = getLicenseStatus(school);
   const nonCompliantUsers = school.users.filter(u => !u.isCompliant);
 
@@ -191,100 +193,67 @@ export const SchoolDetailsDialog = ({
             </Card>
           </TabsContent>
 
-          <TabsContent value="history" className="space-y-4">
-            {/* History */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Histórico de Alterações</CardTitle>
-                <DialogDescription>
-                  Registro de todas as alterações realizadas nesta escola
-                </DialogDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {justifications.length === 0 ? (
-                    <div className="text-center py-8">
-                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">
-                        Nenhuma alteração registrada para esta escola.
-                      </p>
-                    </div>
-                  ) : (
-                    justifications.map((justification) => (
-                      <Card key={justification.id} className="border-l-4 border-l-primary">
-                        <CardContent className="p-4">
-                          <div className="space-y-3">
-                            {/* Header */}
-                            <div className="flex items-start justify-between">
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2">
-                                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground">
-                                    {formatDistanceToNow(new Date(justification.timestamp), {
-                                      addSuffix: true,
-                                      locale: ptBR,
-                                    })}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <User className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground">
-                                    Por: {justification.performedBy}
-                                  </span>
-                                </div>
-                              </div>
-                              <Badge variant="outline">Troca de Usuário</Badge>
-                            </div>
-
-                            {/* User Change Details */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div className="space-y-2">
-                                <h4 className="text-sm font-medium text-destructive">Usuário Anterior:</h4>
-                                <div className="text-sm space-y-1 bg-destructive/5 p-2 rounded">
-                                  <div><strong>Nome:</strong> {justification.oldUser.name}</div>
-                                  <div><strong>E-mail:</strong> {justification.oldUser.email}</div>
-                                  <div><strong>Função:</strong> {justification.oldUser.role}</div>
-                                </div>
-                              </div>
-                              <div className="space-y-2">
-                                <h4 className="text-sm font-medium text-success">Novo Usuário:</h4>
-                                <div className="text-sm space-y-1 bg-success/5 p-2 rounded">
-                                  <div><strong>Nome:</strong> {justification.newUser.name}</div>
-                                  <div><strong>E-mail:</strong> {justification.newUser.email}</div>
-                                  <div><strong>Função:</strong> {justification.newUser.role}</div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Reason */}
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium">Motivo:</h4>
-                              <p className="text-sm text-muted-foreground bg-muted p-3 rounded">
-                                {justification.reason}
-                              </p>
-                            </div>
-
-                            {/* Attachment */}
-                            {justification.attachment && (
-                              <div className="space-y-2">
-                                <h4 className="text-sm font-medium">Anexo:</h4>
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="gap-1">
-                                    <FileText className="h-3 w-3" />
-                                    {justification.attachment.name}
-                                  </Badge>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+	          <TabsContent value="history" className="space-y-4">
+	            {/* History */}
+	            <Card>
+	              <CardHeader>
+	                <CardTitle className="text-lg">Histórico de Alterações</CardTitle>
+	                <DialogDescription>
+	                  Registro de todas as alterações realizadas nesta escola
+	                </DialogDescription>
+	              </CardHeader>
+	              <CardContent>
+	                <div className="space-y-4">
+	                  {history.length === 0 ? (
+	                    <div className="text-center py-8">
+	                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+	                      <p className="text-muted-foreground">
+	                        Nenhuma alteração registrada para esta escola.
+	                      </p>
+	                    </div>
+	                  ) : (
+	                    history.map((entry) => (
+	                      <Card key={entry.id} className="border-l-4 border-l-primary">
+	                        <CardContent className="p-4">
+	                          <div className="space-y-3">
+	                            {/* Header */}
+	                            <div className="flex items-start justify-between">
+	                              <div className="space-y-1">
+	                                <div className="flex items-center gap-2">
+	                                  <Calendar className="h-4 w-4 text-muted-foreground" />
+	                                  <span className="text-sm text-muted-foreground">
+	                                    {formatDistanceToNow(new Date(entry.timestamp), {
+	                                      addSuffix: true,
+	                                      locale: ptBR,
+	                                    })}
+	                                  </span>
+	                                </div>
+	                                <div className="flex items-center gap-2">
+	                                  <User className="h-4 w-4 text-muted-foreground" />
+	                                  <span className="text-sm text-muted-foreground">
+	                                    Por: {entry.performedBy}
+	                                  </span>
+	                                </div>
+	                              </div>
+	                              <Badge variant="outline">{entry.action.replace('_', ' ')}</Badge>
+	                            </div>
+	
+	                            {/* Details */}
+	                            <div className="space-y-2">
+	                              <h4 className="text-sm font-medium">Detalhes da Ação:</h4>
+	                              <p className="text-sm text-muted-foreground bg-muted p-3 rounded">
+	                                {entry.details}
+	                              </p>
+	                            </div>
+	                          </div>
+	                        </CardContent>
+	                      </Card>
+	                    ))
+	                  )}
+	                </div>
+	              </CardContent>
+	            </Card>
+	          </TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { School, Justification, SchoolUser, CanvaUsageData } from '@/types/schoolLicense';
+import { School, Justification, SchoolUser, CanvaUsageData, HistoryEntry } from '@/types/schoolLicense';
 import { 
   processSchoolsWithUsers, 
   generateCanvaOverview,
@@ -11,6 +11,7 @@ import { ProcessedSchoolData, CanvaOverviewData } from '@/types/officialData';
 interface SchoolLicenseState {
   schools: School[];
   justifications: Justification[];
+  history: HistoryEntry[]; // Novo estado para o histórico de alterações
   usageData: CanvaUsageData[];
   officialData: ProcessedSchoolData[];
   overviewData: CanvaOverviewData | null;
@@ -31,6 +32,9 @@ interface SchoolLicenseState {
   addJustification: (justification: Omit<Justification, 'id' | 'timestamp'>) => void;
   getJustificationsBySchool: (schoolId: string) => Justification[];
   
+  addHistoryEntry: (entry: Omit<HistoryEntry, 'id' | 'timestamp'>) => void; // Nova ação para adicionar entrada de histórico
+  getHistoryBySchool: (schoolId: string) => HistoryEntry[]; // Nova ação para obter histórico
+  
   setUsageData: (data: CanvaUsageData[]) => void;
   
   // Helpers
@@ -48,6 +52,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
     (set, get) => ({
       schools: seedSchools,
       justifications: [],
+      history: [], // Inicialização do novo estado
       usageData: [],
       officialData: [],
       overviewData: null,
@@ -116,100 +121,163 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         )
       })),
 
-      addUser: (schoolId, user) => set(state => ({
-        schools: state.schools.map(school => 
-          school.id === schoolId 
-            ? { 
-                ...school, 
-                users: [...school.users, {
-                  ...user,
-                  id: Date.now().toString(),
-                  createdAt: new Date().toISOString(),
-                  isCompliant: get().isEmailValid(user.email)
-                }],
-                usedLicenses: school.users.length + 1
-              }
-            : school
-        )
-      })),
+      addUser: (schoolId, user) => {
+        const state = get();
+        const school = state.schools.find(s => s.id === schoolId);
+        if (!school) return state;
 
-      updateUser: (schoolId, userId, updates) => set(state => ({
-        schools: state.schools.map(school => 
-          school.id === schoolId 
-            ? {
-                ...school,
-                users: school.users.map(user => 
-                  user.id === userId 
-                    ? { 
-                        ...user, 
-                        ...updates,
-                        isCompliant: updates.email ? get().isEmailValid(updates.email) : user.isCompliant
-                      }
-                    : user
-                )
-              }
-            : school
-        )
-      })),
+        const newUser = {
+          ...user,
+          id: Date.now().toString(),
+          createdAt: new Date().toISOString(),
+          isCompliant: state.isEmailValid(user.email)
+        };
 
-      removeUser: (schoolId, userId) => set(state => ({
-        schools: state.schools.map(school => 
-          school.id === schoolId 
-            ? { 
-                ...school, 
-                users: school.users.filter(user => user.id !== userId),
-                usedLicenses: Math.max(0, school.usedLicenses - 1)
-              }
-            : school
-        )
-      })),
+        // 1. Adicionar entrada de histórico
+        state.addHistoryEntry({
+          schoolId: school.id,
+          schoolName: school.name,
+          action: 'GRANT_LICENSE',
+          details: `Licença concedida ao usuário ${newUser.name} (${newUser.email}) com o papel de ${newUser.role}.`,
+          performedBy: 'Sistema/Usuário' // TODO: Implementar autenticação para obter o usuário real
+        });
+
+        // 2. Atualizar o estado da escola
+        return {
+          schools: state.schools.map(s => 
+            s.id === schoolId 
+              ? { 
+                  ...s, 
+                  users: [...s.users, newUser],
+                  usedLicenses: s.users.length + 1
+                }
+              : s
+          )
+        };
+      },
+
+      updateUser: (schoolId, userId, updates) => {
+        const state = get();
+        const school = state.schools.find(s => s.id === schoolId);
+        const oldUser = school?.users.find(u => u.id === userId);
+        if (!school || !oldUser) return state;
+
+        const updatedUser = {
+          ...oldUser,
+          ...updates,
+          isCompliant: updates.email ? state.isEmailValid(updates.email) : oldUser.isCompliant
+        };
+
+        // 1. Adicionar entrada de histórico
+        state.addHistoryEntry({
+          schoolId: school.id,
+          schoolName: school.name,
+          action: 'UPDATE_USER',
+          details: `Usuário ${oldUser.name} (${oldUser.email}) atualizado. Alterações: ${Object.keys(updates).join(', ')}.`,
+          performedBy: 'Sistema/Usuário' // TODO: Implementar autenticação para obter o usuário real
+        });
+
+        // 2. Atualizar o estado da escola
+        return {
+          schools: state.schools.map(s => 
+            s.id === schoolId 
+              ? {
+                  ...s,
+                  users: s.users.map(u => 
+                    u.id === userId 
+                      ? updatedUser
+                      : u
+                  )
+                }
+              : s
+          )
+        };
+      },
+
+      removeUser: (schoolId, userId) => {
+        const state = get();
+        const school = state.schools.find(s => s.id === schoolId);
+        const userToRemove = school?.users.find(u => u.id === userId);
+        if (!school || !userToRemove) return state;
+
+        // 1. Adicionar entrada de histórico
+        state.addHistoryEntry({
+          schoolId: school.id,
+          schoolName: school.name,
+          action: 'REMOVE_USER',
+          details: `Usuário ${userToRemove.name} (${userToRemove.email}) removido. Licença liberada.`,
+          performedBy: 'Sistema/Usuário' // TODO: Implementar autenticação para obter o usuário real
+        });
+
+        // 2. Atualizar o estado da escola
+        return {
+          schools: state.schools.map(s => 
+            s.id === schoolId 
+              ? { 
+                  ...s, 
+                  users: s.users.filter(user => user.id !== userId),
+                  usedLicenses: Math.max(0, s.usedLicenses - 1)
+                }
+              : s
+          )
+        };
+      },
 
       swapUser: (schoolId, oldUserId, newUser, justificationData) => {
         const state = get();
         const school = state.schools.find(s => s.id === schoolId);
         const oldUser = school?.users.find(u => u.id === oldUserId);
         
-        if (!school || !oldUser) return;
+	        if (!school || !oldUser) return;
+	
+	        const justification: Justification = {
+	          ...justificationData,
+	          id: Date.now().toString(),
+	          timestamp: new Date().toISOString(),
+	          oldUser: {
+	            name: oldUser.name,
+	            email: oldUser.email,
+	            role: oldUser.role,
+	          },
+	          newUser: {
+	            name: newUser.name,
+	            email: newUser.email,
+	            role: newUser.role,
+	          }
+	        };
 
-        const justification: Justification = {
-          ...justificationData,
-          id: Date.now().toString(),
-          timestamp: new Date().toISOString(),
-          oldUser: {
-            name: oldUser.name,
-            email: oldUser.email,
-            role: oldUser.role,
-          },
-          newUser: {
-            name: newUser.name,
-            email: newUser.email,
-            role: newUser.role,
-          }
-        };
-
-        set(state => ({
-          schools: state.schools.map(s => 
-            s.id === schoolId 
-              ? { 
-                  ...s, 
-                  users: s.users.map(u => 
-                    u.id === oldUserId 
-                      ? {
-                          ...u,
-                          name: newUser.name,
-                          email: newUser.email,
-                          role: newUser.role,
-                          isCompliant: get().isEmailValid(newUser.email)
-                        }
-                      : u
-                  ),
-                  hasRecentJustifications: true
-                }
-              : s
-          ),
-          justifications: [...state.justifications, justification]
-        }));
-      },
+          // 1. Adicionar entrada de histórico
+          state.addHistoryEntry({
+            schoolId: school.id,
+            schoolName: school.name,
+            action: 'TRANSFER_LICENSE',
+            details: `Licença transferida de ${oldUser.name} (${oldUser.email}) para ${newUser.name} (${newUser.email}). Motivo: ${justificationData.reason}.`,
+            performedBy: justificationData.performedBy
+          });
+	
+	        set(state => ({
+	          schools: state.schools.map(s => 
+	            s.id === schoolId 
+	              ? { 
+	                  ...s, 
+	                  users: s.users.map(u => 
+	                    u.id === oldUserId 
+	                      ? {
+	                          ...u,
+	                          name: newUser.name,
+	                          email: newUser.email,
+	                          role: newUser.role,
+	                          isCompliant: get().isEmailValid(newUser.email)
+	                        }
+	                      : u
+	                  ),
+	                  hasRecentJustifications: true
+	                }
+	              : s
+	          ),
+	          justifications: [...state.justifications, justification]
+	        }));
+	      },
 
       addJustification: (justification) => set(state => ({
         justifications: [...state.justifications, {
@@ -221,6 +289,18 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
 
       getJustificationsBySchool: (schoolId) => {
         return get().justifications.filter(j => j.schoolId === schoolId);
+      },
+
+      addHistoryEntry: (entry) => set(state => ({
+        history: [...state.history, {
+          ...entry,
+          id: Date.now().toString(),
+          timestamp: new Date().toISOString()
+        }]
+      })),
+
+      getHistoryBySchool: (schoolId) => {
+        return get().history.filter(h => h.schoolId === schoolId).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       },
 
       setUsageData: (data) => set({ usageData: data }),

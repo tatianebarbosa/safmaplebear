@@ -13,7 +13,8 @@ import {
   Paperclip,
   MapPin,
   Settings,
-  Eye
+  Eye,
+  RefreshCw
 } from 'lucide-react';
 import { School } from '@/types/schoolLicense';
 import { UserDialog } from './UserDialog';
@@ -309,72 +310,50 @@ export const SchoolLicenseCard = ({
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-2 pt-2 border-t">
-            <div className="flex gap-2">
-              {school.users.length < 2 ? (
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={() => setShowUserDialog(true)}
-                  className="flex-1"
-                >
-                  <Plus className="h-3 w-3 mr-1" />
-                  Adicionar
-                </Button>
-              ) : (
-                <Button 
-                  size="sm" 
-                  variant="secondary" 
-                  onClick={() => openSwapDialog(school.users[0].id)}
-                  className="flex-1"
-                >
-                  Transferir Licença
-                </Button>
-              )}
+          <div className="flex flex-col space-y-2 pt-2 border-t">
+            {/* Botão de Ação Principal Condicional */}
+            {licenseStatus === 'Disponível' ? (
+              <Button 
+                size="sm" 
+                variant="default" 
+                onClick={() => setShowUserDialog(true)}
+                className="w-full"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Conceder Licença
+              </Button>
+            ) : licenseStatus === 'Excedido' ? (
+              <Button 
+                size="sm" 
+                variant="secondary" 
+                onClick={() => openSwapDialog(school.users[0].id)} // Assumindo que o primeiro usuário é o que será trocado por padrão
+                className="w-full"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Transferir Licença
+              </Button>
+            ) : (
               <Button 
                 size="sm" 
                 variant="outline" 
-                onClick={() => setShowDetailsDialog(true)}
-                className="flex-1"
+                disabled
+                className="w-full"
               >
-                <Eye className="h-3 w-3 mr-1" />
-                Detalhes
+                Licenças Completas
               </Button>
-            </div>
+            )}
+            
+            {/* Botão Gerenciar (Substitui Detalhes) */}
             <Button 
               size="sm" 
               variant="outline" 
-              onClick={() => onManage(school)}
+              onClick={() => setShowDetailsDialog(true)}
               className="w-full"
             >
               <Settings className="h-3 w-3 mr-1" />
               Gerenciar
             </Button>
           </div>
-
-          {/* Additional Actions */}
-          {school.users.length > 0 && (
-            <div className="flex gap-2">
-              <Button 
-                size="sm" 
-                variant="secondary" 
-                onClick={() => openSwapDialog(school.users[0].id)}
-                className="flex-1"
-              >
-                Trocar Usuário
-              </Button>
-              {justifications.length > 0 && (
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={() => setShowJustificationsDialog(true)}
-                >
-                  <Paperclip className="h-3 w-3 mr-1" />
-                  Ver Justificativas
-                </Button>
-              )}
-            </div>
-          )}
         </CardContent>
       </Card>
 

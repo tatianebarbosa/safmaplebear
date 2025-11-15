@@ -67,3 +67,15 @@ export interface UsageFilters {
   cluster?: string;
   school?: string;
 }
+
+export type HistoryAction = 'GRANT_LICENSE' | 'TRANSFER_LICENSE' | 'REMOVE_USER' | 'UPDATE_USER';
+
+export interface HistoryEntry {
+  id: string;
+  schoolId: string;
+  schoolName: string;
+  action: HistoryAction;
+  details: string; // Descrição detalhada da ação
+  performedBy: string; // Quem realizou a ação
+  timestamp: string;
+}
