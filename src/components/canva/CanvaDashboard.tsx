@@ -137,13 +137,13 @@ const CanvaDashboard = () => {
         <StatsCard
           title="Escolas Ativas"
           value={overviewData.totalSchools.toString()}
-          description={`${overviewData.schoolsAtCapacity} em capacidade máxima`}
+          description={`${overviewData.schoolsAtCapacity || 0} em capacidade máxima`}
           icon={<Building2 className="h-4 w-4" />}
         />
         <StatsCard
           title="Domínios Não Maple Bear"
           value={overviewData.nonMapleBearDomains.toString()}
-          description={`${getDomainCounts().length} domínios diferentes`}
+          description={`${getDomainCounts()?.length || 0} domínios diferentes`}
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={overviewData.nonMapleBearDomains > 0 ? "destructive" : "default"}
         />
@@ -168,14 +168,14 @@ const CanvaDashboard = () => {
           <CardContent>
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                {overviewData.topNonCompliantDomains.slice(0, 5).map(({ domain, count }) => (
+                {(overviewData.topNonCompliantDomains || []).slice(0, 5).map(({ domain, count }) => (
                   <span key={domain} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-destructive-foreground">
                     {domain} ({count})
                   </span>
                 ))}
-                {overviewData.topNonCompliantDomains.length > 5 && (
+                {(overviewData.topNonCompliantDomains || []).length > 5 && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
-                    +{overviewData.topNonCompliantDomains.length - 5} domínios
+                    +{(overviewData.topNonCompliantDomains || []).length - 5} domínios
                   </span>
                 )}
               </div>
