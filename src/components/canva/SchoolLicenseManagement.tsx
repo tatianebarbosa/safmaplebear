@@ -175,7 +175,7 @@ export const SchoolLicenseManagement = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <StatsCard
           title="Total de Escolas"
           value={totalSchools.toString()}
