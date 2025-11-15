@@ -35,248 +35,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { loadUserData, type UserData } from "@/lib/userAnalytics";
+import { useUserManagement } from "@/hooks/useUserManagement";
+import { UserData } from "@/lib/userAnalytics";
 
 const UserManagement = () => {
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [schoolFilter, setSchoolFilter] = useState("");
-  
-  // Dialog states
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-  
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    role: "Estudante",
-    school: "",
-    schoolId: "",
-    licenseStatus: "Disponível",
-    updatedAt: new Date().toISOString().split('T')[0]
-  });
-
-  useEffect(() => {
-    loadUsers();
-  }, []);
-
-  useEffect(() => {
-    filterUsers();
-  }, [users, searchTerm, statusFilter, schoolFilter]);
-
-  const loadUsers = async () => {
-    try {
-      setLoading(true);
-      
-      // Carregar usuários do localStorage primeiro
-      const savedUsers = localStorage.getItem('maple-bear-users');
-      if (savedUsers) {
-        const parsedUsers = JSON.parse(savedUsers);
-        setUsers(parsedUsers);
-      } else {
-        // Se não houver dados salvos, carregar do CSV
-        const userData = await loadUserData();
-        setUsers(userData);
-        localStorage.setItem('maple-bear-users', JSON.stringify(userData));
-      }
-      
-      toast.success("Usuários carregados com sucesso!");
-    } catch (error) {
-      toast.error("Erro ao carregar usuários");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const saveUsers = (updatedUsers: UserData[]) => {
-    localStorage.setItem('maple-bear-users', JSON.stringify(updatedUsers));
-    setUsers(updatedUsers);
-  };
-
-  const filterUsers = () => {
-    let filtered = users;
-
-    // Filtro por texto
-    if (searchTerm) {
-      filtered = filtered.filter(user => 
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.school.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Filtro por status de licença
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(user => {
-        switch (statusFilter) {
-          case "available":
-            return user.licenseStatus === "Disponível" || user.licenseStatus === "";
-          case "active":
-            return user.licenseStatus === "Ativa";
-          case "inactive":
-            return user.licenseStatus === "Inativa";
-          case "excess":
-            return user.licenseStatus === "Excesso";
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Filtro por escola
-    if (schoolFilter) {
-      filtered = filtered.filter(user => 
-        user.school.toLowerCase().includes(schoolFilter.toLowerCase())
-      );
-    }
-
-    setFilteredUsers(filtered);
-  };
-
-  const handleAddUser = () => {
-    if (!formData.name || !formData.email) {
-      toast.error("Nome e email são obrigatórios");
-      return;
-    }
-
-    // Verificar se email já existe
-    if (users.some(user => user.email === formData.email)) {
-      toast.error("Este email já está cadastrado");
-      return;
-    }
-
-    const newUser: UserData = {
-      ...formData,
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-
-    const updatedUsers = [...users, newUser];
-    saveUsers(updatedUsers);
-    
-    setIsAddDialogOpen(false);
-    resetForm();
-    toast.success("Usuário adicionado com sucesso!");
-  };
-
-  const handleEditUser = () => {
-    if (!selectedUser) return;
-
-    const updatedUsers = users.map(user => 
-      user.email === selectedUser.email 
-        ? { ...formData, updatedAt: new Date().toISOString().split('T')[0] }
-        : user
-    );
-
-    saveUsers(updatedUsers);
-    
-    setIsEditDialogOpen(false);
-    setSelectedUser(null);
-    resetForm();
-    toast.success("Usuário atualizado com sucesso!");
-  };
-
-  const handleDeleteUser = () => {
-    if (!selectedUser) return;
-
-    const updatedUsers = users.filter(user => user.email !== selectedUser.email);
-    saveUsers(updatedUsers);
-    
-    setIsDeleteDialogOpen(false);
-    setSelectedUser(null);
-    toast.success("Usuário excluído com sucesso!");
-  };
-
-  const openEditDialog = (user: UserData) => {
-    setSelectedUser(user);
-    setFormData({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      school: user.school,
-      schoolId: user.schoolId,
-      licenseStatus: user.licenseStatus || "Disponível",
-      updatedAt: user.updatedAt
-    });
-    setIsEditDialogOpen(true);
-  };
-
-  const openDeleteDialog = (user: UserData) => {
-    setSelectedUser(user);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      email: "",
-      role: "Estudante",
-      school: "",
-      schoolId: "",
-      licenseStatus: "Disponível",
-      updatedAt: new Date().toISOString().split('T')[0]
-    });
-  };
-
-  const exportUsers = () => {
-    const csvContent = [
-      "Nome;E-mail;Função;Escola;Escola ID;Status Licença;Atualizado em",
-      ...filteredUsers.map(user => 
-        `${user.name};${user.email};${user.role};${user.school};${user.schoolId};${user.licenseStatus};${user.updatedAt}`
-      )
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `usuarios-maple-bear-${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    window.URL.revokeObjectURL(url);
-    
-    toast.success("Dados exportados com sucesso!");
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Ativa":
-        return <Badge variant="default">Ativa</Badge>;
-      case "Inativa":
-        return <Badge variant="secondary">Inativa</Badge>;
-      case "Excesso":
-        return <Badge variant="destructive">Excesso</Badge>;
-      case "Disponível":
-      default:
-        return <Badge variant="outline">Disponível</Badge>;
-    }
-  };
-
-  const getSchoolStats = () => {
-    const schoolStats = new Map<string, { total: number; active: number; excess: number }>();
-    
-    users.forEach(user => {
-      if (user.school) {
-        if (!schoolStats.has(user.school)) {
-          schoolStats.set(user.school, { total: 0, active: 0, excess: 0 });
-        }
-        const stats = schoolStats.get(user.school)!;
-        stats.total++;
-        if (user.licenseStatus === "Ativa") stats.active++;
-        if (user.licenseStatus === "Excesso") stats.excess++;
-      }
-    });
-
-    return Array.from(schoolStats.entries())
-      .map(([school, stats]) => ({ school, ...stats }))
-      .sort((a, b) => b.total - a.total);
-  };
+  const {
+    users,
+    filteredUsers,
+    loading,
+    searchTerm,
+    setSearchTerm,
+    statusFilter,
+    setStatusFilter,
+    schoolFilter,
+    setSchoolFilter,
+    isAddDialogOpen,
+    setIsAddDialogOpen,
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    selectedUser,
+    setSelectedUser,
+    formData,
+    setFormData,
+    handleAddUser,
+    handleEditUser,
+    handleDeleteUser,
+    openEditDialog,
+    openDeleteDialog,
+    resetForm,
+    exportUsers,
+    getStatusBadge,
+    getSchoolStats,
+    allUsers,
+  } = useUserManagement();
 
   if (loading) {
     return (
