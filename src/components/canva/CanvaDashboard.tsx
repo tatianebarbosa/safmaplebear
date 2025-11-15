@@ -113,83 +113,7 @@ const CanvaDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        <StatsCard
-          title="Total de Usuários"
-          value={overviewData.totalUsers.toString()}
-          description={`${overviewData.schoolsWithUsers} escolas ativas`}
-          icon={<Users className="h-4 w-4" />}
-        />
-        <StatsCard
-          title="Usuários Conformes"
-          value={overviewData.compliantUsers.toString()}
-          description={`${overviewData.complianceRate?.toFixed(1) || 0}% de conformidade`}
-          icon={<TrendingUp className="h-4 w-4" />}
-        />
-        <StatsCard
-          title="Fora da Política"
-          value={overviewData.nonCompliantUsers.toString()}
-          description="Usuários com domínio não autorizado"
-          icon={<AlertTriangle className="h-4 w-4" />}
-          variant={overviewData.nonCompliantUsers > 0 ? "destructive" : "default"}
-        />
-        <StatsCard
-          title="Escolas Ativas"
-          value={overviewData.totalSchools.toString()}
-          description={`${overviewData.schoolsAtCapacity || 0} em capacidade máxima`}
-          icon={<Building2 className="h-4 w-4" />}
-        />
-        <StatsCard
-          title="Domínios Não Maple Bear"
-          value={overviewData.nonMapleBearDomains.toString()}
-          description={`${getDomainCounts()?.length || 0} domínios diferentes`}
-          icon={<AlertTriangle className="h-4 w-4" />}
-          variant={overviewData.nonMapleBearDomains > 0 ? "destructive" : "default"}
-        />
-      </div>
 
-      {/* Compliance Alert */}
-      {overviewData.nonCompliantUsers > 0 && (
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardHeader>
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
-              <div className="space-y-1">
-                <CardTitle className="text-destructive">
-                  Alerta de Conformidade - Alto Risco
-                </CardTitle>
-                <CardDescription>
-                  {overviewData.nonCompliantUsers} usuários com domínios não autorizados identificados
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {(overviewData.topNonCompliantDomains || []).slice(0, 5).map(({ domain, count }) => (
-                  <span key={domain} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-destructive-foreground">
-                    {domain} ({count})
-                  </span>
-                ))}
-                {(overviewData.topNonCompliantDomains || []).length > 5 && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
-                    +{(overviewData.topNonCompliantDomains || []).length - 5} domínios
-                  </span>
-                )}
-              </div>
-              <Button 
-                variant="destructive" 
-                onClick={() => toast.info('Navegando para usuários não conformes')}
-                className="mt-4"
-              >
-                Ver Detalhes dos Usuários Não Conformes
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full mt-6">
@@ -202,7 +126,83 @@ const CanvaDashboard = () => {
 </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {/* Conteúdo da Visão Geral (vazio ou com outros componentes) */}
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            <StatsCard
+              title="Total de Usuários"
+              value={overviewData.totalUsers.toString()}
+              description={`${overviewData.schoolsWithUsers} escolas ativas`}
+              icon={<Users className="h-4 w-4" />}
+            />
+            <StatsCard
+              title="Usuários Conformes"
+              value={overviewData.compliantUsers.toString()}
+              description={`${overviewData.complianceRate?.toFixed(1) || 0}% de conformidade`}
+              icon={<TrendingUp className="h-4 w-4" />}
+            />
+            <StatsCard
+              title="Fora da Política"
+              value={overviewData.nonCompliantUsers.toString()}
+              description="Usuários com domínio não autorizado"
+              icon={<AlertTriangle className="h-4 w-4" />}
+              variant={overviewData.nonCompliantUsers > 0 ? "destructive" : "default"}
+            />
+            <StatsCard
+              title="Escolas Ativas"
+              value={overviewData.totalSchools.toString()}
+              description={`${overviewData.schoolsAtCapacity || 0} em capacidade máxima`}
+              icon={<Building2 className="h-4 w-4" />}
+            />
+            <StatsCard
+              title="Domínios Não Maple Bear"
+              value={overviewData.nonMapleBearDomains.toString()}
+              description={`${getDomainCounts()?.length || 0} domínios diferentes`}
+              icon={<AlertTriangle className="h-4 w-4" />}
+              variant={overviewData.nonMapleBearDomains > 0 ? "destructive" : "default"}
+            />
+          </div>
+
+          {/* Compliance Alert */}
+          {overviewData.nonCompliantUsers > 0 && (
+            <Card className="border-destructive/20 bg-destructive/5">
+              <CardHeader>
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+                  <div className="space-y-1">
+                    <CardTitle className="text-destructive">
+                      Alerta de Conformidade - Alto Risco
+                    </CardTitle>
+                    <CardDescription>
+                      {overviewData.nonCompliantUsers} usuários com domínios não autorizados identificados
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {(overviewData.topNonCompliantDomains || []).slice(0, 5).map(({ domain, count }) => (
+                      <span key={domain} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-destructive-foreground">
+                        {domain} ({count})
+                      </span>
+                    ))}
+                    {(overviewData.topNonCompliantDomains || []).length > 5 && (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
+                        +{(overviewData.topNonCompliantDomains || []).length - 5} domínios
+                      </span>
+                    )}
+                  </div>
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => toast.info('Navegando para usuários não conformes')}
+                    className="mt-4"
+                  >
+                    Ver Detalhes dos Usuários Não Conformes
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">
