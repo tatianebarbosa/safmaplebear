@@ -26,7 +26,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
 
   if (nonCompliantUsers.length === 0) {
     return (
-      <Card className="border-success/20 bg-success/5">
+      <Card className="rounded-none border-success/20 bg-success/5">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-success" />
@@ -39,7 +39,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
   }
 
   return (
-    <Card className={`border-${risk.color === 'destructive' ? 'destructive' : 'warning'}/20 bg-${risk.color === 'destructive' ? 'destructive' : 'warning'}/5`}>
+    <Card className={`rounded-none border-${risk.color === 'destructive' ? 'destructive' : 'warning'}/20 bg-${risk.color === 'destructive' ? 'destructive' : 'warning'}/5`}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
