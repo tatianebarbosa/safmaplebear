@@ -299,8 +299,9 @@ Como posso ser mais específico para ajudá-lo?`;
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isLoading}
                 size="sm"
+                isLoading={isLoading}
               >
-                <Send className="h-4 w-4" />
+                {!isLoading && <Send className="h-4 w-4" />}
               </Button>
             </div>
           </CardContent>

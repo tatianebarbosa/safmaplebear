@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -255,6 +256,9 @@ const AIKnowledgeBase = () => {
     setIsPromptDialogOpen(true);
   };
 
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [promptToDelete, setPromptToDelete] = useState<string | null>(null);
+
   const deleteItem = (id: string) => {
     const updated = knowledgeItems.filter(item => item.id !== id);
     saveKnowledge(updated);
@@ -265,6 +269,20 @@ const AIKnowledgeBase = () => {
     const updated = aiPrompts.filter(prompt => prompt.id !== id);
     savePrompts(updated);
     toast({ title: "Prompt removido", description: "Prompt foi removido do sistema" });
+  };
+
+  const handleDeleteItem = () => {
+    if (itemToDelete) {
+      deleteItem(itemToDelete);
+      setItemToDelete(null);
+    }
+  };
+
+  const handleDeletePrompt = () => {
+    if (promptToDelete) {
+      deletePrompt(promptToDelete);
+      setPromptToDelete(null);
+    }
   };
 
   const exportData = () => {
@@ -291,6 +309,41 @@ const AIKnowledgeBase = () => {
 
   return (
     <div className="space-y-6">
+      {/* AlertDialog para deletar item de conhecimento */}
+      <AlertDialog open={!!itemToDelete} onOpenChange={setItemToDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza que deseja remover este item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível. O item de conhecimento será permanentemente removido da base.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteItem} className="bg-destructive hover:bg-destructive/90">
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* AlertDialog para deletar prompt */}
+      <AlertDialog open={!!promptToDelete} onOpenChange={setPromptToDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza que deseja remover este prompt?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível. O prompt será permanentemente removido do sistema.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeletePrompt} className="bg-destructive hover:bg-destructive/90">
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Base de Conhecimento IA</h1>
@@ -454,9 +507,11 @@ const AIKnowledgeBase = () => {
                       <Button size="sm" variant="ghost" onClick={() => handleEdit(item)}>
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => deleteItem(item.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="ghost" onClick={() => setItemToDelete(item.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
                     </div>
                   </div>
                 </CardContent>
@@ -568,9 +623,11 @@ const AIKnowledgeBase = () => {
                       <Button size="sm" variant="ghost" onClick={() => handleEditPrompt(prompt)}>
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => deletePrompt(prompt.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="ghost" onClick={() => setPromptToDelete(prompt.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
                     </div>
                   </div>
                 </CardContent>

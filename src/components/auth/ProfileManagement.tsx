@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,6 +42,7 @@ const ProfileManagement = () => {
   const [newUserOpen, setNewUserOpen] = useState(false);
   const { toast } = useToast();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -93,6 +95,10 @@ const ProfileManagement = () => {
 
   // Atualizar perfil
   const updateProfile = async () => {
+    setIsLoading(true);
+    // Simulação de chamada de API
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);) => {
     if (!isAllowedDomain(formData.email)) {
       toast({
         title: "Email não permitido",
@@ -190,18 +196,26 @@ const ProfileManagement = () => {
   };
 
   // Negar usuário pendente
+  const [denyUserId, setDenyUserId] = useState<string | null>(null);
+
+  const handleDenyUser = () => {
+    if (!denyUserId) return;
+    denyUser(denyUserId);
+    setDenyUserId(null);
+  };
+
   const denyUser = (userId: string) => {
+    // Ação real de negação (simulada)
     const updatedPending = pendingUsers.filter(u => u.id !== userId);
     setPendingUsers(updatedPending);
     localStorage.setItem('saf_pending_users', JSON.stringify(updatedPending));
 
     toast({
       title: "Acesso negado",
-      description: "Usuário foi removido da lista de pendentes"
+      description: "Usuário foi removido da lista de pendentes",
+      variant: "destructive"
     });
-  };
-
-  // Criar novo usuário (admin only)
+  };in only)
   const createUser = () => {
     if (!isAllowedDomain(formData.email)) {
       toast({
@@ -354,7 +368,7 @@ const ProfileManagement = () => {
                           Apenas emails @mbcentral, @seb ou @sebsa são permitidos
                         </p>
                       </div>
-                      <Button onClick={updateProfile} className="w-full">
+                      <Button onClick={updateProfile} className="w-full" isLoading={isLoading}>
                         Salvar Alterações
                       </Button>
                     </div>
@@ -445,24 +459,45 @@ const ProfileManagement = () => {
                             </p>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            onClick={() => approveUser(user.id)}
-                            className="bg-success hover:bg-success/80 text-success-foreground"
-                          >
-                            <CheckCircle className="w-4 h-4 mr-1" />
-                            Aprovar
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="destructive"
-                            onClick={() => denyUser(user.id)}
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Negar
-                          </Button>
-                        </div>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  onClick={() => approveUser(user.id)}
+                  className="bg-success hover:bg-success/80 text-success-foreground"
+                >
+                  <CheckCircle className="w-4 h-4 mr-1" />
+                  Aprovar
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      size="sm" 
+                      variant="destructive"
+                      onClick={() => setDenyUserId(user.id)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Negar
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Tem certeza que deseja negar o acesso?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta ação removerá o usuário da lista de pendentes. Ele precisará refazer a solicitação.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDenyUser} 
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Negar Acesso
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
                       </div>
                     ))
                   )}

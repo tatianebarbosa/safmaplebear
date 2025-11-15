@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -196,6 +197,15 @@ const VoucherManagement = () => {
     });
   };
 
+  const [voucherToDelete, setVoucherToDelete] = useState<string | null>(null);
+
+  const handleDeleteVoucher = () => {
+    if (voucherToDelete) {
+      deleteVoucher(voucherToDelete);
+      setVoucherToDelete(null);
+    }
+  };
+
   const deleteVoucher = (id: string) => {
     const updatedVouchers = vouchers.filter(v => v.id !== id);
     saveVouchers(updatedVouchers);
@@ -250,6 +260,25 @@ const VoucherManagement = () => {
   };
 
   return (
+    <>
+      {/* AlertDialog para deletar voucher */}
+      <AlertDialog open={!!voucherToDelete} onOpenChange={setVoucherToDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza que deseja remover este voucher?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível. O voucher será permanentemente removido do sistema.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteVoucher} className="bg-destructive hover:bg-destructive/90">
+              Remover Voucher
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
@@ -478,7 +507,7 @@ const VoucherManagement = () => {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => deleteVoucher(voucher.id)}
+                    onClick={() => setVoucherToDelete(voucher.id)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
