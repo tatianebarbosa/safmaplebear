@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { formatCurrency, formatDateBR, formatPercentage } from '@/lib/formatters';
+import { downloadCSV, generateFilenameWithDate } from '@/lib/fileUtils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -58,23 +60,16 @@ export const CostManagementDashboard = () => {
     const csvData = [
       ['Data', 'Número', 'Descrição', 'Equipe', 'Valor', 'Status'],
       ...invoices.map(inv => [
-        new Date(inv.date).toLocaleDateString('pt-BR'),
+        formatDateBR(inv.date),
         inv.invoiceNumber,
         inv.description,
         inv.team || 'N/A',
-        `R$ ${inv.amount.toFixed(2)}`,
+        formatCurrency(inv.amount),
         inv.status === 'paid' ? 'Pago' : 'Pendente'
       ])
     ];
 
-    const csvContent = csvData.map(row => row.join(';')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `faturas-canva-${selectedYear}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(csvData, `faturas-canva-${selectedYear}`);
     toast.success('Faturas exportadas com sucesso');
   };
 
@@ -137,32 +132,32 @@ export const CostManagementDashboard = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <StatsCard
           title="Gasto Total"
-          value={`R$ ${analytics.totalYearCost.toFixed(2)}`}
+          value={formatCurrency(analytics.totalYearCost)}
           description={`${selectedYear} • ${analytics.totalInvoices} faturas`}
           icon={<DollarSign className="h-4 w-4" />}
         />
         <StatsCard
           title="Média Mensal"
-          value={`R$ ${analytics.averageMonthly.toFixed(2)}`}
+          value={formatCurrency(analytics.averageMonthly)}
           description="Gasto médio por mês"
           icon={<Calendar className="h-4 w-4" />}
         />
         <StatsCard
           title="Custo por Licença"
-          value={`R$ ${analytics.costPerLicense.toFixed(2)}`}
+          value={formatCurrency(analytics.costPerLicense)}
           description="Baseado em licenças ativas"
           icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatsCard
           title="Orçamento Utilizado"
-          value={`${budgetUsagePercent.toFixed(1)}%`}
-          description={`R$ ${remainingBudget.toFixed(2)} restante`}
+          value={formatPercentage(budgetUsagePercent)}
+          description={`${formatCurrency(remainingBudget)} restante`}
           icon={<Target className="h-4 w-4" />}
           variant={budgetUsagePercent > 100 ? "destructive" : "default"}
         />
         <StatsCard
           title="Orçamento Anual"
-          value={`R$ ${annualBudget.toFixed(2)}`}
+          value={formatCurrency(annualBudget)}
           description="Meta estabelecida"
           icon={<Target className="h-4 w-4" />}
         />
@@ -210,7 +205,7 @@ export const CostManagementDashboard = () => {
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip 
-                  formatter={(value) => [`R$ ${Number(value).toFixed(2)}`, 'Valor']}
+                  formatter={(value) => [formatCurrency(Number(value)), 'Valor']}
                 />
                 <Line 
                   type="monotone" 
@@ -245,7 +240,7 @@ export const CostManagementDashboard = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => `R$ ${Number(value).toFixed(2)}`} />
+                <Tooltip formatter={(value) => formatCurrency(Number(value))} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -282,11 +277,11 @@ export const CostManagementDashboard = () => {
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {invoice.invoiceNumber} • {invoice.team} • {new Date(invoice.date).toLocaleDateString('pt-BR')}
+                      {invoice.invoiceNumber} • {invoice.team} • {formatDateBR(invoice.date)}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-lg">R$ {invoice.amount.toFixed(2)}</div>
+                    <div className="font-bold text-lg">{formatCurrency(invoice.amount)}</div>
                     <div className="text-sm text-muted-foreground">{invoice.currency}</div>
                   </div>
                 </div>

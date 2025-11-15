@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+import { formatDateTimeBR, formatDateForFilename } from '@/lib/formatters';
+import { downloadCSV, sanitizeForCSV } from '@/lib/fileUtils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -215,9 +217,9 @@ const VoucherManagement = () => {
     });
   };
 
-  const exportData = () => {
-    const csvContent = [
-      ['Escola', 'Tipo', 'Quantidade', 'Status', 'Solicitado por', 'Criado em', 'Código', 'Descrição'].join(','),
+  const exportVouchers = () => {
+    const csvData = [
+      ['Escola', 'Tipo', 'Valor', 'Status', 'Solicitante', 'Data', 'Código', 'Descrição'],
       ...vouchers.map(v => [
         v.school,
         v.type,
@@ -226,17 +228,11 @@ const VoucherManagement = () => {
         v.requestedBy,
         v.createdAt,
         v.voucherCode || '',
-        v.description.replace(/,/g, ';')
-      ].join(','))
-    ].join('\n');
+        sanitizeForCSV(v.description)
+      ])
+    ];
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `vouchers_saf_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    downloadCSV(csvData, `vouchers_saf_${formatDateForFilename()}`);
   };
 
   const getStatusIcon = (status: string) => {

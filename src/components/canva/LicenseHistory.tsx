@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { formatDateTimeBR, formatDateForFilename } from '@/lib/formatters';
+import { downloadCSV } from '@/lib/fileUtils';
 import { History, Filter, Download, Calendar, School, User } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,30 +82,21 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
   };
 
   const exportHistory = () => {
-    const headers = [
-      'Data/Hora', 'Escola', 'Ação', 'Usuário', 'Email', 'Escola Destino', 'Justificativa', 'Executado por'
+    const csvData = [
+      ['Data/Hora', 'Escola', 'Ação', 'Usuário', 'Email', 'Escola Destino', 'Justificativa', 'Executado por'],
+      ...filteredHistory.map(action => [
+        formatDateTimeBR(action.timestamp),
+        action.schoolName,
+        getActionLabel(action.action),
+        action.userName || '-',
+        action.userEmail || '-',
+        action.targetSchoolName || '-',
+        action.justification,
+        action.performedBy
+      ])
     ];
 
-    const rows = filteredHistory.map(action => [
-      new Date(action.timestamp).toLocaleString('pt-BR'),
-      action.schoolName,
-      getActionLabel(action.action),
-      action.userName || '-',
-      action.userEmail || '-',
-      action.targetSchoolName || '-',
-      action.justification,
-      action.performedBy
-    ]);
-
-    const csvContent = [headers, ...rows].map(row => 
-      row.map(cell => `"${cell}"`).join(',')
-    ).join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `historico-licencas-canva-${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+    downloadCSV(csvData, `historico-licencas-canva-${formatDateForFilename()}`);
   };
 
   return (

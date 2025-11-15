@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { validateEmail } from '@/lib/validators';
 import {
   Dialog,
   DialogContent,
@@ -65,7 +66,7 @@ export const UserDialog = ({
     
     if (!formData.email.trim()) {
       newErrors.email = 'E-mail é obrigatório';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!validateEmail(formData.email)) {
       newErrors.email = 'E-mail inválido';
     }
     

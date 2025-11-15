@@ -1,4 +1,5 @@
-import React from 'react';
+import { useState } from 'react';
+import { getNonComplianceReason as getComplianceReason } from '@/lib/validators';
 import {
   Dialog,
   DialogContent,
@@ -50,20 +51,7 @@ export const SchoolDetailsDialog = ({
   const licenseStatus = getLicenseStatus(school);
   const nonCompliantUsers = school.users.filter(u => !u.isCompliant);
 
-  const getNonComplianceReason = (email: string) => {
-    const domain = email.toLowerCase().split('@')[1];
-    if (!domain) return 'Email inválido';
-    
-    if (domain.includes('gmail.com') || domain.includes('hotmail.com') || domain.includes('yahoo.com')) {
-      return 'Email pessoal não autorizado';
-    }
-    
-    if (!domain.includes('maplebear') && domain !== 'mbcentral.com.br') {
-      return 'Domínio não autorizado pela política Maple Bear';
-    }
-    
-    return 'Email fora da política';
-  };
+  const getNonComplianceReason = getComplianceReason;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

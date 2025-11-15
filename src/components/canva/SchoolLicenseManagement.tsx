@@ -320,13 +320,13 @@ export const SchoolLicenseManagement = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mt-4 justify-end">
-            <Button variant="outline" onClick={handleExport}>
-              <Download className="h-4 w-4 mr-2" />
+          <div className="flex flex-wrap gap-2 mt-4 justify-end">
+            <Button variant="outline" onClick={handleExport} className="gap-2">
+              <Download className="h-4 w-4" />
               Exportar CSV
             </Button>
-            <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="h-4 w-4 mr-2" />
+            <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-2">
+              <Upload className="h-4 w-4" />
               Importar CSV
             </Button>
             <input

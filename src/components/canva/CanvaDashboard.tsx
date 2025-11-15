@@ -89,17 +89,6 @@ const CanvaDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/dashboard')}
-              className="gap-2"
-            >
-              <Home className="h-4 w-4" />
-              Voltar ao Início
-            </Button>
-          </div>
           <h1 className="text-3xl font-bold tracking-tight">Gestão Canva</h1>
           <p className="text-muted-foreground">
             Dados oficiais sincronizados • {overviewData.totalUsers} usuários ativos
