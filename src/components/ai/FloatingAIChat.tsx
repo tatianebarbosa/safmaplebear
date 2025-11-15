@@ -26,7 +26,7 @@ const FloatingAIChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      content: 'Olá! Sou seu assistente de IA do Maple Bear SAF. Posso responder perguntas sobre licenças Canva, escolas, usuários e métricas. Como posso ajudá-lo?',
+      content: 'Olá! Sou o Assistente de IA do SAF. Posso responder sobre licenças Canva, escolas, usuários e métricas. Como posso ajudar?',
       role: 'assistant',
       timestamp: new Date()
     }
@@ -97,7 +97,7 @@ const FloatingAIChat = () => {
       console.error("Erro ao processar mensagem:", error);
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.",
+        content: "Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.",
         role: 'assistant',
         timestamp: new Date()
       };
@@ -125,7 +125,7 @@ const FloatingAIChat = () => {
       }
 
       // Se a intenção é clara, mas a busca falhou, retorna uma mensagem de erro específica
-      return "Desculpe, não consegui encontrar a escola ou o dado específico que você procurou na base de dados. Tente refinar sua busca ou perguntar o nome exato da escola.";
+      return "Não encontrei a escola ou o dado específico na base. Tente refinar a busca ou perguntar o nome exato da escola.";
     }
 
     return null; // Não é uma consulta de dados de escola, deixa a IA tratar
@@ -159,23 +159,23 @@ const FloatingAIChat = () => {
     const lowerInput = input.toLowerCase();
     
     if (lowerInput.includes('ticket') || lowerInput.includes('chamado')) {
-      return `Entendi que você está perguntando sobre tickets. No momento temos vários tickets pendentes. Os mais críticos são aqueles com mais de 15 dias. Gostaria que eu liste os tickets mais urgentes?`;
+      return `Você perguntou sobre tickets. Temos vários pendentes, sendo os mais críticos aqueles com mais de 15 dias. Gostaria de listar os mais urgentes?`;
     }
     
     if (lowerInput.includes('escola') || lowerInput.includes('unidade')) {
-      return `Posso ajudar com informações sobre escolas! No sistema temos dados de várias unidades. Você gostaria de saber sobre alguma escola específica? Posso mostrar informações como contatos ou histórico de atendimentos.`;
+      return `Posso fornecer informações sobre escolas! Qual unidade específica você gostaria de consultar (contatos, histórico, etc.)?`;
     }
     
     if (lowerInput.includes('texto') || lowerInput.includes('melhorar') || lowerInput.includes('escrever')) {
-      return `Posso ajudar a melhorar seus textos de atendimento! Basta me enviar o texto que você quer melhorar e eu posso torná-lo mais educado, acolhedor ou profissional. Qual texto você gostaria de melhorar?`;
+      return `Posso aprimorar seus textos de atendimento (educado, acolhedor ou profissional). Qual texto você gostaria de melhorar?`;
     }
     
     if (lowerInput.includes('relatório') || lowerInput.includes('dashboard')) {
-      return `Para relatórios e dashboards, posso ajudar explicando os dados ou sugerindo análises. Qual métrica específica você gostaria de entender melhor? Temos dados de vouchers, licenças, atendimentos e muito mais.`;
+      return `Para relatórios e dashboards, posso explicar dados ou sugerir análises. Qual métrica (vouchers, licenças, atendimentos, etc.) você gostaria de entender melhor?`;
     }
     
     if (lowerInput.includes('licença') || lowerInput.includes('canva')) {
-      return `Posso ajudar com informações sobre licenças Canva! Temos dados atualizados sobre:
+      return `Posso fornecer informações sobre licenças Canva, como:
 • Licenças ativas por escola
 • Usuários conformes e não conformes
 • Domínios autorizados
@@ -184,7 +184,7 @@ const FloatingAIChat = () => {
 Qual informação específica você gostaria?`;
     }
     
-    return `Entendi sua pergunta sobre "${input}". Como assistente do Maple Bear SAF, posso ajudar com:
+    return `Entendi sua pergunta sobre "${input}". Como Assistente SAF, posso ajudar com:
     
 • Informações sobre licenças Canva
 • Dados de escolas e franquias
@@ -192,7 +192,7 @@ Qual informação específica você gostaria?`;
 • Relatórios e métricas
 • Suporte geral
 
-Como posso ser mais específico para ajudá-lo?`;
+Como posso ser mais específico?`;
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -222,7 +222,7 @@ Como posso ser mais específico para ajudá-lo?`;
         <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
           <div className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
-            <CardTitle className="text-sm">Assistente IA - Maple Bear SAF</CardTitle>
+            <CardTitle className="text-sm">Assistente SAF</CardTitle>
             <Badge variant="default" className="text-xs">
               ChatGPT 4.1-mini
             </Badge>

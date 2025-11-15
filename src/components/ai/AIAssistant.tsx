@@ -42,7 +42,7 @@ const AIAssistant = () => {
   // Função para consultar dados de escolas
   const querySchoolData = async (message: string) => {
     if (!schoolDataLoaded) {
-      toast.error("Dados das escolas ainda estão sendo carregados");
+        toast.error("Aguarde: os dados das escolas ainda estão sendo carregados.");
       return;
     }
 
@@ -63,7 +63,7 @@ const AIAssistant = () => {
       }
 
       if (!schoolInfo) {
-        toast.error("Não foi possível encontrar a escola específica. Tente o nome completo.");
+        toast.error("Escola não encontrada. Tente o nome completo.");
         return;
       }
 
@@ -77,7 +77,7 @@ const AIAssistant = () => {
       
       setResponses(prev => [aiResponse, ...prev]);
       setInputText('');
-      toast.success("Dados da escola recuperados com sucesso!");
+      toast.success("Dados da escola recuperados.");
       
     } catch (error: any) {
       console.error('Erro ao consultar dados das escolas:', error);
@@ -142,17 +142,17 @@ Departamento de Atendimento`;
     
     setResponses(prev => [response, ...prev]);
     setLoading(false);
-    toast.success("Texto melhorado com sucesso!");
+    toast.success("Texto aprimorado.");
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Texto copiado para a área de transferência!");
+    toast.success("Texto copiado.");
   };
 
   const clearHistory = () => {
     setResponses([]);
-    toast.success("Histórico limpo!");
+    toast.success("Histórico limpo.");
   };
 
   return (
@@ -161,10 +161,10 @@ Departamento de Atendimento`;
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Bot className="h-8 w-8 text-primary" />
-            Assistente de IA
+Assistente de Texto e Dados
           </h1>
           <p className="text-muted-foreground">
-            Torne seu atendimento mais educado e acolhedor
+Reescreva textos e consulte dados de escolas rapidamente.
           </p>
         </div>
         {responses.length > 0 && (
@@ -178,14 +178,14 @@ Departamento de Atendimento`;
       {/* Interface de Input */}
       <Card>
         <CardHeader>
-          <CardTitle>Melhore seu texto ou Consulte Escolas</CardTitle>
+          <CardTitle>Aprimorar Texto ou Consultar Escola</CardTitle>},{find:
           <CardDescription>
-            Digite seu texto para melhorar ou o nome de uma escola para consultar
+            Digite o texto para aprimorar ou o nome da escola para consulta.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
-            placeholder="Digite o texto que você gostaria de melhorar ou o nome de uma escola (ex: 'escola São Roque')..."
+            placeholder="Digite o texto que quer aprimorar ou o nome da escola (ex.: 'Escola São Roque')."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             rows={4}
@@ -198,7 +198,7 @@ Departamento de Atendimento`;
               variant="outline"
             >
               <Heart className="mr-2 h-4 w-4" />
-              Mais Educado
+Educado (Cortesia)
             </Button>
             
             <Button
@@ -207,7 +207,7 @@ Departamento de Atendimento`;
               variant="outline"
             >
               <Smile className="mr-2 h-4 w-4" />
-              Mais Acolhedor
+Acolhedor (Empatia)
             </Button>
             
             <Button
@@ -216,7 +216,7 @@ Departamento de Atendimento`;
               variant="outline"
             >
               <Send className="mr-2 h-4 w-4" />
-              Mais Profissional
+Profissional (Formal)
             </Button>
 
             <Button
@@ -225,7 +225,7 @@ Departamento de Atendimento`;
               variant="default"
             >
               <Bot className="mr-2 h-4 w-4" />
-              Consultar Escola
+Buscar Dados da Escola
             </Button>
           </div>
           
@@ -241,21 +241,21 @@ Departamento de Atendimento`;
       {/* Histórico de Respostas */}
       {responses.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Histórico de Interações</h2>
+          <h2 className="text-2xl font-semibold">Histórico</h2>
           
           {responses.map((response) => (
             <Card key={response.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">
-                    {response.type === 'school_query' ? 'Consulta de Escolas' : 'Texto Melhorado'}
+                    {response.type === 'school_query' ? 'Consulta de Escola' : 'Texto Aprimorado'}
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">
                       {response.type === 'polite' && 'Educado'}
                       {response.type === 'welcoming' && 'Acolhedor'}
                       {response.type === 'professional' && 'Profissional'}
-                      {response.type === 'school_query' && 'Dados Escola'}
+                      {response.type === 'school_query' && 'Consulta de Dados'}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {response.timestamp}
@@ -267,7 +267,7 @@ Departamento de Atendimento`;
                 {/* Pergunta/Texto Original */}
                 <div>
                   <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                    {response.type === 'school_query' ? 'Sua Consulta:' : 'Texto Original:'}
+                    {response.type === 'school_query' ? 'Consulta:' : 'Original:'}
                   </h4>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm">{response.originalText}</p>
@@ -277,8 +277,8 @@ Departamento de Atendimento`;
                 {/* Resposta da IA */}
                 <div>
                   <h4 className="font-medium text-sm text-success mb-2">
-                    {response.type === 'school_query' ? 'Dados Encontrados:' : 'Texto Melhorado:'}
-                  </h4>
+                    {response.type === 'school_query' ? 'Resultado:' : 'Aprimorado:'}
+                  </h4>},{find:
                   <div className="p-3 bg-success-bg border border-success/20 rounded-lg">
                     <p className="text-sm whitespace-pre-line">{response.improvedText}</p>
                   </div>
@@ -290,7 +290,7 @@ Departamento de Atendimento`;
                   onClick={() => copyToClipboard(response.improvedText)}
                 >
                   <Copy className="mr-2 h-4 w-4" />
-                  Copiar Resposta
+                  Copiar Texto
                 </Button>
               </CardContent>
             </Card>
@@ -301,25 +301,25 @@ Departamento de Atendimento`;
       {/* Dicas de Uso */}
       <Card>
         <CardHeader>
-          <CardTitle>Dicas de Uso</CardTitle>
+          <CardTitle>Guia Rápido</CardTitle>},{find:
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
               <Heart className="h-4 w-4 text-primary mt-0.5" />
-              <span><strong>Mais Educado:</strong> Adiciona formalidade e cortesia ao texto</span>
+              <span><strong>Educado:</strong> Adiciona cortesia e formalidade ao texto.</span>
             </li>
             <li className="flex items-start gap-2">
               <Smile className="h-4 w-4 text-primary mt-0.5" />
-              <span><strong>Mais Acolhedor:</strong> Torna o texto mais caloroso e próximo</span>
+              <span><strong>Acolhedor:</strong> Torna o texto mais caloroso e empático.</span>
             </li>
             <li className="flex items-start gap-2">
               <Send className="h-4 w-4 text-primary mt-0.5" />
-              <span><strong>Mais Profissional:</strong> Adequa o texto para contextos corporativos</span>
+              <span><strong>Profissional:</strong> Adequa o texto para comunicação formal.</span>
             </li>
             <li className="flex items-start gap-2">
               <Bot className="h-4 w-4 text-primary mt-0.5" />
-              <span><strong>Consultar Escola:</strong> Busca todos os dados da escola na planilha unificada</span>
+              <span><strong>Buscar Dados da Escola:</strong> Consulta dados da escola na base unificada.</span>
             </li>
           </ul>
         </CardContent>
