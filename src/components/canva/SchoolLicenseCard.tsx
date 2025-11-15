@@ -271,7 +271,7 @@ export const SchoolLicenseCard = ({
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <div className="w-2 h-2 bg-destructive rounded-full"></div>}],path:
+                            <div className="w-2 h-2 bg-destructive rounded-full"></div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>{getNonComplianceReason(user.email)}</p>
