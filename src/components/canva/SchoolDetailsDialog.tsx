@@ -114,7 +114,7 @@ export const SchoolDetailsDialog = ({
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Não Conformes:</span>
-                      <span className={nonCompliantUsers.length > 0 ? 'text-red-600' : 'text-green-600'}>
+                      <span className={nonCompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
                         {nonCompliantUsers.length}
                       </span>
                     </div>
@@ -155,7 +155,7 @@ export const SchoolDetailsDialog = ({
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger>
-                                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                    <div className="w-2 h-2 bg-destructive rounded-full"></div>
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <p>{getNonComplianceReason(user.email)}</p>
@@ -211,7 +211,7 @@ export const SchoolDetailsDialog = ({
                     </div>
                   ) : (
                     justifications.map((justification) => (
-                      <Card key={justification.id} className="border-l-4 border-l-blue-500">
+                      <Card key={justification.id} className="border-l-4 border-l-primary">
                         <CardContent className="p-4">
                           <div className="space-y-3">
                             {/* Header */}
@@ -239,16 +239,16 @@ export const SchoolDetailsDialog = ({
                             {/* User Change Details */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="space-y-2">
-                                <h4 className="text-sm font-medium text-red-600">Usuário Anterior:</h4>
-                                <div className="text-sm space-y-1 bg-red-50 p-2 rounded">
+                                <h4 className="text-sm font-medium text-destructive">Usuário Anterior:</h4>
+                                <div className="text-sm space-y-1 bg-destructive/5 p-2 rounded">
                                   <div><strong>Nome:</strong> {justification.oldUser.name}</div>
                                   <div><strong>E-mail:</strong> {justification.oldUser.email}</div>
                                   <div><strong>Função:</strong> {justification.oldUser.role}</div>
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <h4 className="text-sm font-medium text-green-600">Novo Usuário:</h4>
-                                <div className="text-sm space-y-1 bg-green-50 p-2 rounded">
+                                <h4 className="text-sm font-medium text-success">Novo Usuário:</h4>
+                                <div className="text-sm space-y-1 bg-success/5 p-2 rounded">
                                   <div><strong>Nome:</strong> {justification.newUser.name}</div>
                                   <div><strong>E-mail:</strong> {justification.newUser.email}</div>
                                   <div><strong>Função:</strong> {justification.newUser.role}</div>

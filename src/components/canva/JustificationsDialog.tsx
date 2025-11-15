@@ -92,7 +92,7 @@ export const JustificationsDialog = ({
                     {/* User Change Details */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <h4 className="text-sm font-medium text-red-600">Usuário Anterior:</h4>
+                        <h4 className="text-sm font-medium text-destructive">Usuário Anterior:</h4>
                         <div className="text-sm space-y-1">
                           <div><strong>Nome:</strong> {justification.oldUser.name}</div>
                           <div><strong>E-mail:</strong> {justification.oldUser.email}</div>
@@ -100,7 +100,7 @@ export const JustificationsDialog = ({
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <h4 className="text-sm font-medium text-green-600">Novo Usuário:</h4>
+                        <h4 className="text-sm font-medium text-success">Novo Usuário:</h4>
                         <div className="text-sm space-y-1">
                           <div><strong>Nome:</strong> {justification.newUser.name}</div>
                           <div><strong>E-mail:</strong> {justification.newUser.email}</div>

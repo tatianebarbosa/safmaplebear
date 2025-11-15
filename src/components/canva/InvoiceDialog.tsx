@@ -128,10 +128,10 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
                 value={formData.invoiceNumber}
                 onChange={(e) => handleChange('invoiceNumber', e.target.value)}
                 placeholder="03398-32532777"
-                className={errors.invoiceNumber ? 'border-red-500' : ''}
+                className={errors.invoiceNumber ? 'border-destructive' : ''}
               />
               {errors.invoiceNumber && (
-                <p className="text-sm text-red-500">{errors.invoiceNumber}</p>
+                <p className="text-sm text-destructive">{errors.invoiceNumber}</p>
               )}
             </div>
 
@@ -142,10 +142,10 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
                 type="date"
                 value={formData.date}
                 onChange={(e) => handleChange('date', e.target.value)}
-                className={errors.date ? 'border-red-500' : ''}
+                className={errors.date ? 'border-destructive' : ''}
               />
               {errors.date && (
-                <p className="text-sm text-red-500">{errors.date}</p>
+                <p className="text-sm text-destructive">{errors.date}</p>
               )}
             </div>
           </div>
@@ -160,10 +160,10 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
                 value={formData.amount}
                 onChange={(e) => handleChange('amount', e.target.value)}
                 placeholder="289.90"
-                className={errors.amount ? 'border-red-500' : ''}
+                className={errors.amount ? 'border-destructive' : ''}
               />
               {errors.amount && (
-                <p className="text-sm text-red-500">{errors.amount}</p>
+                <p className="text-sm text-destructive">{errors.amount}</p>
               )}
             </div>
 
@@ -188,10 +188,10 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
               value={formData.description}
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Canva Pro"
-              className={errors.description ? 'border-red-500' : ''}
+              className={errors.description ? 'border-destructive' : ''}
             />
             {errors.description && (
-              <p className="text-sm text-red-500">{errors.description}</p>
+              <p className="text-sm text-destructive">{errors.description}</p>
             )}
           </div>
 

@@ -164,15 +164,15 @@ const CanvaDashboard = () => {
 
           {/* Compliance Alert */}
           {overviewData.nonCompliantUsers > 0 && (
-            <Card className="border-red-200 bg-red-50 shadow-sm">
+            <Card className="border-destructive/20 bg-destructive/5 shadow-sm">
               <CardHeader>
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
+                  <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
                   <div className="space-y-1">
-                    <CardTitle className="text-base font-semibold text-red-600">
+                    <CardTitle className="text-base font-semibold text-destructive">
                       Alerta de Conformidade - Alto Risco
                     </CardTitle>
-                    <CardDescription className="text-sm text-red-500">
+                    <CardDescription className="text-sm text-destructive">
                       {overviewData.nonCompliantUsers} usuários com domínios não autorizados identificados
                     </CardDescription>
                   </div>
@@ -182,7 +182,7 @@ const CanvaDashboard = () => {
                 <div className="space-y-3">
                   <div className="flex flex-wrap gap-2">
                     {(overviewData.topNonCompliantDomains || []).slice(0, 5).map(({ domain, count }) => (
-                      <span key={domain} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500 text-white">
+                      <span key={domain} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive text-destructive-foreground">
                         {domain} ({count})
                       </span>
                     ))}
@@ -225,7 +225,7 @@ const CanvaDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Funcionalidades Avançadas</CardTitle>
-              <CardDescription className="text-sm text-red-500">
+              <CardDescription className="text-sm text-destructive">
                 Ferramentas para gestão avançada do Canva
               </CardDescription>
             </CardHeader>

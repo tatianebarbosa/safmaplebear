@@ -112,10 +112,10 @@ export const UserDialog = ({
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="Nome completo"
-              className={errors.name ? 'border-red-500' : ''}
+              className={errors.name ? 'border-destructive' : ''}
             />
             {errors.name && (
-              <p className="text-sm text-red-500">{errors.name}</p>
+              <p className="text-sm text-destructive">{errors.name}</p>
             )}
           </div>
 
@@ -127,10 +127,10 @@ export const UserDialog = ({
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
               placeholder="usuario@maplebear.com.br"
-              className={errors.email ? 'border-red-500' : ''}
+              className={errors.email ? 'border-destructive' : ''}
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email}</p>
+              <p className="text-sm text-destructive">{errors.email}</p>
             )}
             {formData.email && (
               <div className="flex items-center gap-2">

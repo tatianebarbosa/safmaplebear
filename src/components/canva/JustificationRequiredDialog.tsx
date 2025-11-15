@@ -172,7 +172,7 @@ export const JustificationRequiredDialog = ({
                   aria-expanded={openCombobox}
                   className={cn(
                     "w-full justify-between",
-                    errors.performedBy ? 'border-red-500' : ''
+                    errors.performedBy ? 'border-destructive' : ''
                   )}
                 >
                   {selectedMember
@@ -220,7 +220,7 @@ export const JustificationRequiredDialog = ({
               </PopoverContent>
             </Popover>
             {errors.performedBy && (
-              <p className="text-sm text-red-500">{errors.performedBy}</p>
+              <p className="text-sm text-destructive">{errors.performedBy}</p>
             )}
           </div>
 
@@ -237,10 +237,10 @@ export const JustificationRequiredDialog = ({
               }}
               placeholder="Descreva o motivo para esta alteração de licença..."
               rows={4}
-              className={errors.reason ? 'border-red-500' : ''}
+              className={errors.reason ? 'border-destructive' : ''}
             />
             {errors.reason && (
-              <p className="text-sm text-red-500">{errors.reason}</p>
+              <p className="text-sm text-destructive">{errors.reason}</p>
             )}
           </div>
 

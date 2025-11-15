@@ -109,16 +109,16 @@ export const CostManagementDashboard = () => {
         <div className="space-y-2">
           {alerts.map((alert) => (
             <Card key={alert.id} className={`border-l-4 ${
-              alert.severity === 'high' ? 'border-l-red-500 bg-red-50' :
-              alert.severity === 'medium' ? 'border-l-yellow-500 bg-yellow-50' :
-              'border-l-blue-500 bg-blue-50'
+              alert.severity === 'high' ? 'border-l-destructive bg-destructive/5' :
+              alert.severity === 'medium' ? 'border-l-warning bg-warning/5' :
+              'border-l-primary bg-primary/5'
             }`}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className={`h-4 w-4 ${
-                    alert.severity === 'high' ? 'text-red-600' :
-                    alert.severity === 'medium' ? 'text-yellow-600' :
-                    'text-blue-600'
+                    alert.severity === 'high' ? 'text-destructive' :
+                    alert.severity === 'medium' ? 'text-warning' :
+                    'text-primary'
                   }`} />
                   <span className="font-medium">{alert.message}</span>
                 </div>

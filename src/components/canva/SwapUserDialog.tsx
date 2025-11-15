@@ -171,10 +171,10 @@ export const SwapUserDialog = ({
               value={formData.newName}
               onChange={(e) => handleChange('newName', e.target.value)}
               placeholder="Nome completo do novo usuário"
-              className={errors.newName ? 'border-red-500' : ''}
+              className={errors.newName ? 'border-destructive' : ''}
             />
             {errors.newName && (
-              <p className="text-sm text-red-500">{errors.newName}</p>
+              <p className="text-sm text-destructive">{errors.newName}</p>
             )}
           </div>
 
@@ -186,10 +186,10 @@ export const SwapUserDialog = ({
               value={formData.newEmail}
               onChange={(e) => handleChange('newEmail', e.target.value)}
               placeholder="usuario@maplebear.com.br"
-              className={errors.newEmail ? 'border-red-500' : ''}
+              className={errors.newEmail ? 'border-destructive' : ''}
             />
             {errors.newEmail && (
-              <p className="text-sm text-red-500">{errors.newEmail}</p>
+              <p className="text-sm text-destructive">{errors.newEmail}</p>
             )}
             {formData.newEmail && (
               <div className="flex items-center gap-2">
@@ -227,10 +227,10 @@ export const SwapUserDialog = ({
               onChange={(e) => handleChange('reason', e.target.value)}
               placeholder="Descreva o motivo da substituição do usuário..."
               rows={3}
-              className={errors.reason ? 'border-red-500' : ''}
+              className={errors.reason ? 'border-destructive' : ''}
             />
             {errors.reason && (
-              <p className="text-sm text-red-500">{errors.reason}</p>
+              <p className="text-sm text-destructive">{errors.reason}</p>
             )}
           </div>
 

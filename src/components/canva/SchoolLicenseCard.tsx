@@ -87,17 +87,17 @@ export const SchoolLicenseCard = ({
 
   const getLicensesBadgeColor = () => {
     switch (licenseStatus) {
-      case 'Disponível': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Completo': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'Excedido': return 'bg-red-100 text-red-800 border-red-200';
+      case 'Disponível': return 'bg-success/10 text-success-foreground border-success/20';
+      case 'Completo': return 'bg-warning/10 text-warning-foreground border-warning/20';
+      case 'Excedido': return 'bg-destructive/10 text-destructive-foreground border-destructive/20';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getProgressColor = () => {
-    if (school.usedLicenses > school.totalLicenses) return 'bg-red-500';
-    if (school.usedLicenses === school.totalLicenses) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (school.usedLicenses > school.totalLicenses) return 'bg-destructive';
+    if (school.usedLicenses === school.totalLicenses) return 'bg-warning';
+    return 'bg-success';
   };
 
   const handleAddUser = (userData: any) => {
@@ -243,15 +243,15 @@ export const SchoolLicenseCard = ({
               <span>{school.users.length} usuários</span>
             </div>
             {nonCompliantUsers.length > 0 && (
-              <div className="flex items-center gap-1 text-destructive/80">
+              <div className="flex items-center gap-1 text-destructive">
                 <AlertTriangle className="h-4 w-4" />
                 <span>{nonCompliantUsers.length} fora da política</span>
               </div>
             )}
             {school.hasRecentJustifications && (
               <div className="flex items-center gap-1 text-muted-foreground">
-                <Paperclip className="h-4 w-4 text-blue-600" />
-                <span className="text-blue-600">Justificativas</span>
+                <Paperclip className="h-4 w-4 text-primary" />
+                <span className="text-primary">Justificativas</span>
               </div>
             )}
           </div>
@@ -263,14 +263,14 @@ export const SchoolLicenseCard = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1">
                     <span className="text-sm font-medium truncate">{user.name}</span>
-                    <Badge variant={user.isCompliant ? "secondary" : "destructive"} className="text-xs font-medium bg-destructive/10 text-destructive border-destructive/20">
+                    <Badge variant={user.isCompliant ? "secondary" : "destructive"}>
                       {user.role}
                     </Badge>
                     {!user.isCompliant && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <div className="w-2 h-2 bg-destructive rounded-full"></div>}],path:
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>{getNonComplianceReason(user.email)}</p>

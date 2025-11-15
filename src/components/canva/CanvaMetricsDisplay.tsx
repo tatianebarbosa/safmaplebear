@@ -85,11 +85,11 @@ export const CanvaMetricsDisplay: React.FC = () => {
     const changeColor = change === undefined || change === 0
       ? 'text-muted-foreground'
       : change > 0
-        ? 'text-green-600'
-        : 'text-red-600';
+        ? 'text-success'
+        : 'text-destructive';
 
-    const iconColor = variant === 'destructive' ? 'text-red-500' :
-                      variant === 'success' ? 'text-green-500' :
+    const iconColor = variant === 'destructive' ? 'text-destructive' :
+                      variant === 'success' ? 'text-success' :
                       variant === 'warning' ? 'text-yellow-500' :
                       'text-primary';
 
@@ -131,7 +131,7 @@ export const CanvaMetricsDisplay: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="border-primary/20 bg-primary/5">
+      <Card className="border-border/40 bg-card">
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="space-y-1">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
@@ -148,9 +148,9 @@ export const CanvaMetricsDisplay: React.FC = () => {
       </Card>
 
       {error && (
-        <div className="flex items-center p-4 bg-red-50 border border-red-200 rounded-lg">
-          <AlertTriangle className="h-5 w-5 text-red-600 mr-3" />
-          <p className="text-sm text-red-800">⚠️ {error}</p>
+        <div className="flex items-center p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
+          <AlertTriangle className="h-5 w-5 text-destructive mr-3" />
+          <p className="text-sm text-destructive">⚠️ {error}</p>
         </div>
       )}
 

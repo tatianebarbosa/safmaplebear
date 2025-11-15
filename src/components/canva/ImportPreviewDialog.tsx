@@ -97,10 +97,10 @@ export const ImportPreviewDialog = ({
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-red-600">Inválidos</CardTitle>
+                <CardTitle className="text-sm text-destructive">Inválidos</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">{invalidItems.length}</div>
+                <div className="text-2xl font-bold text-destructive">{invalidItems.length}</div>
                 <div className="text-xs text-muted-foreground">serão ignorados</div>
               </CardContent>
             </Card>
@@ -137,16 +137,16 @@ export const ImportPreviewDialog = ({
                     <div
                       key={index}
                       className={`p-3 border rounded-lg ${
-                        item.valid ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+                        item.valid ? 'border-success/20 bg-success/5' : 'border-destructive/20 bg-destructive/5'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="space-y-1 flex-1">
                           <div className="flex items-center gap-2">
                             {item.valid ? (
-                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <CheckCircle className="h-4 w-4 text-success" />
                             ) : (
-                              <AlertTriangle className="h-4 w-4 text-red-600" />
+                              <AlertTriangle className="h-4 w-4 text-destructive" />
                             )}
                             <span className="font-medium text-sm">{item.name}</span>
                             <Badge variant={item.validRole ? "default" : "destructive"} className="text-xs">
@@ -157,7 +157,7 @@ export const ImportPreviewDialog = ({
                             {item.email}
                           </div>
                           <div className="text-xs">
-                            <span className={item.schoolFound ? 'text-green-600' : 'text-red-600'}>
+                            <span className={item.schoolFound ? 'text-success' : 'text-destructive'}>
                               {item.schoolName}
                             </span>
                           </div>
@@ -195,15 +195,15 @@ export const ImportPreviewDialog = ({
 
           {/* Warnings */}
           {invalidItems.length > 0 && (
-            <Card className="border-yellow-200 bg-yellow-50">
+            <Card className="border-warning/20 bg-warning/5">
               <CardHeader>
-                <CardTitle className="text-sm text-yellow-800 flex items-center gap-2">
+                <CardTitle className="text-sm text-warning-foreground flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4" />
                   Atenção
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-yellow-800">
+                <p className="text-sm text-warning-foreground">
                   {invalidItems.length} registro(s) contém(têm) erros e não será(ão) importado(s). 
                   Apenas {validItems.length} registro(s) válido(s) será(ão) processado(s).
                 </p>

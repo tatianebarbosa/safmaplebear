@@ -26,7 +26,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
 
   if (nonCompliantUsers.length === 0) {
     return (
-      <Card className="border-success/20 bg-success/5">
+      <Card className="border-success/20 bg-card">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-success" />
@@ -39,7 +39,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
   }
 
   return (
-    <Card className={`border-${risk.color === 'destructive' ? 'destructive' : 'warning'}/20 bg-${risk.color === 'destructive' ? 'destructive' : 'warning'}/5`}>
+    <Card className={`border-${risk.color === 'destructive' ? 'destructive' : 'warning'}/20 bg-card`}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -86,14 +86,13 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
                 .sort(([,a], [,b]) => b - a)
                 .slice(0, 5)
                 .map(([domain, count]) => (
-                  <Badge key={domain} variant="outline" className="text-xs">
-                    {domain} ({count})
+                  <Badge key={do<Badge variant="destructive" className="text-xs">                    {domain} ({count})
                   </Badge>
                 ))}
             </div>
           </div>
 
-          <Button onClick={onViewDetails} variant="outline" size="sm" className="w-full">
+          <Button onClick={onViewDetails} variant="destructive" size="sm" className="w-full">
             Ver Detalhes dos Usuários Não Conformes
           </Button>
         </div>
