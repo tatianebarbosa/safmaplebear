@@ -163,19 +163,19 @@ export const SchoolLicenseManagement = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Gestão de Licenças por Escola</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-xl font-medium">Gestão de Licenças por Escola</h2>
+          <p className="text-sm text-muted-foreground">
             Gerencie usuários, licenças e conformidade das escolas
           </p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatsCard
           title="Total de Escolas"
           value={totalSchools.toString()}
@@ -220,7 +220,7 @@ export const SchoolLicenseManagement = () => {
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-3">
             {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -281,7 +281,7 @@ export const SchoolLicenseManagement = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2 mt-4 justify-end">
+          <div className="flex flex-wrap gap-2 mt-3 justify-end">
             <Button variant="outline" onClick={handleExport} className="gap-2">
               <Download className="h-4 w-4" />
               Exportar CSV
@@ -302,7 +302,7 @@ export const SchoolLicenseManagement = () => {
       </Card>
 
       {/* Schools Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredSchools.map((school) => (
           <SchoolLicenseCard
             key={school.id}
@@ -316,7 +316,7 @@ export const SchoolLicenseManagement = () => {
       {filteredSchools.length === 0 && (
         <Card>
           <CardContent className="text-center py-8">
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Nenhuma escola encontrada com os filtros aplicados.
             </p>
           </CardContent>

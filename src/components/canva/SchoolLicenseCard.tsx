@@ -193,14 +193,14 @@ export const SchoolLicenseCard = ({
 
   return (
     <>
-      <Card className="w-full">
+      <Card className="w-full rounded-xl shadow-sm border-border/40">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <CardTitle className="text-lg">{school.name}</CardTitle>
+              <CardTitle className="text-base font-semibold">{school.name}</CardTitle>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 {school.city && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 text-muted-foreground">
                     <MapPin className="h-3 w-3" />
                     {school.city}
                   </div>
@@ -210,7 +210,7 @@ export const SchoolLicenseCard = ({
                 </Badge>
               </div>
             </div>
-            <Badge variant={getStatusBadgeVariant(school.status)}>
+            <Badge variant="outline" className="text-xs font-medium border-border/50 bg-background/50">
               {school.status}
             </Badge>
           </div>
@@ -220,7 +220,7 @@ export const SchoolLicenseCard = ({
           {/* License Status */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className={`text-sm font-medium px-2 py-1 rounded border ${getLicensesBadgeColor()}`}>
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${getLicensesBadgeColor()}`}>
                 {school.usedLicenses}/{school.totalLicenses} Licenças
                 {licenseStatus === 'Excedido' && ' (Excesso)'}
               </span>
@@ -228,9 +228,9 @@ export const SchoolLicenseCard = ({
                 {utilizationPercent.toFixed(0)}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-muted rounded-full h-1.5">
               <div 
-                className={`h-2 rounded-full transition-all ${getProgressColor()}`}
+                className={`h-1.5 rounded-full transition-all ${getProgressColor()}`}
                 style={{ width: `${Math.min(100, utilizationPercent)}%` }}
               />
             </div>
@@ -238,18 +238,18 @@ export const SchoolLicenseCard = ({
 
           {/* Indicators */}
           <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 text-muted-foreground">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span>{school.users.length} usuários</span>
             </div>
             {nonCompliantUsers.length > 0 && (
-              <div className="flex items-center gap-1 text-red-600">
+              <div className="flex items-center gap-1 text-destructive/80">
                 <AlertTriangle className="h-4 w-4" />
                 <span>{nonCompliantUsers.length} fora da política</span>
               </div>
             )}
             {school.hasRecentJustifications && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 text-muted-foreground">
                 <Paperclip className="h-4 w-4 text-blue-600" />
                 <span className="text-blue-600">Justificativas</span>
               </div>
@@ -259,11 +259,10 @@ export const SchoolLicenseCard = ({
           {/* Users List */}
           <div className="space-y-2 max-h-40 overflow-y-auto">
             {school.users.slice(0, 5).map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+              <div key={user.<div className="flex items-center justify-between p-2 border-b border-border/50 last:border-b-0">                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1">
                     <span className="text-sm font-medium truncate">{user.name}</span>
-                    <Badge variant={user.isCompliant ? "default" : "destructive"} className="text-xs">
+                    <Badge variant={user.isCompliant ? "secondary" : "destructive"} className="text-xs font-medium bg-destructive/10 text-destructive border-destructive/20">
                       {user.role}
                     </Badge>
                     {!user.isCompliant && (
@@ -279,11 +278,11 @@ export const SchoolLicenseCard = ({
                       </TooltipProvider>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground truncate">
+                  <div className="text-xs text-muted-foreground truncate ml-1">
                     {user.email}
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 text-muted-foreground">
                   <Button
                     size="sm"
                     variant="ghost"

@@ -76,7 +76,7 @@ const CanvaDashboard = () => {
   if (!overviewData) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">Erro ao carregar dados do Canva.</p>
+        <p className="text-sm text-muted-foreground">Erro ao carregar dados do Canva.</p>
         <Button onClick={loadOfficialData} className="mt-4">
           Tentar Novamente
         </Button>
@@ -85,12 +85,12 @@ const CanvaDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-4 space-y-4">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestão Canva</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold">Gestão Canva</h1>
+          <p className="text-sm text-muted-foreground">
             Dados oficiais sincronizados • {overviewData.totalUsers} usuários ativos
           </p>
         </div>
@@ -116,13 +116,13 @@ const CanvaDashboard = () => {
 
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="w-full mt-6">
-        <TabsList className="flex w-full overflow-x-auto border-b">
-          <TabsTrigger value="overview" className="whitespace-nowrap">Visão Geral</TabsTrigger>
-          <TabsTrigger value="schools" className="whitespace-nowrap">Escolas</TabsTrigger>
-          <TabsTrigger value="usage" className="whitespace-nowrap">Usos</TabsTrigger>
-          <TabsTrigger value="costs" className="whitespace-nowrap">Custos</TabsTrigger>
-          <TabsTrigger value="advanced" className="whitespace-nowrap">Avançado</TabsTrigger>
+      <Tabs defaultValue="overview" className="w-full mt-4">
+        <TabsList className="flex w-full overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50">
+          <TabsTrigger value="overview" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Visão Geral</TabsTrigger>
+          <TabsTrigger value="schools" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Escolas</TabsTrigger>
+          <TabsTrigger value="usage" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Usos</TabsTrigger>
+          <TabsTrigger value="costs" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Custos</TabsTrigger>
+          <TabsTrigger value="advanced" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Avançado</TabsTrigger>
 </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -164,15 +164,15 @@ const CanvaDashboard = () => {
 
           {/* Compliance Alert */}
           {overviewData.nonCompliantUsers > 0 && (
-            <Card className="border-destructive/20 bg-destructive/5">
+            <Card className="border-red-200 bg-red-50 shadow-sm">
               <CardHeader>
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+                  <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
                   <div className="space-y-1">
-                    <CardTitle className="text-destructive">
+                    <CardTitle className="text-base font-semibold text-red-600">
                       Alerta de Conformidade - Alto Risco
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm text-red-500">
                       {overviewData.nonCompliantUsers} usuários com domínios não autorizados identificados
                     </CardDescription>
                   </div>
@@ -182,7 +182,7 @@ const CanvaDashboard = () => {
                 <div className="space-y-3">
                   <div className="flex flex-wrap gap-2">
                     {(overviewData.topNonCompliantDomains || []).slice(0, 5).map(({ domain, count }) => (
-                      <span key={domain} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-destructive-foreground">
+                      <span key={domain} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500 text-white">
                         {domain} ({count})
                       </span>
                     ))}
@@ -193,7 +193,7 @@ const CanvaDashboard = () => {
                     )}
                   </div>
                   <Button 
-                    variant="destructive" 
+                    variant="destructive" size="sm" 
                     onClick={() => toast.info('Navegando para usuários não conformes')}
                     className="mt-4"
                   >
@@ -225,12 +225,12 @@ const CanvaDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Funcionalidades Avançadas</CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm text-red-500">
                 Ferramentas para gestão avançada do Canva
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Em desenvolvimento...
               </p>
             </CardContent>

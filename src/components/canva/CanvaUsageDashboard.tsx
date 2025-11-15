@@ -136,9 +136,9 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-4">
         <div>
-          <h2 className="text-2xl font-bold">Análise de Uso do Canva</h2>
+          <h2 className="text-2xl font-semibold">Análise de Uso do Canva</h2>
           <p className="text-muted-foreground">
             Acompanhe o desempenho e engajamento das escolas
           </p>
@@ -146,14 +146,14 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
+      <Card className="rounded-xl shadow-sm border-border/40">
+        <CardHeader className="pb-3">
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Período</label>
+            <div className="space-y-1">
+              <label className="text-xs uppercase tracking-wide text-muted-foreground">Período</label>
               <Select 
                 value={filters.period} 
                 onValueChange={(value: any) => setFilters(prev => ({ ...prev, period: value }))}
@@ -169,8 +169,8 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Cluster</label>
+            <div className="space-y-1">
+              <label className="text-xs uppercase tracking-wide text-muted-foreground">Cluster</label>
               <Select 
                 value={filters.cluster || 'all'} 
                 onValueChange={(value) => setFilters(prev => ({ 
@@ -192,8 +192,8 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Escola</label>
+            <div className="space-y-1">
+              <label className="text-xs uppercase tracking-wide text-muted-foreground">Escola</label>
               <Select 
                 value={filters.school || 'all'} 
                 onValueChange={(value) => setFilters(prev => ({ 
@@ -219,7 +219,7 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
       </Card>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 pt-4">
         <StatsCard
           title="Designs"
           value={totals.designs.toLocaleString()}
@@ -249,10 +249,10 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
       {/* Charts */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Line Chart - Designs por dia */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Designs Criados por Dia</CardTitle>
-            <CardDescription>
+        <Card className="rounded-xl shadow-sm border-border/40">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xl font-medium">Designs Criados por Dia</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
               Evolução temporal da criação de designs
             </CardDescription>
           </CardHeader>
@@ -278,10 +278,10 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
         </Card>
 
         {/* Bar Chart - Top 10 escolas */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top 10 Escolas Mais Ativas</CardTitle>
-            <CardDescription>
+        <Card className="rounded-xl shadow-sm border-border/40">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xl font-medium">Top 10 Escolas Mais Ativas</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
               Ranking por designs criados no período
             </CardDescription>
           </CardHeader>
@@ -305,11 +305,11 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
       </div>
 
       {/* Top Creators Table */}
-      <Card>
+      <Card className="rounded-xl shadow-sm border-border/40">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Top Criadores</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl font-medium">Top Criadores</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
               Usuários mais ativos no período selecionado
             </CardDescription>
           </div>
@@ -333,9 +333,8 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
           ) : (
             <div className="space-y-4">
               {allCreators.map((creator, index) => (
-                <div key={`${creator.email}-${index}`} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="min-w-8 justify-center">
+                <div key={`${creator.email}-${index}<div className="flex items-center justify-between p-3 border rounded-xl hover:bg-muted/50 transition-colors">                 <div className="flex items-center gap-3">
+                    <Badge variant="secondary" className="min-w-8 justify-center text-xs font-medium">
                       #{index + 1}
                     </Badge>
                     <div>

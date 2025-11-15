@@ -18,20 +18,20 @@ interface StatsCardProps {
 const StatsCard = ({ title, value, icon, description, variant = "default", trend, className }: StatsCardProps) => {
   return (
     <Card className={cn(
-      "card-maple hover:card-elevated", 
+      "rounded-xl shadow-sm border-border/40 hover:shadow-md transition-all", 
       variant === "destructive" ? "border-destructive/20 bg-destructive/5" : "",
       className
     )}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">{title}</p>
             <p className={cn(
-              "text-3xl font-bold",
+              "text-2xl font-semibold",
               variant === "destructive" ? "text-destructive" : "text-foreground"
             )}>{value}</p>
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className="text-sm text-muted-foreground">{description}</p>
             )}
             {trend && (
               <div className="flex items-center gap-1">
@@ -48,11 +48,11 @@ const StatsCard = ({ title, value, icon, description, variant = "default", trend
             )}
           </div>
           <div className={cn(
-            "p-3 rounded-full",
+            "p-2 rounded-full",
             variant === "destructive" ? "bg-destructive/10" : "bg-primary/10"
           )}>
             <div className={cn(
-              "w-6 h-6",
+              "w-5 h-5",
               variant === "destructive" ? "text-destructive" : "text-primary"
             )}>
               {icon}
