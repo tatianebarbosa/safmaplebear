@@ -114,7 +114,7 @@ const CanvaDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="flex flex-wrap gap-4 overflow-x-auto pb-2">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <StatsCard
           title="Total de Usuários"
           value={overviewData.totalUsers.toString()}
