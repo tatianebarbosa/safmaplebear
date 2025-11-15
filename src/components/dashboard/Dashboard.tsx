@@ -6,7 +6,7 @@ import StatsCard from "./StatsCard";
 import SchoolCard from "./SchoolCard";
 import { School, Users, Zap, TrendingUp, Search, Filter } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { Footer } from "@/components/layout/Footer";
+
 
 // Mock data
 const mockStats = {
@@ -196,7 +196,7 @@ const Dashboard = () => {
           ))}
         </div>
       </div>
-      <Footer className="mt-8" />
+
     </div>
   );
 };
