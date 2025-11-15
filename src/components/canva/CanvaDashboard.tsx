@@ -124,7 +124,7 @@ const CanvaDashboard = () => {
         <StatsCard
           title="Usuários Conformes"
           value={overviewData.compliantUsers.toString()}
-          description={`${overviewData.complianceRate.toFixed(1)}% de conformidade`}
+          description={`${overviewData.complianceRate?.toFixed(1) || 0}% de conformidade`}
           icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatsCard
