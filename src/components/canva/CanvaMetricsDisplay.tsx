@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { canvaCollector, CanvaData, CanvaHistorico } from '@/lib/canvaDataCollector';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, CheckCircle, Clock, Download, RefreshCw, User, Users, Zap, Briefcase, GraduationCap, School, Palette, Share2, Link, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { formatNumber, formatDateBR } from '@/lib/formatters';
+import { toast } from 'sonner';
 
 /**
  * Componente para exibir todas as métricas do Canva de forma profissional
@@ -45,8 +50,10 @@ export const CanvaMetricsDisplay: React.FC = () => {
       // Recarrega o histórico
       const hist = await canvaCollector.obterHistorico();
       setHistorico(hist);
+      toast.success('Dados do Canva atualizados com sucesso!');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao coletar dados');
+      toast.error('Erro ao coletar dados do Canva.');
     } finally {
       setLoading(false);
     }
@@ -57,450 +64,220 @@ export const CanvaMetricsDisplay: React.FC = () => {
       await canvaCollector.reverterAlteracao(historicoId);
       // Recarrega os dados
       await carregarDados();
+      toast.success('Alteração revertida com sucesso!');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao reverter alteração');
+      toast.error('Erro ao reverter alteração.');
     }
   };
 
-  // Função para formatar números
-  const formatarNumero = (num: number) => {
-    return num.toLocaleString('pt-BR');
+  const renderMetricCard = (
+    title: string,
+    value: number,
+    icon: React.ReactNode,
+    change?: number,
+    variant: 'default' | 'destructive' | 'success' | 'warning' = 'default'
+  ) => {
+    const changeText = change !== undefined && change !== 0
+      ? `${change > 0 ? '📈 +' : '📉 '}${formatNumber(Math.abs(change))}`
+      : 'Sem alteração';
+
+    const changeColor = change === undefined || change === 0
+      ? 'text-muted-foreground'
+      : change > 0
+        ? 'text-green-600'
+        : 'text-red-600';
+
+    const iconColor = variant === 'destructive' ? 'text-red-500' :
+                      variant === 'success' ? 'text-green-500' :
+                      variant === 'warning' ? 'text-yellow-500' :
+                      'text-primary';
+
+    return (
+      <Card className="hover:shadow-lg transition-shadow">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          <div className={iconColor}>{icon}</div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{formatNumber(value)}</div>
+          <p className={`text-xs ${changeColor}`}>
+            {changeText}
+          </p>
+        </CardContent>
+      </Card>
+    );
   };
 
-  return (
-    <div className="canva-metrics-display">
-      <div className="metrics-header">
-        <div className="header-content">
-          <h2>📊 Métricas Canva</h2>
-          <p className="header-subtitle">Acompanhamento em tempo real das atividades e licenças</p>
+  const renderHistoricoItem = (item: CanvaHistorico) => (
+    <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+      <div className="flex items-center gap-3">
+        <Clock className="h-4 w-4 text-muted-foreground" />
+        <div>
+          <p className="text-sm font-medium">Coletado em: {new Date(item.timestamp).toLocaleString('pt-BR')}</p>
+          <p className="text-xs text-muted-foreground">Pessoas: {formatNumber(item.data.totalPessoas)} • Designs: {formatNumber(item.data.designsCriados)}</p>
         </div>
-        <button onClick={coletarDadosAgora} disabled={loading} className="btn-collect">
-          {loading ? '⏳ Coletando...' : '🔄 Atualizar Agora'}
-        </button>
       </div>
+      <Button 
+        onClick={() => reverterAlteracao(item.id)} 
+        variant="outline" 
+        size="sm"
+        className="text-xs"
+      >
+        Reverter
+      </Button>
+    </div>
+  );
 
-      {error && <div className="error-message">⚠️ {error}</div>}
+  return (
+    <div className="space-y-6">
+      <Card className="border-primary/20 bg-primary/5">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-xl font-bold flex items-center gap-2">
+              <Zap className="h-5 w-5 text-primary" />
+              Métricas Canva
+            </CardTitle>
+            <CardDescription>Acompanhamento em tempo real das atividades e licenças</CardDescription>
+          </div>
+          <Button onClick={coletarDadosAgora} disabled={loading} className="gap-2">
+            {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            {loading ? 'Coletando...' : 'Atualizar Agora'}
+          </Button>
+        </CardHeader>
+      </Card>
+
+      {error && (
+        <div className="flex items-center p-4 bg-red-50 border border-red-200 rounded-lg">
+          <AlertTriangle className="h-5 w-5 text-red-600 mr-3" />
+          <p className="text-sm text-red-800">⚠️ {error}</p>
+        </div>
+      )}
 
       {canvaData && (
         <>
           {/* Seção de Pessoas e Licenças */}
-          <div className="metrics-section">
-            <h3>👥 Pessoas e Licenças</h3>
-            <div className="metrics-grid">
-              <div className="metric-card primary">
-                <div className="metric-icon">👤</div>
-                <div className="metric-content">
-                  <h4>Total de Pessoas</h4>
-                  <p className="metric-value">{formatarNumero(canvaData.totalPessoas)}</p>
-                  <p className="metric-change">
-                    {canvaData.mudancas?.totalPessoas !== undefined && (
-                      <>
-                        {canvaData.mudancas.totalPessoas > 0 ? '📈' : '📉'}
-                        {canvaData.mudancas.totalPessoas > 0 ? '+' : ''}
-                        {canvaData.mudancas.totalPessoas}
-                      </>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              <div className="metric-card secondary">
-                <div className="metric-icon">👨‍💼</div>
-                <div className="metric-content">
-                  <h4>Administradores</h4>
-                  <p className="metric-value">{formatarNumero(canvaData.administradores)}</p>
-                </div>
-              </div>
-
-              <div className="metric-card secondary">
-                <div className="metric-icon">👨‍🎓</div>
-                <div className="metric-content">
-                  <h4>Alunos</h4>
-                  <p className="metric-value">{formatarNumero(canvaData.alunos)}</p>
-                </div>
-              </div>
-
-              <div className="metric-card secondary">
-                <div className="metric-icon">👨‍🏫</div>
-                <div className="metric-content">
-                  <h4>Professores</h4>
-                  <p className="metric-value">{formatarNumero(canvaData.professores)}</p>
-                </div>
-              </div>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Users className="h-5 w-5 text-muted-foreground" />
+              Pessoas e Licenças
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {renderMetricCard(
+                'Total de Pessoas',
+                canvaData.totalPessoas,
+                <User className="h-4 w-4" />,
+                canvaData.mudancas?.totalPessoas
+              )}
+              {renderMetricCard(
+                'Administradores',
+                canvaData.administradores,
+                <Briefcase className="h-4 w-4" />,
+                canvaData.mudancas?.administradores
+              )}
+              {renderMetricCard(
+                'Professores',
+                canvaData.professores,
+                <School className="h-4 w-4" />,
+                canvaData.mudancas?.professores
+              )}
+              {renderMetricCard(
+                'Alunos',
+                canvaData.alunos,
+                <GraduationCap className="h-4 w-4" />,
+                canvaData.mudancas?.alunos
+              )}
             </div>
           </div>
 
-          {/* Seção de Atividade */}
-          <div className="metrics-section">
-            <h3>📈 Atividade e Engajamento</h3>
-            <div className="metrics-grid">
-              <div className="metric-card accent">
-                <div className="metric-icon">🎨</div>
-                <div className="metric-content">
-                  <h4>Designs Criados</h4>
-                  <p className="metric-value">{formatarNumero(canvaData.designsCriados)}</p>
-                  <p className="metric-change">
-                    {canvaData.designsCriadosCrescimento > 0 ? '📈' : '📉'}
-                    {canvaData.designsCriadosCrescimento}% últimos 30 dias
-                  </p>
-                </div>
-              </div>
-
-              <div className="metric-card accent">
-                <div className="metric-icon">🔗</div>
-                <div className="metric-content">
-                  <h4>Total Publicado</h4>
-                  <p className="metric-value">{formatarNumero(canvaData.totalPublicado)}</p>
-                </div>
-              </div>
-
-              <div className="metric-card accent">
-                <div className="metric-icon">📤</div>
-                <div className="metric-content">
-                  <h4>Total Compartilhado</h4>
-                  <p className="metric-value">{formatarNumero(canvaData.totalCompartilhado)}</p>
-                </div>
-              </div>
-
-              <div className="metric-card accent">
-                <div className="metric-icon">👥</div>
-                <div className="metric-content">
-                  <h4>Membros Ativos</h4>
-                  <p className="metric-value">{formatarNumero(canvaData.membrosAtivos)}</p>
-                  <p className="metric-change">
-                    {canvaData.membrosAtivosCrescimento > 0 ? '📈' : '📉'}
-                    {canvaData.membrosAtivosCrescimento}% últimos 30 dias
-                  </p>
-                </div>
-              </div>
+          {/* Seção de Atividades */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Zap className="h-5 w-5 text-muted-foreground" />
+              Atividades
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {renderMetricCard(
+                'Designs Criados',
+                canvaData.designsCriados,
+                <Palette className="h-4 w-4" />,
+                canvaData.designsCriadosCrescimento,
+                canvaData.designsCriadosCrescimento > 0 ? 'success' : 'default'
+              )}
+              {renderMetricCard(
+                'Total Publicado',
+                canvaData.totalPublicado,
+                <Share2 className="h-4 w-4" />,
+                canvaData.totalPublicadoCrescimento,
+                canvaData.totalPublicadoCrescimento > 0 ? 'success' : 'default'
+              )}
+              {renderMetricCard(
+                'Total Compartilhado',
+                canvaData.totalCompartilhado,
+                <Link className="h-4 w-4" />,
+                canvaData.totalCompartilhadoCrescimento,
+                canvaData.totalCompartilhadoCrescimento > 0 ? 'success' : 'default'
+              )}
+              {renderMetricCard(
+                'Membros Ativos',
+                canvaData.membrosAtivos,
+                <Users className="h-4 w-4" />,
+                canvaData.membrosAtivosCrescimento,
+                canvaData.membrosAtivosCrescimento > 0 ? 'success' : 'default'
+              )}
             </div>
           </div>
 
           {/* Seção de Kits de Marca */}
           {canvaData.totalKits > 0 && (
-            <div className="metrics-section">
-              <h3>🎯 Kits de Marca</h3>
-              <div className="kits-info">
-                <p className="kits-count">Total de Kits: <strong>{canvaData.totalKits}</strong></p>
-                {canvaData.kits && canvaData.kits.length > 0 && (
-                  <table className="kits-table">
-                    <thead>
-                      <tr>
-                        <th>Kit de Marca</th>
-                        <th>Aplicado</th>
-                        <th>Criado</th>
-                        <th>Última Atualização</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {canvaData.kits.map((kit, idx) => (
-                        <tr key={idx}>
-                          <td><strong>{kit.nome}</strong></td>
-                          <td>{kit.aplicado}</td>
-                          <td>{kit.criado}</td>
-                          <td>{kit.ultimaAtualizacao}</td>
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Palette className="h-5 w-5 text-muted-foreground" />
+                Kits de Marca
+              </h3>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="p-2 text-left font-semibold">Kit de Marca</th>
+                          <th className="p-2 text-left font-semibold">Aplicado</th>
+                          <th className="p-2 text-left font-semibold">Criado</th>
+                          <th className="p-2 text-left font-semibold">Última Atualização</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
+                      </thead>
+                      <tbody>
+                        {canvaData.kits && canvaData.kits.map((kit, idx) => (
+                          <tr key={idx} className="border-b last:border-b-0 hover:bg-muted/50">
+                            <td className="p-2 font-medium">{kit.nome}</td>
+                            <td className="p-2">{kit.aplicado}</td>
+                            <td className="p-2">{formatDateBR(kit.criado)}</td>
+                            <td className="p-2">{formatDateBR(kit.ultimaAtualizacao)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
 
-          {/* Seção de Histórico */}
-          <div className="metrics-section">
-            <h3>📋 Histórico de Alterações</h3>
-            {historico.length === 0 ? (
-              <p className="no-data">Nenhuma alteração registrada</p>
-            ) : (
-              <table className="historico-table">
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Hora</th>
-                    <th>Pessoas</th>
-                    <th>Designs</th>
-                    <th>Mudança</th>
-                    <th>Usuário</th>
-                    <th>Descrição</th>
-                    <th>Ação</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historico.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.dataAtualizacao}</td>
-                      <td>{item.horaAtualizacao}</td>
-                      <td>{formatarNumero(item.totalPessoas)}</td>
-                      <td>{formatarNumero(item.designsCriados)}</td>
-                      <td className={item.mudancas?.totalPessoas ? (item.mudancas.totalPessoas > 0 ? 'positive' : 'negative') : ''}>
-                        {item.mudancas?.totalPessoas ? (item.mudancas.totalPessoas > 0 ? '+' : '') + item.mudancas.totalPessoas : '-'}
-                      </td>
-                      <td>{item.usuarioAlteracao}</td>
-                      <td>{item.descricaoAlteracao}</td>
-                      <td>
-                        <button
-                          onClick={() => reverterAlteracao(item.id)}
-                          className="btn-revert"
-                          title="Reverter esta alteração"
-                        >
-                          ↩️ Reverter
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          {/* Informações de Atualização */}
-          <div className="update-info">
-            <p>✅ Última atualização: {canvaData.dataAtualizacao} às {canvaData.horaAtualizacao}</p>
+          {/* Histórico de Coletas */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Clock className="h-5 w-5 text-muted-foreground" />
+              Histórico de Coletas
+            </h3>
+            <Card>
+              <CardContent className="p-4 space-y-2">
+                {historico.map(renderHistoricoItem)}
+              </CardContent>
+            </Card>
           </div>
         </>
       )}
-
-      <style>{`
-        .canva-metrics-display {
-          padding: 24px;
-          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-          border-radius: 12px;
-          margin: 20px 0;
-        }
-
-        .metrics-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 30px;
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-content h2 {
-          margin: 0 0 5px 0;
-          font-size: 28px;
-          color: #aa0414;
-        }
-
-        .header-subtitle {
-          margin: 0;
-          font-size: 14px;
-          color: #666;
-        }
-
-        .btn-collect {
-          padding: 12px 24px;
-          background: linear-gradient(135deg, #aa0414 0%, #8b030f 100%);
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 600;
-          transition: all 0.3s;
-          box-shadow: 0 4px 12px rgba(170, 4, 20, 0.3);
-        }
-
-        .btn-collect:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(170, 4, 20, 0.4);
-        }
-
-        .btn-collect:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .error-message {
-          padding: 16px;
-          background-color: #fee;
-          color: #c33;
-          border-left: 4px solid #c33;
-          border-radius: 4px;
-          margin-bottom: 20px;
-          font-weight: 500;
-        }
-
-        .metrics-section {
-          background: white;
-          padding: 24px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .metrics-section h3 {
-          margin: 0 0 20px 0;
-          font-size: 20px;
-          color: #333;
-          border-bottom: 2px solid #aa0414;
-          padding-bottom: 10px;
-        }
-
-        .metrics-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 16px;
-        }
-
-        .metric-card {
-          padding: 20px;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          transition: all 0.3s;
-          border-left: 4px solid #ededed;
-        }
-
-        .metric-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        .metric-card.primary {
-          background: linear-gradient(135deg, #aa0414 0%, #8b030f 100%);
-          color: white;
-          border-left-color: #aa0414;
-        }
-
-        .metric-card.secondary {
-          background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-          color: #333;
-          border-left-color: #aa0414;
-        }
-
-        .metric-card.accent {
-          background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
-          color: #333;
-          border-left-color: #aa0414;
-        }
-
-        .metric-icon {
-          font-size: 32px;
-          min-width: 50px;
-          text-align: center;
-        }
-
-        .metric-content {
-          flex: 1;
-        }
-
-        .metric-content h4 {
-          margin: 0 0 8px 0;
-          font-size: 14px;
-          font-weight: 600;
-          opacity: 0.9;
-        }
-
-        .metric-value {
-          margin: 0 0 4px 0;
-          font-size: 28px;
-          font-weight: bold;
-        }
-
-        .metric-change {
-          margin: 0;
-          font-size: 12px;
-          opacity: 0.8;
-        }
-
-        .kits-info {
-          background: #f9f9f9;
-          padding: 16px;
-          border-radius: 6px;
-        }
-
-        .kits-count {
-          margin: 0 0 16px 0;
-          font-size: 14px;
-          color: #666;
-        }
-
-        .kits-table,
-        .historico-table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 13px;
-          margin-top: 16px;
-        }
-
-        .kits-table thead,
-        .historico-table thead {
-          background-color: #f0f0f0;
-        }
-
-        .kits-table th,
-        .historico-table th {
-          padding: 12px;
-          text-align: left;
-          font-weight: 600;
-          color: #333;
-          border-bottom: 2px solid #aa0414;
-        }
-
-        .kits-table td,
-        .historico-table td {
-          padding: 12px;
-          border-bottom: 1px solid #e0e0e0;
-        }
-
-        .kits-table tr:hover,
-        .historico-table tr:hover {
-          background-color: #f9f9f9;
-        }
-
-        .positive {
-          color: #22c55e;
-          font-weight: 600;
-        }
-
-        .negative {
-          color: #ef4444;
-          font-weight: 600;
-        }
-
-        .btn-revert {
-          padding: 6px 12px;
-          background-color: #aa0414;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 12px;
-          font-weight: 600;
-          transition: all 0.3s;
-        }
-
-        .btn-revert:hover {
-          background-color: #8b030f;
-          transform: scale(1.05);
-        }
-
-        .no-data {
-          text-align: center;
-          color: #999;
-          padding: 20px;
-          font-style: italic;
-        }
-
-        .update-info {
-          text-align: center;
-          padding: 12px;
-          background: white;
-          border-radius: 6px;
-          font-size: 12px;
-          color: #666;
-          margin-top: 20px;
-        }
-      `}</style>
     </div>
   );
 };
-
-export default CanvaMetricsDisplay;

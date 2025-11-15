@@ -169,20 +169,20 @@ const CanvaDashboard = () => {
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
                 {overviewData.topNonCompliantDomains.slice(0, 5).map(({ domain, count }) => (
-                  <span key={domain} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-destructive text-destructive-foreground">
+                  <span key={domain} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-destructive-foreground">
                     {domain} ({count})
                   </span>
                 ))}
                 {overviewData.topNonCompliantDomains.length > 5 && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-muted text-muted-foreground">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
                     +{overviewData.topNonCompliantDomains.length - 5} domínios
                   </span>
                 )}
               </div>
               <Button 
                 variant="destructive" 
-                size="sm"
                 onClick={() => toast.info('Navegando para usuários não conformes')}
+                className="mt-4"
               >
                 Ver Detalhes dos Usuários Não Conformes
               </Button>
@@ -192,17 +192,17 @@ const CanvaDashboard = () => {
       )}
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="schools">Escolas</TabsTrigger>
-          <TabsTrigger value="usage">Usos</TabsTrigger>
-          <TabsTrigger value="costs">Custos</TabsTrigger>
-          <TabsTrigger value="advanced">Avançado</TabsTrigger>
+      <Tabs defaultValue="overview" className="w-full mt-6">
+        <TabsList className="flex w-full overflow-x-auto border-b">
+          <TabsTrigger value="overview" className="whitespace-nowrap">Visão Geral</TabsTrigger>
+          <TabsTrigger value="schools" className="whitespace-nowrap">Escolas</TabsTrigger>
+          <TabsTrigger value="usage" className="whitespace-nowrap">Usos</TabsTrigger>
+          <TabsTrigger value="costs" className="whitespace-nowrap">Custos</TabsTrigger>
+          <TabsTrigger value="advanced" className="whitespace-nowrap">Avançado</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <CanvaMetricsDisplay />
+          {/* Conteúdo da Visão Geral (vazio ou com outros componentes) */}
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">
@@ -229,57 +229,19 @@ const CanvaDashboard = () => {
                 Ferramentas para gestão avançada do Canva
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Sincronização de Dados</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Dados atualizados automaticamente das planilhas oficiais
-                    </p>
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        onClick={loadOfficialData}
-                        disabled={loading}
-                      >
-                        {loading ? 'Carregando...' : 'Recarregar Dados'}
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={handleExportData}>
-                        <Download className="h-3 w-3 mr-1" />
-                        Exportar
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Estatísticas Rápidas</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Taxa de Conformidade:</span>
-                        <span className="font-medium">{overviewData.complianceRate.toFixed(1)}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Escolas com Usuários:</span>
-                        <span className="font-medium">{overviewData.schoolsWithUsers}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Principais Domínios:</span>
-                        <span className="font-medium">{getDomainCounts().length}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Em desenvolvimento...
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
+      </Tabs>
+
+      {/* Rodapé de Métricas (Visível em todas as abas) */}
+      <CanvaMetricsDisplay />
+
+
       </Tabs>
       
       <FloatingAIChat />

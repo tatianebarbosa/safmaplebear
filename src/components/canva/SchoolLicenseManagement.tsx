@@ -231,20 +231,20 @@ export const SchoolLicenseManagement = () => {
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
                 {domainCounts.slice(0, 5).map(({ domain, count }) => (
-                  <Badge key={domain} variant="destructive" className="text-xs">
+                  <Badge key={domain} variant="destructive" className="text-sm font-medium">
                     {domain} ({count})
                   </Badge>
                 ))}
                 {domainCounts.length > 5 && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-sm font-medium">
                     +{domainCounts.length - 5} domínios
                   </Badge>
                 )}
               </div>
               <Button 
                 variant="destructive" 
-                size="sm"
                 onClick={() => toast.info('Navegando para usuários não conformes')}
+                className="mt-4"
               >
                 Ver Detalhes dos Usuários Não Conformes
               </Button>
