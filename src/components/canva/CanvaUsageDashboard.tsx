@@ -333,7 +333,8 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
           ) : (
             <div className="space-y-4">
               {allCreators.map((creator, index) => (
-                <div key={`${creator.email}-${index}<div className="flex items-center justify-between p-3 border rounded-xl hover:bg-muted/50 transition-colors">                 <div className="flex items-center gap-3">
+                <div key={`${creator.email}-${index}`} className="flex items-center justify-between p-3 border rounded-xl hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
                     <Badge variant="secondary" className="min-w-8 justify-center text-xs font-medium">
                       #{index + 1}
                     </Badge>
