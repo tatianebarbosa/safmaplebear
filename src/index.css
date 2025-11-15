@@ -11,22 +11,22 @@
 @layer base {
   :root {
     /* Maple Bear Brand Colors */
-    --maple-red: 349 76% 35%; /* Vermelho mais escuro, próximo ao logo */
-    --maple-red-light: 349 76% 55%;
-    --maple-red-dark: 349 76% 25%;
+    --maple-red: 359 76% 44%; /* #cc1316 - Pantone 186 C */
+    --maple-red-light: 359 76% 55%;
+    --maple-red-dark: 359 76% 35%;
     /* --maple-gold: 45 93% 58%; */
     /* --maple-gold-light: 45 93% 75%; */
     
     /* Base Colors */
     --background: 220 13% 97%;
-    --foreground: 220 9% 13%;
+    --foreground: 0 0% 0%; /* #000000 - Preto */
     
     /* Surface Colors */
     --card: 0 0% 100%;
-    --card-foreground: 220 9% 13%;
+    --card-foreground: 0 0% 0%; /* #000000 - Preto */
     
     --popover: 0 0% 100%;
-    --popover-foreground: 220 9% 13%;
+    --popover-foreground: 0 0% 0%; /* #000000 - Preto */
     
     /* Brand Primary (Maple Red) */
     --primary: var(--maple-red);
@@ -52,7 +52,7 @@
     --warning-bg: 32 95% 95%;
     
     /* Error States */
-    --destructive: 0 84% 60%;
+    --destructive: 359 84% 40%; /* #aa0414 - Vermelho Vívido */
     --destructive-foreground: 0 0% 100%;
     --destructive-light: 0 84% 70%;
     --destructive-bg: 0 84% 95%;
@@ -64,11 +64,11 @@
     --info-bg: 217 91% 95%;
     
     /* Neutral Colors */
-    --muted: 220 13% 95%;
+    --muted: 0 0% 93%; /* #ededed - Cinza Claro */
     --muted-foreground: 220 9% 46%;
     
     --accent: 220 13% 95%;
-    --accent-foreground: 220 9% 13%;
+    --accent-foreground: 0 0% 0%; /* #000000 - Preto */
     
     /* Border & Input */
     --border: 220 13% 91%;
@@ -95,15 +95,15 @@
 
     --sidebar-background: 0 0% 98%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-foreground: 0 0% 0%; /* #000000 - Preto */
 
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: var(--maple-red);
 
     --sidebar-primary-foreground: 0 0% 98%;
 
     --sidebar-accent: 240 4.8% 95.9%;
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent-foreground: 0 0% 0%; /* #000000 - Preto */
 
     --sidebar-border: 220 13% 91%;
 
@@ -169,7 +169,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
   

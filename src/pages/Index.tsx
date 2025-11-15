@@ -6,10 +6,10 @@ import FloatingAIChat from "@/components/ai/FloatingAIChat";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
       
-      <main className="px-6 py-8 max-w-7xl mx-auto">
+      <main className="flex-grow px-6 py-8 max-w-7xl mx-auto w-full">
         <CanvaManagement />
       </main>
       

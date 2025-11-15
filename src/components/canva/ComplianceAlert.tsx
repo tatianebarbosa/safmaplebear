@@ -43,8 +43,8 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <RiskIcon className={`h-5 w-5 text-${risk.color === 'destructive' ? 'destructive/80' : 'warning'}`} />
-            <CardTitle className={`text-${risk.color === 'destructive' ? 'destructive/80' : 'warning'}`}>
+            <RiskIcon className={`h-5 w-5 text-${risk.color === 'destructive' ? 'destructive' : 'warning'}`} />
+            <CardTitle className={`text-${risk.color === 'destructive' ? 'destructive' : 'warning'}`}>
               Alerta de Conformidade - {risk.level}
             </CardTitle>
           </div>
