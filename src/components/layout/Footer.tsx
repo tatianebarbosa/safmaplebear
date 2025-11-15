@@ -6,8 +6,9 @@ interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
 export const Footer = ({ className, ...props }: FooterProps) => {
   return (
     <footer
+      // Alterado para fundo vermelho (destructive) e texto branco (foreground)
       className={cn(
-        "border-t bg-background p-4 text-center text-sm text-muted-foreground",
+        "bg-destructive text-destructive-foreground p-4 text-center text-sm",
         className
       )}
       {...props}
@@ -17,10 +18,16 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           &copy; 2025 Maplebear SAF. Todos os direitos reservados.
         </p>
         <div className="space-x-4">
-          <a href="#" className="hover:text-primary transition-colors">
+          <a 
+            href="#" 
+            className="hover:underline transition-colors" // Removido hover:text-primary para manter o contraste
+          >
             Termos de Serviço
           </a>
-          <a href="#" className="hover:text-primary transition-colors">
+          <a 
+            href="#" 
+            className="hover:underline transition-colors" // Removido hover:text-primary para manter o contraste
+          >
             Política de Privacidade
           </a>
         </div>
