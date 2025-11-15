@@ -27,9 +27,9 @@ const RankingTable = ({ changes, showComparison = true }: RankingTableProps) => 
   };
 
   const getPositionBadge = (position: number) => {
-    if (position === 1) return <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">🥇 1º</Badge>;
-    if (position === 2) return <Badge className="bg-gradient-to-r from-gray-300 to-gray-500 text-white">🥈 2º</Badge>;
-    if (position === 3) return <Badge className="bg-gradient-to-r from-amber-600 to-amber-800 text-white">🥉 3º</Badge>;
+    if (position === 1) return <Badge variant="warning">🥇 1º</Badge>;
+    if (position === 2) return <Badge variant="secondary">🥈 2º</Badge>;
+    if (position === 3) return <Badge variant="outline">🥉 3º</Badge>;
     return <Badge variant="outline">{position}º</Badge>;
   };
 

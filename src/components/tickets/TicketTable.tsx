@@ -35,7 +35,7 @@ export const TicketTable = ({ tickets }: TicketTableProps) => {
       return <Badge variant="destructive" className="text-xs">Crítico</Badge>;
     }
     if (diasAberto >= 8) {
-      return <Badge className="text-xs bg-orange-100 text-orange-800">Atenção</Badge>;
+      return <Badge variant="warning" className="text-xs">Atenção</Badge>;
     }
     return <Badge variant="outline" className="text-xs">Normal</Badge>;
   };
@@ -43,11 +43,11 @@ export const TicketTable = ({ tickets }: TicketTableProps) => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Pendente':
-        return <Badge className="bg-orange-100 text-orange-800">Pendente</Badge>;
+        return <Badge variant="warning">Pendente</Badge>;
       case 'Em andamento':
-        return <Badge className="bg-blue-100 text-blue-800">Em andamento</Badge>;
+        return <Badge variant="info">Em andamento</Badge>;
       case 'Resolvido':
-        return <Badge className="bg-green-100 text-green-800">Resolvido</Badge>;
+        return <Badge variant="success">Resolvido</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }

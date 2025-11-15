@@ -1,0 +1,24 @@
+/* Spacing Utilities - Design System */
+
+@layer utilities {
+  /* Padronização de Gaps */
+  .gap-xs { @apply gap-1; }      /* 4px */
+  .gap-sm { @apply gap-2; }      /* 8px */
+  .gap-md { @apply gap-3; }      /* 12px */
+  .gap-lg { @apply gap-4; }      /* 16px */
+  .gap-xl { @apply gap-6; }      /* 24px */
+  
+  /* Padronização de Padding para Cards */
+  .card-padding-sm { @apply p-3; }    /* 12px */
+  .card-padding-md { @apply p-4; }    /* 16px */
+  .card-padding-lg { @apply p-6; }    /* 24px */
+  
+  /* Padronização de Padding para Containers */
+  .container-padding-x { @apply px-4; }
+  .container-padding-y { @apply py-3; }
+  
+  /* Padronização de Espaçamento Vertical */
+  .section-spacing { @apply space-y-6; }
+  .content-spacing { @apply space-y-4; }
+  .tight-spacing { @apply space-y-2; }
+}

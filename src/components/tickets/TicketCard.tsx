@@ -41,7 +41,7 @@ export const TicketCard = ({ ticket, canManage }: TicketCardProps) => {
       return <Badge variant="destructive" className="text-xs">Crítico {ticket.diasAberto}d</Badge>;
     }
     if (ticket.diasAberto >= 8) {
-      return <Badge className="text-xs bg-orange-100 text-orange-800">Atenção {ticket.diasAberto}d</Badge>;
+      return <Badge variant="warning" className="text-xs">Atenção {ticket.diasAberto}d</Badge>;
     }
     return <Badge variant="outline" className="text-xs">{ticket.diasAberto}d</Badge>;
   };
@@ -57,10 +57,10 @@ export const TicketCard = ({ ticket, canManage }: TicketCardProps) => {
       return <Badge variant="destructive" className="text-xs">Atraso {Math.abs(diffDays)}d</Badge>;
     }
     if (diffDays === 0) {
-      return <Badge className="text-xs bg-yellow-100 text-yellow-800">Vence hoje</Badge>;
+      return <Badge variant="warning" className="text-xs">Vence hoje</Badge>;
     }
     if (diffDays <= 3) {
-      return <Badge className="text-xs bg-blue-100 text-blue-800">Vence em {diffDays}d</Badge>;
+      return <Badge variant="info" className="text-xs">Vence em {diffDays}d</Badge>;
     }
     
     return null;

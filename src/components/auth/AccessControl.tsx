@@ -75,11 +75,11 @@ const AccessControl = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="text-yellow-600"><Clock className="w-3 h-3 mr-1" />Pendente</Badge>;
+        return <Badge variant="warning"><Clock className="w-3 h-3 mr-1" />Pendente</Badge>;
       case 'approved':
-        return <Badge variant="default" className="text-green-600"><UserCheck className="w-3 h-3 mr-1" />Aprovado</Badge>;
+        return <Badge variant="success"><UserCheck className="w-3 h-3 mr-1" />Aprovado</Badge>;
       case 'active':
-        return <Badge variant="default" className="text-green-600"><Shield className="w-3 h-3 mr-1" />Ativo</Badge>;
+        return <Badge variant="success"><Shield className="w-3 h-3 mr-1" />Ativo</Badge>;
       case 'rejected':
         return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Rejeitado</Badge>;
       default:
@@ -171,8 +171,8 @@ const AccessControl = () => {
               </div>
 
               {currentUser.status === 'pending' && (
-                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                <div className="p-4 bg-warning-bg rounded-lg">
+                  <p className="text-sm text-warning-foreground">
                     Sua solicitação foi enviada e está aguardando aprovação da coordenação.
                     Você receberá uma notificação quando for aprovado.
                   </p>
@@ -181,8 +181,8 @@ const AccessControl = () => {
 
               {currentUser.status === 'rejected' && (
                 <div className="space-y-3">
-                  <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                    <p className="text-sm text-red-800 dark:text-red-200">
+                  <div className="p-4 bg-destructive-bg rounded-lg">
+                    <p className="text-sm text-destructive-foreground">
                       Sua solicitação foi rejeitada. Entre em contato com a coordenação para mais informações.
                     </p>
                   </div>

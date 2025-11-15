@@ -449,7 +449,7 @@ const ProfileManagement = () => {
                           <Button 
                             size="sm" 
                             onClick={() => approveUser(user.id)}
-                            className="bg-green-600 hover:bg-green-700"
+                            className="bg-success hover:bg-success/80 text-success-foreground"
                           >
                             <CheckCircle className="w-4 h-4 mr-1" />
                             Aprovar

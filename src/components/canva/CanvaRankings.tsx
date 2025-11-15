@@ -53,9 +53,9 @@ export const CanvaRankings = ({ rankings }: CanvaRankingsProps) => {
   };
 
   const getRankingBadge = (rank: number) => {
-    if (rank === 1) return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">🏆 1º</Badge>;
-    if (rank === 2) return <Badge variant="secondary" className="bg-gray-100 text-gray-800">🥈 2º</Badge>;
-    if (rank === 3) return <Badge variant="outline" className="bg-amber-50 text-amber-800">🥉 3º</Badge>;
+    if (rank === 1) return <Badge variant="warning">🏆 1º</Badge>;
+    if (rank === 2) return <Badge variant="secondary">🥈 2º</Badge>;
+    if (rank === 3) return <Badge variant="outline">🥉 3º</Badge>;
     return <Badge variant="outline">{rank}º</Badge>;
   };
 

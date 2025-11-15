@@ -1,0 +1,20 @@
+/* Border Utilities - Design System */
+
+@layer utilities {
+  /* Border Radius Padronizado */
+  .radius-sm { @apply rounded-sm; }      /* calc(var(--radius) - 4px) */
+  .radius-md { @apply rounded-md; }      /* calc(var(--radius) - 2px) */
+  .radius-lg { @apply rounded-lg; }      /* var(--radius) = 0.75rem */
+  .radius-full { @apply rounded-full; }  /* Para badges e avatares */
+  
+  /* Border Radius para Componentes Específicos */
+  .card-radius { @apply rounded-lg; }
+  .button-radius { @apply rounded-md; }
+  .input-radius { @apply rounded-md; }
+  .badge-radius { @apply rounded-full; }
+  
+  /* Borders Padronizados */
+  .border-default { @apply border border-border; }
+  .border-muted { @apply border border-muted; }
+  .border-primary { @apply border border-primary; }
+}

@@ -1,0 +1,31 @@
+/* Typography Utilities - Design System */
+
+@layer utilities {
+  /* Hierarquia de Títulos */
+  .heading-1 { @apply text-3xl font-bold tracking-tight; }
+  .heading-2 { @apply text-2xl font-bold tracking-tight; }
+  .heading-3 { @apply text-xl font-semibold; }
+  .heading-4 { @apply text-lg font-semibold; }
+  .heading-5 { @apply text-base font-semibold; }
+  .heading-6 { @apply text-sm font-semibold; }
+  
+  /* Tamanhos de Corpo de Texto */
+  .body-lg { @apply text-base font-normal; }
+  .body-md { @apply text-sm font-normal; }
+  .body-sm { @apply text-xs font-normal; }
+  
+  /* Pesos de Fonte Padronizados */
+  .text-regular { @apply font-normal; }
+  .text-medium { @apply font-medium; }
+  .text-semibold { @apply font-semibold; }
+  .text-bold { @apply font-bold; }
+  
+  /* Títulos de Cards */
+  .card-title { @apply text-lg font-semibold; }
+  .card-subtitle { @apply text-sm text-muted-foreground; }
+  
+  /* Labels e Descrições */
+  .label-text { @apply text-sm font-medium; }
+  .description-text { @apply text-sm text-muted-foreground; }
+  .caption-text { @apply text-xs text-muted-foreground; }
+}

@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './styles/spacing.css';
+@import './styles/typography.css';
+@import './styles/borders.css';
+
 /* Maple Bear SAF Design System - Cores em HSL */
 
 @layer base {
@@ -52,6 +56,12 @@
     --destructive-foreground: 0 0% 100%;
     --destructive-light: 0 84% 70%;
     --destructive-bg: 0 84% 95%;
+    
+    /* Info States */
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+    --info-light: 217 91% 70%;
+    --info-bg: 217 91% 95%;
     
     /* Neutral Colors */
     --muted: 220 13% 95%;
@@ -124,6 +134,9 @@
     
     --destructive: 0 84% 70%;
     --destructive-bg: 0 84% 15%;
+    
+    --info: 217 91% 70%;
+    --info-bg: 217 91% 15%;
     
     --muted: 220 9% 15%;
     --muted-foreground: 220 9% 65%;

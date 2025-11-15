@@ -144,11 +144,11 @@ const SchoolAgenda = ({ escolaId, escolaNome }: SchoolAgendaProps) => {
   const getStatusBadge = (status: AgendaItem['status']) => {
     switch (status) {
       case 'agendado':
-        return <Badge className="bg-blue-500 hover:bg-blue-600">Agendado</Badge>;
+        return <Badge variant="info">Agendado</Badge>;
       case 'em-andamento':
-        return <Badge className="bg-orange-500 hover:bg-orange-600">Em Andamento</Badge>;
+        return <Badge variant="warning">Em Andamento</Badge>;
       case 'concluido':
-        return <Badge className="bg-green-500 hover:bg-green-600">Concluído</Badge>;
+        return <Badge variant="success">Concluído</Badge>;
       case 'cancelado':
         return <Badge variant="destructive">Cancelado</Badge>;
       default:
@@ -157,15 +157,15 @@ const SchoolAgenda = ({ escolaId, escolaNome }: SchoolAgendaProps) => {
   };
 
   const getTipoBadge = (tipo: AgendaItem['tipo']) => {
-    const colors = {
-      visita: 'bg-purple-100 text-purple-800',
-      reuniao: 'bg-blue-100 text-blue-800',
-      auditoria: 'bg-red-100 text-red-800',
-      treinamento: 'bg-green-100 text-green-800',
-      outros: 'bg-gray-100 text-gray-800'
+    const variants = {
+      visita: 'secondary' as const,
+      reuniao: 'info' as const,
+      auditoria: 'destructive' as const,
+      treinamento: 'success' as const,
+      outros: 'outline' as const
     };
     
-    return <Badge variant="outline" className={colors[tipo]}>{tipo}</Badge>;
+    return <Badge variant={variants[tipo]}>{tipo}</Badge>;
   };
 
   return (
