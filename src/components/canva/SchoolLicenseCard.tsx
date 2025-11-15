@@ -259,7 +259,7 @@ export const SchoolLicenseCard = ({
           {/* Users List */}
           <div className="space-y-2 max-h-40 overflow-y-auto">
             {school.users.slice(0, 5).map((user) => (
-              <div key={user.<div className="flex items-center justify-between p-2 border-b border-border/50 last:border-b-0">                <div className="flex-1 min-w-0">
+              <div key={user.id} className="flex items-center justify-between p-2 border-b border-border/50 last:border-b-0">                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1">
                     <span className="text-sm font-medium truncate">{user.name}</span>
                     <Badge variant={user.isCompliant ? "secondary" : "destructive"} className="text-xs font-medium bg-destructive/10 text-destructive border-destructive/20">
