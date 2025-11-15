@@ -24,7 +24,7 @@ import {
   Home
 } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
-import { Footer } from '@/components/layout/Footer';
+
 import { UsageFilters, CanvaUsageData } from '@/types/schoolLicense';
 
 interface CanvaUsageDashboardProps {
@@ -358,6 +358,6 @@ export const CanvaUsageDashboard = ({ onNavigateToUsers }: CanvaUsageDashboardPr
         </CardContent>
       </Card>
     </div>
-    <Footer className="mt-8" />
+
   );
 };

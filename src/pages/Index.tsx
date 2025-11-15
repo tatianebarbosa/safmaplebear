@@ -1,6 +1,7 @@
 // import { useState } from "react"; // Removido para simplificar
 import Header from "@/components/layout/Header";
 import CanvaManagement from "@/components/canva/CanvaDashboard";
+import { Footer } from "@/components/layout/Footer";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
 
 const Index = () => {
@@ -13,6 +14,7 @@ const Index = () => {
       </main>
       
       <FloatingAIChat />
+      <Footer />
     </div>
   );
 };
