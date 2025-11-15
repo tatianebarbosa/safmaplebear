@@ -212,46 +212,7 @@ export const SchoolLicenseManagement = () => {
       </div>
 
       {/* Domain Compliance Alert */}
-      {nonMapleBearCount > 0 && (
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardHeader>
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
-              <div className="space-y-1">
-                <CardTitle className="text-destructive">
-                  Alerta de Conformidade - Alto Risco
-                </CardTitle>
-                <CardDescription>
-                  {nonMapleBearCount} usuários com domínios não autorizados foram identificados
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {domainCounts.slice(0, 5).map(({ domain, count }) => (
-                  <Badge key={domain} variant="destructive" className="text-sm font-medium">
-                    {domain} ({count})
-                  </Badge>
-                ))}
-                {domainCounts.length > 5 && (
-                  <Badge variant="outline" className="text-sm font-medium">
-                    +{domainCounts.length - 5} domínios
-                  </Badge>
-                )}
-              </div>
-              <Button 
-                variant="destructive" 
-                onClick={() => toast.info('Navegando para usuários não conformes')}
-                className="mt-4"
-              >
-                Ver Detalhes dos Usuários Não Conformes
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Filters */}
       <Card>
