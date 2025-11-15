@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TruncatedText, TruncatedEmail } from '@/components/ui/truncated-text';
 import { getLicenseHistory, filterLicenseHistory } from '@/lib/canvaDataProcessor';
 
 interface LicenseHistoryProps {
@@ -223,9 +224,9 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
                         {new Date(action.timestamp).toLocaleString('pt-BR')}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <School className="h-3 w-3 text-muted-foreground" />
-                          <span className="truncate max-w-[150px]">{action.schoolName}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <School className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                          <TruncatedText text={action.schoolName} className="text-sm" />
                         </div>
                       </TableCell>
                       <TableCell>
@@ -238,8 +239,8 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
                           <div className="flex items-center gap-2">
                             <User className="h-3 w-3 text-muted-foreground" />
                             <div>
-                              <div className="font-medium text-xs">{action.userName}</div>
-                              <div className="text-xs text-muted-foreground">{action.userEmail}</div>
+                              <TruncatedText text={action.userName} className="font-medium text-xs" />
+                              <TruncatedEmail email={action.userEmail} className="text-xs text-muted-foreground" />
                             </div>
                           </div>
                         )}
@@ -250,9 +251,11 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <span className="text-xs truncate max-w-[200px] block" title={action.justification}>
-                          {action.justification}
-                        </span>
+                        <TruncatedText 
+                          text={action.justification} 
+                          className="text-xs" 
+                          lines={2}
+                        />
                       </TableCell>
                       <TableCell className="text-xs">
                         {action.performedBy}

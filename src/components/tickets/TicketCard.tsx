@@ -87,8 +87,8 @@ export const TicketCard = ({ ticket, canManage }: TicketCardProps) => {
           {canManage && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                  <MoreVertical className="h-3 w-3" />
+                <Button variant="ghost" size="icon-sm">
+                  <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">

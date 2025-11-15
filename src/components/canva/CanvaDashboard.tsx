@@ -125,7 +125,7 @@ const CanvaDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid-responsive-5">
         <StatsCard
           title="Total de Usuários"
           value={overviewData.totalUsers.toString()}
@@ -204,7 +204,7 @@ const CanvaDashboard = () => {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="schools">Escolas</TabsTrigger>
           <TabsTrigger value="usage">Usos</TabsTrigger>

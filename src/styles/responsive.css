@@ -1,0 +1,141 @@
+/* Responsive Utilities - Mobile-First Design System */
+
+@layer utilities {
+  /* Touch Target Sizes - Mínimo 44x44px (iOS/Android Guidelines) */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .touch-target-sm {
+    @apply min-h-[36px] min-w-[36px];
+  }
+  
+  .touch-target-lg {
+    @apply min-h-[48px] min-w-[48px];
+  }
+  
+  /* Button Touch Sizes */
+  .btn-touch {
+    @apply h-11 px-4;  /* 44px height */
+  }
+  
+  .btn-touch-sm {
+    @apply h-9 px-3;   /* 36px height */
+  }
+  
+  .btn-touch-lg {
+    @apply h-12 px-6;  /* 48px height */
+  }
+  
+  /* Icon Button Touch Sizes */
+  .icon-btn-touch {
+    @apply h-11 w-11 p-0;  /* 44x44px */
+  }
+  
+  .icon-btn-touch-sm {
+    @apply h-9 w-9 p-0;    /* 36x36px */
+  }
+  
+  /* Responsive Grids - Mobile First */
+  .grid-responsive-2 {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+  }
+  
+  .grid-responsive-3 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+  }
+  
+  .grid-responsive-4 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+  }
+  
+  .grid-responsive-5 {
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4;
+  }
+  
+  /* Responsive Stats Grid */
+  .stats-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6;
+  }
+  
+  /* Responsive Container Padding */
+  .container-responsive {
+    @apply px-4 py-3 md:px-6 md:py-4 lg:px-8 lg:py-6;
+  }
+  
+  /* Responsive Text Sizes */
+  .heading-responsive-1 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold;
+  }
+  
+  .heading-responsive-2 {
+    @apply text-xl md:text-2xl lg:text-3xl font-bold;
+  }
+  
+  .heading-responsive-3 {
+    @apply text-lg md:text-xl lg:text-2xl font-semibold;
+  }
+  
+  /* Responsive Flex Containers */
+  .flex-responsive {
+    @apply flex flex-col sm:flex-row gap-4;
+  }
+  
+  .flex-responsive-center {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4;
+  }
+  
+  /* Text Truncation with Tooltip Support */
+  .truncate-with-tooltip {
+    @apply truncate cursor-help;
+  }
+  
+  .line-clamp-responsive {
+    @apply line-clamp-2 md:line-clamp-3;
+  }
+  
+  /* Mobile-Friendly Tables */
+  .table-responsive {
+    @apply w-full overflow-x-auto;
+  }
+  
+  .table-responsive > table {
+    @apply min-w-[600px];
+  }
+  
+  /* Card Responsive Padding */
+  .card-padding-responsive {
+    @apply p-3 md:p-4 lg:p-6;
+  }
+  
+  /* Responsive Dialog/Modal Widths */
+  .dialog-responsive-sm {
+    @apply w-full max-w-[95vw] sm:max-w-md;
+  }
+  
+  .dialog-responsive-md {
+    @apply w-full max-w-[95vw] sm:max-w-lg;
+  }
+  
+  .dialog-responsive-lg {
+    @apply w-full max-w-[95vw] sm:max-w-2xl;
+  }
+  
+  .dialog-responsive-xl {
+    @apply w-full max-w-[95vw] sm:max-w-4xl;
+  }
+  
+  /* Responsive Spacing */
+  .section-spacing-responsive {
+    @apply space-y-4 md:space-y-6;
+  }
+  
+  /* Mobile-Friendly Filters */
+  .filters-responsive {
+    @apply flex flex-col sm:flex-row flex-wrap gap-3;
+  }
+  
+  .filter-item-responsive {
+    @apply w-full sm:w-auto sm:min-w-[140px];
+  }
+}

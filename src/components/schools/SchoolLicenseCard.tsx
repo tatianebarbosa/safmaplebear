@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { School, Users, MapPin, Phone, Mail, Settings, Eye, AlertTriangle } from "lucide-react";
 import { School as SchoolType, calculateLicenseStatus } from "@/lib/schoolDataProcessor";
 import { cn } from "@/lib/utils";
+import { TruncatedEmail } from '@/components/ui/truncated-text';
 
 interface SchoolLicenseCardProps {
   school: SchoolType;
@@ -145,9 +146,9 @@ const SchoolLicenseCard = ({ school, onViewDetails, onEditLicenses }: SchoolLice
         {(school.email || school.phone) && (
           <div className="space-y-2 pt-2 border-t border-border">
             {school.email && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Mail className="w-3 h-3" />
-                <span className="truncate">{school.email}</span>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0">
+                <Mail className="w-3 h-3 flex-shrink-0" />
+                <TruncatedEmail email={school.email} />
               </div>
             )}
             {school.phone && (

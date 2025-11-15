@@ -217,8 +217,8 @@ Como posso ser mais específico para ajudá-lo?`;
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      <Card className={`w-96 shadow-2xl transition-all duration-300 ${isMinimized ? 'h-14' : 'h-96'}`}>
+    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 w-full max-w-[calc(100vw-2rem)] sm:w-96 sm:max-w-none">
+      <Card className={`shadow-2xl transition-all duration-300 ${isMinimized ? 'h-14' : 'h-96'}`}>
         <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
           <div className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
