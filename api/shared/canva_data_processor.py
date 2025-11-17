@@ -161,7 +161,7 @@ def process_canva_users(
                 schools_users[school_id]['total_users'] += 1
                 schools_users[school_id]['total_licenses'] += 1 # Licença = Usuário Alocado
                 allocated = True
-           if not allocated:
+        if not allocated:
             # Usuário não alocado
             unallocated_users.append(user)
             schools_users[UNALLOCATED_SCHOOL_ID]['users'].append(user)

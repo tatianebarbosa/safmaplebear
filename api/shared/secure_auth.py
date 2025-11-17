@@ -3,31 +3,66 @@ import jwt
 import os
 import hashlib
 import secrets
+import json
 from datetime import datetime, timedelta
 from typing import Optional, Dict, List
-import json
 
-# User whitelist with roles - moved to environment or config file in prUSERS_WHITELIST = {
-    'tatiane.barbosa': {'name': 'Tatiane Barbosa dos Santos Xavier', 'role': 'agente'},
-    'rafhael.nazeazeno': {'name': 'Rafhael Nazeazeno Pereira', 'role': 'agente'},
-    'ingrid.vania': {'name': 'Ingrid Vania Mazzei de Oliveira', 'role': 'agente'},
-    'joao.felipe': {'name': 'Joao Felipe Gutierrez de Freitas', 'role': 'agente'},
-    'jaqueline.floriano': {'name': 'Jaqueline Floriano da Silva', 'role': 'agente'},
-    'jessika.queiroz': {'name': 'Jessika Queiroz', 'role': 'agente'},
-    'fernanda.louise': {'name': 'Fernanda Louise de Almeida Inacio', 'role': 'agente'},
-    'ana.paula': {'name': 'ANA PAULA OLIVEIRA DE ANDRADE', 'role': 'coordenadora'},
-}
+# --- Configurações ---
 JWT_SECRET = os.environ.get('JWT_SECRET', secrets.token_urlsafe(32))
 JWT_ALGORITHM = 'HS256'
 TOKEN_EXPIRY_HOURS = 8
 SALT_ROUNDS = 12
+USER_DB_PATH = os.path.join(os.path.dirname(__file__), 'users.json')
 
+# --- Estrutura de Dados de Usuário ---
+class User:
+    def __init__(self, username, name, role, hashed_password, salt):
+        self.username = username
+        self.name = name
+        self.role = role
+        self.hashed_password = hashed_password
+        self.salt = salt
+
+    def to_dict(self):
+        return {
+            'username': self.username,
+            'name': self.name,
+            'role': self.role,
+            'hashed_password': self.hashed_password,
+            'salt': self.salt
+        }
+
+# --- Serviço de Autenticação e Gerenciamento de Usuários ---
 class SecureAuthService:
     def __init__(self):
         self.failed_attempts = {}  # In production, use Redis or database
         self.max_attempts = 5
         self.lockout_time = 300  # 5 minutes
+        self._load_users()
         
+    def _load_users(self):
+        """Carrega usuários do arquivo JSON (simulação de DB)"""
+        if not os.path.exists(USER_DB_PATH):
+            self.users = {}
+            self._save_users()
+            return
+
+        try:
+            with open(USER_DB_PATH, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                self.users = {
+                    u['username']: User(**u) for u in data.values()
+                }
+        except Exception:
+            self.users = {}
+            self._save_users()
+
+    def _save_users(self):
+        """Salva usuários no arquivo JSON (simulação de DB)"""
+        data = {u.username: u.to_dict() for u in self.users.values()}
+        with open(USER_DB_PATH, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
     def _hash_password(self, password: str, salt: str = None) -> tuple:
         """Hash password with salt using PBKDF2"""
         if salt is None:
@@ -47,7 +82,8 @@ class SecureAuthService:
         """Verify password against hash"""
         test_hash, _ = self._hash_password(password, salt)
         return secrets.compare_digest(test_hash, hashed_password)
-    
+
+    # --- Lógica de Autenticação (Atualizada) ---
     def _is_account_locked(self, username: str) -> bool:
         """Check if account is locked due to failed attempts"""
         if username not in self.failed_attempts:
@@ -79,34 +115,31 @@ class SecureAuthService:
     
     def authenticate_user(self, username: str, password: str) -> Optional[Dict]:
         """Validate user credentials and return user info"""
+        username = username.lower()
+        
         # Check if account is locked
         if self._is_account_locked(username):
             return {
+                'success': False,
                 'error': 'account_locked',
                 'message': f'Conta bloqueada por {self.lockout_time // 60} minutos devido a muitas tentativas falhadas'
             }
         
-        # Check if user exists in whitelist
-        if username not in USERS_WHITELIST:
+        # Check if user exists
+        user = self.users.get(username)
+        if not user:
             self._record_failed_attempt(username)
             return {
+                'success': False,
                 'error': 'invalid_credentials',
                 'message': 'Credenciais inválidas'
             }
         
-        # In production, get hashed password from secure storage
-        # For now, we assume the password is provided by the user and verified against a secure storage.
-        # For this example, we will assume a successful authentication if the username is in the whitelist and the password is 'maplebear2025'.
-        # This is a temporary solution and should be replaced with a proper password hashing and storage mechanism.
-        
-        # For demonstration purposes, let's use a placeholder for password verification.
-        # In a real application, you would retrieve the user's hashed password and salt from a database
-        # and then use self._verify_password(password, stored_hash, salt) to check it.
-        
-        # Placeholder for password verification (replace with actual secure storage lookup)
-        if password != 'maplebear2025':
+        # Verify password using stored hash and salt
+        if not self._verify_password(password, user.hashed_password, user.salt):
             self._record_failed_attempt(username)
             return {
+                'success': False,
                 'error': 'invalid_credentials',
                 'message': 'Credenciais inválidas'
             }
@@ -114,8 +147,11 @@ class SecureAuthService:
         # Clear failed attempts on successful login
         self._clear_failed_attempts(username)
         
-        user_info = USERS_WHITELIST[username].copy()
-        user_info['username'] = username
+        user_info = {
+            'username': user.username,
+            'name': user.name,
+            'role': user.role
+        }
         
         return {
             'success': True,
@@ -148,8 +184,8 @@ class SecureAuthService:
                 issuer='maple-bear-saf'
             )
             
-            # Additional validation
-            if 'sub' not in payload or payload['sub'] not in USERS_WHITELIST:
+            # Additional validation: check if user still exists
+            if 'sub' not in payload or payload['sub'] not in self.users:
                 return None
                 
             return payload
@@ -159,22 +195,76 @@ class SecureAuthService:
         except jwt.InvalidTokenError:
             return {'error': 'invalid_token', 'message': 'Token inválido'}
     
-    def refresh_token(self, token: str) -> Optional[str]:
-        """Refresh JWT token if valid and not expired"""
-        payload = self.verify_token(token)
+    # --- Lógica de Gerenciamento de Usuários (Nova) ---
+    def get_all_users(self) -> List[Dict]:
+        """Retorna a lista de todos os usuários (sem hash/salt)"""
+        return [{
+            'username': u.username,
+            'name': u.name,
+            'role': u.role
+        } for u in self.users.values()]
+
+    def create_user(self, username: str, name: str, password: str, role: str) -> Dict:
+        """Cria um novo usuário"""
+        username = username.lower()
+        if username in self.users:
+            return {'success': False, 'message': 'Usuário já existe'}
         
-        if not payload or 'error' in payload:
-            return None
+        hashed_password, salt = self._hash_password(password)
         
-        # Generate new token
-        user_info = USERS_WHITELIST[payload['sub']]
-        return self.generate_token(payload['sub'], user_info)
-    
+        new_user = User(username, name, role, hashed_password, salt)
+        self.users[username] = new_user
+        self._save_users()
+        
+        return {'success': True, 'message': 'Usuário criado com sucesso'}
+
+    def update_user_password(self, username: str, new_password: str) -> Dict:
+        """Atualiza a senha de um usuário"""
+        username = username.lower()
+        user = self.users.get(username)
+        if not user:
+            return {'success': False, 'message': 'Usuário não encontrado'}
+        
+        hashed_password, salt = self._hash_password(new_password)
+        user.hashed_password = hashed_password
+        user.salt = salt
+        self._save_users()
+        
+        return {'success': True, 'message': 'Senha atualizada com sucesso'}
+
+    def update_user_role(self, username: str, new_role: str) -> Dict:
+        """Atualiza o perfil (role) de um usuário"""
+        username = username.lower()
+        user = self.users.get(username)
+        if not user:
+            return {'success': False, 'message': 'Usuário não encontrado'}
+        
+        if new_role not in ['admin', 'user', 'agente', 'coordenadora']: # Definir roles válidas
+             return {'success': False, 'message': 'Perfil inválido'}
+
+        user.role = new_role
+        self._save_users()
+        
+        return {'success': True, 'message': 'Perfil atualizado com sucesso'}
+
+    def delete_user(self, username: str) -> Dict:
+        """Deleta um usuário"""
+        username = username.lower()
+        if username not in self.users:
+            return {'success': False, 'message': 'Usuário não encontrado'}
+        
+        del self.users[username]
+        self._save_users()
+        
+        return {'success': True, 'message': 'Usuário deletado com sucesso'}
+
     def check_permission(self, user_role: str, required_role: str) -> bool:
         """Check if user has required permissions"""
         role_hierarchy = {
+            'admin': 3, # Novo nível mais alto
             'agente': 1,
-            'coordenadora': 2
+            'coordenadora': 2,
+            'user': 1
         }
         
         user_level = role_hierarchy.get(user_role, 0)
@@ -183,12 +273,16 @@ class SecureAuthService:
         return user_level >= required_level
     
     def get_user_info(self, username: str) -> Optional[Dict]:
-        """Get user information from whitelist"""
-        if username not in USERS_WHITELIST:
+        """Get user information"""
+        user = self.users.get(username.lower())
+        if not user:
             return None
             
-        user_info = USERS_WHITELIST[username].copy()
-        user_info['username'] = username
+        user_info = {
+            'username': user.username,
+            'name': user.name,
+            'role': user.role
+        }
         return user_info
     
     def validate_email_domain(self, email: str) -> bool:
@@ -199,7 +293,7 @@ class SecureAuthService:
 # Global instance
 secure_auth = SecureAuthService()
 
-# Backward compatibility functions
+# --- Funções de Compatibilidade (Atualizadas) ---
 def authenticate_user(username: str, password: str) -> Optional[Dict]:
     """Legacy function for backward compatibility"""
     result = secure_auth.authenticate_user(username, password)
@@ -218,4 +312,3 @@ def verify_token(token: str) -> Optional[Dict]:
 def check_permission(user_role: str, required_role: str) -> bool:
     """Legacy function for backward compatibility"""
     return secure_auth.check_permission(user_role, required_role)
-

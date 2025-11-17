@@ -1,0 +1,9 @@
+{
+    "admin@mbcentral.com.br": {
+        "username": "admin@mbcentral.com.br",
+        "name": "Administrador Inicial",
+        "role": "admin",
+        "hashed_password": "63f61eabb3f088c1f8cfb7eda91bdd04ec6b59f18ab54393fdd9523fcc9d9bdf",
+        "salt": "b2006e7bb40097cf7fc1924973a61bca0ce9c0124f1abfbe7b48a5999d4240d5"
+    }
+}

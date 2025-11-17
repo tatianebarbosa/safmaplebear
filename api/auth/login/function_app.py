@@ -3,12 +3,14 @@ import json
 from ...shared.secure_auth import secure_auth
 from ...shared.config import config
 
+from ...shared.auth_middleware import auth_middleware
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """Login endpoint - POST /auth/login"""
     
     if req.method != 'POST':
         return func.HttpResponse(
-            json.dumps({"success": False, "message": "Method not allowed"}),
+            json.dumps({"success": False, "message": "Método não permitido"}),
             status_code=405,
             headers={"Content-Type": "application/json"}
         )

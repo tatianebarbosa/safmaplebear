@@ -40,18 +40,13 @@ class AuthService {
   ];
 
   // Simulação de credenciais válidas (em produção, isso seria validado no backend)
-  private readonly VALID_CREDENTIALS = [
-    { email: 'admin@mbcentral.com.br', password: 'maplebear2025', role: 'admin' as const },
-    { email: 'saf@seb.com.br', password: 'saf2025', role: 'user' as const },
-    { email: 'coordenador@sebsa.com.br', password: 'coord2025', role: 'user' as const }
-  ];
+  // Credenciais removidas e migradas para o backend (users.json)
+  // A autenticação agora é feita via chamada de API.
+  private readonly VALID_CREDENTIALS: any[] = [];
 
+  // Token agora é gerado pelo backend (JWT real)
   private generateToken(): string {
-    // Em produção, isso seria um JWT real
-    return btoa(JSON.stringify({
-      timestamp: Date.now(),
-      random: Math.random().toString(36)
-    }));
+    return 'simulated_token_from_backend';
   }
 
   private isValidDomain(email: string): boolean {
@@ -92,22 +87,34 @@ class AuthService {
       // Simular delay de rede
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Validar credenciais
-      const validCredential = this.VALID_CREDENTIALS.find(
-        cred => cred.email === credentials.email && cred.password === credentials.password
-      );
+      // Autenticação via API
+      const apiResponse = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: credentials.email,
+          password: credentials.password,
+        }),
+      });
 
-      if (!validCredential) {
+      const data = await apiResponse.json();
+
+      if (!data.success) {
         return {
           success: false,
-          message: 'Email ou senha incorretos'
+          message: data.message || 'Erro desconhecido na autenticação',
         };
       }
 
-      // Criar perfil do usuário
-      const user = this.createUserProfile(credentials.email, validCredential.role);
-      const token = this.generateToken();
-      const refreshToken = this.generateToken();
+      const { token, user: userData } = data;
+      
+      // Criar perfil do usuário (adaptado para usar dados da API)
+      const user = this.createUserProfile(userData.username, userData.role);
+      // O token e o refresh token agora vêm do backend
+      const refreshToken = token; // Usando o mesmo token para simplificar a migração
+
 
       // Salvar no localStorage (em produção, usar httpOnly cookies)
       localStorage.setItem(this.STORAGE_KEYS.TOKEN, token);
@@ -142,6 +149,10 @@ class AuthService {
     // Limpar outros dados relacionados
     localStorage.removeItem('authenticated');
     localStorage.removeItem('userEmail');
+    
+    // Limpar o token de acesso (se estiver em cookie, seria limpo pelo backend)
+    // Se estiver em localStorage, limpamos aqui.
+    localStorage.removeItem(this.STORAGE_KEYS.TOKEN);
   }
 
   getCurrentUser(): User | null {
