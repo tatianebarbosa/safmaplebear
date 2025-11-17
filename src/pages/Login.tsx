@@ -37,7 +37,9 @@ const Login = () => {
         localStorage.setItem("authenticated", "true");
         localStorage.setItem("userEmail", email);
         
-        navigate("/dashboard", { replace: true });
+        // Redirecionamento forçado para garantir que a página seja carregada
+        window.location.href = "/dashboard";
+        // navigate("/dashboard", { replace: true }); // Comentado para usar window.location.href
       } else {
         toast({
           title: "Erro de autenticação",
