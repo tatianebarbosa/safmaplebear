@@ -26,12 +26,17 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       }
     };
 
-    // Adicionar um pequeno delay para garantir que o localStorage seja atualizado após o login
-    const timer = setTimeout(() => {
+    // Usar um listener para reagir a mudanças no localStorage (simulando um estado global)
+    const handleStorageChange = () => {
         checkAuthentication();
-    }, 100); // 100ms de delay
+    };
 
-    return () => clearTimeout(timer);
+    window.addEventListener('storage', handleStorageChange);
+    checkAuthentication(); // Primeira verificação imediata
+
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    };
   }, [navigate]);
 
   if (isChecking) {

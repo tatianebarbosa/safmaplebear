@@ -25,6 +25,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
+      // Limpar o localStorage antes de tentar o login para evitar dados corrompidos
+      authService.logout();
       const response = await authService.login({ email, password });
 
       if (response.success) {
