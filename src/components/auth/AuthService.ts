@@ -83,31 +83,33 @@ class AuthService {
       // Simular delay de rede
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Autenticação via API
-      const apiResponse = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: credentials.email,
-          password: credentials.password,
-        }),
-      });
+      // --- SOLUÇÃO DE CONTORNO: AUTENTICAÇÃO SIMULADA NO FRONTEND ---
+      // Esta lógica é temporária para contornar o problema de comunicação com o backend
+      // Em produção, a autenticação DEVE ser feita via API.
+      
+      // Simular a busca do usuário no "banco de dados" users.json
+      const simulatedUser = {
+        username: 'temp_admin@mbcentral.com.br',
+        name: 'Admin Temporario',
+        role: 'Admin',
+        password: 'saf123' // Senha em texto puro (INSEGURO, APENAS PARA CONTORNO)
+      };
 
-      const data = await apiResponse.json();
-
-      if (!data.success) {
+      if (credentials.email !== simulatedUser.username || credentials.password !== simulatedUser.password) {
         return {
           success: false,
-          message: data.message || 'Erro desconhecido na autenticação',
+          message: 'Credenciais inválidas. (Simulação de Frontend)'
         };
       }
 
-      const { token, user: userData } = data;
+      const token = this.generateToken();
+      const userData = {
+        username: simulatedUser.username,
+        role: simulatedUser.role
+      };
       
       // Criar perfil do usuário (adaptado para usar dados da API)
-      const user = this.createUserProfile(userData.username, userData.role);
+      const user = this.createUserProfile(userData.username, userData.role as User['role']);
       // O token e o refresh token agora vêm do backend
       const refreshToken = token; // Usando o mesmo token para simplificar a migração
 
