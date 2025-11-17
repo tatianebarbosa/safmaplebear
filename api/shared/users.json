@@ -1,9 +1,9 @@
 {
-    "admin@mbcentral.com.br": {
-        "username": "admin@mbcentral.com.br",
-        "name": "Administrador Inicial",
-        "role": "admin",
-        "hashed_password": "63f61eabb3f088c1f8cfb7eda91bdd04ec6b59f18ab54393fdd9523fcc9d9bdf",
-        "salt": "b2006e7bb40097cf7fc1924973a61bca0ce9c0124f1abfbe7b48a5999d4240d5"
+    "temp_admin@mbcentral.com.br": {
+        "username": "temp_admin@mbcentral.com.br",
+        "name": "Admin Temporario",
+        "role": "Admin",
+        "hashed_password": "3e5add8f40b0abae2435159faefece8d0d22891d492b70bdd90afc67564c73e2",
+        "salt": "eeab61dd70b9ffc3e917d77d9c56b73770c669f09a71afebb34380f13799788d"
     }
 }
