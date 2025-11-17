@@ -33,26 +33,22 @@ class AuthService {
     SESSION_EXPIRY: 'sessionExpiry'
   };
 
+  // Domínios permitidos (mantido apenas para referência, a validação foi removida)
   private readonly ALLOWED_DOMAINS = [
     '@mbcentral.com.br',
     '@seb.com.br', 
     '@sebsa.com.br'
   ];
 
-  // Simulação de credenciais válidas (em produção, isso seria validado no backend)
-  // Credenciais removidas e migradas para o backend (users.json)
-  // A autenticação agora é feita via chamada de API.
-  private readonly VALID_CREDENTIALS: any[] = [];
-
   // Token agora é gerado pelo backend (JWT real)
   private generateToken(): string {
     return 'simulated_token_from_backend';
   }
 
+  // A validação de domínio foi removida para permitir o login do admin temporário
+  // A validação de domínio deve ser feita no backend, se necessário.
   private isValidDomain(email: string): boolean {
-    return this.ALLOWED_DOMAINS.some(domain => 
-      email.toLowerCase().includes(domain)
-    );
+    return true; // Sempre retorna true
   }
 
   private createUserProfile(email: string, role: User['role']): User {
@@ -76,13 +72,13 @@ class AuthService {
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      // Validar domínio
-      if (!this.isValidDomain(credentials.email)) {
-        return {
-          success: false,
-          message: 'Acesso permitido apenas para emails corporativos (@mbcentral, @seb, @sebsa)'
-        };
-      }
+      // A validação de domínio foi removida para permitir o login do admin temporário
+      // if (!this.isValidDomain(credentials.email)) {
+      //   return {
+      //     success: false,
+      //     message: 'Acesso permitido apenas para emails corporativos (@mbcentral, @seb, @sebsa)'
+      //   };
+      // }
 
       // Simular delay de rede
       await new Promise(resolve => setTimeout(resolve, 1000));
