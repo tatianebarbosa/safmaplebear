@@ -39,18 +39,16 @@ export interface Justification {
     role: UserRole;
   };
   reason: string;
-  attachment?: {
-    name: string;
-    data: string; // base64
-    type: string;
-  };
   timestamp: string;
   performedBy: string;
 }
 
+export type UsagePeriod = '30d' | '3m' | '6m' | '12m';
+
 export interface CanvaUsageData {
   schoolId: string;
   schoolName: string;
+  cluster?: string;
   designsCreated: number;
   designsPublished: number;
   designsShared: number;
@@ -63,19 +61,32 @@ export interface CanvaUsageData {
 }
 
 export interface UsageFilters {
-  period: '7d' | '30d' | '90d';
+  period: UsagePeriod;
   cluster?: string;
   school?: string;
 }
 
-export type HistoryAction = 'GRANT_LICENSE' | 'TRANSFER_LICENSE' | 'REMOVE_USER' | 'UPDATE_USER';
+export type HistoryAction = 'GRANT_LICENSE' | 'TRANSFER_LICENSE' | 'REMOVE_USER' | 'UPDATE_USER' | 'ADD_USER';
+
+
+export type HistoryChangeSet =
+  | { type: 'GRANT_LICENSE'; user: SchoolUser }
+  | { type: 'REMOVE_USER'; user: SchoolUser }
+  | { type: 'UPDATE_USER'; before: SchoolUser; after: SchoolUser }
+  | { type: 'TRANSFER_LICENSE'; before: SchoolUser; after: SchoolUser }
+  | { type: 'ADD_USER'; user: SchoolUser };
 
 export interface HistoryEntry {
   id: string;
   schoolId: string;
   schoolName: string;
   action: HistoryAction;
-  details: string; // Descrição detalhada da ação
-  performedBy: string; // Quem realizou a ação
+  details: string; // Descricao detalhada da acao
+  performedBy: string; // Quem realizou a acao
   timestamp: string;
+  changeSet?: HistoryChangeSet;
+  reverted?: boolean;
+  revertReason?: string;
+  revertedBy?: string;
+  revertTimestamp?: string;
 }

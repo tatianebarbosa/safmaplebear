@@ -120,12 +120,14 @@
      BORDER RADIUS
      ============================================ */
   
-  --radius-sm: 0.25rem;    /* 4px */
-  --radius-md: 0.5rem;     /* 8px */
-  --radius-lg: 0.75rem;    /* 12px */
-  --radius-xl: 1rem;       /* 16px */
-  --radius-2xl: 1.5rem;    /* 24px */
+  --radius-sm: 0.3rem;     /* ~5px */
+  --radius-md: 0.55rem;    /* ~9px */
+  --radius-lg: 0.75rem;    /* ~12px */
+  --radius-xl: 0.95rem;    /* ~15px */
+  --radius-2xl: 1.2rem;    /* ~19px */
   --radius-full: 9999px;
+  --radius: var(--radius-xl);
+  --layout-max-width: 1200px;
   
   /* ============================================
      TIPOGRAFIA
@@ -233,6 +235,15 @@ body {
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
   transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+main,
+.container,
+.page-section,
+.dashboard-section {
+  width: min(100%, var(--layout-max-width));
+  margin-inline: auto;
+  padding-inline: var(--spacing-lg);
 }
 
 /* ============================================

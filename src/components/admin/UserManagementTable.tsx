@@ -14,7 +14,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -26,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Edit, Trash2, KeyRound, UserPlus } from 'lucide-react';
+import { Edit, Trash2, KeyRound, UserPlus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { User, Role } from '@/types/tickets';
 
@@ -99,11 +98,11 @@ const api = {
     return response.json();
   },
   deleteUser: async (username: string): Promise<any> => {
-    // O endpoint de delete não foi implementado no backend, mas o PUT/role pode ser usado
-    // Vamos simular o delete por enquanto, ou usar um PUT/DELETE se o backend suportar
-    // Como o backend não tem DELETE, vamos apenas simular o sucesso para não quebrar a UI
-    console.warn('DELETE de usuário não implementado no backend. Simulação de sucesso.');
-    return { success: true, message: 'Usuário deletado com sucesso (simulado)' };
+    const safeUsername = encodeURIComponent(username);
+    const response = await fetchAuthenticated(`/api/admin/users/${safeUsername}`, {
+      method: 'DELETE',
+    });
+    return response.json();
   }
 };
 
@@ -237,15 +236,15 @@ const UserManagementTable = () => {
     }
 
     try {
-      // TODO: Substituir pela chamada real da API
       const result = await api.deleteUser(user.email);
 
-      if (result.success) {
-        toast({ title: 'Sucesso', description: result.message });
-        fetchUsers(); // Recarrega a lista
-      } else {
-        toast({ title: 'Erro', description: result.message, variant: 'destructive' });
+      if (!result.success) {
+        toast({ title: 'Erro', description: result.message || 'Não foi possível remover o usuário.', variant: 'destructive' });
+        return;
       }
+
+      setUsers((current) => current.filter((u) => u.id !== user.id));
+      toast({ title: 'Usuário removido', description: result.message || 'Acesso revogado com sucesso.' });
     } catch (error: any) {
       toast({ title: 'Erro de Conexão', description: error.message || 'Não foi possível deletar o usuário.', variant: 'destructive' });
     }

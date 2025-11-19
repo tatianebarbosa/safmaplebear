@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SchoolCanvaData } from "@/lib/canvaDataProcessor";
+import { MAX_LICENSES_PER_SCHOOL } from "@/config/licenseLimits";
 
 interface SchoolLicenseOverviewProps {
   schoolsData: SchoolCanvaData[];
@@ -60,7 +61,7 @@ export const SchoolLicenseOverview = ({ schoolsData, onSchoolClick }: SchoolLice
           Gestão de Licenças por Escola
         </CardTitle>
         <CardDescription>
-          Cada escola tem direito a 2 licenças do Canva. Monitore o uso e compliance.
+          {`Cada escola tem direito a ${MAX_LICENSES_PER_SCHOOL} licenças do Canva. Monitore o uso e compliance.`}
         </CardDescription>
       </CardHeader>
       <CardContent>

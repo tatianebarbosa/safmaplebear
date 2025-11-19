@@ -102,29 +102,34 @@ export const CanvaDataDisplay = () => {
                 <th>Ação</th>
               </tr>
             </thead>
-            <tbody>
-              {historico.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.dataAtualizacao}</td>
-                  <td>{item.horaAtualizacao}</td>
-                  <td>{item.totalPessoas}</td>
-                  <td className={item.mudanca > 0 ? 'positive' : item.mudanca < 0 ? 'negative' : ''}>
-                    {item.mudanca > 0 ? '+' : ''}{item.mudanca}
-                  </td>
-                  <td>{item.usuarioAlteracao}</td>
-                  <td>{item.descricaoAlteracao}</td>
-                  <td>
-                    <button
-                      onClick={() => reverterAlteracao(item.id)}
-                      className="btn-revert"
-                      title="Reverter esta alteração"
-                    >
-                      Reverter
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+        <tbody>
+          {historico.map((item) => {
+            const pessoasDelta = item.mudancas?.totalPessoas ?? 0;
+            const deltaClass = pessoasDelta > 0 ? 'positive' : pessoasDelta < 0 ? 'negative' : '';
+            const deltaLabel = pessoasDelta !== 0 ? `${pessoasDelta > 0 ? '+' : ''}${pessoasDelta}` : '0';
+            const snapshot = item.data ?? { totalPessoas: item.totalPessoas, designsCriados: item.designsCriados };
+
+            return (
+              <tr key={item.id}>
+                <td>{item.dataAtualizacao}</td>
+                <td>{item.horaAtualizacao}</td>
+                <td>{snapshot.totalPessoas}</td>
+                <td className={deltaClass}>{deltaLabel}</td>
+                <td>{item.usuarioAlteracao}</td>
+                <td>{item.descricaoAlteracao}</td>
+                <td>
+                  <button
+                    onClick={() => reverterAlteracao(item.id)}
+                    className="btn-revert"
+                    title="Reverter esta alteração"
+                  >
+                    Reverter
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
           </table>
         )}
       </div>

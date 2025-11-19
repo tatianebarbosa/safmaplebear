@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -65,33 +65,29 @@ export const SchoolLicenseCard = ({
 
   const getNonComplianceReason = (email: string) => {
     const domain = email.toLowerCase().split('@')[1];
-    if (!domain) return 'Email inválido';
+    if (!domain) return 'Email invalido';
     
     if (domain.includes('gmail.com') || domain.includes('hotmail.com') || domain.includes('yahoo.com')) {
-      return 'Email pessoal não autorizado';
+      return 'Email pessoal nao autorizado';
     }
     
     if (!domain.includes('maplebear') && domain !== 'mbcentral.com.br') {
-      return 'Domínio não autorizado pela política Maple Bear';
+      return 'Dominio nao autorizado pela politica Maple Bear';
     }
     
-    return 'Email fora da política';
-  };
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'Ativa': return 'default';
-      case 'Implantando': return 'secondary';
-      default: return 'outline';
-    }
+    return 'Email fora da politica';
   };
 
   const getLicensesBadgeColor = () => {
     switch (licenseStatus) {
-      case 'Disponível': return 'bg-success/10 text-success-foreground border-success/20';
-      case 'Completo': return 'bg-warning/10 text-warning-foreground border-warning/20';
-      case 'Excedido': return 'bg-destructive/10 text-destructive-foreground border-destructive/20';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'Disponivel':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'Completo':
+        return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'Excedido':
+        return 'bg-rose-50 text-rose-700 border-rose-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -102,15 +98,15 @@ export const SchoolLicenseCard = ({
   };
 
   const handleAddUser = (userData: any) => {
-    // Verificar se a escola já tem 2 usuários
+    // Verificar se a escola ja tem 2 usuarios
     if (school.users.length >= 2) {
-      toast.error('Esta escola já possui o limite máximo de 2 usuários. Para adicionar um novo usuário, você deve transferir ou excluir um usuário existente.');
+      toast.error('Esta escola ja possui o limite maximo de 2 usuarios. Para adicionar um novo usuario, voce deve transferir ou excluir um usuario existente.');
       return;
     }
     
     addUser(school.id, userData);
     setShowUserDialog(false);
-    toast.success('Usuário adicionado com sucesso');
+    toast.success('Usuario adicionado com sucesso');
   };
 
   const handleEditUser = (userData: any) => {
@@ -136,16 +132,22 @@ export const SchoolLicenseCard = ({
     switch (pendingAction.type) {
       case 'edit':
         if (editingUser) {
-          updateUser(school.id, editingUser.id, pendingAction.data);
+          updateUser(school.id, editingUser.id, pendingAction.data, {
+            performedBy: justificationData.performedBy,
+            reason: justificationData.reason
+          });
           setEditingUser(null);
           setShowUserDialog(false);
-          toast.success('Usuário atualizado com sucesso');
+          toast.success('Usuario atualizado com sucesso');
         }
         break;
         
       case 'remove':
-        removeUser(school.id, pendingAction.data.userId);
-        toast.success('Usuário removido com sucesso');
+        removeUser(school.id, pendingAction.data.userId, {
+          performedBy: justificationData.performedBy,
+          reason: justificationData.reason
+        });
+        toast.success('Usuario removido com sucesso');
         break;
         
       case 'swap':
@@ -166,14 +168,13 @@ export const SchoolLicenseCard = ({
                 role: pendingAction.data.newUser.role,
               },
               reason: justificationData.reason,
-              attachment: justificationData.attachment,
               performedBy: justificationData.performedBy,
               // timestamp
             });
           }
           setSwappingUserId(null);
           setShowSwapDialog(false);
-          toast.success('Usuário substituído com sucesso');
+          toast.success('Usuario substituido com sucesso');
         }
         break;
     }
@@ -211,9 +212,6 @@ export const SchoolLicenseCard = ({
                 </Badge>
               </div>
             </div>
-            <Badge variant="outline" className="text-xs font-medium border-border/50 bg-background/50">
-              {school.status}
-            </Badge>
           </div>
         </CardHeader>
 
@@ -222,7 +220,7 @@ export const SchoolLicenseCard = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${getLicensesBadgeColor()}`}>
-                {school.usedLicenses}/{school.totalLicenses} Licenças
+                {school.usedLicenses}/{school.totalLicenses} Licencas
                 {licenseStatus === 'Excedido' && ' (Excesso)'}
               </span>
               <span className="text-xs text-muted-foreground">
@@ -241,18 +239,18 @@ export const SchoolLicenseCard = ({
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Users className="h-4 w-4 text-muted-foreground" />
-              <span>{school.users.length} usuários</span>
+              <span>{school.users.length} usuarios</span>
             </div>
             {nonCompliantUsers.length > 0 && (
               <div className="flex items-center gap-1 text-destructive">
                 <AlertTriangle className="h-4 w-4" />
-                <span>{nonCompliantUsers.length} fora da política</span>
+                <span>{nonCompliantUsers.length} fora da politica</span>
               </div>
             )}
             {school.hasRecentJustifications && (
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Paperclip className="h-4 w-4 text-primary" />
-                <span className="text-primary">Justificativas</span>
+                <span className="text-primary">Referencias (Email/Ticket)</span>
               </div>
             )}
           </div>
@@ -304,15 +302,15 @@ export const SchoolLicenseCard = ({
             ))}
             {school.users.length > 5 && (
               <div className="text-xs text-muted-foreground text-center py-1">
-                +{school.users.length - 5} usuários adicionais
+                +{school.users.length - 5} usuarios adicionais
               </div>
             )}
           </div>
 
           {/* Actions */}
           <div className="flex flex-col space-y-2 pt-2 border-t">
-            {/* Botão de Ação Principal Condicional */}
-            {licenseStatus === 'Disponível' ? (
+            {/* Botao de Acao Principal Condicional */}
+            {licenseStatus === 'Disponivel' ? (
               <Button 
                 size="sm" 
                 variant="default" 
@@ -320,17 +318,17 @@ export const SchoolLicenseCard = ({
                 className="w-full"
               >
                 <Plus className="h-3 w-3 mr-1" />
-                Conceder Licença
+                Conceder Licenca
               </Button>
             ) : licenseStatus === 'Excedido' ? (
               <Button 
                 size="sm" 
                 variant="secondary" 
-                onClick={() => openSwapDialog(school.users[0].id)} // Assumindo que o primeiro usuário é o que será trocado por padrão
+                onClick={() => openSwapDialog(school.users[0].id)} // Assumindo que o primeiro usuario e o que sera trocado por padrao
                 className="w-full"
               >
                 <RefreshCw className="h-3 w-3 mr-1" />
-                Transferir Licença
+                Transferir Licenca
               </Button>
             ) : (
               <Button 
@@ -339,11 +337,11 @@ export const SchoolLicenseCard = ({
                 disabled
                 className="w-full"
               >
-                Licenças Completas
+                Licencas Completas
               </Button>
             )}
             
-            {/* Botão Gerenciar (Substitui Detalhes) */}
+            {/* Botao Gerenciar (Substitui Detalhes) */}
             <Button 
               size="sm" 
               variant="outline" 
@@ -363,7 +361,7 @@ export const SchoolLicenseCard = ({
         onOpenChange={setShowUserDialog}
         onSave={editingUser ? handleEditUser : handleAddUser}
         initialData={editingUser}
-        title={editingUser ? 'Editar Usuário' : 'Adicionar Usuário'}
+        title={editingUser ? 'Editar Usuario' : 'Adicionar Usuario'}
       />
 
       <SwapUserDialog
@@ -384,8 +382,8 @@ export const SchoolLicenseCard = ({
         open={showJustificationDialog}
         onOpenChange={setShowJustificationDialog}
         onConfirm={handleJustificationConfirm}
-        title="Justificativa Necessária"
-        description="Para realizar esta alteração de licença, é necessário fornecer uma justificativa."
+        title="Referencia Necessaria"
+        description="Para realizar esta alteracao de licenca, informe o titulo do e-mail ou numero do ticket."
       />
 
       <SchoolDetailsDialog
@@ -396,3 +394,5 @@ export const SchoolLicenseCard = ({
     </>
   );
 };
+
+

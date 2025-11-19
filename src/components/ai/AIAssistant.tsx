@@ -178,7 +178,7 @@ Reescreva textos e consulte dados de escolas rapidamente.
       {/* Interface de Input */}
       <Card>
         <CardHeader>
-          <CardTitle>Aprimorar Texto ou Consultar Escola</CardTitle>},{find:
+          <CardTitle>Aprimorar Texto ou Consultar Escola</CardTitle>
           <CardDescription>
             Digite o texto para aprimorar ou o nome da escola para consulta.
           </CardDescription>
@@ -278,7 +278,7 @@ Buscar Dados da Escola
                 <div>
                   <h4 className="font-medium text-sm text-success mb-2">
                     {response.type === 'school_query' ? 'Resultado:' : 'Aprimorado:'}
-                  </h4>},{find:
+                  </h4>
                   <div className="p-3 bg-success-bg border border-success/20 rounded-lg">
                     <p className="text-sm whitespace-pre-line">{response.improvedText}</p>
                   </div>
@@ -301,7 +301,7 @@ Buscar Dados da Escola
       {/* Dicas de Uso */}
       <Card>
         <CardHeader>
-          <CardTitle>Guia Rápido</CardTitle>},{find:
+          <CardTitle>Guia Rápido</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm">

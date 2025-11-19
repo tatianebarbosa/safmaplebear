@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, Building2, Plus, Minus, UserX, RefreshCw, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { User, Building2, Plus, UserX, RefreshCw, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { SchoolCanvaData, CanvaUser } from '@/lib/canvaDataProcessor';
+import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
 
 interface LicenseManagementProps {
   schoolsData: SchoolCanvaData[];
@@ -30,7 +31,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
 
   const handleAction = () => {
     if (!selectedSchool || !justification.trim()) {
-      toast.error('Escola e justificativa são obrigatórios');
+      toast.error('Selecione a escola e informe o titulo do e-mail ou numero do ticket correspondente');
       return;
     }
 
@@ -180,7 +181,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
         <CardHeader>
           <CardTitle>Gerenciamento de Licenças por Escola</CardTitle>
           <CardDescription>
-            Cada escola tem direito a 2 licenças. Use as ações abaixo para gerenciar licenças e usuários.
+            {`Cada escola tem direito a ${MAX_LICENSES_PER_SCHOOL} licenças. Use as ações abaixo para gerenciar licenças e usuários.`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -313,13 +314,18 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                               )}
 
                               <div>
-                                <Label htmlFor="justification">Justificativa *</Label>
+                                <Label htmlFor="justification">
+                                  Referencia (Titulo do e-mail ou numero do ticket) *
+                                </Label>
                                 <Textarea
                                   id="justification"
-                                  placeholder="Descreva o motivo desta alteração..."
+                                  placeholder="Titulo do e-mail ou numero do ticket correspondente"
                                   value={justification}
                                   onChange={(e) => setJustification(e.target.value)}
                                 />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Copie o assunto oficial ou o ID do ticket que justificam essa acao.
+                                </p>
                               </div>
                             </div>
 

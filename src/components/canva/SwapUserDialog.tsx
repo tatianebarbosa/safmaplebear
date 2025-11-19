@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { UserRole } from '@/types/schoolLicense';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { Badge } from '@/components/ui/badge';
-import { Upload, File } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SwapUserDialogProps {
@@ -24,7 +23,6 @@ interface SwapUserDialogProps {
   onConfirm: (data: {
     newUser: { name: string; email: string; role: UserRole };
     reason: string;
-    attachment?: { name: string; data: string; type: string };
   }) => void;
   currentUser: any;
 }
@@ -41,13 +39,7 @@ export const SwapUserDialog = ({
     newRole: 'Estudante' as UserRole,
     reason: '',
   });
-  const [attachment, setAttachment] = useState<{
-    name: string;
-    data: string;
-    type: string;
-  } | null>(null);
   const [errors, setErrors] = useState<any>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { isEmailValid } = useSchoolLicenseStore();
 
@@ -83,35 +75,6 @@ export const SwapUserDialog = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error('Apenas arquivos PDF, JPG e PNG são permitidos');
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Arquivo deve ter no máximo 5MB');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string;
-      setAttachment({
-        name: file.name,
-        data: base64,
-        type: file.type,
-      });
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -123,7 +86,6 @@ export const SwapUserDialog = ({
           role: formData.newRole,
         },
         reason: formData.reason,
-        attachment: attachment || undefined,
       });
       resetForm();
     }
@@ -149,7 +111,7 @@ export const SwapUserDialog = ({
         <DialogHeader>
           <DialogTitle>Trocar Usuário</DialogTitle>
           <DialogDescription>
-            Substitua o usuário atual por um novo usuário com justificativa.
+            Substitua o usuário atual informando a referência do e-mail ou ticket que motivou a troca.
           </DialogDescription>
         </DialogHeader>
         
@@ -232,45 +194,6 @@ export const SwapUserDialog = ({
             {errors.reason && (
               <p className="text-sm text-destructive">{errors.reason}</p>
             )}
-          </div>
-
-          <div className="space-y-2">
-            <Label>Anexo (Opcional)</Label>
-            <div className="space-y-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full justify-start"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                {attachment ? 'Alterar arquivo' : 'Adicionar arquivo'}
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              {attachment && (
-                <div className="flex items-center gap-2 p-2 bg-muted rounded">
-                  <File className="h-4 w-4" />
-                  <span className="text-sm">{attachment.name}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setAttachment(null)}
-                  >
-                    ×
-                  </Button>
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Formatos aceitos: PDF, JPG, PNG (máx. 5MB)
-              </p>
-            </div>
           </div>
 
           <DialogFooter>

@@ -302,26 +302,25 @@ export const SchoolLicenseManagement = () => {
       </Card>
 
       {/* Schools Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredSchools.map((school) => (
-          <SchoolLicenseCard
-            key={school.id}
-            school={school}
-            onViewDetails={handleViewDetails}
-            onManage={handleManage}
-          />
-        ))}
-      </div>
-
-      {filteredSchools.length === 0 && (
-        <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-sm text-muted-foreground">
+      <div className="rounded-3xl border border-border/40 bg-background/90 shadow-lg">
+        <div className="max-h-[70vh] overflow-y-auto pr-3 glass-scrollbar">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredSchools.map((school) => (
+              <SchoolLicenseCard
+                key={school.id}
+                school={school}
+                onViewDetails={handleViewDetails}
+                onManage={handleManage}
+              />
+            ))}
+          </div>
+          {filteredSchools.length === 0 && (
+            <div className="text-center py-10 text-sm text-muted-foreground">
               Nenhuma escola encontrada com os filtros aplicados.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Import Dialog */}
       <ImportPreviewDialog

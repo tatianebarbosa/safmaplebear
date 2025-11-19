@@ -144,14 +144,19 @@ const AccessControl = () => {
               </div>
 
               <div>
-                <Label htmlFor="justification">Justificativa</Label>
+                <Label htmlFor="justification">
+                  Referencia (Titulo do e-mail ou numero do ticket)
+                </Label>
                 <Textarea
                   id="justification"
                   value={requestData.justification}
                   onChange={(e) => setRequestData(prev => ({ ...prev, justification: e.target.value }))}
-                  placeholder="Motivo do acesso ao sistema..."
+                  placeholder="Titulo do e-mail ou numero do ticket que motiva a solicitacao"
                   rows={3}
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Use exatamente o assunto do e-mail recebido ou o ID do ticket para justificar o pedido.
+                </p>
               </div>
 
               <Button onClick={handleAccessRequest} className="w-full">

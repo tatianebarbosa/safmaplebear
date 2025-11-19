@@ -14,6 +14,26 @@ TOKEN_EXPIRY_HOURS = 8
 SALT_ROUNDS = 12
 USER_DB_PATH = os.path.join(os.path.dirname(__file__), 'users.json')
 
+ROLE_ALIASES = {
+    'admin': 'Admin',
+    'administrator': 'Admin',
+    'administrador': 'Admin',
+    'administradora': 'Admin',
+    'agent': 'Agent',
+    'agente': 'Agent',
+    'user': 'Agent',
+    'usuario': 'Agent',
+    'coordinator': 'Coordinator',
+    'coordenador': 'Coordinator',
+    'coordenadora': 'Coordinator'
+}
+
+ROLE_HIERARCHY = {
+    'Agent': 1,
+    'Coordinator': 2,
+    'Admin': 3
+}
+
 # --- Estrutura de Dados de Usuário ---
 class User:
     def __init__(self, username, name, role, hashed_password, salt):
@@ -62,6 +82,24 @@ class SecureAuthService:
         data = {u.username: u.to_dict() for u in self.users.values()}
         with open(USER_DB_PATH, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
+
+    def _normalize_role(self, role: str) -> Optional[str]:
+        """Mapeia aliases e normaliza o nome do perfil"""
+        if not role:
+            return None
+
+        cleaned = role.strip()
+        if not cleaned:
+            return None
+
+        canonical = ROLE_ALIASES.get(cleaned.lower())
+        if canonical:
+            return canonical
+
+        if cleaned in ROLE_HIERARCHY:
+            return cleaned
+
+        return None
 
     def _hash_password(self, password: str, salt: str = None) -> tuple:
         """Hash password with salt using PBKDF2"""
@@ -147,10 +185,12 @@ class SecureAuthService:
         # Clear failed attempts on successful login
         self._clear_failed_attempts(username)
         
+        user_role = self._normalize_role(user.role) or 'Agent'
+
         user_info = {
             'username': user.username,
             'name': user.name,
-            'role': user.role
+            'role': user_role
         }
         
         return {
@@ -160,10 +200,12 @@ class SecureAuthService:
     
     def generate_token(self, username: str, user_info: Dict) -> str:
         """Generate JWT token with enhanced security"""
+        normalized_role = self._normalize_role(user_info.get('role')) or 'Agent'
+
         payload = {
             'sub': username,
             'name': user_info['name'],
-            'role': user_info['role'],
+            'role': normalized_role,
             'exp': datetime.utcnow() + timedelta(hours=TOKEN_EXPIRY_HOURS),
             'iat': datetime.utcnow(),
             'jti': secrets.token_urlsafe(16),  # JWT ID for token revocation
@@ -201,7 +243,7 @@ class SecureAuthService:
         return [{
             'username': u.username,
             'name': u.name,
-            'role': u.role
+            'role': self._normalize_role(u.role) or 'Agent'
         } for u in self.users.values()]
 
     def create_user(self, username: str, name: str, password: str, role: str) -> Dict:
@@ -209,10 +251,16 @@ class SecureAuthService:
         username = username.lower()
         if username in self.users:
             return {'success': False, 'message': 'Usuário já existe'}
+
+        normalized_role = self._normalize_role(role)
+        if not normalized_role:
+            if role:
+                return {'success': False, 'message': 'Perfil inválido'}
+            normalized_role = 'Agent'
         
         hashed_password, salt = self._hash_password(password)
         
-        new_user = User(username, name, role, hashed_password, salt)
+        new_user = User(username, name, normalized_role, hashed_password, salt)
         self.users[username] = new_user
         self._save_users()
         
@@ -239,10 +287,11 @@ class SecureAuthService:
         if not user:
             return {'success': False, 'message': 'Usuário não encontrado'}
         
-        if new_role not in ['admin', 'user', 'agente', 'coordenadora']: # Definir roles válidas
-             return {'success': False, 'message': 'Perfil inválido'}
+        normalized_role = self._normalize_role(new_role)
+        if not normalized_role:
+            return {'success': False, 'message': 'Perfil inválido'}
 
-        user.role = new_role
+        user.role = normalized_role
         self._save_users()
         
         return {'success': True, 'message': 'Perfil atualizado com sucesso'}
@@ -260,15 +309,14 @@ class SecureAuthService:
 
     def check_permission(self, user_role: str, required_role: str) -> bool:
         """Check if user has required permissions"""
-        role_hierarchy = {
-            'admin': 3, # Novo nível mais alto
-            'agente': 1,
-            'coordenadora': 2,
-            'user': 1
-        }
-        
-        user_level = role_hierarchy.get(user_role, 0)
-        required_level = role_hierarchy.get(required_role, 0)
+        normalized_user_role = self._normalize_role(user_role)
+        normalized_required_role = self._normalize_role(required_role)
+
+        if not normalized_user_role or not normalized_required_role:
+            return False
+
+        user_level = ROLE_HIERARCHY.get(normalized_user_role, 0)
+        required_level = ROLE_HIERARCHY.get(normalized_required_role, 0)
         
         return user_level >= required_level
     
@@ -281,7 +329,7 @@ class SecureAuthService:
         user_info = {
             'username': user.username,
             'name': user.name,
-            'role': user.role
+            'role': self._normalize_role(user.role) or 'Agent'
         }
         return user_info
     

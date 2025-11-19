@@ -6,10 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, Calendar, User } from 'lucide-react';
+import { FileText, Calendar, User } from 'lucide-react';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -30,25 +29,11 @@ export const JustificationsDialog = ({
   const { getJustificationsBySchool } = useSchoolLicenseStore();
   const justifications = getJustificationsBySchool(schoolId);
 
-  const handleDownloadAttachment = (attachment: any) => {
-    try {
-      // Create a link and trigger download
-      const link = document.createElement('a');
-      link.href = attachment.data;
-      link.download = attachment.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('Erro ao baixar anexo:', error);
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Histórico de Justificativas</DialogTitle>
+        <DialogTitle>Historico de Referencias (Email/Ticket)</DialogTitle>
           <DialogDescription>
             Escola: {schoolName}
           </DialogDescription>
@@ -59,7 +44,7 @@ export const JustificationsDialog = ({
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
-                Nenhuma justificativa encontrada para esta escola.
+                Nenhuma referencia (email/ticket) encontrada para esta escola.
               </p>
             </div>
           ) : (
@@ -117,23 +102,7 @@ export const JustificationsDialog = ({
                       </p>
                     </div>
 
-                    {/* Attachment */}
-                    {justification.attachment && (
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Anexo:</h4>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownloadAttachment(justification.attachment)}
-                            className="gap-2"
-                          >
-                            <Download className="h-3 w-3" />
-                            {justification.attachment.name}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+
                   </div>
                 </CardContent>
               </Card>

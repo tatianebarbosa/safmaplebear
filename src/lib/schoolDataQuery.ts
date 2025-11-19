@@ -1,135 +1,135 @@
-import Papa from 'papaparse';
+import { loadFranchisingSchools } from '@/lib/safDataService';
+import type { School as FranchisingSchool } from '@/types/safData';
 
 interface SchoolData {
   [key: string]: any;
 }
 
+const SCHOOL_FIELDS = [
+  'ID da Escola',
+  'Nome da Escola',
+  'Carteira SAF',
+  'Status da Escola',
+  'Tipo de Escola',
+  'CNPJ',
+  'Logradouro Escola',
+  'Bairro Escola',
+  'CEP Escola',
+  'Cidade da Escola',
+  'Estado da Escola',
+  'Região da Escola',
+  'Telefone de Contato da Escola',
+  'E-mail da Escola',
+  'Razão Social',
+  'Nome Fantasia',
+  'Status CNPJ',
+  'Status Visita Liderança',
+  'Performance da Meta',
+  'Atual Série',
+  'Avançando de Segmento',
+  'Cluster',
+  'Ticket Médio',
+  'Toddle'
+];
+
 let cachedSchoolData: SchoolData[] = [];
 let dataLoaded = false;
 
-/**
- * Carrega os dados das escolas do arquivo CSV
- */
+const buildSchoolRecord = (school: FranchisingSchool): SchoolData => ({
+  'ID da Escola': school.id,
+  'Nome da Escola': school.nome,
+  'Carteira SAF': school.carteiraSaf,
+  'Status da Escola': school.statusEscola,
+  'Tipo de Escola': school.tipoEscola,
+  'CNPJ': school.cnpj,
+  'Logradouro Escola': school.logradouro,
+  'Bairro Escola': school.bairro,
+  'CEP Escola': school.cep,
+  'Cidade da Escola': school.cidade,
+  'Estado da Escola': school.estado,
+  'Região da Escola': school.regiao,
+  'Telefone de Contato da Escola': school.telefone || 'Não informado',
+  'E-mail da Escola': school.email || 'Não informado',
+  'Razão Social': school.razaoSocial,
+  'Nome Fantasia': school.nomeFantasia,
+  'Status CNPJ': school.statusCnpj,
+  'Status Visita Liderança': school.statusVisitaLideranca || 'N/A',
+  'Performance da Meta': school.performanceMeta || 'N/A',
+  'Atual Série': school.atualSerie || 'N/A',
+  'Avançando de Segmento': school.avancandoSegmento || 'N/A',
+  'Cluster': school.cluster,
+  'Ticket Médio': 'N/A',
+  'Toddle': 'N/A'
+});
+
 export const loadSchoolData = async (): Promise<SchoolData[]> => {
   if (dataLoaded && cachedSchoolData.length > 0) {
     return cachedSchoolData;
   }
 
   try {
-    const response = await fetch('/data/dados_escolas_unificados.csv');
-    const csvText = await response.text();
-    
-    return new Promise((resolve, reject) => {
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results: any) => {
-          cachedSchoolData = results.data;
-          dataLoaded = true;
-          resolve(results.data);
-        },
-        error: (error: any) => {
-          reject(new Error(`Erro ao processar CSV: ${error.message}`));
-        }
-      });
-    });
+    const rawSchools = await loadFranchisingSchools();
+    cachedSchoolData = rawSchools.map(buildSchoolRecord);
+    dataLoaded = true;
+    return cachedSchoolData;
   } catch (error) {
     throw new Error(`Erro ao carregar dados das escolas: ${error}`);
   }
 };
 
-/**
- * Busca uma escola por nome
- */
 export const searchSchoolByName = async (schoolName: string): Promise<SchoolData | null> => {
   const data = await loadSchoolData();
-  return data.find(school => 
-    school['Nome da Escola']?.toLowerCase().includes(schoolName.toLowerCase())
-  ) || null;
+  return (
+    data.find(school =>
+      school['Nome da Escola']?.toLowerCase().includes(schoolName.toLowerCase())
+    ) || null
+  );
 };
 
-/**
- * Busca escolas por estado
- */
 export const searchSchoolsByState = async (state: string): Promise<SchoolData[]> => {
   const data = await loadSchoolData();
-  return data.filter(school => 
-    school['Estado da Escola']?.toUpperCase() === state.toUpperCase()
+  return data.filter(
+    school => school['Estado da Escola']?.toUpperCase() === state.toUpperCase()
   );
 };
 
-/**
- * Busca escolas por cluster
- */
 export const searchSchoolsByCluster = async (cluster: string): Promise<SchoolData[]> => {
   const data = await loadSchoolData();
-  return data.filter(school => 
-    school['Cluster']?.toLowerCase() === cluster.toLowerCase()
+  return data.filter(
+    school => school['Cluster']?.toLowerCase() === cluster.toLowerCase()
   );
 };
 
-/**
- * Busca escolas por status
- */
 export const searchSchoolsByStatus = async (status: string): Promise<SchoolData[]> => {
   const data = await loadSchoolData();
-  return data.filter(school => 
-    school['Status da Escola']?.toLowerCase() === status.toLowerCase()
+  return data.filter(
+    school => school['Status da Escola']?.toLowerCase() === status.toLowerCase()
   );
 };
 
-/**
- * Gera um contexto textual com todos os dados das escolas para a IA
- */
 export const generateSchoolContext = async (): Promise<string> => {
   const data = await loadSchoolData();
-  
-  const columns = [
-    'ID da Escola', 'Nome da Escola', 'Carteira SAF', 'Status da Escola',
-    'Tipo de Escola', 'CNPJ', 'Logradouro Escola', 'Bairro Escola',
-    'CEP Escola', 'Cidade da Escola', 'Estado da Escola', 'Região da Escola',
-    'Telefone de Contato da Escola', 'E-mail da Escola', 'Razão Social',
-    'Nome Fantasia', 'Status CNPJ', 'Status Visita Liderança',
-    'Performance da Meta', 'Atual Série', 'Avançando de Segmento',
-    'Cluster', 'Ticket Médio', 'Toddle'
-  ];
 
-  let context = "Dados Oficiais das Escolas Maple Bear (Unificados):\n\n";
-  
-  // Cria uma tabela Markdown com os dados
-  context += "| " + columns.join(" | ") + " |\n";
-  context += "| " + columns.map(() => "---").join(" | ") + " |\n";
-  
+  let context = 'Dados Oficiais das Escolas Maple Bear (Unificados):\n\n';
+  context += '| ' + SCHOOL_FIELDS.join(' | ') + ' |\n';
+  context += '| ' + SCHOOL_FIELDS.map(() => '---').join(' | ') + ' |\n';
+
   data.forEach(school => {
-    const row = columns.map(col => {
+    const row = SCHOOL_FIELDS.map(col => {
       const value = school[col] ?? 'N/A';
-      return String(value).replace(/\|/g, '\\|'); // Escapa pipes para não quebrar a tabela
+      return String(value).replace(/\|/g, '\\|');
     });
-    context += "| " + row.join(" | ") + " |\n";
+    context += '| ' + row.join(' | ') + ' |\n';
   });
 
   return context;
 };
 
-/**
- * Formata os dados de uma escola para exibição
- */
 export const formatSchoolData = (school: SchoolData): string => {
-  if (!school) return "Escola não encontrada.";
-  
-  const fields = [
-    'ID da Escola', 'Nome da Escola', 'Carteira SAF', 'Status da Escola',
-    'Tipo de Escola', 'CNPJ', 'Logradouro Escola', 'Bairro Escola',
-    'CEP Escola', 'Cidade da Escola', 'Estado da Escola', 'Região da Escola',
-    'Telefone de Contato da Escola', 'E-mail da Escola', 'Razão Social',
-    'Nome Fantasia', 'Status CNPJ', 'Status Visita Liderança',
-    'Performance da Meta', 'Atual Série', 'Avançando de Segmento',
-    'Cluster', 'Ticket Médio', 'Toddle'
-  ];
+  if (!school) return 'Escola não encontrada.';
 
-  let formatted = "**Detalhes da Escola:**\n\n";
-  
-  fields.forEach(field => {
+  let formatted = '**Detalhes da Escola:**\n\n';
+  SCHOOL_FIELDS.forEach(field => {
     const value = school[field] ?? 'N/A';
     formatted += `- **${field}:** ${value}\n`;
   });

@@ -1,3 +1,10 @@
+import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import { loadFranchisingSchools, loadLicenseUsers, isEmailCompliant } from '@/lib/safDataService';
+import type {
+  School as BackendSchoolRecord,
+  LicenseUser as BackendLicenseUser
+} from '@/types/safData';
+
 export interface School {
   id: string;
   name: string;
@@ -32,65 +39,40 @@ export interface LicenseStatus {
   status: 'available' | 'warning' | 'full' | 'excess';
 }
 
-export function parseSchoolsCSV(csvContent: string): School[] {
-  const lines = csvContent.split('\n');
-  lines[0].split(';'); // Ignorando headers não utilizados
-  
-  return lines.slice(1)
-    .filter(line => line.trim())
-    .map(line => {
-      const values = line.split(';');
-      
-      const schoolId = values[3] || '';
-      const schoolName = values[4] || '';
-      const status = values[5] || 'Ativa';
-      const cluster = values[6] || '';
-      const cnpj = values[8] || '';
-      const city = values[12] || '';
-      const state = values[13] || '';
-      const region = values[14] || '';
-      const phone = values[15] || '';
-      const email = values[16] || '';
-      
-      return {
-        id: schoolId,
-        name: schoolName,
-        status: status as 'Ativa' | 'Implantando' | 'Inativa',
-        cluster,
-        city,
-        state,
-        region,
-        email,
-        phone,
-        cnpj,
-        maxLicenses: 2, // Padrão de 2 licenças por escola
-        usedLicenses: 0,
-        users: []
-      };
-    })
-    .filter(school => school.id && school.name);
-}
+const normalizeStatusLabel = (status: string): 'Ativa' | 'Implantando' | 'Inativa' => {
+  const normalized = status?.trim().toLowerCase() ?? '';
+  if (normalized.includes('ativa') || normalized.includes('operando')) return 'Ativa';
+  if (normalized.includes('implant')) return 'Implantando';
+  return 'Inativa';
+};
 
-export function parseUsersCSV(csvContent: string): SchoolUser[] {
-  const lines = csvContent.split('\n');
-  
-  return lines.slice(1)
-    .filter(line => line.trim())
-    .map(line => {
-      const values = line.split(';');
-      
-      return {
-        name: values[0] || '',
-        email: values[1] || '',
-        role: values[2] || '',
-        school: values[3] || '',
-        schoolId: values[4] || '',
-        licenseStatus: values[5] || '',
-        updatedAt: values[6] || ''
-      };
-    })
-    .filter(user => user.email);
-}
+const buildProcessorSchool = (raw: BackendSchoolRecord): School => ({
+  id: raw.id.toString(),
+  name: raw.nome,
+  status: normalizeStatusLabel(raw.statusEscola),
+  cluster: raw.cluster,
+  city: raw.cidade,
+  state: raw.estado,
+  region: raw.regiao,
+  email: raw.email ?? '',
+  phone: raw.telefone ?? '',
+  cnpj: raw.cnpj ?? '',
+  maxLicenses: MAX_LICENSES_PER_SCHOOL,
+  usedLicenses: 0,
+  users: []
+});
+
+const buildProcessorUser = (user: BackendLicenseUser): SchoolUser => ({
+  name: user.nome,
+  email: user.email,
+  role: user.funcao,
+  school: user.escolaNome ?? '',
+  schoolId: user.escolaId !== null ? String(user.escolaId) : '',
+  licenseStatus: user.statusLicenca ?? '',
+  updatedAt: user.atualizadoEm
+    ? user.atualizadoEm.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+    : ''
+});
 
 export function calculateLicenseStatus(school: School): LicenseStatus {
   const used = school.usedLicenses;
@@ -120,35 +102,38 @@ export function calculateLicenseStatus(school: School): LicenseStatus {
 }
 
 export function combineSchoolsAndUsers(schools: School[], users: SchoolUser[]): School[] {
-  // Criar um mapa de escolas por nome para facilitar a busca
+  const normalizeName = (value: string): string => value?.trim().toLowerCase() ?? '';
   const schoolMap = new Map<string, School>();
   schools.forEach(school => {
-    schoolMap.set(school.name, school);
+    schoolMap.set(normalizeName(school.name), school);
   });
   
-  // Agrupar usuários por escola
   const usersBySchool = new Map<string, SchoolUser[]>();
   users.forEach(user => {
-    if (user.school) {
-      if (!usersBySchool.has(user.school)) {
-        usersBySchool.set(user.school, []);
-      }
-      usersBySchool.get(user.school)!.push(user);
+    const key = normalizeName(user.school);
+    if (!key) return;
+    if (!usersBySchool.has(key)) {
+      usersBySchool.set(key, []);
     }
+    usersBySchool.get(key)!.push(user);
   });
   
-  // Combinar dados
   return schools.map(school => {
-    const schoolUsers = usersBySchool.get(school.name) || [];
-    const activeUsers = schoolUsers.filter(user => 
-      user.licenseStatus === 'Ativa' || 
-      (user.email.includes('@maplebear.com.br') && user.school === school.name)
-    );
+    const key = normalizeName(school.name);
+    const schoolUsers = usersBySchool.get(key) || [];
+    const activeUsers = schoolUsers.filter(user => {
+      const licenseStatus = user.licenseStatus.toLowerCase();
+      return (
+        licenseStatus.includes('ativa') ||
+        licenseStatus.includes('ativo') ||
+        isEmailCompliant(user.email)
+      );
+    });
     
     return {
       ...school,
       users: schoolUsers,
-      usedLicenses: Math.min(activeUsers.length, school.maxLicenses + 5) // Permitir excesso até 5
+      usedLicenses: Math.min(activeUsers.length, school.maxLicenses + 5)
     };
   });
 }
@@ -182,20 +167,17 @@ export function getSchoolStats(schools: School[]) {
 
 export async function loadSchoolData(): Promise<School[]> {
   try {
-    const [schoolsResponse, usersResponse] = await Promise.all([
-      fetch('/data/escolas.csv'),
-      fetch('/data/usuarios_updated.csv')
+    const [rawSchools, rawUsers] = await Promise.all([
+      loadFranchisingSchools(),
+      loadLicenseUsers()
     ]);
     
-    const schoolsCSV = await schoolsResponse.text();
-    const usersCSV = await usersResponse.text();
-    
-    const schools = parseSchoolsCSV(schoolsCSV);
-    const users = parseUsersCSV(usersCSV);
+    const schools = rawSchools.map(buildProcessorSchool);
+    const users = rawUsers.map(buildProcessorUser);
     
     return combineSchoolsAndUsers(schools, users);
   } catch (error) {
     console.error('Erro ao carregar dados das escolas:', error);
-    return [];
+    throw new Error('Falha ao carregar dados das escolas. Veja o console para detalhes.');
   }
 }

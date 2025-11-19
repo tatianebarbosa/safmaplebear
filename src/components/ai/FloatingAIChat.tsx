@@ -1,24 +1,52 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Send, Minimize2, X } from "lucide-react";
+import { Bot, Send, Minimize2, X, BookOpenText } from "lucide-react";
 import { Mascot } from "@/components/ui/mascot";
 import { BearHappy } from "@/assets/maplebear";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { 
-  loadSchoolData, 
-  searchSchoolByName, 
+import {
+  loadSchoolData,
+  searchSchoolByName,
   formatSchoolData
 } from "@/lib/schoolDataQuery";
+import { getStoredKnowledgeItems, subscribeToKnowledgeBase, buildKnowledgeSummaries } from "@/lib/knowledgeBase";
+import type { KnowledgeAttachmentSummary, KnowledgeItem } from "@/types/knowledge";
+import { loadDashboardBIContext, buildBIAnswer, type DashboardBIContext } from "@/lib/ai/dashboardInsights";
 
 interface ChatMessage {
   id: string;
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
+  sources?: KnowledgeAttachmentSummary[];
 }
+
+const BI_DATA_SOURCES: KnowledgeAttachmentSummary[] = [
+  {
+    id: 'dataset-licencas-canva',
+    title: 'LicenÃ§as Canva (CSV oficial)',
+    category: 'dados',
+    tags: ['csv', 'licencas'],
+    summary: 'Fonte: public/data/licencas_canva.csv'
+  },
+  {
+    id: 'dataset-franchising',
+    title: 'Franchising.csv (mapa de escolas)',
+    category: 'dados',
+    tags: ['csv', 'escolas'],
+    summary: 'Fonte: public/data/Franchising.csv'
+  },
+  {
+    id: 'dataset-canva-history',
+    title: 'HistÃ³rico de coletas Canva',
+    category: 'dados',
+    tags: ['json', 'timer'],
+    summary: 'Fonte: public/data/canva_history.json'
+  }
+];
 
 const FloatingAIChat = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +54,7 @@ const FloatingAIChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      content: 'Olá! Sou o Assistente de IA do SAF. Posso responder sobre licenças Canva, escolas, usuários e métricas. Como posso ajudar?',
+      content: 'OlÃ¡! Sou o Assistente de IA do SAF. Posso responder sobre licenÃ§as Canva, escolas, usuÃ¡rios e mÃ©tricas. Como posso ajudar?',
       role: 'assistant',
       timestamp: new Date()
     }
@@ -34,6 +62,8 @@ const FloatingAIChat = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [schoolDataLoaded, setSchoolDataLoaded] = useState(false);
+  const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [dashboardContext, setDashboardContext] = useState<DashboardBIContext | null>(null);
 
   // Carregar dados das escolas ao montar o componente
   useEffect(() => {
@@ -47,6 +77,42 @@ const FloatingAIChat = () => {
     };
     loadData();
   }, []);
+
+  useEffect(() => {
+    setKnowledgeItems(getStoredKnowledgeItems());
+    const unsubscribe = subscribeToKnowledgeBase(setKnowledgeItems);
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    loadDashboardBIContext()
+      .then((context) => {
+        if (active) {
+          setDashboardContext(context);
+        }
+      })
+      .catch((error) => {
+        console.error('Erro ao carregar contexto de BI do Canva:', error);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const ensureDashboardContext = async (): Promise<DashboardBIContext | null> => {
+    if (dashboardContext) {
+      return dashboardContext;
+    }
+    const context = await loadDashboardBIContext();
+    setDashboardContext(context);
+    return context;
+  };
 
   const sendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -64,7 +130,10 @@ const FloatingAIChat = () => {
     setIsLoading(true);
 
     try {
-      let response;
+      let response: string | null = null;
+      let knowledgeContext: KnowledgeAttachmentSummary[] = [];
+      let knowledgeUsed = false;
+      let dataSourcesUsed: KnowledgeAttachmentSummary[] = [];
       
       // 1. Tenta a consulta direta aos dados das escolas (se carregados)
       if (schoolDataLoaded) {
@@ -74,22 +143,44 @@ const FloatingAIChat = () => {
         }
       }
       
-      // 2. Se não for uma consulta direta de escola, usa o ChatGPT via backend
+      // 2. Consulta BI local com os CSV/JSON oficiais
       if (!response) {
+        const context = await ensureDashboardContext();
+        if (context) {
+          const biAnswer = buildBIAnswer(currentInput, context);
+          if (biAnswer) {
+            response = biAnswer;
+            dataSourcesUsed = [...BI_DATA_SOURCES];
+          }
+        }
+      }
+      
+      // 3. Se ainda nÃ£o houver resposta, usa o backend com contexto da base
+      if (!response) {
+        knowledgeContext = buildKnowledgeSummaries(currentInput, knowledgeItems);
         try {
-          response = await callOpenAI(currentInput);
+          response = await callOpenAI(currentInput, knowledgeContext);
+          knowledgeUsed = knowledgeContext.length > 0;
         } catch (error) {
           console.error('Erro ao chamar ChatGPT:', error);
-          // Fallback para resposta simulada
           response = await simulateAIResponse(currentInput);
         }
       }
       
+      const sources: KnowledgeAttachmentSummary[] = [];
+      if (knowledgeUsed && knowledgeContext.length) {
+        sources.push(...knowledgeContext);
+      }
+      if (dataSourcesUsed.length) {
+        sources.push(...dataSourcesUsed);
+      }
+      
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: response,
+        content: response ?? 'NÃ£o consegui processar sua pergunta neste momento.',
         role: 'assistant',
-        timestamp: new Date()
+        timestamp: new Date(),
+        sources: sources.length ? sources : undefined
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -107,11 +198,11 @@ const FloatingAIChat = () => {
     }
   };
 
-  // Função de consulta de dados das escolas (RAG local)
+  // FunÃ§Ã£o de consulta de dados das escolas (RAG local)
   const querySchoolData = async (message: string): Promise<string | null> => {
     const lowerMessage = message.toLowerCase();
 
-    // Detecção de intenção de consulta de escola
+    // DetecÃ§Ã£o de intenÃ§Ã£o de consulta de escola
     if (lowerMessage.includes('escola') || lowerMessage.includes('unidade') || lowerMessage.includes('cnpj') || lowerMessage.includes('cluster') || lowerMessage.includes('status')) {
       
       // Tenta buscar por nome
@@ -124,23 +215,32 @@ const FloatingAIChat = () => {
         }
       }
 
-      // Se a intenção é clara, mas a busca falhou, retorna uma mensagem de erro específica
-      return "Não encontrei a escola ou o dado específico na base. Tente refinar a busca ou perguntar o nome exato da escola.";
+      // Se a intenÃ§Ã£o Ã© clara, mas a busca falhou, retorna uma mensagem de erro especÃ­fica
+      return "NÃ£o encontrei a escola ou o dado especÃ­fico na base. Tente refinar a busca ou perguntar o nome exato da escola.";
     }
 
-    return null; // Não é uma consulta de dados de escola, deixa a IA tratar
+    return null; // NÃ£o Ã© uma consulta de dados de escola, deixa a IA tratar
   };
 
-  const callOpenAI = async (input: string): Promise<string> => {
+  const callOpenAI = async (
+    input: string,
+    knowledge?: KnowledgeAttachmentSummary[]
+  ): Promise<string> => {
     // Chama o endpoint seguro do backend que injeta os dados do dashboard
+    const payload: Record<string, unknown> = {
+      question: input,
+    };
+
+    if (knowledge && knowledge.length) {
+      payload.knowledge = knowledge;
+    }
+
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        question: input,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
@@ -149,7 +249,7 @@ const FloatingAIChat = () => {
     }
 
     const data = await response.json();
-    return data.response || "Não consegui processar sua pergunta.";
+    return data.response || "NÃ£o consegui processar sua pergunta.";
   };
 
   const simulateAIResponse = async (input: string): Promise<string> => {
@@ -159,40 +259,40 @@ const FloatingAIChat = () => {
     const lowerInput = input.toLowerCase();
     
     if (lowerInput.includes('ticket') || lowerInput.includes('chamado')) {
-      return `Você perguntou sobre tickets. Temos vários pendentes, sendo os mais críticos aqueles com mais de 15 dias. Gostaria de listar os mais urgentes?`;
+      return `VocÃª perguntou sobre tickets. Temos vÃ¡rios pendentes, sendo os mais crÃ­ticos aqueles com mais de 15 dias. Gostaria de listar os mais urgentes?`;
     }
     
     if (lowerInput.includes('escola') || lowerInput.includes('unidade')) {
-      return `Posso fornecer informações sobre escolas! Qual unidade específica você gostaria de consultar (contatos, histórico, etc.)?`;
+      return `Posso fornecer informaÃ§Ãµes sobre escolas! Qual unidade especÃ­fica vocÃª gostaria de consultar (contatos, histÃ³rico, etc.)?`;
     }
     
     if (lowerInput.includes('texto') || lowerInput.includes('melhorar') || lowerInput.includes('escrever')) {
-      return `Posso aprimorar seus textos de atendimento (educado, acolhedor ou profissional). Qual texto você gostaria de melhorar?`;
+      return `Posso aprimorar seus textos de atendimento (educado, acolhedor ou profissional). Qual texto vocÃª gostaria de melhorar?`;
     }
     
-    if (lowerInput.includes('relatório') || lowerInput.includes('dashboard')) {
-      return `Para relatórios e dashboards, posso explicar dados ou sugerir análises. Qual métrica (vouchers, licenças, atendimentos, etc.) você gostaria de entender melhor?`;
+    if (lowerInput.includes('relatÃ³rio') || lowerInput.includes('dashboard')) {
+      return `Para relatÃ³rios e dashboards, posso explicar dados ou sugerir anÃ¡lises. Qual mÃ©trica (vouchers, licenÃ§as, atendimentos, etc.) vocÃª gostaria de entender melhor?`;
     }
     
-    if (lowerInput.includes('licença') || lowerInput.includes('canva')) {
-      return `Posso fornecer informações sobre licenças Canva, como:
-• Licenças ativas por escola
-• Usuários conformes e não conformes
-• Domínios autorizados
-• Métricas de uso
+    if (lowerInput.includes('licenÃ§a') || lowerInput.includes('canva')) {
+      return `Posso fornecer informaÃ§Ãµes sobre licenÃ§as Canva, como:
+â€¢ LicenÃ§as ativas por escola
+â€¢ UsuÃ¡rios conformes e nÃ£o conformes
+â€¢ DomÃ­nios autorizados
+â€¢ MÃ©tricas de uso
 
-Qual informação específica você gostaria?`;
+Qual informaÃ§Ã£o especÃ­fica vocÃª gostaria?`;
     }
     
-    return `Entendi sua pergunta sobre "${input}". Como Assistente SAF, posso ajudar com:
+    return `Entendi sua pergunta sobre "${message}". Como Assistente SAF, posso ajudar com:
     
-• Informações sobre licenças Canva
-• Dados de escolas e franquias
-• Análise de conformidade de usuários
-• Relatórios e métricas
-• Suporte geral
+â€¢ InformaÃ§Ãµes sobre licenÃ§as Canva
+â€¢ Dados de escolas e franquias
+â€¢ AnÃ¡lise de conformidade de usuÃ¡rios
+â€¢ RelatÃ³rios e mÃ©tricas
+â€¢ Suporte geral
 
-Como posso ser mais específico?`;
+Como posso ser mais especÃ­fico?`;
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -268,6 +368,21 @@ Como posso ser mais específico?`;
                         minute: '2-digit'
                       })}
                     </p>
+                    {message.role === 'assistant' && message.sources?.length ? (
+                      <div className="mt-2 space-y-1">
+                        <p className="text-[11px] font-semibold uppercase text-primary flex items-center gap-1">
+                          <BookOpenText className="h-3 w-3" />
+                          Fontes usadas
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {message.sources.map((source) => (
+                            <Badge key={`${message.id}-${source.id}`} variant="outline" className="text-[11px] flex items-center gap-1">
+                              {source.title}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               ))}

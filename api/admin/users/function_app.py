@@ -1,5 +1,6 @@
 import azure.functions as func
 import json
+from urllib.parse import unquote
 from ...shared.secure_auth import secure_auth, JWT_SECRET
 from ...shared.auth_middleware import auth_middleware
 
@@ -108,6 +109,35 @@ def handle_update_role(req: func.HttpRequest) -> func.HttpResponse:
         mimetype="application/json"
     )
 
+def handle_delete_user(req: func.HttpRequest, route_username: str = None) -> func.HttpResponse:
+    """Remove permanentemente um usuário (DELETE /admin/users/{username})"""
+    username = unquote(route_username or '').strip().lower()
+
+    if not username:
+        username = req.params.get('username', '').strip().lower()
+
+    if not username:
+        try:
+            body = req.get_json()
+            username = body.get('username', '').strip().lower()
+        except ValueError:
+            username = ''
+
+    if not username:
+        return func.HttpResponse(
+            json.dumps({"success": False, "message": "Username é obrigatório"}),
+            status_code=400,
+            mimetype="application/json"
+        )
+
+    result = secure_auth.delete_user(username)
+
+    return func.HttpResponse(
+        json.dumps(result, ensure_ascii=False),
+        status_code=200 if result['success'] else 404,
+        mimetype="application/json"
+    )
+
 @auth_middleware(required_role='admin')
 def main(req: func.HttpRequest, user_info: dict) -> func.HttpResponse:
     """Main entry point for user management API"""
@@ -131,7 +161,9 @@ def main(req: func.HttpRequest, user_info: dict) -> func.HttpResponse:
                 status_code=400,
                 mimetype="application/json"
             )
-            
+    elif req.method == 'DELETE':
+        return handle_delete_user(req, action)
+
     return func.HttpResponse(
         json.dumps({"success": False, "message": "Método não permitido"}),
         status_code=405,

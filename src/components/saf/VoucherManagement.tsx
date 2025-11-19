@@ -256,7 +256,7 @@ const VoucherManagement = () => {
   };
 
   return (
-    <>
+    <div className="space-y-6">
       {/* AlertDialog para deletar voucher */}
       <AlertDialog open={!!voucherToDelete} onOpenChange={setVoucherToDelete}>
         <AlertDialogContent>
@@ -274,8 +274,6 @@ const VoucherManagement = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
-    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Gerenciamento de Vouchers</h1>

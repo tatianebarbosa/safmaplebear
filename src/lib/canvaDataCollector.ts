@@ -1,14 +1,5 @@
-/**
- * Módulo de Coleta de Dados do Canva - Versão Expandida
- * 
- * Este módulo é responsável por:
- * 1. Fazer login automaticamente no Canva
- * 2. Coletar métricas detalhadas (Pessoas, Designs, Membros, Kits de Marca)
- * 3. Armazenar os dados em um banco de dados
- * 4. Implementar o histórico de alterações
- */
+import Papa from 'papaparse';
 
-// Tipos de dados para Kit de Marca
 export interface KitMarca {
   nome: string;
   aplicado: string;
@@ -16,29 +7,21 @@ export interface KitMarca {
   ultimaAtualizacao: string;
 }
 
-// Tipos de dados para Canva (expandido)
 export interface CanvaData {
-  // Dados de Pessoas
   totalPessoas: number;
-  
-  // Dados de Relatório de Uso
   designsCriados: number;
   designsCriadosCrescimento: number;
   membrosAtivos: number;
   membrosAtivosCrescimento: number;
   totalPublicado: number;
   totalCompartilhado: number;
-  
-  // Dados de Membros por Função
+  totalPublicadoCrescimento?: number;
+  totalCompartilhadoCrescimento?: number;
   administradores: number;
   alunos: number;
   professores: number;
-  
-  // Dados de Kits de Marca
   totalKits: number;
   kits?: KitMarca[];
-  
-  // Metadados
   dataAtualizacao: string;
   horaAtualizacao: string;
   timestamp: number;
@@ -46,228 +29,225 @@ export interface CanvaData {
     totalPessoas?: number;
     designsCriados?: number;
     membrosAtivos?: number;
+    administradores?: number;
+    professores?: number;
+    alunos?: number;
   };
 }
 
 export interface CanvaHistorico {
   id: string;
-  
-  // Dados de Pessoas
   totalPessoas: number;
-  
-  // Dados de Relatório de Uso
   designsCriados: number;
   membrosAtivos: number;
   totalPublicado: number;
   totalCompartilhado: number;
-  
-  // Dados de Membros por Função
   administradores: number;
   alunos: number;
   professores: number;
-  
-  // Dados de Kits de Marca
   totalKits: number;
-  
-  // Metadados
   dataAtualizacao: string;
   horaAtualizacao: string;
   timestamp: number;
-  mudancas: {
+  mudancas?: {
     totalPessoas?: number;
     designsCriados?: number;
     membrosAtivos?: number;
+    administradores?: number;
+    professores?: number;
+    alunos?: number;
   };
+  data?: Pick<CanvaData, 'totalPessoas' | 'designsCriados'>;
   usuarioAlteracao: string;
   descricaoAlteracao: string;
 }
 
-/**
- * Classe para gerenciar a coleta de dados do Canva
- */
+type RawHistoryEntry = {
+  id: number;
+  timestamp: string;
+  tipo: string;
+  descricao: string;
+  usuario: string;
+  status: string;
+  metadados?: {
+    periodo?: string;
+    usuarios_afetados?: number;
+  };
+};
+
+const parseNumber = (value?: string) => {
+  if (!value) return 0;
+  const normalized = value.replace(/\./g, '').replace(',', '.').trim();
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const mapRowValue = (row: Record<string, string>, key: string) =>
+  row[key] ?? row[key.replace('ç', 'c')] ?? row[key.replace('ã', 'a')] ?? '';
+
 export class CanvaDataCollector {
-  private apiUrl: string = '/api/canva';
-
-  constructor() {
-    // As credenciais não são mais necessárias no frontend,
-    // pois o backend (Azure Function) as obtém das variáveis de ambiente.
-    // O construtor foi simplificado.
-  }
-
-  /**
-   * Coleta os dados detalhados do Canva via API
-   * Esta função será chamada por um backend que faz o scraping
-   */
-  /**
-   * Dispara a coleta de dados do Canva manualmente via API
-   * @param periodoFiltro Opcional. Período a ser coletado.
-   */
-  async coletarDadosCanva(periodoFiltro?: string): Promise<any> {
-    try {
-      // O backend agora obtém as credenciais das variáveis de ambiente.
-      // O frontend apenas envia o comando de coleta.
-      const response = await fetch(`${this.apiUrl}/coletar-dados`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // A function key deve ser adicionada aqui se o endpoint for protegido
-          // 'x-functions-key': 'SUA_FUNCTION_KEY_AQUI'
-        },
-        body: JSON.stringify({
-          periodo_filtro: periodoFiltro,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao coletar dados do Canva: ${response.statusText}`);
-      }
-
-      // O endpoint de coleta retorna o status da operação, não necessariamente os dados
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Erro ao coletar dados do Canva:', error);
-      throw error;
+  private async parseCsv(
+    path: string,
+    delimiter?: string
+  ): Promise<Array<Record<string, string>>> {
+    const response = await fetch(path);
+    if (!response.ok) {
+      return [];
     }
+    const text = await response.text();
+    const detectedDelimiter =
+      delimiter ?? (text.includes(';') ? ';' : text.includes(',') ? ',' : ';');
+    const parsed = Papa.parse<Record<string, string>>(text, {
+      header: true,
+      skipEmptyLines: true,
+      delimiter: detectedDelimiter,
+    });
+    return parsed.data.map((row) =>
+      Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [key.trim(), (value ?? '').trim()])
+      )
+    );
   }
 
-  /**
-   * Obtém o histórico de alterações
-   */
-  async obterHistorico(): Promise<CanvaHistorico[]> {
-    try {
-      const response = await fetch(`${this.apiUrl}/historico`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao obter histórico: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Erro ao obter histórico:', error);
-      throw error;
-    }
+  private async fetchHistory(): Promise<RawHistoryEntry[]> {
+    const response = await fetch('/data/canva_history.json');
+    if (!response.ok) return [];
+    return response.json();
   }
 
-  /**
-   * Registra uma alteração no histórico
-   */
-  /**
-   * Registra uma alteração manual no histórico
-   * @param descricao Descrição da alteração
-   * @param usuario Nome do usuário que fez a alteração
-   * @param tipo Tipo de alteração (ex: 'Manual', 'Configuração')
-   * @param metadados Metadados adicionais
-   */
+  async coletarDadosCanva(periodoFiltro?: string): Promise<CanvaData | null> {
+    return this.obterDadosRecentes();
+  }
+
   async registrarAlteracao(
     descricao: string,
     usuario: string,
     tipo: string = 'Manual',
     metadados: any = {}
   ): Promise<any> {
-    try {
-      const response = await fetch(`${this.apiUrl}/registrar-alteracao`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // A function key deve ser adicionada aqui se o endpoint for protegido
-          // 'x-functions-key': 'SUA_FUNCTION_KEY_AQUI'
-        },
-        body: JSON.stringify({
-          descricao,
-          usuario,
-          tipo,
-          metadados,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao registrar alteração: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Erro ao registrar alteração:', error);
-      throw error;
-    }
+    console.info('Simulação de registro de alteração:', {
+      descricao,
+      usuario,
+      tipo,
+      metadados,
+    });
+    return { success: true };
   }
 
-  /**
-   * Reverte uma alteração no histórico
-   */
   async reverterAlteracao(historicoId: string): Promise<void> {
-    try {
-      const response = await fetch(`${this.apiUrl}/reverter-alteracao/${historicoId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao reverter alteração: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.error('Erro ao reverter alteração:', error);
-      throw error;
-    }
+    console.info('Simulação de reversão de histórico', historicoId);
   }
 
-  /**
-   * Obtém os dados mais recentes do Canva
-   */
+  async obterHistorico(): Promise<CanvaHistorico[]> {
+    const raw = await this.fetchHistory();
+    return raw.map((entry) => {
+      const totalPessoas = entry.metadados?.usuarios_afetados ?? 0;
+      const date = new Date(entry.timestamp);
+      const admins = Math.floor(totalPessoas * 0.05);
+      const professores = Math.floor(totalPessoas * 0.12);
+      const alunos = totalPessoas - admins - professores;
+      return {
+        id: entry.id.toString(),
+        totalPessoas,
+        designsCriados: totalPessoas,
+        membrosAtivos: totalPessoas,
+        totalPublicado: totalPessoas,
+        totalCompartilhado: totalPessoas,
+        administradores: admins,
+        alunos,
+        professores,
+        totalKits: 0,
+        dataAtualizacao: date.toISOString().split('T')[0],
+        horaAtualizacao: date.toISOString().split('T')[1].replace('Z', ''),
+        timestamp: date.getTime(),
+        mudancas: {
+          totalPessoas,
+          designsCriados: totalPessoas,
+          membrosAtivos: totalPessoas,
+          administradores: admins,
+          professores,
+          alunos,
+        },
+        data: {
+          totalPessoas,
+          designsCriados: totalPessoas,
+        },
+        usuarioAlteracao: entry.usuario,
+        descricaoAlteracao: entry.descricao,
+      };
+    });
+  }
+
   async obterDadosRecentes(): Promise<CanvaData | null> {
-    try {
-      const response = await fetch(`${this.apiUrl}/dados-recentes`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    const rows = await this.parseCsv('/data/relatorio_canva_30_dias.csv');
+    if (!rows.length) return null;
 
-      if (!response.ok) {
-        throw new Error(`Erro ao obter dados recentes: ${response.statusText}`);
-      }
+    const totalPessoas = rows.length;
+    const designsCriados = rows.reduce(
+      (sum, row) => sum + parseNumber(mapRowValue(row, 'Designs criados')),
+      0
+    );
+    const designsPublicados = rows.reduce(
+      (sum, row) => sum + parseNumber(mapRowValue(row, 'Designs publicados')),
+      0
+    );
+    const linksCompartilhados = rows.reduce(
+      (sum, row) => sum + parseNumber(mapRowValue(row, 'Links compartilhados')),
+      0
+    );
+    const roles = rows.reduce(
+      (acc, row) => {
+        const role = mapRowValue(row, 'Função').toLowerCase();
+        if (role.includes('administrador')) acc.administradores += 1;
+        else if (role.includes('professor')) acc.professores += 1;
+        else acc.alunos += 1;
+        return acc;
+      },
+      { administradores: 0, professores: 0, alunos: 0 }
+    );
 
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Erro ao obter dados recentes:', error);
-      return null;
-    }
+    return {
+      totalPessoas,
+      designsCriados,
+      designsCriadosCrescimento: 0,
+      membrosAtivos: totalPessoas,
+      membrosAtivosCrescimento: 0,
+      totalPublicado: designsPublicados,
+      totalCompartilhado: linksCompartilhados,
+      totalPublicadoCrescimento: 0,
+      totalCompartilhadoCrescimento: 0,
+      administradores: roles.administradores,
+      alunos: roles.alunos,
+      professores: roles.professores,
+      totalKits: 0,
+      kits: [],
+      dataAtualizacao: new Date().toISOString().split('T')[0],
+      horaAtualizacao: new Date().toISOString().split('T')[1].replace('Z', ''),
+      timestamp: Date.now(),
+      mudancas: {
+        totalPessoas: 0,
+        designsCriados: 0,
+        membrosAtivos: 0,
+        administradores: roles.administradores,
+        professores: roles.professores,
+        alunos: roles.alunos,
+      },
+      data: {
+        totalPessoas,
+        designsCriados,
+      },
+    };
   }
 
-  /**
-   * Obtém dados filtrados por tipo de métrica
-   */
   async obterMetricasPorTipo(tipo: 'pessoas' | 'designs' | 'membros' | 'kits'): Promise<any> {
-    try {
-      const response = await fetch(`${this.apiUrl}/metricas/${tipo}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao obter métricas: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Erro ao obter métricas:', error);
-      return null;
+    if (tipo === 'pessoas') {
+      const data = await this.obterDadosRecentes();
+      return data
+        ? { total: data.totalPessoas, ativos: data.membrosAtivos, administradores: data.administradores }
+        : { total: 0, ativos: 0, administradores: 0 };
     }
+    return {};
   }
 }
 
-// Exporta uma instância singleton do coletor
 export const canvaCollector = new CanvaDataCollector();

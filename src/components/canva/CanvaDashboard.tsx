@@ -1,27 +1,20 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Users, 
-  TrendingUp, 
-  AlertTriangle, 
-  Building2,
-  Download,
-  Home
-} from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import StatsCard from '@/components/dashboard/StatsCard';
 import { SchoolLicenseManagement } from './SchoolLicenseManagement';
 // import { SchoolLicenseOverview } from './SchoolLicenseOverview'; // Não utilizado diretamente aqui
 import { CanvaUsageDashboard } from './CanvaUsageDashboard';
-import { CostManagementDashboard } from './CostManagementDashboard';
-import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { CanvaMetricsDisplay } from './CanvaMetricsDisplay';
+import { CostManagementDashboard } from './CostManagementDashboard';
+import { CanvaAdvancedInsights } from './CanvaAdvancedInsights';
+import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import FloatingAIChat from '@/components/ai/FloatingAIChat';
+import { NonCompliantUsersDialog } from './NonCompliantUsersDialog';
 
 const CanvaDashboard = () => {
   const navigate = useNavigate();
@@ -29,10 +22,10 @@ const CanvaDashboard = () => {
     overviewData, 
     loading,
     loadOfficialData,
-    getDomainCounts
+    schools
   } = useSchoolLicenseStore();
   
-  const [selectedPeriod, setSelectedPeriod] = useState<'30d' | '3m' | '6m' | '12m'>('30d');
+  const [isNonCompliantDialogOpen, setIsNonCompliantDialogOpen] = useState(false);
 
   // Auto-refresh a cada 5 minutos
   useAutoRefresh({
@@ -42,27 +35,29 @@ const CanvaDashboard = () => {
     immediate: true
   });
 
-  const handleExportData = () => {
-    if (!overviewData) return;
-    
-    const csvData = [
-      ['Métrica', 'Valor'],
-      ['Total de Usuários', overviewData.totalUsers.toString()],
-      ['Usuários Conformes', overviewData.compliantUsers.toString()],
-      ['Usuários Não Conformes', overviewData.nonCompliantUsers.toString()],
-      ['Taxa de Conformidade', `${overviewData.complianceRate.toFixed(1)}%`],
-      ['Total de Escolas', overviewData.totalSchools.toString()],
-      ['Escolas com Usuários', overviewData.schoolsWithUsers.toString()],
-    ].map(row => row.join(';')).join('\n');
-    
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `canva-overview-${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-    toast.success('Dados exportados com sucesso');
+  const nonCompliantUserDetails = useMemo(() => {
+    if (!schools?.length) return [];
+    return schools.flatMap(school =>
+      school.users
+        .filter(user => !user.isCompliant)
+        .map(user => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          schoolName: school.name,
+          schoolId: school.id,
+          domain: user.email.split('@')[1]?.toLowerCase() || ''
+        }))
+    );
+  }, [schools]);
+
+  const handleViewNonCompliantUsers = () => {
+    if (nonCompliantUserDetails.length === 0) {
+      toast.info('Nenhum usuário fora da política carregado no momento.');
+      return;
+    }
+    setIsNonCompliantDialogOpen(true);
   };
 
   if (loading) {
@@ -94,23 +89,6 @@ const CanvaDashboard = () => {
             Dados oficiais sincronizados • {overviewData.totalUsers} usuários ativos
           </p>
         </div>
-        <div className="flex gap-2">
-          <Select value={selectedPeriod} onValueChange={(value: any) => setSelectedPeriod(value)}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="30d">Últimos 30 dias</SelectItem>
-              <SelectItem value="3m">Últimos 3 meses</SelectItem>
-              <SelectItem value="6m">Últimos 6 meses</SelectItem>
-              <SelectItem value="12m">Últimos 12 meses</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={handleExportData} variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            Exportar
-          </Button>
-        </div>
       </div>
 
 
@@ -126,42 +104,6 @@ const CanvaDashboard = () => {
 </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            <StatsCard
-              title="Total de Usuários"
-              value={overviewData.totalUsers.toString()}
-              description={`${overviewData.schoolsWithUsers} escolas ativas`}
-              icon={<Users className="h-4 w-4" />}
-            />
-            <StatsCard
-              title="Usuários Conformes"
-              value={overviewData.compliantUsers.toString()}
-              description={`${overviewData.complianceRate?.toFixed(1) || 0}% de conformidade`}
-              icon={<TrendingUp className="h-4 w-4" />}
-            />
-            <StatsCard
-              title="Fora da Política"
-              value={overviewData.nonCompliantUsers.toString()}
-              description="Usuários com domínio não autorizado"
-              icon={<AlertTriangle className="h-4 w-4" />}
-              variant={overviewData.nonCompliantUsers > 0 ? "destructive" : "default"}
-            />
-            <StatsCard
-              title="Escolas Ativas"
-              value={overviewData.totalSchools.toString()}
-              description={`${overviewData.schoolsAtCapacity || 0} em capacidade máxima`}
-              icon={<Building2 className="h-4 w-4" />}
-            />
-            <StatsCard
-              title="Domínios Não Maple Bear"
-              value={overviewData.nonMapleBearDomains.toString()}
-              description={`${getDomainCounts()?.length || 0} domínios diferentes`}
-              icon={<AlertTriangle className="h-4 w-4" />}
-              variant={overviewData.nonMapleBearDomains > 0 ? "destructive" : "default"}
-            />
-          </div>
-
           {/* Compliance Alert */}
           {overviewData.nonCompliantUsers > 0 && (
             <Card className="border-destructive/20 bg-destructive/5 shadow-sm">
@@ -194,15 +136,16 @@ const CanvaDashboard = () => {
                   </div>
                   <Button 
                     variant="destructive" size="sm" 
-                    onClick={() => toast.info('Navegando para usuários não conformes')}
+                    onClick={handleViewNonCompliantUsers}
                     className="mt-4"
                   >
                     Ver Detalhes dos Usuários Não Conformes
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+            </CardContent>
+          </Card>
           )}
+          <CanvaMetricsDisplay overviewSummary={overviewData} />
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">
@@ -222,26 +165,16 @@ const CanvaDashboard = () => {
         </TabsContent>
 
         <TabsContent value="advanced" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Funcionalidades Avançadas</CardTitle>
-              <CardDescription className="text-sm text-destructive">
-                Ferramentas para gestão avançada do Canva
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Em desenvolvimento...
-              </p>
-            </CardContent>
-          </Card>
+          <CanvaAdvancedInsights />
         </TabsContent>
       </Tabs>
 
-      {/* Rodapé de Métricas (Visível em todas as abas) */}
-      <CanvaMetricsDisplay />
-
       <FloatingAIChat />
+      <NonCompliantUsersDialog
+        open={isNonCompliantDialogOpen}
+        onOpenChange={setIsNonCompliantDialogOpen}
+        users={nonCompliantUserDetails}
+      />
     </div>
   );
 };

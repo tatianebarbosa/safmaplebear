@@ -54,7 +54,7 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
     }
     
     if (!formData.justification.trim()) {
-      toast.error("Justificativa é obrigatória");
+      toast.error("Informe o titulo do e-mail ou numero do ticket relacionado a excecao.");
       return;
     }
 
@@ -200,14 +200,19 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
           )}
           
           <div>
-            <Label htmlFor="justification">Justificativa *</Label>
+            <Label htmlFor="justification">
+              Referencia (Titulo do e-mail ou numero do ticket) *
+            </Label>
             <Textarea
               id="justification"
-              placeholder="Explique o motivo da criação desta exceção..."
+              placeholder="Repita o assunto do e-mail ou o numero do ticket citado"
               value={formData.justification}
               onChange={(e) => setFormData({ ...formData, justification: e.target.value })}
               rows={3}
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              Utilize exatamente o titulo do e-mail oficial ou o ID do ticket vinculado a essa excecao.
+            </p>
           </div>
           
           <div className="flex gap-2 justify-end pt-4">

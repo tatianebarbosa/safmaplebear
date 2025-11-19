@@ -25,6 +25,19 @@ export interface AuthResponse {
   message?: string;
 }
 
+const DEFAULT_ADMIN_EMAIL = 'temp_admin@mbcentral.com.br';
+const DEFAULT_ADMIN_PASSWORD = 'saf123';
+const DEFAULT_ADMIN_NAME = 'Admin Temporario';
+const envRole = import.meta.env.VITE_ADMIN_ROLE?.toLowerCase();
+const ADMIN_ROLE: User['role'] =
+  envRole === 'admin' || envRole === 'user' || envRole === 'maintenance'
+    ? (envRole as User['role'])
+    : 'admin';
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL;
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
+const ADMIN_NAME = import.meta.env.VITE_ADMIN_NAME || DEFAULT_ADMIN_NAME;
+const ENFORCE_MONDAY_LOGOUT = import.meta.env.VITE_ENFORCE_MONDAY_LOGOUT === 'true';
+
 class AuthService {
   private readonly STORAGE_KEYS = {
     TOKEN: 'saf_auth_token',
@@ -89,10 +102,10 @@ class AuthService {
       
       // Simular a busca do usuário no "banco de dados" users.json
       const simulatedUser = {
-        username: 'temp_admin@mbcentral.com.br',
-        name: 'Admin Temporario',
-        role: 'Admin',
-        password: 'saf123' // Senha em texto puro (INSEGURO, APENAS PARA CONTORNO)
+        username: ADMIN_EMAIL,
+        name: ADMIN_NAME,
+        role: ADMIN_ROLE,
+        password: ADMIN_PASSWORD // Senha em texto puro (INSEGURO, APENAS PARA CONTORNO)
       };
 
       if (credentials.email !== simulatedUser.username || credentials.password !== simulatedUser.password) {
@@ -103,13 +116,9 @@ class AuthService {
       }
 
       const token = this.generateToken();
-      const userData = {
-        username: simulatedUser.username,
-        role: simulatedUser.role
-      };
       
       // Criar perfil do usuário (adaptado para usar dados da API)
-      const user = this.createUserProfile(userData.username, userData.role as User['role']);
+      const user = this.createUserProfile(simulatedUser.username, simulatedUser.role);
       // O token e o refresh token agora vêm do backend
       const refreshToken = token; // Usando o mesmo token para simplificar a migração
 
@@ -139,19 +148,16 @@ class AuthService {
   }
 
   logout(): void {
-    // Limpar todos os dados de autenticação
+    // Limpar todos os dados de autentica??uo
     Object.values(this.STORAGE_KEYS).forEach(key => {
       localStorage.removeItem(key);
     });
-    
+
     // Limpar outros dados relacionados
     localStorage.removeItem('authenticated');
     localStorage.removeItem('userEmail');
-    
-    // Limpar o token de acesso (se estiver em cookie, seria limpo pelo backend)
-    // Se estiver em localStorage, limpamos aqui.
-    localStorage.removeItem(this.STORAGE_KEYS.TOKEN);
   }
+
 
   getCurrentUser(): User | null {
     try {
@@ -180,11 +186,13 @@ class AuthService {
       return false;
     }
 
-    // Verificar se é segunda-feira (regra de negócio específica)
-    const dayOfWeek = now.getDay();
-    if (dayOfWeek === 1) {
-      this.logout();
-      return false;
+    // Verificar se é segunda-feira (regra de negócio específica, configurável)
+    if (ENFORCE_MONDAY_LOGOUT) {
+      const dayOfWeek = now.getDay();
+      if (dayOfWeek === 1) {
+        this.logout();
+        return false;
+      }
     }
 
     return true;
@@ -214,27 +222,39 @@ class AuthService {
   }
 
   refreshToken(): Promise<AuthResponse> {
-    // Em produção, isso faria uma chamada para o backend
+    // Em produ??uo, isso faria uma chamada para o backend
     return new Promise((resolve) => {
       const refreshToken = localStorage.getItem(this.STORAGE_KEYS.REFRESH_TOKEN);
       const user = this.getCurrentUser();
 
       if (!refreshToken || !user) {
-        resolve({ success: false, message: 'Token de refresh inválido' });
+        resolve({ success: false, message: 'Token de refresh involido' });
         return;
       }
 
       const newToken = this.generateToken();
+      const sessionExpiry = new Date();
+      sessionExpiry.setDate(sessionExpiry.getDate() + 7);
+      const updatedUser = {
+        ...user,
+        sessionExpiry: sessionExpiry.toISOString(),
+        lastLogin: new Date().toISOString()
+      };
+
       localStorage.setItem(this.STORAGE_KEYS.TOKEN, newToken);
+      localStorage.setItem(this.STORAGE_KEYS.SESSION_EXPIRY, sessionExpiry.toISOString());
+      localStorage.setItem(this.STORAGE_KEYS.USER, JSON.stringify(updatedUser));
 
       resolve({
         success: true,
         token: newToken,
-        user,
+        user: updatedUser,
         message: 'Token renovado com sucesso'
       });
     });
   }
+
+
 }
 
 export const authService = new AuthService();

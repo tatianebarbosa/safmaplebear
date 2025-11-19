@@ -157,7 +157,7 @@ const SchoolsDashboard = () => {
 
   const submitJustification = () => {
     if (!justification.trim()) {
-      toast.error("Justificativa é obrigatória");
+      toast.error("Informe o titulo do e-mail ou numero do ticket que respalda essa alteracao.");
       return;
     }
 
@@ -519,14 +519,19 @@ const SchoolsDashboard = () => {
             )}
             
             <div>
-              <Label htmlFor="justification">Justificativa *</Label>
+              <Label htmlFor="justification">
+                Referencia (Titulo do e-mail ou numero do ticket) *
+              </Label>
               <Textarea
                 id="justification"
-                placeholder="Digite a justificativa para esta ação..."
+                placeholder="Titulo do e-mail ou numero do ticket relacionado"
                 value={justification}
                 onChange={(e) => setJustification(e.target.value)}
                 rows={4}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Copie o assunto da mensagem oficial ou o ID do ticket que explica esta alteracao.
+              </p>
             </div>
 
             <div className="flex gap-2 justify-end">

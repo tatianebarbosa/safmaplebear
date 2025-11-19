@@ -1,0 +1,72 @@
+﻿{
+  "modules": [
+    {
+      "id": "dashboard-canva",
+      "name": "Gestão Canva",
+      "route": "/dashboard/canva",
+      "components": ["CanvaDashboard", "SchoolLicenseManagement", "CanvaUsageDashboard", "CostManagementDashboard"],
+      "dataSources": [
+        "useSchoolLicenseStore -> processSchoolsWithUsers()",
+        "public/data/Franchising.csv",
+        "public/data/licencas_canva.csv",
+        "canva_data_integrated_latest.json gerado pela Azure Function TimerSyncCanva"
+      ],
+      "keyActions": [
+        "Exportação CSV pelo botão Exportar",
+        "Auto refresh via hook useAutoRefresh (5 minutos)",
+        "Filtros por período e cluster"
+      ]
+    },
+    {
+      "id": "dashboard-vouchers",
+      "name": "Dashboard de Vouchers",
+      "route": "/dashboard/vouchers",
+      "components": ["VoucherDashboard"],
+      "dataSources": ["lib/voucherDataProcessor -> loadVoucherData", "public/data/vouchers_2026.csv", "public/data/vouchers_excecoes.csv"],
+      "keyActions": ["Filtros por cluster/status", "Relatório PDF", "Exportar CSV"]
+    },
+    {
+      "id": "tickets-saf",
+      "name": "Tickets SAF",
+      "route": "/tickets",
+      "components": ["TicketsPage", "TicketKanban", "TicketTable", "TicketDialog"],
+      "dataSources": ["stores/ticketStore -> localStorage"],
+      "keyActions": ["Alternar Kanban/Tabela", "Atalhos N/K/T", "Filtros por agente/status"]
+    },
+    {
+      "id": "monitoring-portal",
+      "name": "Portal de Monitoria",
+      "route": "/monitoring",
+      "components": ["MonitoringPortal"],
+      "dataSources": ["mockTickets definidos no componente"],
+      "keyActions": ["Criação rápida de tickets", "Atualização de status", "Filtros por status"]
+    },
+    {
+      "id": "insights-analytics",
+      "name": "Insights e Análises",
+      "route": "/insights",
+      "components": ["InsightsAnalytics"],
+      "dataSources": ["mockData interno (AnalyticsData)", "futuro endpoint /api/canva_metricas"],
+      "keyActions": ["Seleção de período", "Geração de relatórios", "Badges por função"]
+    }
+  ],
+  "knowledgeManagement": {
+    "component": "AIKnowledgeBase",
+    "storage": "localStorage (chaves saf_knowledge_base e saf_ai_prompts)",
+    "usage": "Serve como fonte RAG local para o FloatingAIChat",
+    "attachments": "Uploads de arquivos texto/CSV/JSON são convertidos em artigos e ficam com categoria 'documentos' por padrão"
+  },
+  "pipelines": [
+    {
+      "id": "timer-sync-canva",
+      "description": "Azure Function api/TimerSyncCanva executa diariamente, coleta métricas do Canva, integra com DadosEscolas.csv e gera canva_data_integrated_latest.json consumido pelo Chat IA.",
+      "outputs": ["CANVA_REPORT_LATEST.md", "canva_data_integrated_latest.json"]
+    },
+    {
+      "id": "chat-ia",
+      "description": "api/ChatIA lê o arquivo integrado + contexto site_context.json e recebe anexos do usuário para responder via OpenAI gpt-4.1-mini.",
+      "inputs": ["question", "knowledge[]"],
+      "outputs": ["response"]
+    }
+  ]
+}

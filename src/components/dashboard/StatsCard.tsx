@@ -18,7 +18,7 @@ interface StatsCardProps {
 const StatsCard = ({ title, value, icon, description, variant = "default", trend, className }: StatsCardProps) => {
   return (
     <Card className={cn(
-      "rounded-xl shadow-sm border-border/40 hover:shadow-md transition-all", 
+      "rounded-[var(--radius)] shadow-sm border-border/40 hover:shadow-md transition-all", 
       variant === "destructive" ? "border-destructive/20 bg-destructive/5" : "border-border/40 bg-card",
       className
     )}>

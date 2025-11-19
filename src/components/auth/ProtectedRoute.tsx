@@ -1,53 +1,21 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { authService } from "./AuthService";
-import { LoadingMascot } from "@/components/ui/loading-mascot";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  // Se o login deve estar desativado, o ProtectedRoute deve sempre retornar o children
-  const navigate = useNavigate();
-  const [isChecking, setIsChecking] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const isAuthenticated = authService.isAuthenticated();
 
-  useEffect(() => {
-    const checkAuthentication = () => {
-      // Forçar a re-leitura do status de autenticação
-      const authenticated = authService.isAuthenticated();
-      
-      setIsAuthenticated(authenticated);
-      setIsChecking(false);
-
-      if (!authenticated) {
-        navigate("/login", { replace: true });
-      }
-    };
-
-    // Usar um listener para reagir a mudanças no localStorage (simulando um estado global)
-    const handleStorageChange = () => {
-        checkAuthentication();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    checkAuthentication(); // Primeira verificação imediata
-
-    return () => {
-        window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [navigate]);
-
-  if (isChecking) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingMascot message="Verificando autenticação..." size="lg" />
-      </div>
-    );
+  if (!isAuthenticated) {
+    // Redirect them to the /login page, but save the current location they were
+    // trying to go to. This allows us to send them along to that page after they login,
+    // which is a nicer user experience than dropping them off on the home page.
+    return <Navigate to="/login" replace />;
   }
-  
-  return isAuthenticated ? <>{children}</> : <></>; // Retorna um fragmento vazio se não estiver autenticado (o navigate já cuida do redirecionamento);
+
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

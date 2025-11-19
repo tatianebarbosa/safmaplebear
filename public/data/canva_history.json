@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2025-11-10T00:00:00Z",
+    "tipo": "Coleta Automática",
+    "descricao": "Sincronização diária de dados do Canva",
+    "usuario": "TimerSyncCanva",
+    "status": "Sucesso",
+    "metadados": {
+      "periodo": "Últimos 30 dias",
+      "usuarios_afetados": 824
+    }
+  },
+  {
+    "id": 2,
+    "timestamp": "2025-11-13T20:26:00Z",
+    "tipo": "Coleta Manual",
+    "descricao": "Coleta de dados sob demanda via API",
+    "usuario": "API Call",
+    "status": "Sucesso",
+    "metadados": {
+      "periodo": "Últimos 30 dias",
+      "usuarios_afetados": 838
+    }
+  },
+  {
+    "id": 3,
+    "timestamp": "2025-11-19T00:00:00Z",
+    "tipo": "Coleta Manual",
+    "descricao": "Atualizacao dos ultimos 12 meses",
+    "usuario": "Manual Update",
+    "status": "Sucesso",
+    "metadados": {
+      "periodo": "Últimos 12 meses",
+      "usuarios_afetados": 925
+    }
+  }
+]

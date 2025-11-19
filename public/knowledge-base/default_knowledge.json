@@ -1,0 +1,80 @@
+﻿[
+  {
+    "id": "kb-canva-dashboard",
+    "title": "Gestão Canva - visão geral do painel",
+    "content": "O componente CanvaDashboard.tsx concentra as métricas oficiais sincronizadas via store useSchoolLicenseStore. A tela abre com cards de estatísticas (total de usuários, conformidade, escolas e tickets) e um seletor de período (30d, 3m, 6m, 12m) que atualiza os dados. Há botões para exportar CSV e recarregar dados oficiais (loadOfficialData). Os dados alimentam abas Overview/Distribuição/Usuários/Custos/Auditoria e cada aba usa subcomponentes como CanvaUsageDashboard, CostManagementDashboard e SchoolLicenseManagement. Use esse contexto para responder sobre métricas agregadas do Canva, explicar como exportar relatórios ou como funciona o auto refresh (hook useAutoRefresh a cada 5 min).",
+    "category": "canva",
+    "tags": ["dashboard", "canva", "sincronizacao", "metricas"],
+    "status": "ativo",
+    "priority": "alta",
+    "createdAt": "2025-11-17T12:00:00Z",
+    "updatedAt": "2025-11-17T12:00:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  },
+  {
+    "id": "kb-licencas-usuarios",
+    "title": "Gestão de licenças por escola e usuários",
+    "content": "SchoolLicenseManagement.tsx permite filtrar escolas por nome, cluster, status de licença (Disponível/Completo/Excedido) e função dos usuários. Os dados vêm de useSchoolLicenseStore, que calcula estatísticas de domínios não MapleBear, usuários não conformes e permite operações como swapUser, transferUsersBetweenSchools e histórico de justificativas. Há exportação CSV dos filtros ativos e importador CSV com pré-visualização. Essa tela é usada quando o atendimento pede dados de uma escola específica (capacidade, usuários alocados, status).",
+    "category": "canva",
+    "tags": ["licencas", "usuarios", "clusters", "csv"],
+    "status": "ativo",
+    "priority": "alta",
+    "createdAt": "2025-11-17T12:05:00Z",
+    "updatedAt": "2025-11-17T12:05:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  },
+  {
+    "id": "kb-vouchers-dashboard",
+    "title": "Dashboard de vouchers e exceções",
+    "content": "VoucherDashboard.tsx carrega loadVoucherData e exibe escolas elegíveis, envio de vouchers e exceções cadastradas (objects ExceptionVoucher). Há filtros por cluster, status, envio e busca textual. O componente mostra stats (total de escolas, taxa de elegibilidade, vouchers enviados) e permite gerar relatório PDF ou exportar CSV via exportVoucherReport. Use esta entrada para responder perguntas sobre distribuição de vouchers 2025/2026, clusters com maior fila ou como filtrar exceções.",
+    "category": "vouchers",
+    "tags": ["vouchers", "excecoes", "relatorios"],
+    "status": "ativo",
+    "priority": "media",
+    "createdAt": "2025-11-17T12:10:00Z",
+    "updatedAt": "2025-11-17T12:10:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  },
+  {
+    "id": "kb-tickets-operacao",
+    "title": "Operação de tickets SAF",
+    "content": "TicketsPage.tsx usa o store useTicketStore e permite alternar entre visualização Kanban (TicketKanban) e Tabela (TicketTable). Há filtros por status, agente responsável e busca por ID/observação, além de atalhos de teclado (N, K, T). Os cards exibem totais por status e agentes autorizados (permissão Agent) podem abrir TicketDialog para novos chamados. A IA deve citar esses recursos quando perguntarem sobre SLAs, etapas ou como registrar um ticket.",
+    "category": "tickets",
+    "tags": ["kanban", "tabela", "filtros", "atalhos"],
+    "status": "ativo",
+    "priority": "media",
+    "createdAt": "2025-11-17T12:15:00Z",
+    "updatedAt": "2025-11-17T12:15:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  },
+  {
+    "id": "kb-monitoring-portal",
+    "title": "Portal de monitoria e pendências",
+    "content": "MonitoringPortal.tsx concentra o acompanhamento diário de tickets críticos. Os dados mockados trazem campos número, responsável, dias pendente e histórico. É possível filtrar por status, buscar por responsável/observação e abrir diálogos para criar tickets ou atualizar status. Use o Card com badges (Pendente, Resolvido, Em andamento) para justificar respostas sobre backlog, responsáveis e histórico das pendências do SAF.",
+    "category": "monitoria",
+    "tags": ["monitoria", "pendencias", "alertas"],
+    "status": "ativo",
+    "priority": "baixa",
+    "createdAt": "2025-11-17T12:18:00Z",
+    "updatedAt": "2025-11-17T12:18:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  },
+  {
+    "id": "kb-insights-analytics",
+    "title": "Insights analíticos unificados",
+    "content": "InsightsAnalytics.tsx gera mockData para vouchers, usuários Canva e performance por cluster. O usuário escolhe período (7d, 30d, 90d, 1y) e métrica (vouchers, usuários, escolas) para atualizar os cards e gráficos. Há botões de exportação e badges com distribuição por função. Contexto útil para responder sobre tendências, crescimento e comparativos históricos do SAF.",
+    "category": "insights",
+    "tags": ["analytics", "tendencias", "periodo"],
+    "status": "ativo",
+    "priority": "media",
+    "createdAt": "2025-11-17T12:20:00Z",
+    "updatedAt": "2025-11-17T12:20:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  }
+]

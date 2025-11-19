@@ -1,22 +1,36 @@
-import React, { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { canvaCollector, CanvaData, CanvaHistorico } from '@/lib/canvaDataCollector';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, CheckCircle, Clock, Download, RefreshCw, User, Users, Zap, Briefcase, GraduationCap, School, Palette, Share2, Link, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { AlertTriangle, Clock, RefreshCw, Users, Zap, Briefcase, GraduationCap, School, Palette, Share2, Link, TrendingUp, Building2, Shield } from 'lucide-react';
 import { formatNumber, formatDateBR } from '@/lib/formatters';
 import { toast } from 'sonner';
+import type { CanvaOverviewData } from '@/types/officialData';
+import StatsCard from '@/components/dashboard/StatsCard';
 
 /**
  * Componente para exibir todas as métricas do Canva de forma profissional
  */
-export const CanvaMetricsDisplay: React.FC = () => {
+type CanvaMetricsDisplayProps = {
+  overviewSummary?: CanvaOverviewData | null;
+};
+
+export const CanvaMetricsDisplay = ({ overviewSummary }: CanvaMetricsDisplayProps) => {
   const [canvaData, setCanvaData] = useState<CanvaData | null>(null);
   const [historico, setHistorico] = useState<CanvaHistorico[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const carregarDados = React.useCallback(async () => {
+  const formatChangeDescription = (change?: number | null) => {
+    if (!change) {
+      return 'Sem alteração';
+    }
+    const absValue = formatNumber(Math.abs(change));
+    return `${change > 0 ? '+' : '-'}${absValue} vs última coleta`;
+  };
+
+  const carregarDados = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -71,82 +85,38 @@ export const CanvaMetricsDisplay: React.FC = () => {
     }
   };
 
-  const renderMetricCard = (
-    title: string,
-    value: number,
-    icon: React.ReactNode,
-    change?: number,
-    variant: 'default' | 'destructive' | 'success' | 'warning' = 'default'
-  ) => {
-    const changeText = change !== undefined && change !== 0
-      ? `${change > 0 ? '📈 +' : '📉 '}${formatNumber(Math.abs(change))}`
-      : 'Sem alteração';
-
-    const changeColor = change === undefined || change === 0
-      ? 'text-muted-foreground'
-      : change > 0
-        ? 'text-success'
-        : 'text-destructive';
-
-    const iconColor = variant === 'destructive' ? 'text-destructive' :
-                      variant === 'success' ? 'text-success' :
-                      variant === 'warning' ? 'text-yellow-500' :
-                      'text-primary';
+  const renderHistoricoItem = (item: CanvaHistorico) => {
+    const snapshot = item.data ?? {
+      totalPessoas: item.totalPessoas,
+      designsCriados: item.designsCriados
+    };
 
     return (
-      <Card className="hover:shadow-lg transition-shadow">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          <div className={iconColor}>{icon}</div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{formatNumber(value)}</div>
-          <p className={`text-xs ${changeColor}`}>
-            {changeText}
-          </p>
-        </CardContent>
-      </Card>
+      <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+        <div className="flex items-center gap-3">
+          <Clock className="h-4 w-4 text-muted-foreground" />
+          <div>
+            <p className="text-sm font-medium">Coletado em: {new Date(item.timestamp).toLocaleString('pt-BR')}</p>
+            <p className="text-xs text-muted-foreground">Pessoas: {formatNumber(snapshot.totalPessoas)} • Designs: {formatNumber(snapshot.designsCriados)}</p>
+          </div>
+        </div>
+        <Button 
+          onClick={() => reverterAlteracao(item.id)} 
+          variant="outline" 
+          size="sm"
+          className="text-xs"
+        >
+          Reverter
+        </Button>
+      </div>
     );
   };
 
-  const renderHistoricoItem = (item: CanvaHistorico) => (
-    <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-      <div className="flex items-center gap-3">
-        <Clock className="h-4 w-4 text-muted-foreground" />
-        <div>
-          <p className="text-sm font-medium">Coletado em: {new Date(item.timestamp).toLocaleString('pt-BR')}</p>
-          <p className="text-xs text-muted-foreground">Pessoas: {formatNumber(item.data.totalPessoas)} • Designs: {formatNumber(item.data.designsCriados)}</p>
-        </div>
-      </div>
-      <Button 
-        onClick={() => reverterAlteracao(item.id)} 
-        variant="outline" 
-        size="sm"
-        className="text-xs"
-      >
-        Reverter
-      </Button>
-    </div>
-  );
+  const uniqueDomains = overviewSummary?.topNonCompliantDomains?.length ?? 0;
+  const impactedUsers = overviewSummary?.nonMapleBearDomains ?? 0;
 
   return (
     <div className="space-y-6">
-      <Card className="border-border/40 bg-card">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
-              Métricas Canva
-            </CardTitle>
-            <CardDescription>Acompanhamento em tempo real das atividades e licenças</CardDescription>
-          </div>
-          <Button onClick={coletarDadosAgora} disabled={loading} className="gap-2">
-            {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            {loading ? 'Coletando...' : 'Atualizar Agora'}
-          </Button>
-        </CardHeader>
-      </Card>
-
       {error && (
         <div className="flex items-center p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
           <AlertTriangle className="h-5 w-5 text-destructive mr-3" />
@@ -154,42 +124,50 @@ export const CanvaMetricsDisplay: React.FC = () => {
         </div>
       )}
 
+      {overviewSummary && (
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Shield className="h-5 w-5 text-muted-foreground" />
+              Resumo Operacional
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Baseado nos dados oficiais sincronizados
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <StatsCard
+              title="Usuários Conformes"
+              value={overviewSummary.compliantUsers.toString()}
+              description={`${overviewSummary.complianceRate.toFixed(1)}% de conformidade`}
+              icon={<TrendingUp className="h-4 w-4" />}
+            />
+            <StatsCard
+              title="Usuários fora da política"
+              value={overviewSummary.nonCompliantUsers.toString()}
+              description={`${uniqueDomains} domínios externos (${impactedUsers} usuários)`}
+              icon={<AlertTriangle className="h-4 w-4" />}
+              variant={overviewSummary.nonCompliantUsers > 0 ? 'destructive' : 'default'}
+            />
+            <StatsCard
+              title="Escolas com usuários"
+              value={overviewSummary.schoolsWithUsers.toString()}
+              description={`de ${overviewSummary.totalSchools} escolas oficiais`}
+              icon={<School className="h-4 w-4" />}
+            />
+            <StatsCard
+              title="Escolas em capacidade"
+              value={overviewSummary.schoolsAtCapacity.toString()}
+              description="Planeje redistribuições quando necessário"
+              icon={<Building2 className="h-4 w-4" />}
+              variant={overviewSummary.schoolsAtCapacity > 0 ? 'destructive' : 'default'}
+            />
+          </div>
+        </div>
+      )}
+
       {canvaData && (
         <>
-          {/* Seção de Pessoas e Licenças */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              Pessoas e Licenças
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {renderMetricCard(
-                'Total de Pessoas',
-                canvaData.totalPessoas,
-                <User className="h-4 w-4" />,
-                canvaData.mudancas?.totalPessoas
-              )}
-              {renderMetricCard(
-                'Administradores',
-                canvaData.administradores,
-                <Briefcase className="h-4 w-4" />,
-                canvaData.mudancas?.administradores
-              )}
-              {renderMetricCard(
-                'Professores',
-                canvaData.professores,
-                <School className="h-4 w-4" />,
-                canvaData.mudancas?.professores
-              )}
-              {renderMetricCard(
-                'Alunos',
-                canvaData.alunos,
-                <GraduationCap className="h-4 w-4" />,
-                canvaData.mudancas?.alunos
-              )}
-            </div>
-          </div>
-
           {/* Seção de Atividades */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -197,34 +175,30 @@ export const CanvaMetricsDisplay: React.FC = () => {
               Atividades
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {renderMetricCard(
-                'Designs Criados',
-                canvaData.designsCriados,
-                <Palette className="h-4 w-4" />,
-                canvaData.designsCriadosCrescimento,
-                canvaData.designsCriadosCrescimento > 0 ? 'success' : 'default'
-              )}
-              {renderMetricCard(
-                'Total Publicado',
-                canvaData.totalPublicado,
-                <Share2 className="h-4 w-4" />,
-                canvaData.totalPublicadoCrescimento,
-                canvaData.totalPublicadoCrescimento > 0 ? 'success' : 'default'
-              )}
-              {renderMetricCard(
-                'Total Compartilhado',
-                canvaData.totalCompartilhado,
-                <Link className="h-4 w-4" />,
-                canvaData.totalCompartilhadoCrescimento,
-                canvaData.totalCompartilhadoCrescimento > 0 ? 'success' : 'default'
-              )}
-              {renderMetricCard(
-                'Membros Ativos',
-                canvaData.membrosAtivos,
-                <Users className="h-4 w-4" />,
-                canvaData.membrosAtivosCrescimento,
-                canvaData.membrosAtivosCrescimento > 0 ? 'success' : 'default'
-              )}
+              <StatsCard
+                title="Designs Criados"
+                value={formatNumber(canvaData.designsCriados)}
+                description={formatChangeDescription(canvaData.designsCriadosCrescimento)}
+                icon={<Palette className="h-4 w-4" />}
+              />
+              <StatsCard
+                title="Total Publicado"
+                value={formatNumber(canvaData.totalPublicado)}
+                description={formatChangeDescription(canvaData.totalPublicadoCrescimento ?? 0)}
+                icon={<Share2 className="h-4 w-4" />}
+              />
+              <StatsCard
+                title="Total Compartilhado"
+                value={formatNumber(canvaData.totalCompartilhado)}
+                description={formatChangeDescription(canvaData.totalCompartilhadoCrescimento ?? 0)}
+                icon={<Link className="h-4 w-4" />}
+              />
+              <StatsCard
+                title="Membros Ativos"
+                value={formatNumber(canvaData.membrosAtivos)}
+                description={formatChangeDescription(canvaData.membrosAtivosCrescimento)}
+                icon={<Users className="h-4 w-4" />}
+              />
             </div>
           </div>
 

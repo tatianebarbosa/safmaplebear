@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-
-import { User, Key, Trash2, CheckCircle } from "lucide-react";
+import { User, Users, Key, Trash2, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
@@ -96,20 +98,26 @@ const ProfileManagement = () => {
   // Atualizar perfil
   const updateProfile = async () => {
     setIsLoading(true);
-    // Simulação de chamada de API
+    // Simulacao de chamada de API
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);) => {
+
     if (!isAllowedDomain(formData.email)) {
       toast({
-        title: "Email não permitido",
+        title: "Email nao permitido",
         description: "Use emails corporativos @mbcentral, @seb ou @sebsa",
         variant: "destructive"
       });
+      setIsLoading(false);
+      return;
+    }
+
+    if (!currentUser) {
+      setIsLoading(false);
       return;
     }
 
     const updatedUser = {
-      ...currentUser!,
+      ...currentUser,
       name: formData.name,
       email: formData.email
     };
@@ -120,10 +128,11 @@ const ProfileManagement = () => {
     
     toast({
       title: "Perfil atualizado",
-      description: "Suas informações foram atualizadas com sucesso"
+      description: "Suas informacoes foram atualizadas com sucesso"
     });
     
     setIsProfileOpen(false);
+    setIsLoading(false);
   };
 
   // Alterar senha
@@ -215,7 +224,7 @@ const ProfileManagement = () => {
       description: "Usuário foi removido da lista de pendentes",
       variant: "destructive"
     });
-  };in only)
+  };
   const createUser = () => {
     if (!isAllowedDomain(formData.email)) {
       toast({

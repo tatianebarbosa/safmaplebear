@@ -1,3 +1,5 @@
+﻿import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+
 export interface CanvaUser {
   id: string;
   name: string;
@@ -229,6 +231,7 @@ export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] =
     const schoolName = schoolUsers[0]?.school || 'Escola não definida';
     const cluster = extractClusterFromSchool(schoolName);
     const nonCompliantUsers = schoolUsers.filter(u => !u.isCompliant);
+    const licenseLimit = MAX_LICENSES_PER_SCHOOL;
     
     const totalActivity = schoolUsers.reduce((acc, user) => ({
       designsCreated: acc.designsCreated + user.designsCreated,
@@ -237,25 +240,25 @@ export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] =
       designsViewed: acc.designsViewed + user.designsViewed
     }), { designsCreated: 0, designsPublished: 0, sharedLinks: 0, designsViewed: 0 });
 
-    const utilizationRate = Math.min((schoolUsers.length / 2) * 100, 100); // 2 licenças por escola
+    const utilizationRate = licenseLimit > 0 ? Math.min((schoolUsers.length / licenseLimit) * 100, 100) : 0;
     
     let performance: 'high' | 'medium' | 'low' = 'low';
     const avgActivity = (totalActivity.designsCreated + totalActivity.designsPublished) / schoolUsers.length;
     if (avgActivity > 100) performance = 'high';
     else if (avgActivity > 50) performance = 'medium';
 
-    const hasLicenseIssues = schoolUsers.length > 2 || nonCompliantUsers.length > 0;
+    const hasLicenseIssues = schoolUsers.length > licenseLimit || nonCompliantUsers.length > 0;
     const licenseStatus: 'normal' | 'over_limit' | 'needs_attention' = 
-      schoolUsers.length > 2 ? 'over_limit' : 
+      schoolUsers.length > licenseLimit ? 'over_limit' : 
       nonCompliantUsers.length > 0 ? 'needs_attention' : 'normal';
 
     schoolsData.push({
       schoolId,
       schoolName,
       cluster,
-      maxLicenses: 2,
+      maxLicenses: licenseLimit,
       usedLicenses: schoolUsers.length,
-      availableLicenses: Math.max(0, 2 - schoolUsers.length),
+      availableLicenses: Math.max(0, licenseLimit - schoolUsers.length),
       users: schoolUsers,
       nonCompliantUsers,
       totalActivity,
@@ -438,3 +441,6 @@ export const filterLicenseHistory = (filters: {
   
   return history;
 };
+
+
+

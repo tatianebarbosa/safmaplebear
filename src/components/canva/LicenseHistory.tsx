@@ -83,7 +83,7 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
 
   const exportHistory = () => {
     const csvData = [
-      ['Data/Hora', 'Escola', 'Ação', 'Usuário', 'Email', 'Escola Destino', 'Justificativa', 'Executado por'],
+      ['Data/Hora', 'Escola', 'Ação', 'Usuário', 'Email', 'Escola Destino', 'Referencia (Email/Ticket)', 'Executado por'],
       ...filteredHistory.map(action => [
         formatDateTimeBR(action.timestamp),
         action.schoolName,
@@ -206,7 +206,7 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
                     <TableHead>Ação</TableHead>
                     <TableHead>Usuário</TableHead>
                     <TableHead>Destino</TableHead>
-                    <TableHead>Justificativa</TableHead>
+                    <TableHead>Referencia (Email/Ticket)</TableHead>
                     <TableHead>Executado por</TableHead>
                   </TableRow>
                 </TableHeader>
