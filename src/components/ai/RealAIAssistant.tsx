@@ -67,7 +67,6 @@ const RealAIAssistant = () => {
     
     try {
       let schoolInfo = "";
-      let queryType = "geral";
 
       // Detecta o tipo de consulta e busca os dados apropriados
       const lowerMessage = message.toLowerCase();
@@ -78,7 +77,6 @@ const RealAIAssistant = () => {
         const school = await searchSchoolByName(schoolName);
         if (school) {
           schoolInfo = formatSchoolData(school);
-          queryType = "nome";
         }
       } else if (lowerMessage.includes('estado') || lowerMessage.includes('sp') || lowerMessage.includes('mg')) {
         // Busca por estado
@@ -96,7 +94,6 @@ const RealAIAssistant = () => {
           schools.forEach(school => {
             schoolInfo += `- ${school['Nome da Escola']} (${school['Status da Escola']}, Cluster: ${school['Cluster']})\n`;
           });
-          queryType = "estado";
         }
       } else if (lowerMessage.includes('cluster')) {
         // Busca por cluster
@@ -114,7 +111,6 @@ const RealAIAssistant = () => {
           schools.forEach(school => {
             schoolInfo += `- ${school['Nome da Escola']} (${school['Cidade da Escola']}, ${school['Estado da Escola']})\n`;
           });
-          queryType = "cluster";
         }
       } else if (lowerMessage.includes('status') || lowerMessage.includes('operando') || lowerMessage.includes('implantando')) {
         // Busca por status
@@ -132,7 +128,6 @@ const RealAIAssistant = () => {
           schools.forEach(school => {
             schoolInfo += `- ${school['Nome da Escola']} (${school['Cidade da Escola']}, ${school['Estado da Escola']})\n`;
           });
-          queryType = "status";
         }
       }
 

@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, Users, AlertTriangle, Building2, MapPin, RefreshCw } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, Filter, Users, AlertTriangle, MapPin, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { SchoolCanvaData, CanvaUser } from '@/lib/canvaDataProcessor';
+import { SchoolCanvaData } from '@/lib/canvaDataProcessor';
 
 interface EnhancedSchoolManagementProps {
   schoolsData: SchoolCanvaData[];

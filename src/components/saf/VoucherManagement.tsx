@@ -223,7 +223,7 @@ const VoucherManagement = () => {
       ...vouchers.map(v => [
         v.school,
         v.type,
-        v.amount,
+        v.amount.toString(),
         v.status,
         v.requestedBy,
         v.createdAt,
@@ -258,7 +258,7 @@ const VoucherManagement = () => {
   return (
     <div className="space-y-6">
       {/* AlertDialog para deletar voucher */}
-      <AlertDialog open={!!voucherToDelete} onOpenChange={setVoucherToDelete}>
+      <AlertDialog open={!!voucherToDelete} onOpenChange={(open) => !open && setVoucherToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza que deseja remover este voucher?</AlertDialogTitle>
@@ -280,7 +280,7 @@ const VoucherManagement = () => {
           <p className="text-muted-foreground">Controle e histórico de vouchers para escolas</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={exportData} variant="outline">
+          <Button onClick={exportVouchers} variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Exportar CSV
           </Button>

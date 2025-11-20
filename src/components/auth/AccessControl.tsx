@@ -21,7 +21,6 @@ export interface User {
 
 const AccessControl = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isFirstAccess, setIsFirstAccess] = useState(true);
   const [requestData, setRequestData] = useState({
     name: '',
     email: '',
@@ -39,7 +38,6 @@ const AccessControl = () => {
     if (savedUser) {
       const user = JSON.parse(savedUser);
       setCurrentUser(user);
-      setIsFirstAccess(user.status === 'pending');
     }
   };
 

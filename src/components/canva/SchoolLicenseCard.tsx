@@ -1,8 +1,7 @@
-﻿import React, { useState } from 'react';
+﻿import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Edit, 
@@ -13,10 +12,9 @@ import {
   Paperclip,
   MapPin,
   Settings,
-  Eye,
   RefreshCw
 } from 'lucide-react';
-import { School } from '@/types/schoolLicense';
+import { School, type LicenseStatus } from '@/types/schoolLicense';
 import { UserDialog } from './UserDialog';
 import { SwapUserDialog } from './SwapUserDialog';
 import { JustificationsDialog } from './JustificationsDialog';
@@ -54,15 +52,13 @@ export const SchoolLicenseCard = ({
     removeUser, 
     swapUser,
     getLicenseStatus,
-    getJustificationsBySchool,
-    isEmailValid
+    getJustificationsBySchool
   } = useSchoolLicenseStore();
 
-  const licenseStatus = getLicenseStatus(school);
+  const licenseStatus = getLicenseStatus(school) as LicenseStatus;
+  const AVAILABLE_STATUS: LicenseStatus = 'Disponível';
   const utilizationPercent = Math.min(100, (school.usedLicenses / school.totalLicenses) * 100);
   const nonCompliantUsers = school.users.filter(u => !u.isCompliant);
-  const justifications = getJustificationsBySchool(school.id);
-
   const getNonComplianceReason = (email: string) => {
     const domain = email.toLowerCase().split('@')[1];
     if (!domain) return 'Email invalido';
@@ -80,7 +76,7 @@ export const SchoolLicenseCard = ({
 
   const getLicensesBadgeColor = () => {
     switch (licenseStatus) {
-      case 'Disponivel':
+      case AVAILABLE_STATUS:
         return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'Completo':
         return 'bg-amber-50 text-amber-700 border-amber-200';
@@ -103,8 +99,14 @@ export const SchoolLicenseCard = ({
       toast.error('Esta escola ja possui o limite maximo de 2 usuarios. Para adicionar um novo usuario, voce deve transferir ou excluir um usuario existente.');
       return;
     }
-    
-    addUser(school.id, userData);
+
+    addUser(school.id, userData, {
+      origemSolicitacao: 'E-mail',
+      solicitadoPorNome: userData?.name || 'Portal SAF',
+      solicitadoPorEmail: userData?.email || 'nao-informado@saf.com',
+      observacao: 'Inclusao direta pelo painel',
+      performedBy: 'Portal SAF',
+    });
     setShowUserDialog(false);
     toast.success('Usuario adicionado com sucesso');
   };
@@ -191,6 +193,12 @@ export const SchoolLicenseCard = ({
   const openSwapDialog = (userId: string) => {
     setSwappingUserId(userId);
     setShowSwapDialog(true);
+  };
+
+  const handleManageSchool = () => {
+    onViewDetails(school);
+    onManage(school);
+    setShowDetailsDialog(true);
   };
 
   return (
@@ -310,7 +318,7 @@ export const SchoolLicenseCard = ({
           {/* Actions */}
           <div className="flex flex-col space-y-2 pt-2 border-t">
             {/* Botao de Acao Principal Condicional */}
-            {licenseStatus === 'Disponivel' ? (
+            {licenseStatus === AVAILABLE_STATUS ? (
               <Button 
                 size="sm" 
                 variant="default" 
@@ -345,7 +353,7 @@ export const SchoolLicenseCard = ({
             <Button 
               size="sm" 
               variant="outline" 
-              onClick={() => setShowDetailsDialog(true)}
+              onClick={handleManageSchool}
               className="w-full"
             >
               <Settings className="h-3 w-3 mr-1" />

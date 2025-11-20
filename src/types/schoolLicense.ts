@@ -1,6 +1,6 @@
 export type SchoolStatus = 'Ativa' | 'Implantando' | 'Inativa';
 export type UserRole = 'Estudante' | 'Professor' | 'Administrador';
-export type LicenseStatus = 'Disponível' | 'Completo' | 'Excedido';
+export type LicenseStatus = 'Dispon\u00edvel' | 'Completo' | 'Excedido';
 export type ClusterType = 'Implantação' | 'Alta Performance' | 'Potente' | 'Desenvolvimento' | 'Alerta' | 'Outros/Implantação';
 
 export interface SchoolUser {

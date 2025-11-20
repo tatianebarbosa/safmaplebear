@@ -6,7 +6,6 @@ import { Bot, Send, Minimize2, X, BookOpenText } from "lucide-react";
 import { Mascot } from "@/components/ui/mascot";
 import { BearHappy } from "@/assets/maplebear";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import {
   loadSchoolData,
   searchSchoolByName,
@@ -284,7 +283,7 @@ const FloatingAIChat = () => {
 Qual informaÃ§Ã£o especÃ­fica vocÃª gostaria?`;
     }
     
-    return `Entendi sua pergunta sobre "${message}". Como Assistente SAF, posso ajudar com:
+    return `Entendi sua pergunta sobre "${input}". Como Assistente SAF, posso ajudar com:
     
 â€¢ InformaÃ§Ãµes sobre licenÃ§as Canva
 â€¢ Dados de escolas e franquias

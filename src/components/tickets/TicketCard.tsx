@@ -29,7 +29,7 @@ export const TicketCard = ({ ticket, canManage }: TicketCardProps) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: ticket.id });
+  } = useSortable({ id: ticket.id, resizeObserverConfig: { disabled: true } });
 
   const style = {
     transform: CSS.Transform.toString(transform),

@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { canvaCollector, CanvaData, CanvaHistorico } from '@/lib/canvaDataCollector';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Clock, RefreshCw, Users, Zap, Briefcase, GraduationCap, School, Palette, Share2, Link, TrendingUp, Building2, Shield } from 'lucide-react';
+import { AlertTriangle, Clock, Users, Zap, School, Palette, Share2, Link, TrendingUp, Building2, Shield } from 'lucide-react';
 import { formatNumber, formatDateBR } from '@/lib/formatters';
 import { toast } from 'sonner';
 import type { CanvaOverviewData } from '@/types/officialData';
@@ -55,24 +55,6 @@ export const CanvaMetricsDisplay = ({ overviewSummary }: CanvaMetricsDisplayProp
     immediate: true
   });
 
-  const coletarDadosAgora = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const novosDados = await canvaCollector.coletarDadosCanva();
-      setCanvaData(novosDados);
-      // Recarrega o histórico
-      const hist = await canvaCollector.obterHistorico();
-      setHistorico(hist);
-      toast.success('Dados do Canva atualizados com sucesso!');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao coletar dados');
-      toast.error('Erro ao coletar dados do Canva.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const reverterAlteracao = async (historicoId: string) => {
     try {
       await canvaCollector.reverterAlteracao(historicoId);
@@ -117,6 +99,11 @@ export const CanvaMetricsDisplay = ({ overviewSummary }: CanvaMetricsDisplayProp
 
   return (
     <div className="space-y-6">
+      {loading && (
+        <div className="rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
+          Atualizando dados do Canva...
+        </div>
+      )}
       {error && (
         <div className="flex items-center p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
           <AlertTriangle className="h-5 w-5 text-destructive mr-3" />

@@ -1,4 +1,3 @@
-import React from 'react';
 import { TrendingUp, TrendingDown, Users, School, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

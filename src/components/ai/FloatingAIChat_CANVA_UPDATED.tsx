@@ -83,7 +83,7 @@ export const canvaMetricsContext = {
     
     if (perguntaLower.includes('kit') || perguntaLower.includes('marca')) {
       if (dados.kits && dados.kits.length > 0) {
-        const kitsFormatados = dados.kits.map(k => 
+        const kitsFormatados = dados.kits.map((k: { nome: string; aplicado: string; criado: string }) => 
           `- **${k.nome}**: ${k.aplicado} (Criado: ${k.criado})`
         ).join('\n');
         
@@ -159,7 +159,7 @@ export const consultarCanvaComIA = async (pergunta: string, dadosCanva: any, ope
         },
         {
           role: 'user',
-          content: `Dados: ${JSON.stringify(dadosCanva)}\n\nPergunta: ${pergunta}`,
+          content: prompt,
         },
       ],
       temperature: 0.7,

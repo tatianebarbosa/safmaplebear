@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,7 +16,6 @@ import FloatingAIChat from '@/components/ai/FloatingAIChat';
 import { NonCompliantUsersDialog } from './NonCompliantUsersDialog';
 
 const CanvaDashboard = () => {
-  const navigate = useNavigate();
   const { 
     overviewData, 
     loading,

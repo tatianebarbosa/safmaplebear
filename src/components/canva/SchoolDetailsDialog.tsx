@@ -22,8 +22,7 @@ import {
   AlertTriangle,
   MapPin,
   Building2,
-  Mail,
-  Phone
+  Mail
 } from 'lucide-react';
 import { School, HistoryEntry } from '@/types/schoolLicense';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
@@ -45,7 +44,6 @@ export const SchoolDetailsDialog = ({
   const { 
     getHistoryBySchool, // Adicionar a nova funcao
     getLicenseStatus,
-    isEmailValid,
     revertHistoryEntry
   } = useSchoolLicenseStore();
   const { toast } = useToast();

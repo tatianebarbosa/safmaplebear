@@ -360,7 +360,7 @@ const AIKnowledgeBase = () => {
   return (
     <div className="space-y-6">
       {/* AlertDialog para deletar item de conhecimento */}
-      <AlertDialog open={!!itemToDelete} onOpenChange={setItemToDelete}>
+      <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza que deseja remover este item?</AlertDialogTitle>
@@ -378,7 +378,7 @@ const AIKnowledgeBase = () => {
       </AlertDialog>
 
       {/* AlertDialog para deletar prompt */}
-      <AlertDialog open={!!promptToDelete} onOpenChange={setPromptToDelete}>
+      <AlertDialog open={!!promptToDelete} onOpenChange={(open) => !open && setPromptToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza que deseja remover este prompt?</AlertDialogTitle>

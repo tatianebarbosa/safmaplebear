@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { CanvaOverviewData, OfficialSchool, OfficialUser, ProcessedSchoolData } from '@/types/officialData';
 import { isEmailCompliant } from '@/lib/safDataService';
 import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';

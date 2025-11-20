@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatCurrency, formatDateBR, formatPercentage } from '@/lib/formatters';
-import { downloadCSV, generateFilenameWithDate } from '@/lib/fileUtils';
+import { downloadCSV } from '@/lib/fileUtils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -236,7 +236,7 @@ export const CostManagementDashboard = () => {
                   dataKey="amount"
                   label={({ team, percentage }) => `${team}: ${percentage.toFixed(1)}%`}
                 >
-                  {analytics.teamBreakdown.map((entry, index) => (
+                  {analytics.teamBreakdown.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>

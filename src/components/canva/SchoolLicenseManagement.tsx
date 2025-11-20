@@ -1,13 +1,10 @@
-import React, { useState, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Combobox } from '@/components/ui/combobox';
 import { 
   Search, 
-  Filter, 
   Download, 
   Upload, 
   X,
@@ -18,7 +15,7 @@ import {
 import { SchoolLicenseCard } from './SchoolLicenseCard';
 import { ImportPreviewDialog } from './ImportPreviewDialog';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
-import { School, ClusterType, LicenseStatus } from '@/types/schoolLicense';
+import { School } from '@/types/schoolLicense';
 import { toast } from 'sonner';
 import StatsCard from '@/components/dashboard/StatsCard';
 

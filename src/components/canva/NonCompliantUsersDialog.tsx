@@ -125,7 +125,7 @@ export const NonCompliantUsersDialog = ({
                 <Filter className="h-4 w-4" />
                 <span>Filtrar por domínio</span>
                 {(searchTerm || domainFilter) && (
-                  <Button size="xs" variant="ghost" onClick={handleClearFilters}>
+                  <Button size="sm" variant="ghost" onClick={handleClearFilters}>
                     Limpar
                   </Button>
                 )}

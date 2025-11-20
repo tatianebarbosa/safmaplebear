@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { UserRole } from '@/types/schoolLicense';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
 
 interface SwapUserDialogProps {
   open: boolean;
@@ -50,7 +49,6 @@ export const SwapUserDialog = ({
       newRole: 'Estudante',
       reason: '',
     });
-    setAttachment(null);
     setErrors({});
   };
 
