@@ -8,7 +8,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
     <footer
       // Alterado para fundo vermelho (destructive) e texto branco (foreground)
       className={cn(
-        "bg-muted text-foreground border-t border-border p-4 text-center text-sm",
+        "bg-card text-muted-foreground border-t border-border p-4 text-center text-sm",
         className
       )}
       {...props}
@@ -20,13 +20,13 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         <div className="space-x-4">
           <a 
             href="#" 
-            className="hover:text-primary transition-colors" // Removido hover:text-primary para manter o contraste
+            className="hover:text-foreground transition-colors"
           >
             Termos de Serviço
           </a>
           <a 
             href="#" 
-            className="hover:text-primary transition-colors" // Removido hover:text-primary para manter o contraste
+            className="hover:text-foreground transition-colors"
           >
             Política de Privacidade
           </a>
