@@ -20,7 +20,7 @@ import BearHappy from './mascots/bear_happy.png';
 // Logos Institucionais
 import MapleLogos from './logos/maple_logos.png';
 import MapleLogoOutline from './logos/maple_logo_outline.png';
-import InstitutionalLogo from './logos/maple_bear_institutional_logo.png';
+import TripleLogo from './logos/maple_bear_triple_logo.png';
 
 // Exportação organizada por categoria
 export const Mascots = {
@@ -46,7 +46,7 @@ export const Mascots = {
 export const Logos = {
   Full: MapleLogos,
   Outline: MapleLogoOutline,
-  Institutional: InstitutionalLogo,
+  Triple: TripleLogo,
 };
 
 // Exportações individuais para importação direta
@@ -63,7 +63,7 @@ export {
   BearHappy,
   MapleLogos,
   MapleLogoOutline,
-  InstitutionalLogo,
+  TripleLogo,
 };
 
 // Mapeamento de uso sugerido por contexto

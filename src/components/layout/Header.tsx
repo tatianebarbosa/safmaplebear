@@ -61,9 +61,9 @@ const Header = (props: HeaderProps) => {
 	          {/* Logo */}
 	          <div className="flex items-center gap-2">
 	            <img 
-	              src={Logos.Institutional} 
+	              src={Logos.Triple} 
 	              alt="Maple Bear SAF" 
-	              className="w-10 h-10 object-contain"
+	              className="h-10 object-contain w-auto"
 	            />
             <div>
               <h1 className="text-lg font-bold text-foreground">Maple Bear SAF</h1>

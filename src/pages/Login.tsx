@@ -67,7 +67,7 @@ const Login = () => {
       <Card className="w-full max-w-md relative backdrop-blur-sm bg-card/95 border-border/50 shadow-2xl">
         <CardHeader className="text-center space-y-4 pb-6">
           <div className="flex justify-center mb-4">
-		            <Mascot src={Logos.Institutional} size="md" alt="Maple Bear - Bem-vindo!" />
+		            <Mascot src={Logos.Triple} size="lg" alt="Maple Bear - Bem-vindo!" />
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">
             Maple Bear SAF
