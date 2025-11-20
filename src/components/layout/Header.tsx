@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/components/auth/AuthService";
-import { BearHappy } from "@/assets/maplebear";
+import { Logos } from "@/assets/maplebear";
 
 interface HeaderProps {
   // activeSection: string; // Removido
@@ -58,13 +58,13 @@ const Header = (props: HeaderProps) => {
     <header className="bg-card border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-40 w-full">
       <div className="w-full px-4 py-3">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <img 
-              src={BearHappy} 
-              alt="Maple Bear SAF" 
-              className="w-10 h-10 object-contain"
-            />
+	          {/* Logo */}
+	          <div className="flex items-center gap-2">
+	            <img 
+	              src={Logos.Institutional} 
+	              alt="Maple Bear SAF" 
+	              className="w-10 h-10 object-contain"
+	            />
             <div>
               <h1 className="text-lg font-bold text-foreground">Maple Bear SAF</h1>
             </div>

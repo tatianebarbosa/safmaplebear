@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
 import { authService } from "@/components/auth/AuthService";
 import { Mascot } from "@/components/ui/mascot";
-import { BearWaving } from "@/assets/maplebear";
+import { Logos } from "@/assets/maplebear";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -67,7 +67,7 @@ const Login = () => {
       <Card className="w-full max-w-md relative backdrop-blur-sm bg-card/95 border-border/50 shadow-2xl">
         <CardHeader className="text-center space-y-4 pb-6">
           <div className="flex justify-center mb-4">
-	            <Mascot src={BearWaving} size="md" alt="Maple Bear - Bem-vindo!" />
+		            <Mascot src={Logos.Institutional} size="md" alt="Maple Bear - Bem-vindo!" />
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">
             Maple Bear SAF
