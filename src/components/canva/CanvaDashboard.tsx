@@ -82,8 +82,8 @@ const CanvaDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Gestão Canva</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-2xl font-semibold text-foreground">Gestão Canva</h1>
+          <p className="text-sm text-foreground/70">
             Dados oficiais sincronizados • {overviewData.totalUsers} usuários ativos
           </p>
         </div>
@@ -94,11 +94,11 @@ const CanvaDashboard = () => {
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full mt-4">
         <TabsList className="flex w-full overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50">
-          <TabsTrigger value="overview" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Visão Geral</TabsTrigger>
-          <TabsTrigger value="schools" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Escolas</TabsTrigger>
-          <TabsTrigger value="usage" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Usos</TabsTrigger>
-          <TabsTrigger value="costs" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Custos</TabsTrigger>
-          <TabsTrigger value="advanced" className="whitespace-nowrap data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Avançado</TabsTrigger>
+          <TabsTrigger value="overview" className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Visão Geral</TabsTrigger>
+          <TabsTrigger value="schools" className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Escolas</TabsTrigger>
+          <TabsTrigger value="usage" className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Usos</TabsTrigger>
+          <TabsTrigger value="costs" className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Custos</TabsTrigger>
+          <TabsTrigger value="advanced" className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">Avançado</TabsTrigger>
 </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
