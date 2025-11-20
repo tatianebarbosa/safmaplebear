@@ -1,0 +1,171 @@
+
+> safmaplebear@1.0.0 build
+> tsc && vite build
+
+src/components/ai/FloatingAIChat.tsx(9,1): error TS6133: 'toast' is declared but its value is never read.
+src/components/ai/FloatingAIChat.tsx(287,43): error TS2552: Cannot find name 'message'. Did you mean 'messages'?
+src/components/ai/FloatingAIChat_CANVA_UPDATED.tsx(86,47): error TS7006: Parameter 'k' implicitly has an 'any' type.
+src/components/ai/FloatingAIChat_CANVA_UPDATED.tsx(141,9): error TS6133: 'prompt' is declared but its value is never read.
+src/components/ai/RealAIAssistant.tsx(70,11): error TS6133: 'queryType' is declared but its value is never read.
+src/components/auth/AccessControl.tsx(24,10): error TS6133: 'isFirstAccess' is declared but its value is never read.
+src/components/auth/AuthService.ts(50,20): error TS6133: 'ALLOWED_DOMAINS' is declared but its value is never read.
+src/components/auth/AuthService.ts(63,11): error TS6133: 'isValidDomain' is declared but its value is never read.
+src/components/auth/AuthService.ts(63,25): error TS6133: 'email' is declared but its value is never read.
+src/components/canva/CanvaDashboard.tsx(20,9): error TS6133: 'navigate' is declared but its value is never read.
+src/components/canva/CanvaInsights.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/canva/CanvaMetricsDisplay.tsx(4,29): error TS6133: 'CardHeader' is declared but its value is never read.
+src/components/canva/CanvaMetricsDisplay.tsx(4,41): error TS6133: 'CardTitle' is declared but its value is never read.
+src/components/canva/CanvaMetricsDisplay.tsx(6,32): error TS6133: 'RefreshCw' is declared but its value is never read.
+src/components/canva/CanvaMetricsDisplay.tsx(6,55): error TS6133: 'Briefcase' is declared but its value is never read.
+src/components/canva/CanvaMetricsDisplay.tsx(6,66): error TS6133: 'GraduationCap' is declared but its value is never read.
+src/components/canva/CanvaMetricsDisplay.tsx(22,10): error TS6133: 'loading' is declared but its value is never read.
+src/components/canva/CanvaMetricsDisplay.tsx(58,9): error TS6133: 'coletarDadosAgora' is declared but its value is never read.
+src/components/canva/CostManagementDashboard.tsx(3,23): error TS6133: 'generateFilenameWithDate' is declared but its value is never read.
+src/components/canva/CostManagementDashboard.tsx(239,49): error TS6133: 'entry' is declared but its value is never read.
+src/components/canva/EnhancedSchoolManagement.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/canva/EnhancedSchoolManagement.tsx(2,48): error TS6133: 'Building2' is declared but its value is never read.
+src/components/canva/EnhancedSchoolManagement.tsx(10,27): error TS6133: 'CanvaUser' is declared but its value is never read.
+src/components/canva/ImportPreviewDialog.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/canva/InvoiceDialog.tsx(14,1): error TS6133: 'Textarea' is declared but its value is never read.
+src/components/canva/JustificationRequiredDialog.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/canva/JustificationRequiredDialog.tsx(11,1): error TS6133: 'Input' is declared but its value is never read.
+src/components/canva/JustificationRequiredDialog.tsx(18,1): error TS6133: 'toast' is declared but its value is never read.
+src/components/canva/JustificationRequiredDialog.tsx(19,24): error TS6133: 'searchTeamMembers' is declared but its value is never read.
+src/components/canva/JustificationsDialog.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/canva/LicenseHistory.tsx(4,37): error TS6133: 'Calendar' is declared but its value is never read.
+src/components/canva/LicenseHistory.tsx(12,29): error TS6133: 'filterLicenseHistory' is declared but its value is never read.
+src/components/canva/LicenseManagement.tsx(6,1): error TS6133: 'Input' is declared but its value is never read.
+src/components/canva/NonCompliantUsersDialog.tsx(128,27): error TS2322: Type '"xs"' is not assignable to type '"default" | "sm" | "lg" | "icon" | "icon-sm" | null | undefined'.
+src/components/canva/SchoolDetailsDialog.tsx(26,3): error TS6133: 'Phone' is declared but its value is never read.
+src/components/canva/SchoolDetailsDialog.tsx(48,5): error TS6133: 'isEmailValid' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(5,1): error TS6133: 'Progress' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(16,3): error TS6133: 'Eye' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(36,3): error TS6133: 'onViewDetails' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(37,3): error TS6133: 'onManage' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(58,5): error TS6133: 'isEmailValid' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(64,9): error TS6133: 'justifications' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(83,12): error TS2678: Type '"Disponivel"' is not comparable to type '"Disponível" | "Completo" | "Excedido"'.
+src/components/canva/SchoolLicenseCard.tsx(107,5): error TS2554: Expected 3 arguments, but got 2.
+src/components/canva/SchoolLicenseCard.tsx(130,11): error TS6133: 'timestamp' is declared but its value is never read.
+src/components/canva/SchoolLicenseCard.tsx(313,14): error TS2367: This comparison appears to be unintentional because the types '"Disponível" | "Completo" | "Excedido"' and '"Disponivel"' have no overlap.
+src/components/canva/SchoolLicenseManagement.tsx(2,29): error TS6133: 'CardDescription' is declared but its value is never read.
+src/components/canva/SchoolLicenseManagement.tsx(6,1): error TS6133: 'Badge' is declared but its value is never read.
+src/components/canva/SchoolLicenseManagement.tsx(7,1): error TS6133: 'Combobox' is declared but its value is never read.
+src/components/canva/SchoolLicenseManagement.tsx(10,3): error TS6133: 'Filter' is declared but its value is never read.
+src/components/canva/SchoolLicenseManagement.tsx(21,18): error TS6133: 'ClusterType' is declared but its value is never read.
+src/components/canva/SchoolLicenseManagement.tsx(21,31): error TS6133: 'LicenseStatus' is declared but its value is never read.
+src/components/canva/SchoolLicenseManagement.tsx(43,9): error TS6133: 'schoolOptions' is declared but its value is never read.
+src/components/canva/SwapUserDialog.tsx(18,1): error TS6133: 'toast' is declared but its value is never read.
+src/components/canva/SwapUserDialog.tsx(53,5): error TS2304: Cannot find name 'setAttachment'.
+src/components/dashboard/StatsCard.tsx(2,1): error TS6133: 'LucideIcon' is declared but its value is never read.
+src/components/insights/InsightsAnalytics.tsx(39,10): error TS6133: 'selectedMetric' is declared but its value is never read.
+src/components/insights/InsightsAnalytics.tsx(39,26): error TS6133: 'setSelectedMetric' is declared but its value is never read.
+src/components/layout/Header.tsx(29,17): error TS6133: 'props' is declared but its value is never read.
+src/components/monitoring/MonitoringPortal.tsx(8,74): error TS6133: 'Search' is declared but its value is never read.
+src/components/monitoring/MonitoringPortal.tsx(59,22): error TS6133: 'setSearchTerm' is declared but its value is never read.
+src/components/monitoring/MonitoringPortal.tsx(60,24): error TS6133: 'setStatusFilter' is declared but its value is never read.
+src/components/ranking/RankingDashboard.tsx(8,43): error TS6133: 'CanvaUserData' is declared but its value is never read.
+src/components/ranking/RankingTable.tsx(14,40): error TS6133: 'positionChange' is declared but its value is never read.
+src/components/saf/AIKnowledgeBase.tsx(11,94): error TS6133: 'DialogClose' is declared but its value is never read.
+src/components/saf/AIKnowledgeBase.tsx(363,42): error TS2322: Type 'Dispatch<SetStateAction<string | null>>' is not assignable to type '(open: boolean) => void'.
+  Types of parameters 'value' and 'open' are incompatible.
+    Type 'boolean' is not assignable to type 'SetStateAction<string | null>'.
+src/components/saf/AIKnowledgeBase.tsx(381,44): error TS2322: Type 'Dispatch<SetStateAction<string | null>>' is not assignable to type '(open: boolean) => void'.
+  Types of parameters 'value' and 'open' are incompatible.
+    Type 'boolean' is not assignable to type 'SetStateAction<string | null>'.
+src/components/saf/SAFControlCenter.tsx(1,20): error TS6133: 'useEffect' is declared but its value is never read.
+src/components/saf/SAFControlCenter.tsx(40,19): error TS6133: 'setTickets' is declared but its value is never read.
+src/components/saf/VoucherManagement.tsx(2,10): error TS6133: 'formatDateTimeBR' is declared but its value is never read.
+src/components/saf/VoucherManagement.tsx(4,29): error TS6133: 'CardDescription' is declared but its value is never read.
+src/components/saf/VoucherManagement.tsx(4,46): error TS6133: 'CardHeader' is declared but its value is never read.
+src/components/saf/VoucherManagement.tsx(4,58): error TS6133: 'CardTitle' is declared but its value is never read.
+src/components/saf/VoucherManagement.tsx(6,161): error TS6133: 'AlertDialogTrigger' is declared but its value is never read.
+src/components/saf/VoucherManagement.tsx(220,9): error TS6133: 'exportVouchers' is declared but its value is never read.
+src/components/saf/VoucherManagement.tsx(235,17): error TS2345: Argument of type '(string | number)[][]' is not assignable to parameter of type 'string[][]'.
+  Type '(string | number)[]' is not assignable to type 'string[]'.
+    Type 'string | number' is not assignable to type 'string'.
+      Type 'number' is not assignable to type 'string'.
+src/components/saf/VoucherManagement.tsx(261,45): error TS2322: Type 'Dispatch<SetStateAction<string | null>>' is not assignable to type '(open: boolean) => void'.
+  Types of parameters 'value' and 'open' are incompatible.
+    Type 'boolean' is not assignable to type 'SetStateAction<string | null>'.
+src/components/saf/VoucherManagement.tsx(283,28): error TS2304: Cannot find name 'exportData'.
+src/components/saf/VoucherManagement.tsx(526,81): error TS6133: 'index' is declared but its value is never read.
+src/components/schools/SchoolAgenda.tsx(2,29): error TS6133: 'CardHeader' is declared but its value is never read.
+src/components/schools/SchoolAgenda.tsx(2,41): error TS6133: 'CardTitle' is declared but its value is never read.
+src/components/schools/SchoolsDashboard.tsx(7,60): error TS6133: 'DialogTrigger' is declared but its value is never read.
+src/components/schools/SchoolsDashboard.tsx(12,33): error TS6133: 'Filter' is declared but its value is never read.
+src/components/schools/SchoolsDashboard.tsx(41,10): error TS6133: 'showAddVoucher' is declared but its value is never read.
+src/components/schools/SchoolsDashboard.tsx(41,26): error TS6133: 'setShowAddVoucher' is declared but its value is never read.
+src/components/tickets/TicketCard.tsx(32,19): error TS2345: Argument of type '{ id: string; }' is not assignable to parameter of type 'Arguments'.
+  Property 'resizeObserverConfig' is missing in type '{ id: string; }' but required in type 'Arguments'.
+src/components/tickets/TicketKanban.tsx(18,1): error TS6133: 'Button' is declared but its value is never read.
+src/components/tickets/TicketTable.tsx(1,1): error TS6133: 'useState' is declared but its value is never read.
+src/components/ui/calendar.tsx(45,20): error TS6133: '_props' is declared but its value is never read.
+src/components/ui/calendar.tsx(46,21): error TS6133: '_props' is declared but its value is never read.
+src/components/ui/form.tsx(4,99): error TS7016: Could not find a declaration file for module 'react-hook-form'. 'c:/Users/Tatiane/safmaplebear/node_modules/react-hook-form/dist/index.esm.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/react-hook-form` if it exists or add a new declaration (.d.ts) file containing `declare module 'react-hook-form';`
+src/components/users/UserManagement.tsx(1,1): error TS6192: All imports in import declaration are unused.
+src/components/users/UserManagement.tsx(39,1): error TS6133: 'UserData' is declared but its value is never read.
+src/components/users/UserManagement.tsx(43,5): error TS6133: 'users' is declared but its value is never read.
+src/components/users/UserManagement.tsx(44,5): error TS2339: Property 'filteredUsers' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(45,5): error TS2339: Property 'loading' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(48,5): error TS2339: Property 'statusFilter' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(49,5): error TS2339: Property 'setStatusFilter' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(50,5): error TS2339: Property 'schoolFilter' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(51,5): error TS2339: Property 'setSchoolFilter' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(52,5): error TS2339: Property 'isAddDialogOpen' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(53,5): error TS2339: Property 'setIsAddDialogOpen' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(54,5): error TS2339: Property 'isEditDialogOpen' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(55,5): error TS2339: Property 'setIsEditDialogOpen' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(56,5): error TS2339: Property 'isDeleteDialogOpen' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(57,5): error TS2339: Property 'setIsDeleteDialogOpen' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(58,5): error TS2339: Property 'selectedUser' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(59,5): error TS2339: Property 'setSelectedUser' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(59,5): error TS6133: 'setSelectedUser' is declared but its value is never read.
+src/components/users/UserManagement.tsx(60,5): error TS2339: Property 'formData' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(61,5): error TS2339: Property 'setFormData' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(62,5): error TS2339: Property 'handleAddUser' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(65,5): error TS2339: Property 'openEditDialog' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(66,5): error TS2339: Property 'openDeleteDialog' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(67,5): error TS2339: Property 'resetForm' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(67,5): error TS6133: 'resetForm' is declared but its value is never read.
+src/components/users/UserManagement.tsx(68,5): error TS2339: Property 'exportUsers' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(69,5): error TS2339: Property 'getStatusBadge' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(70,5): error TS2339: Property 'getSchoolStats' does not exist on type '{ users: User[]; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; filterRole: "admin" | "user" | "maintenance" | "all"; setFilterRole: Dispatch<...>; ... 8 more ...; allUsers: User[]; }'.
+src/components/users/UserManagement.tsx(71,5): error TS6133: 'allUsers' is declared but its value is never read.
+src/components/users/UserManagement.tsx(195,42): error TS7006: Parameter 'user' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(195,48): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(246,36): error TS7006: Parameter 'school' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(246,44): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(290,48): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(300,48): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(311,57): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(329,57): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(348,46): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(381,48): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(391,48): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(403,57): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(421,57): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(440,46): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/users/UserManagement.tsx(450,21): error TS2322: Type '(user: User) => void' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Types of parameters 'user' and 'event' are incompatible.
+    Type 'MouseEvent<HTMLButtonElement, MouseEvent>' is missing the following properties from type 'User': id, name, email, role, and 3 more.
+src/components/users/UserManagement.tsx(479,43): error TS2322: Type '(userId: string) => Promise<void>' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Types of parameters 'userId' and 'event' are incompatible.
+    Type 'MouseEvent<HTMLButtonElement, MouseEvent>' is not assignable to type 'string'.
+src/lib/canvaDataCollector.ts(118,27): error TS6133: 'periodoFiltro' is declared but its value is never read.
+src/lib/canvaDataCollector.ts(235,7): error TS2353: Object literal may only specify known properties, and 'data' does not exist in type 'CanvaData'.
+src/lib/fileUtils.ts(245,23): error TS6133: 'e' is declared but its value is never read.
+src/lib/fileUtils.ts(268,23): error TS6133: 'e' is declared but its value is never read.
+src/lib/integratedCanvaService.ts(188,32): error TS2339: Property 'cluster' does not exist on type 'never'.
+src/lib/integratedCanvaService.ts(218,3): error TS6133: 'data' is declared but its value is never read.
+src/lib/officialDataProcessor.ts(12,10): error TS2300: Duplicate identifier 'School'.
+src/lib/officialDataProcessor.ts(16,10): error TS2300: Duplicate identifier 'School'.
+src/lib/pdfGenerator.ts(51,7): error TS2339: Property 'autoTable' does not exist on type 'import("c:/Users/Tatiane/safmaplebear/node_modules/@types/jspdf/index.d.ts")'.
+src/lib/pdfGenerator.ts(84,9): error TS2339: Property 'autoTable' does not exist on type 'import("c:/Users/Tatiane/safmaplebear/node_modules/@types/jspdf/index.d.ts")'.
+src/lib/pdfGenerator.ts(131,7): error TS2339: Property 'autoTable' does not exist on type 'import("c:/Users/Tatiane/safmaplebear/node_modules/@types/jspdf/index.d.ts")'.
+src/lib/pdfGenerator.ts(164,7): error TS2339: Property 'autoTable' does not exist on type 'import("c:/Users/Tatiane/safmaplebear/node_modules/@types/jspdf/index.d.ts")'.
+src/pages/Login.tsx(1,20): error TS6133: 'useEffect' is declared but its value is never read.
+src/pages/Login.tsx(8,23): error TS6133: 'LogIn' is declared but its value is never read.
+src/pages/Login.tsx(18,9): error TS6133: 'navigate' is declared but its value is never read.

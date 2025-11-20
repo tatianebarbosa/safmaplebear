@@ -175,6 +175,7 @@ export const JustificationRequiredDialog = ({
             )}
           </div>
 
+        </div>
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
             Cancelar

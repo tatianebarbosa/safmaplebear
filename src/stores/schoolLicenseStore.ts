@@ -46,8 +46,8 @@ interface SchoolLicenseState {
   addUser: (schoolId: string, user: Omit<SchoolUser, 'id' | 'createdAt'>, meta: AddUserMeta) => boolean;
   updateUser: (schoolId: string, userId: string, updates: Partial<SchoolUser>, meta?: ActionMeta) => void;
   removeUser: (schoolId: string, userId: string, meta?: ActionMeta) => void;
-  
-  swapUser: (schoolId: string, oldUserId: string, newUser: Omit<SchoolUser, 'id' | 'createdAt'>, justification: Omit<Justification, 'id' | 'timestamp'>) => void;
+
+swapUser: (schoolId: string, oldUserId: string, newUser: Omit<SchoolUser, 'id' | 'createdAt'>, justification: Omit<Justification, 'id' | 'timestamp'>) => void;
   transferUsersBetweenSchools: (
     sourceSchoolId: string,
     sourceUserId: string,
@@ -177,21 +177,19 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           return false;
         }
 
-        const newUser = {
+        const newUser: SchoolUser = {
           ...user,
           id: Date.now().toString(),
           createdAt: new Date().toISOString(),
           isCompliant: state.isEmailValid(user.email)
         };
 
-        const performedBy = meta.performedBy || 'Sistema/Usuário';
-
         state.addHistoryEntry({
           schoolId: school.id,
           schoolName: school.name,
           action: 'ADD_USER',
-          details: `Novo usuário adicionado: ${user.name} (${user.email}). Origem: ${meta.origemSolicitacao}. Solicitado por: ${meta.solicitadoPorNome} (${meta.solicitadoPorEmail}). Motivo: ${meta.observacao}.`,
-          performedBy,
+          details: `Novo usuario adicionado: ${user.name} (${user.email}). Origem: ${meta.origemSolicitacao}. Solicitado por: ${meta.solicitadoPorNome} (${meta.solicitadoPorEmail}). Motivo: ${meta.observacao}.`,
+          performedBy: meta.performedBy || 'Sistema/Usuario',
           changeSet: {
             type: 'GRANT_LICENSE',
             user: newUser
@@ -199,10 +197,10 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         });
 
         set(state => ({
-          schools: state.schools.map(s => 
-            s.id === schoolId 
-              ? { 
-                  ...s, 
+          schools: state.schools.map(s =>
+            s.id === schoolId
+              ? {
+                  ...s,
                   users: [...s.users, newUser],
                   usedLicenses: s.users.length + 1
                 }
@@ -212,16 +210,16 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
 
         return true;
       },
-            updateUser: (schoolId, userId, updates, meta) => {
-        const actionMeta: ActionMeta = meta ?? { performedBy: 'Sistema/Usuário' };
+
+      updateUser: (schoolId, userId, updates, meta) => {
         const state = get();
         const school = state.schools.find(s => s.id === schoolId);
         const oldUser = school?.users.find(u => u.id === userId);
-        if (!school || !oldUser) return state;
+        if (!school || !oldUser) return;
 
+        const actionMeta: ActionMeta = meta ?? { performedBy: 'Sistema/Usuario' };
         const previousUser = { ...oldUser };
-
-        const updatedUser = {
+        const updatedUser: SchoolUser = {
           ...oldUser,
           ...updates,
           isCompliant: updates.email ? state.isEmailValid(updates.email) : oldUser.isCompliant
@@ -231,8 +229,8 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           schoolId: school.id,
           schoolName: school.name,
           action: 'UPDATE_USER',
-          details: `Usuário ${oldUser.name} (${oldUser.email}) atualizado. Alterações: ${Object.keys(updates).join(', ')}.${actionMeta.reason ? ` Motivo: ${actionMeta.reason}` : ''}`,
-          performedBy: actionMeta.performedBy || 'Sistema/Usuário',
+          details: `Usuario ${oldUser.name} (${oldUser.email}) atualizado. Alteracoes: ${Object.keys(updates).join(', ')}.${actionMeta.reason ? ` Motivo: ${actionMeta.reason}` : ''}`,
+          performedBy: actionMeta.performedBy || 'Sistema/Usuario',
           changeSet: {
             type: 'UPDATE_USER',
             before: previousUser,
@@ -240,54 +238,49 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           }
         });
 
-        return {        // 2. Atualizar o estado da escola
-        return {
-          schools: state.schools.map(s => 
-            s.id === schoolId 
+        set(state => ({
+          schools: state.schools.map(s =>
+            s.id === schoolId
               ? {
                   ...s,
-                  users: s.users.map(u => 
-                    u.id === userId 
-                      ? updatedUser
-                      : u
-                  )
+                  users: s.users.map(u => (u.id === userId ? updatedUser : u))
                 }
               : s
           )
-        };
+        }));
       },
 
-            removeUser: (schoolId, userId, meta) => {
-        const actionMeta: ActionMeta = meta ?? { performedBy: 'Sistema/Usuário' };
+      removeUser: (schoolId, userId, meta) => {
         const state = get();
         const school = state.schools.find(s => s.id === schoolId);
         const userToRemove = school?.users.find(u => u.id === userId);
-        if (!school || !userToRemove) return state;
+        if (!school || !userToRemove) return;
+
+        const actionMeta: ActionMeta = meta ?? { performedBy: 'Sistema/Usuario' };
 
         state.addHistoryEntry({
           schoolId: school.id,
           schoolName: school.name,
           action: 'REMOVE_USER',
-          details: `Usuário ${userToRemove.name} (${userToRemove.email}) removido. Licença liberada.${actionMeta.reason ? ` Motivo: ${actionMeta.reason}` : ''}`,
-          performedBy: actionMeta.performedBy || 'Sistema/Usuário',
+          details: `Usuario ${userToRemove.name} (${userToRemove.email}) removido. Licenca liberada.${actionMeta.reason ? ` Motivo: ${actionMeta.reason}` : ''}`,
+          performedBy: actionMeta.performedBy || 'Sistema/Usuario',
           changeSet: {
             type: 'REMOVE_USER',
             user: userToRemove
           }
         });
 
-        return {        // 2. Atualizar o estado da escola
-        return {
-          schools: state.schools.map(s => 
-            s.id === schoolId 
-              ? { 
-                  ...s, 
+        set(state => ({
+          schools: state.schools.map(s =>
+            s.id === schoolId
+              ? {
+                  ...s,
                   users: s.users.filter(user => user.id !== userId),
                   usedLicenses: Math.max(0, s.usedLicenses - 1)
                 }
               : s
           )
-        };
+        }));
       },
 
       swapUser: (schoolId, oldUserId, newUser, justificationData) => {
