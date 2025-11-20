@@ -55,8 +55,8 @@ const Header = (props: HeaderProps) => {
   };
 
   return (
-    <header className="bg-card border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-40">
-      <div className="container mx-auto px-4 py-3">
+    <header className="bg-card border-b border-border shadow-[var(--shadow-card)] sticky top-0 z-40 w-full">
+      <div className="w-full px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
