@@ -11,7 +11,7 @@ import {
 } from '@/lib/officialDataProcessor';
 import {
   calculateLicenseStatus,
-  isEmailValid
+  validateEmail as isEmailValid
 } from '../lib';
 import {
   buildOverviewFromIntegration,
@@ -413,16 +413,20 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           schools: state.schools.map(s => {
             if (s.id === sourceSchoolId) {
               // Remove sourceUser e adiciona targetUser na escola de origem
+              const newUsers = [...s.users.filter(u => u.id !== sourceUserId), { ...targetUser, isCompliant: isEmailValid(targetUser.email) }];
               return {
                 ...s,
-                users: [...s.users.filter(u => u.id !== sourceUserId), { ...targetUser, isCompliant: isEmailValid(targetUser.email) }],
+                users: newUsers,
+                usedLicenses: newUsers.length, // Recalcula licenças usadas
               };
             }
             if (s.id === targetSchoolId) {
               // Remove targetUser e adiciona sourceUser na escola de destino
+              const newUsers = [...s.users.filter(u => u.id !== targetUserId), { ...sourceUser, isCompliant: isEmailValid(sourceUser.email) }];
               return {
                 ...s,
-                users: [...s.users.filter(u => u.id !== targetUserId), { ...sourceUser, isCompliant: isEmailValid(sourceUser.email) }],
+                users: newUsers,
+                usedLicenses: newUsers.length, // Recalcula licenças usadas
               };
             }
             return s;
