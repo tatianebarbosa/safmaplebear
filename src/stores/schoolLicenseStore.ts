@@ -4,11 +4,27 @@ import { School, Justification, SchoolUser, CanvaUsageData, HistoryEntry, Histor
 import { getLicenseLimitForSchool, MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
 import {
   processSchoolsWithUsers,
-  generateCanvaOverview,
-  isEmailCompliant,
+  geimport {
+  buildOverviewFromIntegration,
   parseOfficialSchoolsCSV,
   buildFallbackData // Importar a função refatorada
 } from '@/lib/officialDataProcessor';
+
+/**
+ * Calcula o status da licença com base no uso e no total de licenças.
+ * @param usedLicenses - Número de licenças em uso.
+ * @param totalLicenses - Número total de licenças disponíveis.
+ * @returns Status da licença ('Disponível', 'Completo', 'Excedido').
+ */
+const calculateLicenseStatus = (usedLicenses: number, totalLicenses: number): 'Disponível' | 'Completo' | 'Excedido' => {
+  if (usedLicenses > totalLicenses) {
+    return 'Excedido';
+  }
+  if (usedLicenses === totalLicenses) {
+    return 'Completo';
+  }
+  return 'Disponível';
+};
 import {
 
   validateEmail as isEmailValid
@@ -554,22 +570,6 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         return get().officialData.reduce((acc, data) => acc + data.nonCompliantUsers, 0);
       },
       getDomainCounts: () => {
-
-/**
- * Calcula o status da licença com base no uso e no total de licenças.
- * @param usedLicenses - Número de licenças em uso.
- * @param totalLicenses - Número total de licenças disponíveis.
- * @returns Status da licença ('Disponível', 'Completo', 'Excedido').
- */
-const calculateLicenseStatus = (usedLicenses: number, totalLicenses: number): 'Disponível' | 'Completo' | 'Excedido' => {
-  if (usedLicenses > totalLicenses) {
-    return 'Excedido';
-  }
-  if (usedLicenses === totalLicenses) {
-    return 'Completo';
-  }
-  return 'Disponível';
-};
         const officialData = get().officialData;
         if (!officialData || officialData.length === 0) return [];
 
