@@ -17,7 +17,7 @@ import {
   mapSchoolStatusFallback,
   mapUserRoleFallback,
   calculateLicenseStatus as calculateLicenseStatusUtil,
-} from '../utils/schoolUtils';
+} from './index';
 
 export { isEmailCompliant };
 
