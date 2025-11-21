@@ -6,12 +6,10 @@ import {
   processSchoolsWithUsers,
   generateCanvaOverview,
   isEmailCompliant,
-  parseOfficialSchoolsCSV
+  parseOfficialSchoolsCSV,
+  buildFallbackData // Importar a função refatorada
 } from '@/lib/officialDataProcessor';
 import {
-  normalizeValue,
-  mapSchoolStatusFallback,
-  mapUserRoleFallback,
   calculateLicenseStatus,
   isEmailValid
 } from '@/lib/utils/schoolUtils';
@@ -37,154 +35,7 @@ type ActionMeta = {
   reason?: string;
 };
 
-const buildFallbackData = async (): Promise<{
-  processedData: ProcessedSchoolData[];
-  overview: CanvaOverviewData;
-} | null> => {
-  const [schools, licenseUsers] = await Promise.all([
-    loadFranchisingSchools(),
-    loadLicenseUsers()
-  ]);
 
-  if (!licenseUsers.length) {
-    return null;
-  }
-
-  const schoolById = new Map<number, typeof schools[number]>();
-  const schoolByName = new Map<string, typeof schools[number]>();
-  schools.forEach((school) => {
-    schoolById.set(school.id, school);
-    schoolByName.set(normalizeValue(school.nome), school);
-  });
-
-  const toOfficialSchool = (school: typeof schools[number]): OfficialSchool => ({
-    id: school.id.toString(),
-    name: school.nome || `Escola ${school.id}`,
-    status: mapSchoolStatusFallback(school.statusEscola),
-    cluster: school.cluster || 'Outros',
-    cnpj: school.cnpj || undefined,
-    city: school.cidade || '',
-    state: school.estado || '',
-    region: school.regiao || '',
-    address: school.logradouro || ''
-  });
-
-  const findSchool = (userSchoolId: number | null, userSchoolName: string | null) => {
-    if (userSchoolId !== null) {
-      const byId = schoolById.get(userSchoolId);
-      if (byId) return byId;
-    }
-    if (userSchoolName) {
-      const normalized = normalizeValue(userSchoolName);
-      const exact = schoolByName.get(normalized);
-      if (exact) return exact;
-      for (const [key, school] of schoolByName.entries()) {
-        if (key.includes(normalized) || normalized.includes(key)) {
-          return school;
-        }
-      }
-    }
-    return null;
-  };
-
-  const officialSchools = new Map<string, OfficialSchool>();
-  const usersBySchool = new Map<string, OfficialUser[]>();
-
-  licenseUsers.forEach((user, idx) => {
-    const matchedSchool = findSchool(user.escolaId, user.escolaNome);
-    if (matchedSchool) {
-      const key = matchedSchool.id.toString();
-      if (!officialSchools.has(key)) {
-        officialSchools.set(key, toOfficialSchool(matchedSchool));
-      }
-    }
-
-    const schoolKey = matchedSchool ? matchedSchool.id.toString() : 'no-school';
-    const officialUser: OfficialUser = {
-      id: `fallback-${idx}-${user.email}`,
-      name: user.nome || user.email.split('@')[0],
-      email: user.email,
-      role: mapUserRoleFallback(user.funcao),
-      school: matchedSchool?.nome,
-      schoolId: matchedSchool ? matchedSchool.id.toString() : undefined,
-      licenseStatus: user.statusLicenca || undefined,
-      updatedAt: user.atualizadoEm ? user.atualizadoEm.toISOString() : undefined,
-      isCompliant: isEmailCompliant(user.email),
-    };
-
-    const bucket = usersBySchool.get(schoolKey) ?? [];
-    bucket.push(officialUser);
-    usersBySchool.set(schoolKey, bucket);
-  });
-
-  const processedData: ProcessedSchoolData[] = [];
-  usersBySchool.forEach((bucket, schoolId) => {
-    const officialSchool =
-      schoolId !== 'no-school' ? officialSchools.get(schoolId) : undefined;
-
-    const totalUsers = bucket.length;
-    const estimatedLicenses =
-      schoolId === 'no-school'
-        ? Math.max(totalUsers, 1)
-        : MAX_LICENSES_PER_SCHOOL;
-
-    processedData.push({
-      school:
-        officialSchool ??
-        ({
-          id: 'no-school',
-          name: 'Usuários sem escola',
-          status: 'Ativa',
-          cluster: 'Outros',
-          city: '',
-          state: '',
-          region: ''
-        } as OfficialSchool),
-      users: bucket,
-      totalUsers,
-      compliantUsers: bucket.filter((user) => user.isCompliant).length,
-      nonCompliantUsers: bucket.filter((user) => !user.isCompliant).length,
-      estimatedLicenses,
-      licenseStatus: calculateLicenseStatus(totalUsers, estimatedLicenses)
-    });
-  });
-
-  const compliantUsers = licenseUsers.filter((u) => isEmailCompliant(u.email)).length;
-  const nonCompliantUsers = licenseUsers.length - compliantUsers;
-
-  const nonMapleBearDomains = new Map<string, number>();
-  licenseUsers.forEach((user) => {
-    if (!isEmailCompliant(user.email)) {
-      const domain = user.email.split('@')[1]?.toLowerCase();
-      if (domain) {
-        nonMapleBearDomains.set(domain, (nonMapleBearDomains.get(domain) || 0) + 1);
-      }
-    }
-  });
-
-  const topNonCompliantDomains = Array.from(nonMapleBearDomains.entries())
-    .map(([domain, count]) => ({ domain, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
-
-  const schoolsWithUsers = Array.from(usersBySchool.keys()).filter(
-    (key) => key !== 'no-school'
-  ).length;
-
-  const overview: CanvaOverviewData = {
-    totalUsers: licenseUsers.length,
-    totalSchools: schools.length,
-    compliantUsers,
-    nonCompliantUsers,
-    complianceRate: licenseUsers.length ? (compliantUsers / licenseUsers.length) * 100 : 0,
-    nonMapleBearDomains: nonCompliantUsers,
-    topNonCompliantDomains,
-    schoolsWithUsers,
-    schoolsAtCapacity: Math.floor((schools.length || 0) * 0.6)
-  };
-
-  return { processedData, overview };
-};
 
 interface SchoolLicenseState {
   schools: School[];
