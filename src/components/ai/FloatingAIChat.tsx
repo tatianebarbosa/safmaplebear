@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bot, Send, Minimize2, X, BookOpenText } from "lucide-react";
 import { Mascot } from "@/components/ui/mascot";
-import { BearHappy } from "@/assets/maplebear";
+import { Mascots } from "@/assets/maplebear";
 import { Badge } from "@/components/ui/badge";
 import {
   loadSchoolData,
@@ -309,7 +309,7 @@ Como posso ser mais especÃ­fico?`;
           size="lg"
           className="rounded-full h-16 w-16 shadow-lg hover:shadow-xl transition-all duration-300 bg-white hover:bg-gray-50 p-0"
         >
-          <Mascot src={BearHappy} size="md" alt="Assistente IA" animated />
+          <Mascot src={Mascots.Happy} size="md" alt="Assistente IA" animated />
         </Button>
       </div>
     );
