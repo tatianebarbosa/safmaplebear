@@ -15,7 +15,7 @@ import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
 import {
   normalizeValue,
 
-  mapUserRoleFallback,
+
 } from './index';
 
 export { isEmailCompliant };
@@ -217,6 +217,24 @@ export const generateCanvaOverview = async (): Promise<CanvaOverviewData> => {
 };
 
 // Esta função foi movida da store para isolar a lógica de processamento de dados.
+
+/**
+ * Mapeia o perfil do usuário para um valor padrão.
+ * @param role - Perfil do usuário.
+ * @returns Perfil do usuário mapeado.
+ */
+const mapUserRoleFallback = (role: string): UserRole => {
+  switch (role) {
+    case 'Estudante':
+      return 'Estudante';
+    case 'Professor':
+      return 'Professor';
+    case 'Administrador':
+      return 'Administrador';
+    default:
+      return 'Estudante'; // Assumindo Estudante como fallback
+  }
+};
 
 /**
  * Mapeia o status da escola para um valor padrão.
