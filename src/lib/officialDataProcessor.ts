@@ -16,7 +16,6 @@ import {
   normalizeValue,
   mapSchoolStatusFallback,
   mapUserRoleFallback,
-  calculateLicenseStatus as calculateLicenseStatusUtil,
 } from './index';
 
 export { isEmailCompliant };
@@ -218,6 +217,22 @@ export const generateCanvaOverview = async (): Promise<CanvaOverviewData> => {
 };
 
 // Esta função foi movida da store para isolar a lógica de processamento de dados.
+
+/**
+ * Calcula o status da licença com base no uso e no total de licenças.
+ * @param usedLicenses - Número de licenças em uso.
+ * @param totalLicenses - Número total de licenças disponíveis.
+ * @returns Status da licença ('Disponível', 'Completo', 'Excedido').
+ */
+const calculateLicenseStatusUtil = (usedLicenses: number, totalLicenses: number): 'Disponível' | 'Completo' | 'Excedido' => {
+  if (usedLicenses > totalLicenses) {
+    return 'Excedido';
+  }
+  if (usedLicenses === totalLicenses) {
+    return 'Completo';
+  }
+  return 'Disponível';
+};
 export const buildFallbackData = async (): Promise<{
   processedData: ProcessedSchoolData[];
   overview: CanvaOverviewData;
