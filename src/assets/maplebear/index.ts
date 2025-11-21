@@ -49,22 +49,7 @@ export const Logos = {
   Triple: TripleLogo,
 };
 
-// Exportações individuais para importação direta
-export {
-  BearWaving,
-  BearLeaning,
-  BearThinking,
-  BearInvestigating,
-  BearIdea,
-  BearWriting,
-  BearReading,
-  BearPeeking,
-  BearPulling,
-  BearHappy,
-  MapleLogos,
-  MapleLogoOutline,
-  TripleLogo,
-};
+
 
 // Mapeamento de uso sugerido por contexto
 export const MascotUsage = {

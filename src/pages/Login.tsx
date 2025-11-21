@@ -17,7 +17,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Redirecionamento automático removido para permitir login normal
+  
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -39,9 +39,8 @@ const Login = () => {
         localStorage.setItem("authenticated", "true");
         localStorage.setItem("userEmail", email);
         
-        // Redirecionamento forçado para garantir que a página seja carregada
-        window.location.href = "/dashboard";
-        // navigate("/dashboard", { replace: true }); // Comentado para usar window.location.href
+        // Redirecionamento usando navigate para evitar full page reload
+        navigate("/dashboard", { replace: true });
       } else {
         toast({
           title: "Erro de autenticação",
