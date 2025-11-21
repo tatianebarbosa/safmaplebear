@@ -14,7 +14,7 @@ import { School } from '@/types/safData';
 import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
 import {
   normalizeValue,
-  mapSchoolStatusFallback,
+
   mapUserRoleFallback,
 } from './index';
 
@@ -217,6 +217,24 @@ export const generateCanvaOverview = async (): Promise<CanvaOverviewData> => {
 };
 
 // Esta função foi movida da store para isolar a lógica de processamento de dados.
+
+/**
+ * Mapeia o status da escola para um valor padrão.
+ * @param status - Status da escola.
+ * @returns Status da escola mapeado.
+ */
+const mapSchoolStatusFallback = (status: string): SchoolStatus => {
+  switch (status) {
+    case 'Ativa':
+      return 'Ativa';
+    case 'Inativa':
+      return 'Inativa';
+    case 'Implantação':
+      return 'Implantação';
+    default:
+      return 'Outros';
+  }
+};
 
 /**
  * Calcula o status da licença com base no uso e no total de licenças.
