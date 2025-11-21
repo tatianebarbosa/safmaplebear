@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { canvaCollector, CanvaData, CanvaHistorico } from '@/lib/canvaDataCollector';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,11 +12,11 @@ import StatsCard from '@/components/dashboard/StatsCard';
 /**
  * Componente para exibir todas as métricas do Canva de forma profissional
  */
-type CanvaMetricsDisplayProps = {
-  overviewSummary?: CanvaOverviewData | null;
-};
+import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 
-export const CanvaMetricsDisplay = ({ overviewSummary }: CanvaMetricsDisplayProps) => {
+export const CanvaMetricsDisplay = () => {
+  const { overviewData } = useSchoolLicenseStore();
+  const overviewSummary = overviewData;
   const [canvaData, setCanvaData] = useState<CanvaData | null>(null);
   const [historico, setHistorico] = useState<CanvaHistorico[]>([]);
   const [loading, setLoading] = useState(false);
@@ -94,8 +94,8 @@ export const CanvaMetricsDisplay = ({ overviewSummary }: CanvaMetricsDisplayProp
     );
   };
 
-  const uniqueDomains = overviewSummary?.topNonCompliantDomains?.length ?? 0;
-  const impactedUsers = overviewSummary?.nonMapleBearDomains ?? 0;
+  const uniqueDomains = useMemo(() => overviewSummary?.topNonCompliantDomains?.length ?? 0, [overviewSummary]);
+  const impactedUsers = useMemo(() => overviewSummary?.nonMapleBearDomains ?? 0, [overviewSummary]);
 
   return (
     <div className="space-y-6">

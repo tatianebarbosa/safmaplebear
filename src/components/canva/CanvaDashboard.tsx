@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,9 @@ const CanvaDashboard = () => {
     overviewData, 
     loading,
     loadOfficialData,
-    schools
+    schools,
+    getDomainCounts,
+    getNonMapleBearCount,
   } = useSchoolLicenseStore();
   
   const [isNonCompliantDialogOpen, setIsNonCompliantDialogOpen] = useState(false);
@@ -50,13 +52,18 @@ const CanvaDashboard = () => {
     );
   }, [schools]);
 
-  const handleViewNonCompliantUsers = () => {
+  const nonCompliantDomainCounts = useMemo(() => getDomainCounts(), [getDomainCounts]);
+  const nonCompliantUserCount = useMemo(() => getNonMapleBearCount(), [getNonMapleBearCount]);
+
+  const handleViewNonCompliantUsers = useCallback(() => {
     if (nonCompliantUserDetails.length === 0) {
       toast.info('Nenhum usuário fora da política carregado no momento.');
       return;
     }
     setIsNonCompliantDialogOpen(true);
-  };
+  }, [nonCompliantUserDetails]);
+
+
 
   if (loading) {
     return (
@@ -113,7 +120,7 @@ const CanvaDashboard = () => {
                       Alerta de Conformidade - Alto Risco
                     </CardTitle>
                     <CardDescription className="text-sm text-destructive">
-                      {overviewData.nonCompliantUsers} usuários com domínios não autorizados identificados
+                      {nonCompliantUserCount} usuários com domínios não autorizados identificados
                     </CardDescription>
                   </div>
                 </div>
@@ -121,14 +128,14 @@ const CanvaDashboard = () => {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex flex-wrap gap-2">
-                    {(overviewData.topNonCompliantDomains || []).slice(0, 5).map(({ domain, count }) => (
+                    {(nonCompliantDomainCounts || []).slice(0, 5).map(({ domain, count }) => (
                       <span key={domain} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive text-destructive-foreground">
                         {domain} ({count})
                       </span>
                     ))}
-                    {(overviewData.topNonCompliantDomains || []).length > 5 && (
+                    {(nonCompliantDomainCounts || []).length > 5 && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
-                        +{(overviewData.topNonCompliantDomains || []).length - 5} domínios
+                        +{(nonCompliantDomainCounts || []).length - 5} domínios
                       </span>
                     )}
                   </div>

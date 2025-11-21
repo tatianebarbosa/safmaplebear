@@ -14,6 +14,7 @@ import {
   Settings,
   RefreshCw
 } from 'lucide-react';
+import { isEmailCompliant } from '@/lib/officialDataProcessor'; // Importar a função de validação de email
 import { School, type LicenseStatus } from '@/types/schoolLicense';
 import { UserDialog } from './UserDialog';
 import { SwapUserDialog } from './SwapUserDialog';
@@ -59,19 +60,22 @@ export const SchoolLicenseCard = ({
   const AVAILABLE_STATUS: LicenseStatus = 'Disponível';
   const utilizationPercent = Math.min(100, (school.usedLicenses / school.totalLicenses) * 100);
   const nonCompliantUsers = school.users.filter(u => !u.isCompliant);
+  
+  // A lógica de getNonComplianceReason deve ser movida para um utilitário se for complexa.
+  // Por enquanto, vamos simplificar, pois a store já faz a marcação de isCompliant.
   const getNonComplianceReason = (email: string) => {
     const domain = email.toLowerCase().split('@')[1];
-    if (!domain) return 'Email invalido';
+    if (!domain) return 'Email inválido';
     
     if (domain.includes('gmail.com') || domain.includes('hotmail.com') || domain.includes('yahoo.com')) {
-      return 'Email pessoal nao autorizado';
+      return 'Email pessoal não autorizado';
     }
     
     if (!domain.includes('maplebear') && domain !== 'mbcentral.com.br') {
-      return 'Dominio nao autorizado pela politica Maple Bear';
+      return 'Domínio não autorizado pela política Maple Bear';
     }
     
-    return 'Email fora da politica';
+    return 'Email fora da política';
   };
 
   const getLicensesBadgeColor = () => {
