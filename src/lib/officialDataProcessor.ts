@@ -13,7 +13,7 @@ import {
 import { School } from '@/types/safData';
 import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
 import {
-  normalizeValue,
+
 
 
 } from './index';
@@ -217,6 +217,18 @@ export const generateCanvaOverview = async (): Promise<CanvaOverviewData> => {
 };
 
 // Esta função foi movida da store para isolar a lógica de processamento de dados.
+
+/**
+ * Normaliza um valor para string, tratando null/undefined como string vazia.
+ * @param value - O valor a ser normalizado.
+ * @returns O valor como string.
+ */
+const normalizeValue = (value: any): string => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  return String(value);
+};
 
 /**
  * Mapeia o perfil do usuário para um valor padrão.
