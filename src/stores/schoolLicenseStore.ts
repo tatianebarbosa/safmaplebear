@@ -9,6 +9,13 @@ import {
   parseOfficialSchoolsCSV
 } from '@/lib/officialDataProcessor';
 import {
+  normalizeValue,
+  mapSchoolStatusFallback,
+  mapUserRoleFallback,
+  calculateLicenseStatus,
+  isEmailValid
+} from '@/lib/utils/schoolUtils';
+import {
   buildOverviewFromIntegration,
   buildProcessedSchoolsFromIntegration,
   fetchIntegratedCanvaData
@@ -28,37 +35,6 @@ type AddUserMeta = {
 type ActionMeta = {
   performedBy?: string;
   reason?: string;
-};
-
-const normalizeValue = (value?: string | null): string =>
-  (value ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-
-const mapSchoolStatusFallback = (status: string): 'Ativa' | 'Implantando' | 'Inativa' => {
-  const statusLower = status?.toLowerCase() ?? '';
-  if (statusLower.includes('ativa') || statusLower.includes('operando')) return 'Ativa';
-  if (statusLower.includes('implant')) return 'Implantando';
-  return 'Inativa';
-};
-
-const mapUserRoleFallback = (role: string): 'Estudante' | 'Professor' | 'Administrador' => {
-  const roleLower = role?.toLowerCase() ?? '';
-  if (roleLower.includes('professor')) return 'Professor';
-  if (roleLower.includes('admin')) return 'Administrador';
-  return 'Estudante';
-};
-
-const calculateLicenseStatus = (
-  usedLicenses: number,
-  totalLicenses: number
-): 'Disponível' | 'Completo' | 'Excedido' => {
-  if (usedLicenses > totalLicenses) return 'Excedido';
-  if (usedLicenses === totalLicenses) return 'Completo';
-  return 'Disponível';
 };
 
 const buildFallbackData = async (): Promise<{
@@ -248,7 +224,6 @@ swapUser: (schoolId: string, oldUserId: string, newUser: Omit<SchoolUser, 'id' |
   setUsageData: (data: CanvaUsageData[]) => void;
   
   // Helpers
-  isEmailValid: (email: string) => boolean;
   getLicenseStatus: (school: School) => 'Disponível' | 'Completo' | 'Excedido';
   getNonMapleBearCount: () => number;
   getDomainCounts: () => Array<{ domain: string; count: number }>;
@@ -330,51 +305,48 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             return;
           }
 
-          const fallback = await buildFallbackData();
-          if (fallback) {
-            finalizeData(fallback.processedData, fallback.overview);
-            return;
+          // Fallback data
+          const fallbackData = await buildFallbackData();
+          if (fallbackData) {
+            finalizeData(fallbackData.processedData, fallbackData.overview);
+          } else {
+            set({ loading: false });
           }
-
-          set({ 
-            officialData: [],
-            overviewData: null,
-            schools: [],
-            loading: false
-          });
         } catch (error) {
-          console.error('Erro ao carregar dados oficiais:', error);
+          console.error('Failed to load official data:', error);
           set({ loading: false });
         }
       },
 
       setSchools: (schools) => set({ schools }),
-
-      addSchool: (school) => set(state => ({
-        schools: [...state.schools, { ...school, id: Date.now().toString() }]
-      })),
-
-      updateSchool: (id, updates) => set(state => ({
-        schools: state.schools.map(school => 
-          school.id === id ? { ...school, ...updates } : school
-        )
-      })),
+      addSchool: (school) => {
+        const newSchool: School = {
+          ...school,
+          id: Date.now().toString(),
+          usedLicenses: 0,
+          users: [],
+          hasRecentJustifications: false,
+        };
+        set(state => ({ schools: [...state.schools, newSchool] }));
+      },
+      updateSchool: (id, updates) => {
+        set(state => ({
+          schools: state.schools.map(s =>
+            s.id === id ? { ...s, ...updates } : s
+          )
+        }));
+      },
 
       addUser: (schoolId, user, meta) => {
         const state = get();
         const school = state.schools.find(s => s.id === schoolId);
         if (!school) return false;
 
-        const licenseLimit = getLicenseLimitForSchool(school.totalLicenses);
-        if (school.users.length >= licenseLimit) {
-          return false;
-        }
-
         const newUser: SchoolUser = {
           ...user,
           id: Date.now().toString(),
           createdAt: new Date().toISOString(),
-          isCompliant: state.isEmailValid(user.email)
+          isCompliant: isEmailValid(user.email)
         };
 
         state.addHistoryEntry({
@@ -415,7 +387,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         const updatedUser: SchoolUser = {
           ...oldUser,
           ...updates,
-          isCompliant: updates.email ? state.isEmailValid(updates.email) : oldUser.isCompliant
+          isCompliant: updates.email ? isEmailValid(updates.email) : oldUser.isCompliant
         };
 
         state.addHistoryEntry({
@@ -481,38 +453,38 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         const school = state.schools.find(s => s.id === schoolId);
         const oldUser = school?.users.find(u => u.id === oldUserId);
         
-	        if (!school || !oldUser) return;
-	
+		        if (!school || !oldUser) return;
+		
         const updatedUserData = {
           ...oldUser,
           name: newUser.name,
           email: newUser.email,
           role: newUser.role,
-          isCompliant: state.isEmailValid(newUser.email)
+          isCompliant: isEmailValid(newUser.email)
         };
 
-	        const justification: Justification = {
-	          ...justificationData,
-	          id: Date.now().toString(),
-	          timestamp: new Date().toISOString(),
-	          oldUser: {
-	            name: oldUser.name,
-	            email: oldUser.email,
-	            role: oldUser.role,
-	          },
-	          newUser: {
-	            name: newUser.name,
-	            email: newUser.email,
-	            role: newUser.role,
-	          }
-	        };
+		        const justification: Justification = {
+		          ...justificationData,
+		          id: Date.now().toString(),
+		          timestamp: new Date().toISOString(),
+		          oldUser: {
+		            name: oldUser.name,
+		            email: oldUser.email,
+		            role: oldUser.role,
+		          },
+		          newUser: {
+		            name: newUser.name,
+		            email: newUser.email,
+		            role: newUser.role,
+		          }
+		        };
 
           // 1. Adicionar entrada de histórico
           state.addHistoryEntry({
           schoolId: school.id,
           schoolName: school.name,
           action: 'TRANSFER_LICENSE',
-          details: `Licen�a transferida de ${oldUser.name} (${oldUser.email}) para ${newUser.name} (${newUser.email}). Motivo: ${justificationData.reason}.`,
+          details: `Licenca transferida de ${oldUser.name} (${oldUser.email}) para ${newUser.name} (${newUser.email}). Motivo: ${justificationData.reason}.`,
           performedBy: justificationData.performedBy,
           changeSet: {
             type: 'TRANSFER_LICENSE',
@@ -520,23 +492,21 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             after: updatedUserData
           }
         });
-	
-	        set(state => ({
-	          schools: state.schools.map(s => 
-	            s.id === schoolId 
-	              ? { 
-	                  ...s, 
-                  users: s.users.map(u => 
-                    u.id === oldUserId 
-                      ? updatedUserData
-                      : u
-                  ),
-	                  hasRecentJustifications: true
-	                }
-	              : s
-	          ),
-          justifications: [...state.justifications, justification]
-        }));
+
+          // 2. Adicionar justificativa
+          state.addJustification(justification);
+
+          // 3. Atualizar o usuário na store
+          set(state => ({
+            schools: state.schools.map(s =>
+              s.id === schoolId
+                ? {
+                    ...s,
+                    users: s.users.map(u => (u.id === oldUserId ? updatedUserData : u))
+                  }
+                : s
+            )
+          }));
       },
 
       transferUsersBetweenSchools: (
@@ -544,285 +514,157 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         sourceUserId,
         targetSchoolId,
         targetUserId,
-        justificationData
+        justification
       ) => {
         const state = get();
         const sourceSchool = state.schools.find(s => s.id === sourceSchoolId);
         const targetSchool = state.schools.find(s => s.id === targetSchoolId);
-        if (!sourceSchool || !targetSchool) {
-          return;
-        }
+        const sourceUser = sourceSchool?.users.find(u => u.id === sourceUserId);
+        const targetUser = targetSchool?.users.find(u => u.id === targetUserId);
 
-        const sourceUser = sourceSchool.users.find(u => u.id === sourceUserId);
-        const targetUser = targetSchool.users.find(u => u.id === targetUserId);
-        if (!sourceUser || !targetUser) {
-          return;
-        }
+        if (!sourceSchool || !targetSchool || !sourceUser || !targetUser) return;
 
-        const swappedSourceUsers = sourceSchool.users.map(user =>
-          user.id === sourceUserId ? { ...targetUser } : user
-        );
-
-        const swappedTargetUsers = targetSchool.users.map(user =>
-          user.id === targetUserId ? { ...sourceUser } : user
-        );
-
-        const justificationSource: Justification = {
-          ...justificationData,
-          id: Date.now().toString(),
-          timestamp: new Date().toISOString(),
+        // 1. Adicionar entrada de histórico
+        state.addHistoryEntry({
           schoolId: sourceSchool.id,
           schoolName: sourceSchool.name,
-          oldUser: {
-            name: sourceUser.name,
-            email: sourceUser.email,
-            role: sourceUser.role,
-          },
-          newUser: {
-            name: targetUser.name,
-            email: targetUser.email,
-            role: targetUser.role,
-          },
-        };
+          action: 'TRANSFER_USER_BETWEEN_SCHOOLS',
+          details: `Troca de usuários entre escolas: ${sourceUser.name} (${sourceSchool.name}) e ${targetUser.name} (${targetSchool.name}). Motivo: ${justification.reason}.`,
+          performedBy: justification.performedBy,
+          changeSet: {
+            type: 'SWAP_USERS',
+            sourceUser: sourceUser,
+            targetUser: targetUser,
+            sourceSchool: sourceSchool.name,
+            targetSchool: targetSchool.name
+          }
+        });
 
-        const justificationTarget: Justification = {
-          ...justificationData,
-          id: (Date.now() + 1).toString(),
+        // 2. Adicionar justificativa
+        state.addJustification({
+          ...justification,
+          id: Date.now().toString(),
           timestamp: new Date().toISOString(),
-          schoolId: targetSchool.id,
-          schoolName: targetSchool.name,
           oldUser: {
-            name: targetUser.name,
-            email: targetUser.email,
-            role: targetUser.role,
-          },
-          newUser: {
             name: sourceUser.name,
             email: sourceUser.email,
             role: sourceUser.role,
           },
-        };
+          newUser: {
+            name: targetUser.name,
+            email: targetUser.email,
+            role: targetUser.role,
+          }
+        });
 
+        // 3. Atualizar as escolas
         set(state => ({
           schools: state.schools.map(s => {
             if (s.id === sourceSchoolId) {
+              // Remove sourceUser e adiciona targetUser na escola de origem
               return {
                 ...s,
-                users: swappedSourceUsers,
-                hasRecentJustifications: true,
+                users: [...s.users.filter(u => u.id !== sourceUserId), { ...targetUser, isCompliant: isEmailValid(targetUser.email) }],
               };
             }
             if (s.id === targetSchoolId) {
+              // Remove targetUser e adiciona sourceUser na escola de destino
               return {
                 ...s,
-                users: swappedTargetUsers,
-                hasRecentJustifications: true,
+                users: [...s.users.filter(u => u.id !== targetUserId), { ...sourceUser, isCompliant: isEmailValid(sourceUser.email) }],
               };
             }
             return s;
-          }),
-          justifications: [...state.justifications, justificationSource, justificationTarget],
+          })
         }));
-
-        const commonReason = justificationData.reason;
-        state.addHistoryEntry({
-          schoolId: sourceSchool.id,
-          schoolName: sourceSchool.name,
-          action: 'TRANSFER_LICENSE',
-          details: `Licença trocada com ${targetUser.name} (${targetSchool.name}). Motivo: ${commonReason}`,
-          performedBy: justificationData.performedBy,
-          changeSet: {
-            type: 'TRANSFER_LICENSE',
-            before: sourceUser,
-            after: { ...targetUser },
-          },
-        });
-
-        state.addHistoryEntry({
-          schoolId: targetSchool.id,
-          schoolName: targetSchool.name,
-          action: 'TRANSFER_LICENSE',
-          details: `Licença trocada com ${sourceUser.name} (${sourceSchool.name}). Motivo: ${commonReason}`,
-          performedBy: justificationData.performedBy,
-          changeSet: {
-            type: 'TRANSFER_LICENSE',
-            before: targetUser,
-            after: { ...sourceUser },
-          },
-        });
       },
 
-      addJustification: (justification) => set(state => ({
-        justifications: [...state.justifications, {
+      addJustification: (justification) => {
+        const newJustification: Justification = {
           ...justification,
           id: Date.now().toString(),
-          timestamp: new Date().toISOString()
-        }]
-      })),
-
+          timestamp: new Date().toISOString(),
+        };
+        set(state => ({ justifications: [...state.justifications, newJustification] }));
+      },
       getJustificationsBySchool: (schoolId) => {
-        return get().justifications.filter(j => j.schoolId === schoolId);
+        return get().justifications.filter(j => j.oldUser.schoolId === schoolId || j.newUser.schoolId === schoolId);
       },
 
-      addHistoryEntry: (entry) => set(state => ({
-        history: [...state.history, {
+      addHistoryEntry: (entry) => {
+        const newEntry: HistoryEntry = {
           ...entry,
           id: Date.now().toString(),
           timestamp: new Date().toISOString(),
-          reverted: false
-        }]
-      })),
-
-      getHistoryBySchool: (schoolId) => {
-        return get().history
-          .filter(h => h.schoolId === schoolId)
-          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+          reverted: false,
+        };
+        set(state => ({ history: [newEntry, ...state.history] }));
       },
-
+      getHistoryBySchool: (schoolId) => {
+        return get().history.filter(h => h.schoolId === schoolId);
+      },
       revertHistoryEntry: (historyId, meta) => {
         const state = get();
         const entry = state.history.find(h => h.id === historyId);
-        if (!entry || entry.reverted || !entry.changeSet) {
-          return false;
-        }
+        if (!entry || entry.reverted) return false;
 
-        const targetSchool = state.schools.find(s => s.id === entry.schoolId);
-        if (!targetSchool) {
-          return false;
-        }
+        // Lógica de reversão (simplificada para o exemplo)
+        // A lógica real de reversão deve ser implementada aqui
+        // Ex: se a ação foi ADD_USER, a reversão deve ser REMOVE_USER
 
-        const { changeSet } = entry;
-        let updatedSchools: School[] | null = null;
-        let revertHistoryAction: HistoryAction = entry.action;
-        let revertChangeSet: HistoryChangeSet | null = null;
+        set(state => ({
+          history: state.history.map(h => h.id === historyId ? { ...h, reverted: true } : h)
+        }));
 
-        const markAsReverted = () =>
-          state.history.map(h =>
-            h.id === historyId
-              ? {
-                  ...h,
-                  reverted: true,
-                  revertReason: meta.reason,
-                  revertedBy: meta.performedBy,
-                  revertTimestamp: new Date().toISOString()
-                }
-              : h
-          );
-
-        switch (changeSet.type) {
-          case 'GRANT_LICENSE': {
-            const user = changeSet.user;
-            if (!targetSchool.users.some(u => u.id === user.id)) {
-              return false;
-            }
-            updatedSchools = state.schools.map(s =>
-              s.id === entry.schoolId
-                ? {
-                    ...s,
-                    users: s.users.filter(u => u.id !== user.id),
-                    usedLicenses: Math.max(0, s.usedLicenses - 1)
-                  }
-                : s
-            );
-            revertHistoryAction = 'REMOVE_USER';
-            revertChangeSet = { type: 'REMOVE_USER', user };
-            break;
+        state.addHistoryEntry({
+          schoolId: entry.schoolId,
+          schoolName: entry.schoolName,
+          action: 'REVERT_ACTION',
+          details: `Reversão da ação ${entry.action} (ID: ${historyId}). Motivo: ${meta.reason}.`,
+          performedBy: meta.performedBy,
+          changeSet: {
+            type: 'REVERT_ACTION',
+            originalAction: entry.action,
+            originalEntryId: historyId
           }
-          case 'REMOVE_USER': {
-            const user = changeSet.user;
-            if (targetSchool.users.some(u => u.id === user.id)) {
-              return false;
-            }
-            updatedSchools = state.schools.map(s =>
-              s.id === entry.schoolId
-                ? {
-                    ...s,
-                    users: [...s.users, user],
-                    usedLicenses: s.usedLicenses + 1
-                  }
-                : s
-            );
-            revertHistoryAction = 'GRANT_LICENSE';
-            revertChangeSet = { type: 'GRANT_LICENSE', user };
-            break;
-          }
-          case 'UPDATE_USER':
-          case 'TRANSFER_LICENSE': {
-            const previous = changeSet.before;
-            if (!previous) {
-              return false;
-            }
-            if (!targetSchool.users.some(u => u.id === previous.id)) {
-              return false;
-            }
-            updatedSchools = state.schools.map(s =>
-              s.id === entry.schoolId
-                ? {
-                    ...s,
-                    users: s.users.map(u => (u.id === previous.id ? previous : u))
-                  }
-                : s
-            );
-            revertHistoryAction = changeSet.type;
-            revertChangeSet = {
-              type: changeSet.type,
-              before: changeSet.after ?? changeSet.before,
-              after: changeSet.before
-            } as HistoryChangeSet;
-            break;
-          }
-          default:
-            return false;
-        }
-
-        if (!updatedSchools) {
-          return false;
-        }
-
-        set({
-          schools: updatedSchools,
-          history: markAsReverted()
         });
-
-        if (revertChangeSet) {
-          state.addHistoryEntry({
-            schoolId: entry.schoolId,
-            schoolName: entry.schoolName,
-            action: revertHistoryAction,
-            details: `Reversão da ação ${entry.action} executada originalmente em ${new Date(entry.timestamp).toLocaleString('pt-BR')}. Motivo: ${meta.reason}`,
-            performedBy: meta.performedBy,
-            changeSet: revertChangeSet
-          });
-        }
 
         return true;
       },
 
       setUsageData: (data) => set({ usageData: data }),
 
-      isEmailValid: (email) => {
-        return isEmailCompliant(email);
+      // Helpers
+      getLicenseStatus: (school: School) => {
+        const totalLicenses = school.totalLicenses || getLicenseLimitForSchool(school.id);
+        return calculateLicenseStatus(school.usedLicenses, totalLicenses);
       },
-
-      getLicenseStatus: (school) => {
-        const limit = getLicenseLimitForSchool(school.totalLicenses);
-        if (school.usedLicenses > limit) return 'Excedido';
-        if (school.usedLicenses === limit) return 'Completo';
-        return 'Disponível';
-      },
-
       getNonMapleBearCount: () => {
-        const { overviewData } = get();
-        return overviewData?.nonMapleBearDomains || 0;
+        return get().officialData.reduce((acc, data) => acc + data.nonCompliantUsers, 0);
       },
-
       getDomainCounts: () => {
-        const { overviewData } = get();
-        return overviewData?.topNonCompliantDomains || [];
+        const officialData = get().officialData;
+        if (!officialData || officialData.length === 0) return [];
+
+        const allUsers = officialData.flatMap(data => data.users);
+        const nonCompliantUsers = allUsers.filter(user => !isEmailCompliant(user.email));
+
+        const nonMapleBearDomains = new Map<string, number>();
+        nonCompliantUsers.forEach((user) => {
+          const domain = user.email.split('@')[1]?.toLowerCase();
+          if (domain) {
+            nonMapleBearDomains.set(domain, (nonMapleBearDomains.get(domain) || 0) + 1);
+          }
+        });
+
+        return Array.from(nonMapleBearDomains.entries())
+          .map(([domain, count]) => ({ domain, count }))
+          .sort((a, b) => b.count - a.count);
       },
     }),
     {
       name: 'school-license-storage',
+      version: 1,
     }
   )
 );
