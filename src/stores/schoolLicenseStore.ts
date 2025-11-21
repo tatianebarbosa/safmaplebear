@@ -12,7 +12,7 @@ import {
 import {
   calculateLicenseStatus,
   isEmailValid
-} from '@/lib/utils/schoolUtils';
+} from '../lib';
 import {
   buildOverviewFromIntegration,
   buildProcessedSchoolsFromIntegration,
