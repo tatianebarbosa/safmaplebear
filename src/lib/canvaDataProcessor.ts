@@ -1,4 +1,5 @@
-﻿import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+﻿import { getCurrentLicenseLimit } from '@/stores/configStore';
+import { isCompliantEmail as isEmailCompliant } from './validators';
 
 export interface CanvaUser {
   id: string;
@@ -84,13 +85,6 @@ interface LicenseAction {
   timestamp: string;
   performedBy: string;
 }
-
-// Domínios permitidos pela política
-const COMPLIANT_DOMAINS = ['maplebear.com.br', 'sebsa.com.br', 'seb.com.br'];
-
-const isEmailCompliant = (email: string): boolean => {
-  return COMPLIANT_DOMAINS.some(domain => email.toLowerCase().includes(domain));
-};
 
 const parseCanvaReportCSV = (csvContent: string, period: '30d' | '3m' | '6m' | '12m'): CanvaUser[] => {
   const lines = csvContent.split('\n');
@@ -231,7 +225,7 @@ export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] =
     const schoolName = schoolUsers[0]?.school || 'Escola não definida';
     const cluster = extractClusterFromSchool(schoolName);
     const nonCompliantUsers = schoolUsers.filter(u => !u.isCompliant);
-    const licenseLimit = MAX_LICENSES_PER_SCHOOL;
+    const licenseLimit = getCurrentLicenseLimit();
     
     const totalActivity = schoolUsers.reduce((acc, user) => ({
       designsCreated: acc.designsCreated + user.designsCreated,

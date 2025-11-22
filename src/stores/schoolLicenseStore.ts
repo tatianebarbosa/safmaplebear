@@ -1,14 +1,29 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { School, Justification, SchoolUser, CanvaUsageData, HistoryEntry, HistoryAction, HistoryChangeSet } from '@/types/schoolLicense';
-import { getLicenseLimitForSchool, MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import {
+  School,
+  Justification,
+  SchoolUser,
+  CanvaUsageData,
+  HistoryEntry,
+  HistoryAction,
+  HistoryChangeSet
+} from '@/types/schoolLicense';
+import { getLicenseLimitForSchool, parseEnvLimit } from '@/config/licenseLimits';
 import {
   processSchoolsWithUsers,
-  geimport {
-  buildOverviewFromIntegration,
+  generateCanvaOverview,
   parseOfficialSchoolsCSV,
-  buildFallbackData // Importar a função refatorada
+  buildFallbackData
 } from '@/lib/officialDataProcessor';
+import {
+  buildOverviewFromIntegration,
+  buildProcessedSchoolsFromIntegration,
+  fetchIntegratedCanvaData
+} from '@/lib/integratedCanvaService';
+import { ProcessedSchoolData, CanvaOverviewData } from '@/types/officialData';
+import { validateEmail } from '../lib';
+import { getCurrentLicenseLimit } from './configStore';
 
 /**
  * Calcula o status da licença com base no uso e no total de licenças.
@@ -25,18 +40,6 @@ const calculateLicenseStatus = (usedLicenses: number, totalLicenses: number): 'D
   }
   return 'Disponível';
 };
-import {
-
-  validateEmail as isEmailValid
-} from '../lib';
-import {
-  buildOverviewFromIntegration,
-  buildProcessedSchoolsFromIntegration,
-  fetchIntegratedCanvaData
-} from '@/lib/integratedCanvaService';
-import { ProcessedSchoolData, CanvaOverviewData } from '@/types/officialData';
-import type { OfficialSchool, OfficialUser } from '@/types/officialData';
-import { loadFranchisingSchools, loadLicenseUsers } from '@/lib/safDataService';
 
 type AddUserMeta = {
   origemSolicitacao: 'Ticket SAF' | 'E-mail';
@@ -89,8 +92,11 @@ swapUser: (schoolId: string, oldUserId: string, newUser: Omit<SchoolUser, 'id' |
   revertHistoryEntry: (historyId: string, meta: { reason: string; performedBy: string }) => boolean;
   
   setUsageData: (data: CanvaUsageData[]) => void;
-  
+
+  applyLicenseLimitForAllSchools: (limit: number) => void;
+
   // Helpers
+  isEmailValid: (email: string) => boolean;
   getLicenseStatus: (school: School) => 'Disponível' | 'Completo' | 'Excedido';
   getNonMapleBearCount: () => number;
   getDomainCounts: () => Array<{ domain: string; count: number }>;
@@ -113,6 +119,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       loadOfficialData: async () => {
         set({ loading: true });
         try {
+          const configuredLimit = getCurrentLicenseLimit();
           const finalizeData = (processedData: ProcessedSchoolData[], overview: CanvaOverviewData) => {
             const convertedSchools: School[] = processedData.map(data => ({
               id: data.school.id,
@@ -122,7 +129,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             cluster: data.school.cluster as any,
             totalLicenses: data.school.id === 'no-school'
               ? Math.max(data.estimatedLicenses, 1)
-              : MAX_LICENSES_PER_SCHOOL,
+              : getLicenseLimitForSchool(undefined, configuredLimit),
               usedLicenses: data.totalUsers,
               users: data.users.map(user => ({
                 id: user.id,
@@ -213,7 +220,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           ...user,
           id: Date.now().toString(),
           createdAt: new Date().toISOString(),
-          isCompliant: isEmailValid(user.email)
+          isCompliant: validateEmail(user.email)
         };
 
         state.addHistoryEntry({
@@ -223,7 +230,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           details: `Novo usuario adicionado: ${user.name} (${user.email}). Origem: ${meta.origemSolicitacao}. Solicitado por: ${meta.solicitadoPorNome} (${meta.solicitadoPorEmail}). Motivo: ${meta.observacao}.`,
           performedBy: meta.performedBy || 'Sistema/Usuario',
           changeSet: {
-            type: 'GRANT_LICENSE',
+            type: 'ADD_USER',
             user: newUser
           }
         });
@@ -254,7 +261,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         const updatedUser: SchoolUser = {
           ...oldUser,
           ...updates,
-          isCompliant: updates.email ? isEmailValid(updates.email) : oldUser.isCompliant
+          isCompliant: updates.email ? validateEmail(updates.email) : oldUser.isCompliant
         };
 
         state.addHistoryEntry({
@@ -327,24 +334,26 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           name: newUser.name,
           email: newUser.email,
           role: newUser.role,
-          isCompliant: isEmailValid(newUser.email)
+          isCompliant: validateEmail(newUser.email)
         };
 
-		        const justification: Justification = {
-		          ...justificationData,
-		          id: Date.now().toString(),
-		          timestamp: new Date().toISOString(),
-		          oldUser: {
-		            name: oldUser.name,
-		            email: oldUser.email,
-		            role: oldUser.role,
-		          },
-		          newUser: {
-		            name: newUser.name,
-		            email: newUser.email,
-		            role: newUser.role,
-		          }
-		        };
+        const justification: Justification = {
+          ...justificationData,
+          id: Date.now().toString(),
+          timestamp: new Date().toISOString(),
+          oldUser: {
+            name: oldUser.name,
+            email: oldUser.email,
+            role: oldUser.role,
+            schoolId: school.id,
+          },
+          newUser: {
+            name: newUser.name,
+            email: newUser.email,
+            role: newUser.role,
+            schoolId: school.id,
+          }
+        };
 
           // 1. Adicionar entrada de histórico
           state.addHistoryEntry({
@@ -410,17 +419,19 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         // 2. Adicionar justificativa
         state.addJustification({
           ...justification,
-          id: Date.now().toString(),
-          timestamp: new Date().toISOString(),
+          schoolId: sourceSchoolId,
+          schoolName: sourceSchool.name,
           oldUser: {
             name: sourceUser.name,
             email: sourceUser.email,
             role: sourceUser.role,
+            schoolId: sourceSchoolId,
           },
           newUser: {
             name: targetUser.name,
             email: targetUser.email,
             role: targetUser.role,
+            schoolId: targetSchoolId,
           }
         });
 
@@ -429,7 +440,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           schools: state.schools.map(s => {
             if (s.id === sourceSchoolId) {
               // Remove sourceUser e adiciona targetUser na escola de origem
-              const newUsers = [...s.users.filter(u => u.id !== sourceUserId), { ...targetUser, isCompliant: isEmailValid(targetUser.email) }];
+              const newUsers = [...s.users.filter(u => u.id !== sourceUserId), { ...targetUser, isCompliant: validateEmail(targetUser.email) }];
               return {
                 ...s,
                 users: newUsers,
@@ -438,7 +449,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             }
             if (s.id === targetSchoolId) {
               // Remove targetUser e adiciona sourceUser na escola de destino
-              const newUsers = [...s.users.filter(u => u.id !== targetUserId), { ...sourceUser, isCompliant: isEmailValid(sourceUser.email) }];
+              const newUsers = [...s.users.filter(u => u.id !== targetUserId), { ...sourceUser, isCompliant: validateEmail(sourceUser.email) }];
               return {
                 ...s,
                 users: newUsers,
@@ -455,11 +466,19 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           ...justification,
           id: Date.now().toString(),
           timestamp: new Date().toISOString(),
+          oldUser: {
+            ...justification.oldUser,
+            schoolId: justification.oldUser.schoolId ?? justification.schoolId,
+          },
+          newUser: {
+            ...justification.newUser,
+            schoolId: justification.newUser.schoolId ?? justification.schoolId,
+          }
         };
         set(state => ({ justifications: [...state.justifications, newJustification] }));
       },
       getJustificationsBySchool: (schoolId) => {
-        return get().justifications.filter(j => j.oldUser.schoolId === schoolId || j.newUser.schoolId === schoolId);
+        return get().justifications.filter(j => j.schoolId === schoolId);
       },
 
       addHistoryEntry: (entry) => {
@@ -487,36 +506,43 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           let usedLicenses = s.usedLicenses;
 
           switch (entry.action) {
-            case 'ADD_USER':
-            case 'GRANT_LICENSE':
-              // Reverter ADD/GRANT: Remover o usuário
-              if (entry.changeSet && 'user' in entry.changeSet) {
-                newUsers = newUsers.filter(u => u.id !== entry.changeSet.user.id);
+            case 'ADD_USER': {
+              const changeSet = entry.changeSet;
+              if (changeSet?.type === 'ADD_USER') {
+                newUsers = newUsers.filter(u => u.id !== changeSet.user.id);
                 usedLicenses = Math.max(0, usedLicenses - 1);
               }
               break;
-            case 'REMOVE_USER':
-              // Reverter REMOVE: Adicionar o usuário de volta
-              if (entry.changeSet && 'user' in entry.changeSet) {
-                newUsers = [...newUsers, entry.changeSet.user];
+            }
+            case 'REMOVE_USER': {
+              const changeSet = entry.changeSet;
+              if (changeSet?.type === 'REMOVE_USER') {
+                newUsers = [...newUsers, changeSet.user];
                 usedLicenses += 1;
               }
               break;
-            case 'UPDATE_USER':
-              // Reverter UPDATE: Restaurar o estado 'before'
-              if (entry.changeSet && 'before' in entry.changeSet) {
-                newUsers = newUsers.map(u => u.id === entry.changeSet.after.id ? entry.changeSet.before : u);
-                // A contagem de licenças não muda em um UPDATE
+            }
+            case 'UPDATE_USER': {
+              const changeSet = entry.changeSet;
+              if (changeSet?.type === 'UPDATE_USER') {
+                newUsers = newUsers.map(u =>
+                  u.id === changeSet.after.id ? changeSet.before : u
+                );
               }
               break;
+            }
+            case 'TRANSFER_LICENSE': {
+              const changeSet = entry.changeSet;
+              if (changeSet?.type === 'TRANSFER_LICENSE') {
+                newUsers = newUsers.map(u =>
+                  u.id === changeSet.after.id ? changeSet.before : u
+                );
+              }
+              break;
+            }
             case 'TRANSFER_USER_BETWEEN_SCHOOLS':
-              // Ação complexa, requer lógica específica para reverter a troca
-              // Por enquanto, apenas marca como revertida. A reversão completa será manual ou em outra função.
-              // A lógica de SWAP/TRANSFER é complexa para reversão automática simples.
-              // Para simplificar, vamos reverter apenas o registro no histórico.
               return s;
             default:
-              // Nenhuma ação de reversão de dados para outros tipos
               return s;
           }
 
@@ -559,11 +585,25 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         return true;
       },
 
+      applyLicenseLimitForAllSchools: (limit) => {
+        const sanitized = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : parseEnvLimit();
+
+        set(state => ({
+          schools: state.schools.map(school => ({
+            ...school,
+            totalLicenses: school.id === 'no-school'
+              ? school.totalLicenses
+              : getLicenseLimitForSchool(undefined, sanitized)
+          }))
+        }));
+      },
+
       setUsageData: (data) => set({ usageData: data }),
 
       // Helpers
+      isEmailValid: (email) => validateEmail(email),
       getLicenseStatus: (school: School) => {
-        const totalLicenses = school.totalLicenses || getLicenseLimitForSchool(school.id);
+        const totalLicenses = getLicenseLimitForSchool(school.totalLicenses, getCurrentLicenseLimit());
         return calculateLicenseStatus(school.usedLicenses, totalLicenses);
       },
       getNonMapleBearCount: () => {
@@ -574,7 +614,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         if (!officialData || officialData.length === 0) return [];
 
         const allUsers = officialData.flatMap(data => data.users);
-        const nonCompliantUsers = allUsers.filter(user => !isEmailCompliant(user.email));
+        const nonCompliantUsers = allUsers.filter(user => !user.isCompliant);
 
         const nonMapleBearDomains = new Map<string, number>();
         nonCompliantUsers.forEach((user) => {

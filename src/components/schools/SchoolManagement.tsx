@@ -9,10 +9,11 @@ import StatsCard from "@/components/dashboard/StatsCard";
 import { School, Users, AlertTriangle, CheckCircle, Search, Filter, RefreshCw, LayoutGrid, Rows } from "lucide-react";
 import { School as SchoolType, loadSchoolData, getSchoolStats, calculateLicenseStatus } from "@/lib/schoolDataProcessor";
 import { useToast } from "@/hooks/use-toast";
-import { MAX_LICENSES_PER_SCHOOL } from "@/config/licenseLimits";
+import { useConfigStore } from "@/stores/configStore";
 import { cn } from "@/lib/utils";
 
 const SchoolManagement = () => {
+  const licenseLimitPerSchool = useConfigStore(state => state.licenseLimitPerSchool);
   const [schools, setSchools] = useState<SchoolType[]>([]);
   const [filteredSchools, setFilteredSchools] = useState<SchoolType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -404,7 +405,7 @@ const SchoolManagement = () => {
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <Badge variant="outline" className="bg-muted/40">
-              {`Padrão: ${MAX_LICENSES_PER_SCHOOL} licenças por escola`}
+              {`Padrão: ${licenseLimitPerSchool} licenças por escola`}
             </Badge>
             <span>
               {focusAtRisk ? "Filtro rápido: risco ativo" : "Dados sincronizados localmente"}

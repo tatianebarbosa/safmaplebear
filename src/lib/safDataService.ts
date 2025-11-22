@@ -1,11 +1,12 @@
 import Papa from 'papaparse';
-import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import { getCurrentLicenseLimit } from '@/stores/configStore';
 import {
   School,
   LicenseUser,
   SchoolCanvaStats,
   SchoolCardView
 } from '@/types/safData';
+import { isCompliantEmail as isCompliantEmailByPolicy } from './validators';
 
 const FRANCHISING_CSV_PATH = '/data/Franchising.csv';
 const LICENCAS_CSV_PATH = '/data/licencas_canva.csv';
@@ -15,14 +16,6 @@ const CSV_OPTIONS = {
   delimiter: ';',
   skipEmptyLines: true
 };
-
-const COMPLIANT_DOMAINS = [
-  'maplebear.com.br',
-  'co.maplebear.com.br',
-  'mbcentral.com.br',
-  'sebsa.com.br',
-  'seb.com.br'
-];
 
 type CsvRecord = Record<string, string>;
 
@@ -143,14 +136,7 @@ const fetchCsvText = async (path: string): Promise<string> => {
 };
 
 export const isEmailCompliant = (email: string): boolean => {
-  const normalized = email.trim().toLowerCase();
-  if (!normalized.includes('@')) return false;
-  const domain = normalized.split('@')[1];
-  if (!domain) return false;
-  if (COMPLIANT_DOMAINS.some(valid => domain === valid || domain.endsWith(`.${valid}`))) {
-    return true;
-  }
-  return domain?.includes('maplebear') ?? false;
+  return isCompliantEmailByPolicy(email);
 };
 
 export const loadFranchisingSchools = async (): Promise<School[]> => {
@@ -235,7 +221,7 @@ export const calculateSchoolCanvaStats = (
   schoolId: number | 'UNASSIGNED' | 'CENTRAL',
   schoolName: string,
   users: LicenseUser[],
-  totalLicenses: number = MAX_LICENSES_PER_SCHOOL
+  totalLicenses: number = getCurrentLicenseLimit()
 ): SchoolCanvaStats => {
   const totalUsuarios = users.length;
   const foraDaPolitica = users.filter(user => !isEmailCompliant(user.email)).length;
@@ -290,7 +276,10 @@ export const buildSchoolCardViews = (
     let school: School | null = null;
     let schoolId: number | 'CENTRAL' | 'UNASSIGNED' = key;
     let label = 'Usuários sem escola definida';
-    let totalLicenses = key === 'CENTRAL' ? Math.max(MAX_LICENSES_PER_SCHOOL, groupUsers.length) : MAX_LICENSES_PER_SCHOOL;
+    const configuredLimit = getCurrentLicenseLimit();
+    let totalLicenses = key === 'CENTRAL'
+      ? Math.max(configuredLimit, groupUsers.length)
+      : configuredLimit;
 
     if (key === 'CENTRAL') {
       school = CENTRAL_SCHOOL_PLACEHOLDER;

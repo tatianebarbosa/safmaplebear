@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { CanvaOverviewData, OfficialSchool, OfficialUser, ProcessedSchoolData } from '@/types/officialData';
 import { isEmailCompliant } from '@/lib/safDataService';
-import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import { getCurrentLicenseLimit } from '@/stores/configStore';
 
 export interface IntegratedCanvaUser {
   nome?: string;
@@ -199,7 +199,7 @@ export function buildProcessedSchoolsFromIntegration(
     const licenseTotal =
       schoolRecord.id === '0'
         ? Math.max(totalUsers, 1)
-        : MAX_LICENSES_PER_SCHOOL;
+        : getCurrentLicenseLimit();
 
     return {
       school: schoolRecord,

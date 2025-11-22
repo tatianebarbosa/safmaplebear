@@ -23,7 +23,8 @@ export const ALLOWED_DOMAINS = [
 export const COMPLIANT_DOMAINS = [
   'maplebear.com.br',
   'seb.com.br',
-  'sebsa.com.br'
+  'sebsa.com.br',
+  'mb.com.br'
 ] as const;
 
 // ============================================================================
@@ -103,9 +104,33 @@ export function isCompliantEmail(email: string): boolean {
   if (!validateEmail(email)) {
     return false;
   }
-  
-  const domain = getEmailDomain(email);
-  return COMPLIANT_DOMAINS.some(compliantDomain => domain === compliantDomain);
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const [username, domain] = normalizedEmail.split('@');
+
+  if (!domain) {
+    return false;
+  }
+
+  const matchesCompliantDomain = COMPLIANT_DOMAINS.some(
+    compliantDomain =>
+      domain === compliantDomain ||
+      domain.endsWith(`.${compliantDomain}`) ||
+      domain.startsWith(`${compliantDomain}.`)
+  );
+
+  if (matchesCompliantDomain) {
+    return true;
+  }
+
+  // Regras adicionais:
+  // - Qualquer email que contenha "maplebear" no corpo
+  // - Emails que combinam a sigla "mb" com outro identificador (ex: escola)
+  const hasMapleBearInLocalPart = username?.includes('maplebear');
+  const hasMbWithIdentifier =
+    username?.includes('mb') && Boolean(username?.match(/mb[\w.-]*[\w]/));
+
+  return Boolean(hasMapleBearInLocalPart || hasMbWithIdentifier);
 }
 
 /**

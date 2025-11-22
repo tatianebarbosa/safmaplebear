@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mascot } from './mascot';
-import { BearInvestigating } from '@/assets/maplebear';
+import { MascotUsage } from '@/assets/maplebear';
 import { cn } from '@/lib/utils';
 
 interface LoadingMascotProps {
@@ -28,9 +28,9 @@ export const LoadingMascot: React.FC<LoadingMascotProps> = ({
   return (
     <div className={cn('flex flex-col items-center justify-center gap-4', className)}>
       <div className="animate-bounce">
-        <Mascot 
-          src={BearInvestigating} 
-          size={size} 
+        <Mascot
+          src={MascotUsage.loading}
+          size={size}
           alt="Carregando..."
         />
       </div>

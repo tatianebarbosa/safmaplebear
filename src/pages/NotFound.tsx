@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Mascot } from "@/components/ui/mascot";
-import { BearPeeking } from "@/assets/maplebear";
+import { MascotUsage } from "@/assets/maplebear";
 import { Home, ArrowLeft } from "lucide-react";
 
 const NotFound = () => {
@@ -16,10 +16,10 @@ const NotFound = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
       <div className="text-center px-4 max-w-2xl">
-        <Mascot 
-          src={BearPeeking} 
-          size="xl" 
-          alt="Maple Bear - Página não encontrada" 
+        <Mascot
+          src={MascotUsage.notFound}
+          size="xl"
+          alt="Maple Bear - Página não encontrada"
           className="mb-8"
         />
         

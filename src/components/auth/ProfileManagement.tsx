@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Users, Key, Trash2, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useConfigStore } from "@/stores/configStore";
+import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 
 
 interface UserProfile {
@@ -42,6 +44,8 @@ const ProfileManagement = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [newUserOpen, setNewUserOpen] = useState(false);
+  const { licenseLimitPerSchool, setLicenseLimitPerSchool } = useConfigStore();
+  const applyLicenseLimitForAllSchools = useSchoolLicenseStore(state => state.applyLicenseLimitForAllSchools);
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +56,7 @@ const ProfileManagement = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [licenseLimitDraft, setLicenseLimitDraft] = useState(licenseLimitPerSchool.toString());
 
   // Carregar dados do usuário atual e listas
   useEffect(() => {
@@ -59,6 +64,10 @@ const ProfileManagement = () => {
     loadPendingUsers();
     loadAllUsers();
   }, []);
+
+  useEffect(() => {
+    setLicenseLimitDraft(licenseLimitPerSchool.toString());
+  }, [licenseLimitPerSchool]);
 
   const loadUserData = () => {
     const userData = localStorage.getItem('saf_current_user');
@@ -167,8 +176,29 @@ const ProfileManagement = () => {
       newPassword: '',
       confirmPassword: ''
     });
-    
+
     setIsPasswordOpen(false);
+  };
+
+  const handleLicenseLimitSave = () => {
+    const parsedLimit = Number(licenseLimitDraft);
+
+    if (!Number.isFinite(parsedLimit) || parsedLimit <= 0) {
+      toast({
+        title: "Valor inválido",
+        description: "Informe um número maior que zero para o limite de licenças por escola",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLicenseLimitPerSchool(parsedLimit);
+    applyLicenseLimitForAllSchools(parsedLimit);
+
+    toast({
+      title: "Limite de licenças atualizado",
+      description: `Cada escola passa a ter direito a ${parsedLimit} licenças.`,
+    });
   };
 
   // Aprovar usuário pendente
@@ -435,6 +465,40 @@ const ProfileManagement = () => {
               </div>
             </CardContent>
           </Card>
+
+          {currentUser.role === 'admin' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Licenças padrão por escola</CardTitle>
+                <CardDescription>
+                  Ajuste o limite máximo aplicado a todas as escolas. O valor padrão é 2 licenças por escola.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+                  <div className="space-y-2">
+                    <Label htmlFor="licenseLimit">Limite atual</Label>
+                    <Input
+                      id="licenseLimit"
+                      type="number"
+                      min={1}
+                      value={licenseLimitDraft}
+                      onChange={(e) => setLicenseLimitDraft(e.target.value)}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Todas as telas usarão este valor para calcular status de uso, limites disponíveis e geração de dados.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 md:items-end">
+                    <Button variant="outline" onClick={() => setLicenseLimitDraft(licenseLimitPerSchool.toString())}>
+                      Repor valor salvo
+                    </Button>
+                    <Button onClick={handleLicenseLimitSave}>Atualizar limite</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         {/* Aprovações - apenas para admin */}

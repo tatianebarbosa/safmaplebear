@@ -11,7 +11,7 @@ import {
   isEmailCompliant
 } from '@/lib/safDataService';
 import { School } from '@/types/safData';
-import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import { getCurrentLicenseLimit } from '@/stores/configStore';
 import {
 
 
@@ -175,7 +175,7 @@ export const processSchoolsWithUsers = async (): Promise<ProcessedSchoolData[]> 
 const estimateSchoolLicenses = (school: OfficialSchool, userCount: number): number => {
   return school.id === 'no-school'
     ? Math.max(userCount, 1)
-    : MAX_LICENSES_PER_SCHOOL;
+    : getCurrentLicenseLimit();
 };
 
 export const generateCanvaOverview = async (): Promise<CanvaOverviewData> => {
@@ -370,7 +370,7 @@ export const buildFallbackData = async (): Promise<{
     const estimatedLicenses =
       schoolId === 'no-school'
         ? Math.max(totalUsers, 1)
-        : MAX_LICENSES_PER_SCHOOL;
+        : getCurrentLicenseLimit();
 
     processedData.push({
       school:
