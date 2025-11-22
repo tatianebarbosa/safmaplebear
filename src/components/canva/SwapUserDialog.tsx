@@ -113,16 +113,6 @@ export const SwapUserDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        {/* Current User Info */}
-        <div className="p-3 bg-muted rounded-lg">
-          <h4 className="font-medium text-sm mb-2">Usuário Atual:</h4>
-          <div className="space-y-1 text-sm">
-            <div><strong>Nome:</strong> {currentUser.name}</div>
-            <div><strong>E-mail:</strong> {currentUser.email}</div>
-            <div><strong>Função:</strong> {currentUser.role}</div>
-          </div>
-        </div>
-        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="newName">Novo Nome</Label>

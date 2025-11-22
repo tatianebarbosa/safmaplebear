@@ -32,11 +32,13 @@ export interface Justification {
     name: string;
     email: string;
     role: UserRole;
+    schoolId?: string;
   };
   newUser: {
     name: string;
     email: string;
     role: UserRole;
+    schoolId?: string;
   };
   reason: string;
   timestamp: string;
@@ -66,7 +68,14 @@ export interface UsageFilters {
   school?: string;
 }
 
-export type HistoryAction = 'GRANT_LICENSE' | 'TRANSFER_LICENSE' | 'REMOVE_USER' | 'UPDATE_USER' | 'ADD_USER';
+export type HistoryAction =
+  | 'GRANT_LICENSE'
+  | 'TRANSFER_LICENSE'
+  | 'REMOVE_USER'
+  | 'UPDATE_USER'
+  | 'ADD_USER'
+  | 'TRANSFER_USER_BETWEEN_SCHOOLS'
+  | 'REVERT_ACTION';
 
 
 export type HistoryChangeSet =
@@ -74,7 +83,15 @@ export type HistoryChangeSet =
   | { type: 'REMOVE_USER'; user: SchoolUser }
   | { type: 'UPDATE_USER'; before: SchoolUser; after: SchoolUser }
   | { type: 'TRANSFER_LICENSE'; before: SchoolUser; after: SchoolUser }
-  | { type: 'ADD_USER'; user: SchoolUser };
+  | { type: 'ADD_USER'; user: SchoolUser }
+  | {
+      type: 'SWAP_USERS';
+      sourceUser: SchoolUser;
+      targetUser: SchoolUser;
+      sourceSchool: string;
+      targetSchool: string;
+    }
+  | { type: 'REVERT_ACTION'; originalAction: HistoryAction; originalEntryId: string };
 
 export interface HistoryEntry {
   id: string;

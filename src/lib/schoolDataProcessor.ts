@@ -1,4 +1,4 @@
-import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import { getCurrentLicenseLimit } from '@/stores/configStore';
 import { loadFranchisingSchools, loadLicenseUsers, isEmailCompliant } from '@/lib/safDataService';
 import type {
   School as BackendSchoolRecord,
@@ -57,7 +57,7 @@ const buildProcessorSchool = (raw: BackendSchoolRecord): School => ({
   email: raw.email ?? '',
   phone: raw.telefone ?? '',
   cnpj: raw.cnpj ?? '',
-  maxLicenses: MAX_LICENSES_PER_SCHOOL,
+  maxLicenses: getCurrentLicenseLimit(),
   usedLicenses: 0,
   users: []
 });

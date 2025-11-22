@@ -150,7 +150,7 @@ const CanvaDashboard = () => {
             </CardContent>
           </Card>
           )}
-          <CanvaMetricsDisplay overviewSummary={overviewData} />
+          <CanvaMetricsDisplay />
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">
