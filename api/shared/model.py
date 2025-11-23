@@ -2,6 +2,7 @@
 from dataclasses import dataclass, asdict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
+from uuid import uuid4
 
 @dataclass
 class OfficialSchool:
@@ -88,6 +89,38 @@ class AuditLogEntry:
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
+@dataclass
+class Event:
+    """Calendar event stored for SAF agenda"""
+    id: str
+    titulo: str
+    dataInicio: str
+    createdByUserId: str
+    createdByName: str
+    createdAt: str
+    descricao: Optional[str] = None
+    dataFim: Optional[str] = None
+    tipo: Optional[str] = None
+    updatedAt: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> "Event":
+        """Build an event ensuring optional fields exist"""
+        return Event(
+            id=data.get("id") or str(uuid4()),
+            titulo=data.get("titulo", "").strip(),
+            descricao=data.get("descricao"),
+            dataInicio=data.get("dataInicio", ""),
+            dataFim=data.get("dataFim"),
+            tipo=data.get("tipo"),
+            createdByUserId=data.get("createdByUserId", ""),
+            createdByName=data.get("createdByName", ""),
+            createdAt=data.get("createdAt", datetime.utcnow().isoformat()),
+            updatedAt=data.get("updatedAt"),
+        )
 class LicenseBadgeHelper:
     """Helper class for generating license badges"""
     
