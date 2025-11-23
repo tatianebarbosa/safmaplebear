@@ -18,9 +18,10 @@ import BearPulling from './mascots/bear_pulling.png';
 import BearHappy from './mascots/bear_happy.png';
 
 // Logos Institucionais
-import MapleLogos from './logos/maple_logos.png';
 import MapleLogoOutline from './logos/maple_logo_outline.png';
 import TripleLogo from './logos/maple_bear_triple_logo.png';
+import SAFLogo from './logos/SAFLOGO.png';
+import SAFLogoAlt from './logos/SAFLOGO2.png';
 
 // Exportação organizada por categoria
 export const Mascots = {
@@ -44,9 +45,11 @@ export const Mascots = {
 };
 
 export const Logos = {
-  Full: MapleLogos,
+  Full: TripleLogo,
   Outline: MapleLogoOutline,
   Triple: TripleLogo,
+  SAF: SAFLogo,
+  SAFAlt: SAFLogoAlt,
 };
 
 

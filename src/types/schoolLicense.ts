@@ -18,6 +18,7 @@ export interface School {
   status: SchoolStatus;
   city?: string;
   cluster: ClusterType;
+  contactEmail?: string;
   totalLicenses: number;
   usedLicenses: number;
   users: SchoolUser[];
@@ -57,6 +58,9 @@ export interface CanvaUsageData {
     name: string;
     email: string;
     designs: number;
+    schoolName?: string;
+    schoolId?: string;
+    cluster?: string;
   }>;
 }
 
@@ -73,7 +77,11 @@ export type HistoryChangeSet =
   | { type: 'GRANT_LICENSE'; user: SchoolUser }
   | { type: 'REMOVE_USER'; user: SchoolUser }
   | { type: 'UPDATE_USER'; before: SchoolUser; after: SchoolUser }
-  | { type: 'TRANSFER_LICENSE'; before: SchoolUser; after: SchoolUser }
+  | {
+      type: 'TRANSFER_LICENSE';
+      sourceSchool: { id: string; name: string; beforeUser: SchoolUser; afterUser: SchoolUser };
+      targetSchool?: { id: string; name: string; beforeUser: SchoolUser; afterUser: SchoolUser };
+    }
   | { type: 'ADD_USER'; user: SchoolUser };
 
 export interface HistoryEntry {

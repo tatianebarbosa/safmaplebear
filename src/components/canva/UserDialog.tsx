@@ -212,7 +212,7 @@ export const UserDialog = ({
             )}
             {formData.email && (
               <div className="flex items-center gap-2">
-                <Badge variant={emailCompliant ? "default" : "destructive"}>
+                <Badge variant={emailCompliant ? "success" : "destructive"}>
                   {emailCompliant ? 'Conforme' : 'Fora da política'}
                 </Badge>
                 {!emailCompliant && (

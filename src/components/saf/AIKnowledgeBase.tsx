@@ -1,18 +1,62 @@
 ﻿import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Search, Trash2, Bot, Download, Paperclip, FileText, Tag } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Search,
+  Trash2,
+  Bot,
+  Download,
+  Paperclip,
+  FileText,
+  Tag,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { KnowledgeItem, AIPrompt } from "@/types/knowledge";
-import { getStoredKnowledgeItems, persistKnowledgeItems, seedKnowledgeBase } from "@/lib/knowledgeBase";
+import {
+  getStoredKnowledgeItems,
+  persistKnowledgeItems,
+  seedKnowledgeBase,
+} from "@/lib/knowledgeBase";
 
 const generateKnowledgeId = () => {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -33,23 +77,25 @@ const AIKnowledgeBase = () => {
   const [initializing, setInitializing] = useState(true);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadCategory, setUploadCategory] = useState("documentos");
-  const [uploadPriority, setUploadPriority] = useState<"alta" | "media" | "baixa">("media");
+  const [uploadPriority, setUploadPriority] = useState<
+    "alta" | "media" | "baixa"
+  >("media");
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    category: 'atendimento',
-    tags: '',
-    priority: 'media'
+    title: "",
+    content: "",
+    category: "atendimento",
+    tags: "",
+    priority: "media",
   });
 
   const [promptData, setPromptData] = useState({
-    name: '',
-    prompt: '',
-    category: 'atendimento',
-    isActive: true
+    name: "",
+    prompt: "",
+    category: "atendimento",
+    isActive: true,
   });
 
   // Carregar dados do localStorage
@@ -64,34 +110,37 @@ const AIKnowledgeBase = () => {
           setKnowledgeItems(seeded);
           toast({
             title: "Base inicial carregada",
-            description: "Adicionamos o contexto oficial do site para a IA usar imediatamente.",
+            description:
+              "Adicionamos o contexto oficial do site para a IA usar imediatamente.",
           });
         }
       }
 
-      const savedPrompts = localStorage.getItem('saf_ai_prompts');
+      const savedPrompts = localStorage.getItem("saf_ai_prompts");
       if (savedPrompts) {
         setAiPrompts(JSON.parse(savedPrompts));
       } else {
         const initialPrompts = [
           {
-            id: '1',
-            name: 'Tom Educado',
-            prompt: 'Reescreva o texto a seguir mantendo o mesmo conteÃºdo, mas com um tom mais educado e profissional, adequado para o atendimento ao cliente Maple Bear:',
-            category: 'atendimento',
+            id: "1",
+            name: "Tom Educado",
+            prompt:
+              "Reescreva o texto a seguir mantendo o mesmo conteÃºdo, mas com um tom mais educado e profissional, adequado para o atendimento ao cliente Maple Bear:",
+            category: "atendimento",
             isActive: true,
             usageCount: 50,
-            createdAt: new Date().toLocaleString('pt-BR')
+            createdAt: new Date().toLocaleString("pt-BR"),
           },
           {
-            id: '2',
-            name: 'Resposta TÃ©cnica Canva',
-            prompt: 'Com base no conhecimento sobre licenÃ§as Canva da Maple Bear, responda a seguinte dÃºvida de forma clara e tÃ©cnica:',
-            category: 'canva',
+            id: "2",
+            name: "Resposta TÃ©cnica Canva",
+            prompt:
+              "Com base no conhecimento sobre licenÃ§as Canva da Maple Bear, responda a seguinte dÃºvida de forma clara e tÃ©cnica:",
+            category: "canva",
             isActive: true,
             usageCount: 30,
-            createdAt: new Date().toLocaleString('pt-BR')
-          }
+            createdAt: new Date().toLocaleString("pt-BR"),
+          },
         ];
         setAiPrompts(initialPrompts);
       }
@@ -110,45 +159,54 @@ const AIKnowledgeBase = () => {
 
   const savePrompts = (prompts: AIPrompt[]) => {
     setAiPrompts(prompts);
-    localStorage.setItem('saf_ai_prompts', JSON.stringify(prompts));
+    localStorage.setItem("saf_ai_prompts", JSON.stringify(prompts));
   };
 
   const handleSubmitKnowledge = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-    
+
+    const tagsArray = formData.tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag);
+
     if (editingItem) {
-      const updatedItems = knowledgeItems.map(item => {
+      const updatedItems = knowledgeItems.map((item) => {
         if (item.id === editingItem.id) {
           return {
             ...item,
             ...formData,
-            priority: formData.priority as 'alta' | 'media' | 'baixa',
+            priority: formData.priority as "alta" | "media" | "baixa",
             tags: tagsArray,
-            updatedAt: new Date().toLocaleString('pt-BR')
+            updatedAt: new Date().toLocaleString("pt-BR"),
           };
         }
         return item;
       });
-      
+
       saveKnowledge(updatedItems);
-      toast({ title: "Item atualizado", description: "Conhecimento foi atualizado com sucesso" });
+      toast({
+        title: "Item atualizado",
+        description: "Conhecimento foi atualizado com sucesso",
+      });
     } else {
       const newItem: KnowledgeItem = {
         id: generateKnowledgeId(),
         ...formData,
-        priority: formData.priority as 'alta' | 'media' | 'baixa',
+        priority: formData.priority as "alta" | "media" | "baixa",
         tags: tagsArray,
-        status: 'ativo',
-        createdAt: new Date().toLocaleString('pt-BR'),
-        updatedAt: new Date().toLocaleString('pt-BR'),
+        status: "ativo",
+        createdAt: new Date().toLocaleString("pt-BR"),
+        updatedAt: new Date().toLocaleString("pt-BR"),
         createdBy: localStorage.getItem("userEmail") || "Sistema",
-        usageCount: 0
+        usageCount: 0,
       };
-      
+
       saveKnowledge([...knowledgeItems, newItem]);
-      toast({ title: "Item criado", description: "Novo conhecimento foi adicionado" });
+      toast({
+        title: "Item criado",
+        description: "Novo conhecimento foi adicionado",
+      });
     }
 
     resetForm();
@@ -190,7 +248,8 @@ const AIKnowledgeBase = () => {
       if (!uploads.length) {
         toast({
           title: "Nenhum conteÃºdo encontrado",
-          description: "Os arquivos enviados estÃ£o vazios ou nÃ£o puderam ser lidos.",
+          description:
+            "Os arquivos enviados estÃ£o vazios ou nÃ£o puderam ser lidos.",
           variant: "destructive",
         });
         return;
@@ -202,10 +261,11 @@ const AIKnowledgeBase = () => {
         description: `${uploads.length} arquivo(s) foram convertidos em artigos da base.`,
       });
     } catch (error) {
-      console.error(error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
       toast({
         title: "Erro ao anexar documentos",
-        description: "Tente novamente ou utilize arquivos .txt, .md, .csv ou .json.",
+        description: `Tente novamente ou utilize arquivos .txt, .md, .csv ou .json. Detalhe: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {
@@ -218,27 +278,33 @@ const AIKnowledgeBase = () => {
 
   const handleSubmitPrompt = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (editingPrompt) {
-      const updatedPrompts = aiPrompts.map(prompt => {
+      const updatedPrompts = aiPrompts.map((prompt) => {
         if (prompt.id === editingPrompt.id) {
           return { ...prompt, ...promptData };
         }
         return prompt;
       });
-      
+
       savePrompts(updatedPrompts);
-      toast({ title: "Prompt atualizado", description: "Prompt da IA foi atualizado" });
+      toast({
+        title: "Prompt atualizado",
+        description: "Prompt da IA foi atualizado",
+      });
     } else {
       const newPrompt: AIPrompt = {
         id: `prompt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         ...promptData,
         usageCount: 0,
-        createdAt: new Date().toLocaleString('pt-BR')
+        createdAt: new Date().toLocaleString("pt-BR"),
       };
-      
+
       savePrompts([...aiPrompts, newPrompt]);
-      toast({ title: "Prompt criado", description: "Novo prompt da IA foi criado" });
+      toast({
+        title: "Prompt criado",
+        description: "Novo prompt da IA foi criado",
+      });
     }
 
     resetPromptForm();
@@ -246,7 +312,7 @@ const AIKnowledgeBase = () => {
 
   if (initializing) {
     return (
-      <div className="container mx-auto px-6 py-12">
+      <div className="w-full py-12">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
           <div>
@@ -262,11 +328,11 @@ const AIKnowledgeBase = () => {
 
   const resetForm = () => {
     setFormData({
-      title: '',
-      content: '',
-      category: 'atendimento',
-      tags: '',
-      priority: 'media'
+      title: "",
+      content: "",
+      category: "atendimento",
+      tags: "",
+      priority: "media",
     });
     setEditingItem(null);
     setIsDialogOpen(false);
@@ -274,10 +340,10 @@ const AIKnowledgeBase = () => {
 
   const resetPromptForm = () => {
     setPromptData({
-      name: '',
-      prompt: '',
-      category: 'atendimento',
-      isActive: true
+      name: "",
+      prompt: "",
+      category: "atendimento",
+      isActive: true,
     });
     setEditingPrompt(null);
     setIsPromptDialogOpen(false);
@@ -289,8 +355,8 @@ const AIKnowledgeBase = () => {
       title: item.title,
       content: item.content,
       category: item.category,
-      tags: item.tags.join(', '),
-      priority: item.priority
+      tags: item.tags.join(", "),
+      priority: item.priority,
     });
     setIsDialogOpen(true);
   };
@@ -301,7 +367,7 @@ const AIKnowledgeBase = () => {
       name: prompt.name,
       prompt: prompt.prompt,
       category: prompt.category,
-      isActive: prompt.isActive
+      isActive: prompt.isActive,
     });
     setIsPromptDialogOpen(true);
   };
@@ -310,15 +376,21 @@ const AIKnowledgeBase = () => {
   const [promptToDelete, setPromptToDelete] = useState<string | null>(null);
 
   const deleteItem = (id: string) => {
-    const updated = knowledgeItems.filter(item => item.id !== id);
+    const updated = knowledgeItems.filter((item) => item.id !== id);
     saveKnowledge(updated);
-    toast({ title: "Item removido", description: "Conhecimento foi removido da base" });
+    toast({
+      title: "Item removido",
+      description: "Conhecimento foi removido da base",
+    });
   };
 
   const deletePrompt = (id: string) => {
-    const updated = aiPrompts.filter(prompt => prompt.id !== id);
+    const updated = aiPrompts.filter((prompt) => prompt.id !== id);
     savePrompts(updated);
-    toast({ title: "Prompt removido", description: "Prompt foi removido do sistema" });
+    toast({
+      title: "Prompt removido",
+      description: "Prompt foi removido do sistema",
+    });
   };
 
   const handleDeleteItem = () => {
@@ -337,40 +409,60 @@ const AIKnowledgeBase = () => {
 
   const exportData = () => {
     const data = { knowledgeItems, aiPrompts };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `saf_knowledge_base_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `saf_knowledge_base_${
+      new Date().toISOString().split("T")[0]
+    }.json`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
   // Filtrar itens
-  const filteredItems = knowledgeItems.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+  const filteredItems = knowledgeItems.filter((item) => {
+    const matchesSearch =
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.tags.some((tag) =>
+        tag.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    const matchesCategory =
+      selectedCategory === "all" || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const categories = ['all', ...Array.from(new Set(knowledgeItems.map(item => item.category)))];
+  const categories = [
+    "all",
+    ...Array.from(new Set(knowledgeItems.map((item) => item.category))),
+  ];
 
   return (
     <div className="space-y-6">
       {/* AlertDialog para deletar item de conhecimento */}
-      <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+      <AlertDialog
+        open={!!itemToDelete}
+        onOpenChange={(open) => !open && setItemToDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Tem certeza que deseja remover este item?</AlertDialogTitle>
+            <AlertDialogTitle>
+              Tem certeza que deseja remover este item?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Esta aÃ§Ã£o Ã© irreversÃ­vel. O item de conhecimento serÃ¡ permanentemente removido da base.
+              Esta aÃ§Ã£o Ã© irreversÃ­vel. O item de conhecimento serÃ¡
+              permanentemente removido da base.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteItem} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDeleteItem}
+              className="bg-destructive hover:bg-destructive/90"
+            >
               Remover
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -378,17 +470,26 @@ const AIKnowledgeBase = () => {
       </AlertDialog>
 
       {/* AlertDialog para deletar prompt */}
-      <AlertDialog open={!!promptToDelete} onOpenChange={(open) => !open && setPromptToDelete(null)}>
+      <AlertDialog
+        open={!!promptToDelete}
+        onOpenChange={(open) => !open && setPromptToDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Tem certeza que deseja remover este prompt?</AlertDialogTitle>
+            <AlertDialogTitle>
+              Tem certeza que deseja remover este prompt?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Esta aÃ§Ã£o Ã© irreversÃ­vel. O prompt serÃ¡ permanentemente removido do sistema.
+              Esta aÃ§Ã£o Ã© irreversÃ­vel. O prompt serÃ¡ permanentemente
+              removido do sistema.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeletePrompt} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDeletePrompt}
+              className="bg-destructive hover:bg-destructive/90"
+            >
               Remover
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -397,7 +498,9 @@ const AIKnowledgeBase = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Base de Conhecimento IA</h1>
-          <p className="text-muted-foreground">Gerencie conhecimentos e prompts da IA SAF</p>
+          <p className="text-muted-foreground">
+            Gerencie conhecimentos e prompts da IA SAF
+          </p>
         </div>
         <div className="flex gap-2">
           <Button onClick={exportData} variant="outline">
@@ -425,33 +528,42 @@ const AIKnowledgeBase = () => {
                 className="pl-10"
               />
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map(cat => (
+                {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
-                    {cat === 'all' ? 'Todas' : cat}
+                    {cat === "all" ? "Todas" : cat}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={() => {
-                  setEditingItem(null);
-                  resetForm();
-                }}>
+                <Button
+                  onClick={() => {
+                    setEditingItem(null);
+                    resetForm();
+                  }}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Novo Conhecimento
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>{editingItem ? 'Editar' : 'Novo'} Conhecimento</DialogTitle>
+                  <DialogTitle>
+                    {editingItem ? "Editar" : "Novo"} Conhecimento
+                  </DialogTitle>
                   <DialogDescription>
-                    {editingItem ? 'Atualize as informaÃ§Ãµes' : 'Adicione novo conhecimento Ã  base da IA'}
+                    {editingItem
+                      ? "Atualize as informaÃ§Ãµes"
+                      : "Adicione novo conhecimento Ã  base da IA"}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmitKnowledge} className="space-y-4">
@@ -460,14 +572,21 @@ const AIKnowledgeBase = () => {
                     <Input
                       id="title"
                       value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, title: e.target.value })
+                      }
                       placeholder="TÃ­tulo do conhecimento"
                       required
                     />
                   </div>
                   <div>
                     <Label htmlFor="category">Categoria</Label>
-                    <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, category: value })
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -482,7 +601,12 @@ const AIKnowledgeBase = () => {
                   </div>
                   <div>
                     <Label htmlFor="priority">Prioridade</Label>
-                    <Select value={formData.priority} onValueChange={(value) => setFormData({...formData, priority: value})}>
+                    <Select
+                      value={formData.priority}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, priority: value })
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -498,7 +622,9 @@ const AIKnowledgeBase = () => {
                     <Input
                       id="tags"
                       value={formData.tags}
-                      onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, tags: e.target.value })
+                      }
                       placeholder="tag1, tag2, tag3"
                     />
                   </div>
@@ -507,14 +633,16 @@ const AIKnowledgeBase = () => {
                     <Textarea
                       id="content"
                       value={formData.content}
-                      onChange={(e) => setFormData({...formData, content: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, content: e.target.value })
+                      }
                       placeholder="ConteÃºdo detalhado do conhecimento..."
                       className="min-h-32"
                       required
                     />
                   </div>
                   <Button type="submit" className="w-full">
-                    {editingItem ? 'Atualizar' : 'Criar'} Conhecimento
+                    {editingItem ? "Atualizar" : "Criar"} Conhecimento
                   </Button>
                 </form>
               </DialogContent>
@@ -528,14 +656,19 @@ const AIKnowledgeBase = () => {
                 Anexar documentos e textos
               </CardTitle>
               <CardDescription>
-                Converta PDFs exportados para texto e faÃ§a upload dos arquivos .txt, .md, .csv ou .json. Cada arquivo Ã© transformado em um artigo e fica disponÃ­vel imediatamente para a IA.
+                Converta PDFs exportados para texto e faÃ§a upload dos arquivos
+                .txt, .md, .csv ou .json. Cada arquivo Ã© transformado em um
+                artigo e fica disponÃ­vel imediatamente para a IA.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
                   <Label>Categoria padrÃ£o</Label>
-                  <Select value={uploadCategory} onValueChange={(value) => setUploadCategory(value)}>
+                  <Select
+                    value={uploadCategory}
+                    onValueChange={(value) => setUploadCategory(value)}
+                  >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Categoria" />
                     </SelectTrigger>
@@ -551,7 +684,12 @@ const AIKnowledgeBase = () => {
                 </div>
                 <div>
                   <Label>Prioridade</Label>
-                  <Select value={uploadPriority} onValueChange={(value) => setUploadPriority(value as 'alta' | 'media' | 'baixa')}>
+                  <Select
+                    value={uploadPriority}
+                    onValueChange={(value) =>
+                      setUploadPriority(value as "alta" | "media" | "baixa")
+                    }
+                  >
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
@@ -568,7 +706,8 @@ const AIKnowledgeBase = () => {
                     Dica
                   </p>
                   <p className="text-muted-foreground mt-1">
-                    Gere sumÃ¡rios curtos (atÃ© 8k caracteres). Arquivos maiores serÃ£o automaticamente truncados.
+                    Gere sumÃ¡rios curtos (atÃ© 8k caracteres). Arquivos maiores
+                    serÃ£o automaticamente truncados.
                   </p>
                 </div>
               </div>
@@ -582,7 +721,8 @@ const AIKnowledgeBase = () => {
                   onChange={(e) => handleFileUpload(e.target.files)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Arraste e solte arquivos de texto exportados dos sistemas (limite prÃ¡tico ~8.000 caracteres por item).
+                  Arraste e solte arquivos de texto exportados dos sistemas
+                  (limite prÃ¡tico ~8.000 caracteres por item).
                 </p>
               </div>
             </CardContent>
@@ -598,7 +738,11 @@ const AIKnowledgeBase = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-semibold">{item.title}</h3>
                         <Badge variant="outline">{item.category}</Badge>
-                        <Badge variant={item.priority === 'alta' ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={
+                            item.priority === "alta" ? "default" : "secondary"
+                          }
+                        >
                           {item.priority}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
@@ -610,7 +754,11 @@ const AIKnowledgeBase = () => {
                       </p>
                       <div className="flex items-center gap-2 mb-2">
                         {item.tags.map((tag, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="text-xs"
+                          >
                             <Tag className="w-3 h-3 mr-1" />
                             {tag}
                           </Badge>
@@ -626,11 +774,19 @@ const AIKnowledgeBase = () => {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="ghost" onClick={() => handleEdit(item)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEdit(item)}
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="ghost" onClick={() => setItemToDelete(item.id)}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setItemToDelete(item.id)}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </AlertDialogTrigger>
@@ -646,21 +802,30 @@ const AIKnowledgeBase = () => {
           {/* Controles dos Prompts */}
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Prompts da IA</h2>
-            <Dialog open={isPromptDialogOpen} onOpenChange={setIsPromptDialogOpen}>
+            <Dialog
+              open={isPromptDialogOpen}
+              onOpenChange={setIsPromptDialogOpen}
+            >
               <DialogTrigger asChild>
-                <Button onClick={() => {
-                  setEditingPrompt(null);
-                  resetPromptForm();
-                }}>
+                <Button
+                  onClick={() => {
+                    setEditingPrompt(null);
+                    resetPromptForm();
+                  }}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Novo Prompt
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>{editingPrompt ? 'Editar' : 'Novo'} Prompt IA</DialogTitle>
+                  <DialogTitle>
+                    {editingPrompt ? "Editar" : "Novo"} Prompt IA
+                  </DialogTitle>
                   <DialogDescription>
-                    {editingPrompt ? 'Atualize o prompt' : 'Configure um novo prompt para a IA'}
+                    {editingPrompt
+                      ? "Atualize o prompt"
+                      : "Configure um novo prompt para a IA"}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmitPrompt} className="space-y-4">
@@ -669,14 +834,21 @@ const AIKnowledgeBase = () => {
                     <Input
                       id="promptName"
                       value={promptData.name}
-                      onChange={(e) => setPromptData({...promptData, name: e.target.value})}
+                      onChange={(e) =>
+                        setPromptData({ ...promptData, name: e.target.value })
+                      }
                       placeholder="Nome descritivo do prompt"
                       required
                     />
                   </div>
                   <div>
                     <Label htmlFor="promptCategory">Categoria</Label>
-                    <Select value={promptData.category} onValueChange={(value) => setPromptData({...promptData, category: value})}>
+                    <Select
+                      value={promptData.category}
+                      onValueChange={(value) =>
+                        setPromptData({ ...promptData, category: value })
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -693,7 +865,9 @@ const AIKnowledgeBase = () => {
                     <Textarea
                       id="promptContent"
                       value={promptData.prompt}
-                      onChange={(e) => setPromptData({...promptData, prompt: e.target.value})}
+                      onChange={(e) =>
+                        setPromptData({ ...promptData, prompt: e.target.value })
+                      }
                       placeholder="Digite o prompt que a IA deve usar..."
                       className="min-h-32"
                       required
@@ -704,12 +878,17 @@ const AIKnowledgeBase = () => {
                       type="checkbox"
                       id="isActive"
                       checked={promptData.isActive}
-                      onChange={(e) => setPromptData({...promptData, isActive: e.target.checked})}
+                      onChange={(e) =>
+                        setPromptData({
+                          ...promptData,
+                          isActive: e.target.checked,
+                        })
+                      }
                     />
                     <Label htmlFor="isActive">Prompt ativo</Label>
                   </div>
                   <Button type="submit" className="w-full">
-                    {editingPrompt ? 'Atualizar' : 'Criar'} Prompt
+                    {editingPrompt ? "Atualizar" : "Criar"} Prompt
                   </Button>
                 </form>
               </DialogContent>
@@ -727,8 +906,10 @@ const AIKnowledgeBase = () => {
                         <Bot className="w-4 h-4" />
                         <h3 className="font-semibold">{prompt.name}</h3>
                         <Badge variant="outline">{prompt.category}</Badge>
-                        <Badge variant={prompt.isActive ? 'default' : 'secondary'}>
-                          {prompt.isActive ? 'Ativo' : 'Inativo'}
+                        <Badge
+                          variant={prompt.isActive ? "default" : "secondary"}
+                        >
+                          {prompt.isActive ? "Ativo" : "Inativo"}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
                           Usado {prompt.usageCount} vezes
@@ -742,11 +923,19 @@ const AIKnowledgeBase = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="ghost" onClick={() => handleEditPrompt(prompt)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEditPrompt(prompt)}
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="ghost" onClick={() => setPromptToDelete(prompt.id)}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setPromptToDelete(prompt.id)}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </AlertDialogTrigger>

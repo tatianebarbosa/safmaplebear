@@ -1,18 +1,36 @@
-import { Navigate } from "react-router-dom";
-import { authService } from "./AuthService";
+// src/components/auth/ProtectedRoute.tsx
+import { Navigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { isAuthenticated } from "@/services/authService";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const isAuthenticated = authService.isAuthenticated();
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuth, setIsAuth] = useState(false);
 
-  if (!isAuthenticated) {
-    // Redirect them to the /login page, but save the current location they were
-    // trying to go to. This allows us to send them along to that page after they login,
-    // which is a nicer user experience than dropping them off on the home page.
-    return <Navigate to="/login" replace />;
+  useEffect(() => {
+    // Verificar autenticação de forma assíncrona
+    const checkAuth = () => {
+      setIsAuth(isAuthenticated());
+      setIsLoading(false);
+    };
+
+    // Simular pequeno delay para evitar flickering
+    const timer = setTimeout(checkAuth, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <Skeleton className="h-screen w-full" />;
+  }
+
+  if (!isAuth) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;

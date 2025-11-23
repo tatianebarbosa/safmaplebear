@@ -22,6 +22,7 @@ export interface KnowledgeAttachmentSummary {
   category: string;
   tags: string[];
   summary: string;
+  url?: string;
 }
 
 export interface AIPrompt {

@@ -2,14 +2,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import SchoolLicenseCard from "./SchoolLicenseCard";
 import StatsCard from "@/components/dashboard/StatsCard";
-import { School, Users, AlertTriangle, CheckCircle, Search, Filter, RefreshCw, LayoutGrid, Rows } from "lucide-react";
-import { School as SchoolType, loadSchoolData, getSchoolStats, calculateLicenseStatus } from "@/lib/schoolDataProcessor";
+import {
+  School,
+  Users,
+  AlertTriangle,
+  CheckCircle,
+  Search,
+  Filter,
+  RefreshCw,
+  LayoutGrid,
+  Rows,
+} from "lucide-react";
+import {
+  School as SchoolType,
+  loadSchoolData,
+  getSchoolStats,
+  calculateLicenseStatus,
+} from "@/lib/schoolDataProcessor";
 import { useToast } from "@/hooks/use-toast";
-import { MAX_LICENSES_PER_SCHOOL } from "@/config/licenseLimits";
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { useLicenseLimit } from "@/config/licenseLimits";
 import { cn } from "@/lib/utils";
 
 const SchoolManagement = () => {
@@ -24,6 +46,7 @@ const SchoolManagement = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [focusAtRisk, setFocusAtRisk] = useState(false);
   const { toast } = useToast();
+  const licenseLimit = useLicenseLimit();
 
   useEffect(() => {
     loadSchools();
@@ -31,7 +54,24 @@ const SchoolManagement = () => {
 
   useEffect(() => {
     filterSchools();
-  }, [schools, searchTerm, statusFilter, licenseFilter, sortOption, focusAtRisk]);
+  }, [
+    schools,
+    searchTerm,
+    statusFilter,
+    licenseFilter,
+    sortOption,
+    focusAtRisk,
+  ]);
+
+  useEffect(() => {
+    if (schools.length === 0) return;
+    setSchools((prev) =>
+      prev.map((school) => ({
+        ...school,
+        maxLicenses: licenseLimit,
+      }))
+    );
+  }, [licenseLimit]);
 
   const loadSchools = async () => {
     setLoading(true);
@@ -44,11 +84,13 @@ const SchoolManagement = () => {
         description: `${schoolData.length} escolas carregadas.`,
       });
     } catch (err) {
-      console.error('Erro ao carregar escolas:', err);
-      setError("Não encontramos os arquivos CSV dentro de public/data. Confirme se escolas.csv e usuarios_updated.csv estão disponíveis e compartilham o mesmo separador ';'.");
+      setError(
+        "Não encontramos os arquivos CSV dentro de public/data. Confirme se escolas.csv e usuarios_updated.csv estão disponíveis e compartilham o mesmo separador ';'."
+      );
       toast({
         title: "Erro ao carregar dados",
-        description: "Verifique se os arquivos CSV estão disponíveis em public/data.",
+        description:
+          "Verifique se os arquivos CSV estão disponíveis em public/data.",
         variant: "destructive",
       });
     } finally {
@@ -68,30 +110,34 @@ const SchoolManagement = () => {
 
     // Filtro por texto
     if (searchTerm) {
-      filtered = filtered.filter(school =>
-        school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        school.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        school.state.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (school) =>
+          school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          school.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          school.state.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filtro por status da escola
     if (statusFilter !== "all") {
-      filtered = filtered.filter(school => school.status === statusFilter);
+      filtered = filtered.filter((school) => school.status === statusFilter);
     }
 
     // Filtro por status de licenças
     if (licenseFilter !== "all") {
-      filtered = filtered.filter(school => {
+      filtered = filtered.filter((school) => {
         const licenseStatus = calculateLicenseStatus(school);
         return licenseStatus.status === licenseFilter;
       });
     }
 
     if (focusAtRisk) {
-      filtered = filtered.filter(school => {
+      filtered = filtered.filter((school) => {
         const licenseStatus = calculateLicenseStatus(school);
-        return licenseStatus.status === "warning" || licenseStatus.status === "excess";
+        return (
+          licenseStatus.status === "warning" ||
+          licenseStatus.status === "excess"
+        );
       });
     }
 
@@ -117,7 +163,7 @@ const SchoolManagement = () => {
   };
 
   const handleViewDetails = (school: SchoolType) => {
-    console.log('Ver detalhes da escola:', school);
+    // Navegar para detalhes da escola
     toast({
       title: `Detalhes de ${school.name}`,
       description: `${school.users.length} usuários cadastrados`,
@@ -125,7 +171,7 @@ const SchoolManagement = () => {
   };
 
   const handleEditLicenses = (school: SchoolType) => {
-    console.log('Editar licenças da escola:', school);
+    // Abrir diálogo de edição de licenças
     toast({
       title: `Editar licenças`,
       description: `Configure as licenças para ${school.name}. Para salvar alterações, conecte ao Supabase.`,
@@ -153,11 +199,8 @@ const SchoolManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center space-y-4">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-muted-foreground">Carregando dados das escolas...</p>
-        </div>
+      <div className="min-h-96">
+        <LoadingSkeleton type="dashboard" />
       </div>
     );
   }
@@ -176,22 +219,26 @@ const SchoolManagement = () => {
                 <h2 className="text-2xl font-semibold text-foreground">
                   Não foi possível carregar as escolas
                 </h2>
-                <p className="text-muted-foreground mt-2">
-                  {error}
-                </p>
+                <p className="text-muted-foreground mt-2">{error}</p>
               </div>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="rounded-lg border border-border/60 bg-background/80 p-4">
-                <p className="text-sm font-semibold text-foreground mb-1">O que verificar</p>
+                <p className="text-sm font-semibold text-foreground mb-1">
+                  O que verificar
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  Confirme se os arquivos foram exportados com separador ';' e se estão na pasta <code>public/data</code>.
+                  Confirme se os arquivos foram exportados com separador ';' e
+                  se estão na pasta <code>public/data</code>.
                 </p>
               </div>
               <div className="rounded-lg border border-border/60 bg-background/80 p-4">
-                <p className="text-sm font-semibold text-foreground mb-1">IDs consistentes</p>
+                <p className="text-sm font-semibold text-foreground mb-1">
+                  IDs consistentes
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  As colunas de ID devem estar iguais entre escolas.csv e usuarios_updated.csv para combinar os dados.
+                  As colunas de ID devem estar iguais entre escolas.csv e
+                  usuarios_updated.csv para combinar os dados.
                 </p>
               </div>
             </div>
@@ -213,12 +260,13 @@ const SchoolManagement = () => {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
-            <School className="w-6 h-6 text-primary" />
+            <School className="w-6 h-6 text-primary-dark" />
           </div>
           Gerenciamento de Escolas
         </h1>
         <p className="text-muted-foreground">
-          Controle de licenças Canva por escola - Atualmente {stats.totalLicenses} licenças distribuídas
+          Controle de licenças Canva por escola - Atualmente{" "}
+          {stats.totalLicenses} licenças distribuídas
         </p>
       </div>
 
@@ -228,12 +276,18 @@ const SchoolManagement = () => {
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-destructive mt-0.5" />
               <div>
-                <p className="font-semibold text-foreground">Não foi possível atualizar os CSVs</p>
+                <p className="font-semibold text-foreground">
+                  Não foi possível atualizar os CSVs
+                </p>
                 <p className="text-sm text-muted-foreground">{error}</p>
               </div>
             </div>
             <div className="flex gap-2 md:ml-auto">
-              <Button variant="outline" size="sm" onClick={() => setError(null)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setError(null)}
+              >
                 Ocultar aviso
               </Button>
               <Button size="sm" onClick={loadSchools}>
@@ -257,13 +311,20 @@ const SchoolManagement = () => {
           title="Licenças Utilizadas"
           value={`${stats.usedLicenses}/${stats.totalLicenses}`}
           icon={<Users className="h-4 w-4" />}
-          trend={{ value: Math.round(stats.utilizationRate), isPositive: stats.utilizationRate < 90 }}
+          trend={{
+            value: Math.round(stats.utilizationRate),
+            isPositive: stats.utilizationRate < 90,
+          }}
         />
         <StatsCard
           title="Escolas com Excesso"
           value={stats.schoolsWithExcess}
           icon={<AlertTriangle className="h-4 w-4" />}
-          className={stats.schoolsWithExcess > 0 ? "border-destructive/20 bg-destructive-bg/10" : ""}
+          className={
+            stats.schoolsWithExcess > 0
+              ? "border-destructive/20 bg-destructive-bg/10"
+              : ""
+          }
         />
         <StatsCard
           title="Taxa de Utilização"
@@ -292,7 +353,7 @@ const SchoolManagement = () => {
                 className="pl-10"
               />
             </div>
-            
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Status da Escola" />
@@ -325,11 +386,18 @@ const SchoolManagement = () => {
               <SelectContent>
                 <SelectItem value="usage-desc">Maior utilização</SelectItem>
                 <SelectItem value="name-asc">Nome (A-Z)</SelectItem>
-                <SelectItem value="licenses-remaining">Menos licenças livres</SelectItem>
+                <SelectItem value="licenses-remaining">
+                  Menos licenças livres
+                </SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={loadSchools} disabled={loading} variant="outline" className="md:justify-self-end">
-              {loading ? 'Carregando...' : 'Atualizar'}
+            <Button
+              onClick={loadSchools}
+              disabled={loading}
+              variant="outline"
+              className="md:justify-self-end"
+            >
+              {loading ? "Carregando..." : "Atualizar"}
             </Button>
           </div>
 
@@ -339,11 +407,16 @@ const SchoolManagement = () => {
                 type="button"
                 size="sm"
                 variant={focusAtRisk ? "secondary" : "outline"}
-                className={cn("gap-2", focusAtRisk && "bg-warning/10 text-warning")}
+                className={cn(
+                  "gap-2",
+                  focusAtRisk && "bg-warning/10 text-warning"
+                )}
                 onClick={() => setFocusAtRisk((prev) => !prev)}
               >
                 <AlertTriangle className="w-4 h-4" />
-                {focusAtRisk ? "Filtro risco ativo" : "Mostrar escolas em risco"}
+                {focusAtRisk
+                  ? "Filtro risco ativo"
+                  : "Mostrar escolas em risco"}
               </Button>
               <Button
                 type="button"
@@ -357,7 +430,9 @@ const SchoolManagement = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground hidden md:inline">Visualização</span>
+              <span className="text-xs text-muted-foreground hidden md:inline">
+                Visualização
+              </span>
               <div className="inline-flex overflow-hidden rounded-md border border-border">
                 <Button
                   type="button"
@@ -384,7 +459,11 @@ const SchoolManagement = () => {
           {appliedFilters.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {appliedFilters.map((label) => (
-                <Badge key={label} variant="outline" className="bg-muted/40 text-xs font-normal px-3 py-1 rounded-full">
+                <Badge
+                  key={label}
+                  variant="outline"
+                  className="bg-muted/40 text-xs font-normal px-3 py-1 rounded-full"
+                >
                   {label}
                 </Badge>
               ))}
@@ -404,14 +483,16 @@ const SchoolManagement = () => {
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <Badge variant="outline" className="bg-muted/40">
-              {`Padrão: ${MAX_LICENSES_PER_SCHOOL} licenças por escola`}
+              {`Padrão: ${licenseLimit} licenças por escola`}
             </Badge>
             <span>
-              {focusAtRisk ? "Filtro rápido: risco ativo" : "Dados sincronizados localmente"}
+              {focusAtRisk
+                ? "Filtro rápido: risco ativo"
+                : "Dados sincronizados localmente"}
             </span>
           </div>
         </div>
-        
+
         <div className={resultsLayoutClass}>
           {filteredSchools.map((school) => (
             <SchoolLicenseCard
@@ -439,7 +520,9 @@ const SchoolManagement = () => {
               </Badge>
               <School className="w-12 h-12 text-muted-foreground" />
               <h3 className="text-lg font-semibold text-foreground">
-                {hasFiltersApplied ? "Nenhuma escola corresponde aos filtros" : "Ainda não existem escolas carregadas"}
+                {hasFiltersApplied
+                  ? "Nenhuma escola corresponde aos filtros"
+                  : "Ainda não existem escolas carregadas"}
               </h3>
               <p className="text-muted-foreground max-w-xl">
                 {hasFiltersApplied
@@ -468,9 +551,13 @@ const SchoolManagement = () => {
               <AlertTriangle className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Escolas em atenção</p>
+              <p className="text-sm font-semibold text-foreground">
+                Escolas em atenção
+              </p>
               <p className="text-xs text-muted-foreground">
-                {atRiskSchools.length} {atRiskSchools.length === 1 ? "escola" : "escolas"} com licenças próximas do limite.
+                {atRiskSchools.length}{" "}
+                {atRiskSchools.length === 1 ? "escola" : "escolas"} com licenças
+                próximas do limite.
               </p>
             </div>
           </div>
@@ -479,26 +566,37 @@ const SchoolManagement = () => {
               highlightedAtRisk.map((school) => {
                 const status = calculateLicenseStatus(school);
                 return (
-                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-foreground" key={school.id}>
+                  <div
+                    className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-foreground"
+                    key={school.id}
+                  >
                     <p className="font-semibold">{school.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {status.used}/{status.total} licenças ({Math.round(status.percentage)}%)
+                      {status.used}/{status.total} licenças (
+                      {Math.round(status.percentage)}%)
                     </p>
                   </div>
                 );
               })
             ) : (
               <div className="col-span-3 text-sm text-muted-foreground">
-                Nenhuma escola está em alerta agora. Continue observando o uso médio nas próximas atualizações.
+                Nenhuma escola está em alerta agora. Continue observando o uso
+                médio nas próximas atualizações.
               </div>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button size="sm" variant="secondary" onClick={() => setFocusAtRisk(true)} disabled={atRiskSchools.length === 0}>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setFocusAtRisk(true)}
+              disabled={atRiskSchools.length === 0}
+            >
               Ver escolas em risco
             </Button>
             <p className="text-xs text-muted-foreground">
-              Use esse atalho para filtrar rapidamente apenas as escolas com status de alerta ou excesso.
+              Use esse atalho para filtrar rapidamente apenas as escolas com
+              status de alerta ou excesso.
             </p>
           </div>
         </CardContent>
@@ -508,15 +606,16 @@ const SchoolManagement = () => {
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="p-2 rounded-full bg-primary/10">
-              <AlertTriangle className="w-5 h-5 text-primary" />
+              <AlertTriangle className="w-5 h-5 text-primary-dark" />
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-2">
                 Gerenciamento Completo de Licenças
               </h3>
               <p className="text-sm text-muted-foreground mb-3">
-                Para funcionalidades avançadas como edição de limites de licenças, 
-                histórico de alterações e notificações automáticas, conecte seu projeto ao Supabase.
+                Para funcionalidades avançadas como edição de limites de
+                licenças, histórico de alterações e notificações automáticas,
+                conecte seu projeto ao Supabase.
               </p>
               <Button size="sm" className="btn-maple">
                 Conectar Supabase
@@ -530,6 +629,3 @@ const SchoolManagement = () => {
 };
 
 export default SchoolManagement;
-
-
-

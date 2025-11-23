@@ -1,15 +1,32 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Mail, Building, Shield } from "lucide-react";
 import { toast } from "sonner";
-import { loadUserData, analyzeEmails, getUsersBySchool, getClusterSAFResponsibles, type UserData, type EmailAnalysis } from "@/lib/userAnalytics";
+import {
+  loadUserData,
+  analyzeEmails,
+  getUsersBySchool,
+  getClusterSAFResponsibles,
+  type UserData,
+  type EmailAnalysis,
+} from "@/lib/userAnalytics";
 
 const UserAnalytics = () => {
   const [users, setUsers] = useState<UserData[]>([]);
-  const [emailAnalysis, setEmailAnalysis] = useState<EmailAnalysis | null>(null);
-  const [usersBySchool, setUsersBySchool] = useState<Map<string, UserData[]>>(new Map());
+  const [emailAnalysis, setEmailAnalysis] = useState<EmailAnalysis | null>(
+    null
+  );
+  const [usersBySchool, setUsersBySchool] = useState<Map<string, UserData[]>>(
+    new Map()
+  );
   const [safResponsibles, setSafResponsibles] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,20 +39,20 @@ const UserAnalytics = () => {
       setLoading(true);
       const userData = await loadUserData();
       setUsers(userData);
-      
+
       const analysis = analyzeEmails(userData);
       setEmailAnalysis(analysis);
-      
+
       const schoolGroups = getUsersBySchool(userData);
       setUsersBySchool(schoolGroups);
-      
+
       const responsibles = getClusterSAFResponsibles(userData);
       setSafResponsibles(responsibles);
-      
+
       toast.success("Dados dos usuários carregados com sucesso!");
     } catch (error) {
-      toast.error("Erro ao carregar dados dos usuários");
-      console.error(error);
+      const message = error instanceof Error ? error.message : "Erro desconhecido";
+      toast.error(`Erro ao carregar dados dos usuários: ${message}`);
     } finally {
       setLoading(false);
     }
@@ -64,7 +81,9 @@ const UserAnalytics = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total de Usuários
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -77,24 +96,32 @@ const UserAnalytics = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Emails Maple Bear</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Emails Maple Bear / MB Central
+            </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{emailAnalysis?.totalMaplebearUsers || 0}</div>
+            <div className="text-2xl font-bold">
+              {emailAnalysis?.totalMaplebearUsers || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Usuários com email @maplebear
+              Usuários com email @maplebear ou @mbcentral
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Emails Externos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Emails Externos
+            </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-warning">{emailAnalysis?.totalExternalUsers || 0}</div>
+            <div className="text-2xl font-bold text-warning">
+              {emailAnalysis?.totalExternalUsers || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               Usuários com email externo
             </p>
@@ -103,7 +130,9 @@ const UserAnalytics = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Responsáveis SAF</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Responsáveis SAF
+            </CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -131,13 +160,13 @@ const UserAnalytics = () => {
                   Emails Autorizados
                 </CardTitle>
                 <CardDescription>
-                  Usuários com emails @maplebear, @seb, @sebsa
+                  Usuários com emails @maplebear, @mbcentral, @seb, @sebsa
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-2">
                   <div className="flex justify-between items-center">
-                    <span>@maplebear</span>
+                    <span>@maplebear / @mbcentral</span>
                     <Badge variant="outline">
                       {emailAnalysis?.totalMaplebearUsers || 0}
                     </Badge>
@@ -179,34 +208,47 @@ const UserAnalytics = () => {
             </Card>
           </div>
 
-          {emailAnalysis?.externalEmails && emailAnalysis.externalEmails.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Lista de Emails Externos</CardTitle>
-                <CardDescription>
-                  Usuários que precisam de revisão
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {emailAnalysis.externalEmails.slice(0, 20).map((user, index) => (
-                    <div key={index} className="flex justify-between items-center p-2 border rounded">
-                      <div>
-                        <span className="font-medium">{user.name || 'Sem nome'}</span>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
-                      </div>
-                      <Badge variant="secondary">{user.school || 'Sem escola'}</Badge>
-                    </div>
-                  ))}
-                  {emailAnalysis.externalEmails.length > 20 && (
-                    <p className="text-sm text-muted-foreground text-center">
-                      E mais {emailAnalysis.externalEmails.length - 20} usuários...
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {emailAnalysis?.externalEmails &&
+            emailAnalysis.externalEmails.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Lista de Emails Externos</CardTitle>
+                  <CardDescription>
+                    Usuários que precisam de revisão
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {emailAnalysis.externalEmails
+                      .slice(0, 20)
+                      .map((user, index) => (
+                        <div
+                          key={index}
+                          className="flex justify-between items-center p-2 border rounded"
+                        >
+                          <div>
+                            <span className="font-medium">
+                              {user.name || "Sem nome"}
+                            </span>
+                            <p className="text-sm text-muted-foreground">
+                              {user.email}
+                            </p>
+                          </div>
+                          <Badge variant="secondary">
+                            {user.school || "Sem escola"}
+                          </Badge>
+                        </div>
+                      ))}
+                    {emailAnalysis.externalEmails.length > 20 && (
+                      <p className="text-sm text-muted-foreground text-center">
+                        E mais {emailAnalysis.externalEmails.length - 20}{" "}
+                        usuários...
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
         </TabsContent>
 
         <TabsContent value="schools" className="space-y-4">
@@ -227,11 +269,16 @@ const UserAnalytics = () => {
                   .sort(([, a], [, b]) => b.length - a.length)
                   .slice(0, 30)
                   .map(([school, schoolUsers], index) => (
-                  <div key={index} className="flex justify-between items-center p-2 border rounded">
-                    <span className="font-medium">{school}</span>
-                    <Badge variant="outline">{schoolUsers.length} usuários</Badge>
-                  </div>
-                ))}
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-2 border rounded"
+                    >
+                      <span className="font-medium">{school}</span>
+                      <Badge variant="outline">
+                        {schoolUsers.length} usuários
+                      </Badge>
+                    </div>
+                  ))}
               </div>
             </CardContent>
           </Card>
@@ -254,14 +301,26 @@ const UserAnalytics = () => {
                   <div key={index} className="p-3 border rounded-lg">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-medium">{responsible.name || 'Sem nome'}</h4>
-                        <p className="text-sm text-muted-foreground">{responsible.email}</p>
+                        <h4 className="font-medium">
+                          {responsible.name || "Sem nome"}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          {responsible.email}
+                        </p>
                         {responsible.school && (
-                          <p className="text-sm text-primary">{responsible.school}</p>
+                          <p className="text-sm text-primary">
+                            {responsible.school}
+                          </p>
                         )}
                       </div>
-                      <Badge variant={responsible.email.includes('@seb') ? 'default' : 'secondary'}>
-                        {responsible.role || 'SAF'}
+                      <Badge
+                        variant={
+                          responsible.email.includes("@seb")
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {responsible.role || "SAF"}
                       </Badge>
                     </div>
                   </div>

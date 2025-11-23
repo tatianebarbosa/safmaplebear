@@ -1,154 +1,232 @@
-import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Search, 
-  Download, 
-  Upload, 
-  X,
-  AlertTriangle,
-  Building2,
-  Users
-} from 'lucide-react';
-import { SchoolLicenseCard } from './SchoolLicenseCard';
-import { ImportPreviewDialog } from './ImportPreviewDialog';
-import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
-import { School } from '@/types/schoolLicense';
-import { toast } from 'sonner';
-import StatsCard from '@/components/dashboard/StatsCard';
+import { useEffect, useMemo, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Download, X, AlertTriangle, Building2, Users } from "lucide-react";
+import { SchoolLicenseCard } from "./SchoolLicenseCard";
+import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
+import { School } from "@/types/schoolLicense";
+import { toast } from "sonner";
+import StatsCard from "@/components/dashboard/StatsCard";
+import { useLicenseLimit } from "@/config/licenseLimits";
 
-export const SchoolLicenseManagement = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSchool, setSelectedSchool] = useState('');
-  const [clusterFilter, setClusterFilter] = useState<string>('all');
-  const [licenseFilter, setLicenseFilter] = useState<string>('all');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [showImportDialog, setShowImportDialog] = useState(false);
-  const [importData, setImportData] = useState<any[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+interface SchoolLicenseManagementProps {
+  externalSearchTerm?: string;
+  onExternalSearchConsumed?: () => void;
+}
 
-  const { 
-    schools, 
+export const SchoolLicenseManagement = ({
+  externalSearchTerm,
+  onExternalSearchConsumed,
+}: SchoolLicenseManagementProps) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSchool, setSelectedSchool] = useState("");
+  const [clusterFilter, setClusterFilter] = useState<string>("all");
+  const [licenseFilter, setLicenseFilter] = useState<string>("all");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const pageSize = 24;
+  const licenseLimit = useLicenseLimit();
+
+  const {
+    schools,
     getLicenseStatus,
     getNonMapleBearCount,
-    getDomainCounts 
+    getDomainCounts,
+    officialData,
+    overviewData,
   } = useSchoolLicenseStore();
 
-  // Criar opções para o combobox de escolas
-  const schoolOptions = schools.map(school => ({
-    value: school.id,
-    label: school.name
-  }));
+  const normalizeValue = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "");
+  const normalizedSearch = normalizeValue(searchTerm.trim());
 
-  // Filter schools
-  const filteredSchools = schools.filter(school => {
-    const matchesSearch = !searchTerm || 
-      school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      school.cluster.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      school.users.some(user => 
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    
-    const matchesSelectedSchool = !selectedSchool || school.id === selectedSchool;
-    
-    const matchesCluster = clusterFilter === 'all' || school.cluster === clusterFilter;
-    
-    const matchesRole = roleFilter === 'all' || 
-      school.users.some(user => user.role === roleFilter);
-    
-    const schoolLicenseStatus = getLicenseStatus(school);
-    const matchesLicense = licenseFilter === 'all' || schoolLicenseStatus === licenseFilter;
-    
-    return matchesSearch && matchesSelectedSchool && matchesCluster && matchesRole && matchesLicense;
-  });
+  const filteredSchools = useMemo(() => {
+    const priorityRank = (school: School) => {
+      const nameLower = (school.name || "").toLowerCase();
+      if (school.id === "no-school" || nameLower.includes("sem escola")) return -2;
+      if (school.id?.toLowerCase().includes("central") || nameLower.includes("central")) return -1;
+      return 0;
+    };
 
-  // Calculate stats
-  const totalSchools = schools.length;
-  const activeSchools = schools.filter(s => s.status === 'Ativa').length;
-  const totalLicenses = schools.reduce((sum, s) => sum + s.totalLicenses, 0);
-  const usedLicenses = schools.reduce((sum, s) => sum + s.usedLicenses, 0);
-  const exceedingSchools = schools.filter(s => getLicenseStatus(s) === 'Excedido').length;
-  const nonCompliantUsers = schools.reduce((sum, s) => sum + s.users.filter(u => !u.isCompliant).length, 0);
-  const nonMapleBearCount = getNonMapleBearCount();
-  const domainCounts = getDomainCounts();
+    const sorted = [...schools].sort((a, b) => {
+      const rankA = priorityRank(a);
+      const rankB = priorityRank(b);
+      if (rankA !== rankB) return rankA - rankB;
 
-  const handleClearFilters = () => {
-    setSearchTerm('');
-    setSelectedSchool('');
-    setClusterFilter('all');
-    setLicenseFilter('all');
-    setRoleFilter('all');
-  };
+      const deltaA = Math.max(0, a.usedLicenses - a.totalLicenses);
+      const deltaB = Math.max(0, b.usedLicenses - b.totalLicenses);
+      if (deltaA !== deltaB) return deltaB - deltaA;
+      return b.usedLicenses - a.usedLicenses;
+    });
 
-  const handleExport = () => {
-    const csvData = [
-      ['Escola', 'Status', 'Cluster', 'Cidade', 'Licenças Totais', 'Licenças Usadas', 'Status Licenças', 'Total Usuários', 'Usuários Não Conformes'],
-      ...filteredSchools.map(school => [
-        school.name,
-        school.status,
-        school.cluster,
-        school.city || '',
-        school.totalLicenses,
-        school.usedLicenses,
-        getLicenseStatus(school),
-        school.users.length,
-        school.users.filter(u => !u.isCompliant).length
-      ])
-    ];
-
-    const csvContent = csvData.map(row => row.join(';')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'escolas-licencas.csv';
-    link.click();
-    URL.revokeObjectURL(url);
-    toast.success('Dados exportados com sucesso');
-  };
-
-  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target?.result as string;
-      try {
-        const lines = text.split('\n').filter(line => line.trim());
-        const headers = lines[0].split(';').map(h => h.toLowerCase().trim());
-        
-        const expectedHeaders = ['schoolid', 'name', 'email', 'role'];
-        const hasRequiredHeaders = expectedHeaders.every(header => 
-          headers.some(h => h.includes(header))
+    return sorted.filter((school) => {
+      const matchesSearch =
+        !normalizedSearch ||
+        normalizeValue(school.name).includes(normalizedSearch) ||
+        normalizeValue(school.cluster).includes(normalizedSearch) ||
+        school.users.some(
+          (user) =>
+            normalizeValue(user.name).includes(normalizedSearch) ||
+            normalizeValue(user.email).includes(normalizedSearch) ||
+            normalizeValue(user.role).includes(normalizedSearch)
         );
 
-        if (!hasRequiredHeaders) {
-          toast.error('Formato inválido. Colunas necessárias: schoolId, name, email, role');
-          return;
-        }
+      const matchesSelectedSchool = !selectedSchool || school.id === selectedSchool;
+      const matchesCluster =
+        clusterFilter === "all" ||
+        normalizeValue(school.cluster) === normalizeValue(clusterFilter);
+      const matchesRole =
+        roleFilter === "all" ||
+        school.users.some((user) => normalizeValue(user.role) === normalizeValue(roleFilter));
 
-        const data = lines.slice(1).map(line => {
-          const values = line.split(';');
-          return {
-            schoolId: values[headers.indexOf('schoolid')] || values[0],
-            name: values[headers.indexOf('name')] || values[1],
-            email: values[headers.indexOf('email')] || values[2],
-            role: values[headers.indexOf('role')] || values[3],
-          };
-        }).filter(row => row.schoolId && row.name && row.email);
+      const schoolLicenseStatus = getLicenseStatus(school);
+      const matchesLicense =
+        licenseFilter === "all" ||
+        normalizeValue(schoolLicenseStatus) === normalizeValue(licenseFilter);
 
-        setImportData(data);
-        setShowImportDialog(true);
-      } catch (error) {
-        toast.error('Erro ao processar arquivo CSV');
+      return matchesSearch && matchesSelectedSchool && matchesCluster && matchesRole && matchesLicense;
+    });
+  }, [schools, normalizedSearch, selectedSchool, clusterFilter, roleFilter, licenseFilter, getLicenseStatus]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredSchools.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const visibleSchools = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return filteredSchools.slice(start, end);
+  }, [filteredSchools, currentPage, pageSize]);
+
+  const {
+    totalSchools,
+    activeSchools,
+    totalLicenses,
+    usedLicenses,
+    exceedingSchools,
+    nonCompliantUsers,
+    nonMapleBearCount,
+    domainCounts,
+  } = useMemo(() => {
+    const normalizeText = (value?: string) =>
+      (value ?? "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "");
+
+    const countedSchools = schools.filter((school) => {
+      const name = normalizeText(school.name);
+      return school.id !== "no-school" && !name.includes("central");
+    });
+
+    const officialSchoolCount =
+      overviewData?.totalSchools ??
+      officialData?.filter((item) => item.school.id !== "no-school").length ??
+      0;
+
+    const totalSchoolsAll = officialSchoolCount || countedSchools.length;
+    const activeWithLicenses = countedSchools.filter((s) => s.usedLicenses > 0).length;
+
+    const totals = countedSchools.reduce(
+      (acc, s) => {
+        acc.usedLicenses += s.usedLicenses;
+        acc.nonCompliantUsers += s.users.filter((u) => !u.isCompliant).length;
+        if (s.usedLicenses > 0) acc.activeSchools += 1;
+        if (getLicenseStatus(s) === "Excedido") acc.exceedingSchools += 1;
+        return acc;
+      },
+      {
+        usedLicenses: 0,
+        nonCompliantUsers: 0,
+        activeSchools: 0,
+        exceedingSchools: 0,
       }
+    );
+
+    return {
+      totalSchools: totalSchoolsAll,
+      activeSchools: activeWithLicenses,
+      totalLicenses: totalSchoolsAll * licenseLimit,
+      usedLicenses: totals.usedLicenses,
+      exceedingSchools: totals.exceedingSchools,
+      nonCompliantUsers: totals.nonCompliantUsers,
+      nonMapleBearCount: getNonMapleBearCount(),
+      domainCounts: getDomainCounts(),
     };
-    reader.readAsText(file);
+  }, [schools, getLicenseStatus, getDomainCounts, getNonMapleBearCount, licenseLimit]);
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSelectedSchool("");
+    setClusterFilter("all");
+    setLicenseFilter("all");
+    setRoleFilter("all");
+    setPage(1);
+  };
+
+  useEffect(() => {
+    if (externalSearchTerm) {
+      setSearchTerm(externalSearchTerm);
+      setPage(1);
+      onExternalSearchConsumed?.();
+    }
+  }, [externalSearchTerm, onExternalSearchConsumed]);
+
+  const handleExport = () => {
+    // Exporta sempre a visão filtrada mais recente
+    const formatCell = (value: unknown) => {
+      const raw = value ?? "";
+      const str = typeof raw === "string" ? raw : String(raw);
+      if (/[;"\n\r]/.test(str)) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const csvData = [
+      [
+        "Escola",
+        "Status",
+        "Cluster",
+        "Cidade",
+        "Licencas Totais",
+        "Licencas Usadas",
+        "Status Licencas",
+        "Total Usuarios",
+        "Usuarios Nao Conformes",
+      ],
+      ...filteredSchools.map((school) => [
+        formatCell(school.name),
+        formatCell(school.status ?? ""),
+        formatCell(school.cluster ?? ""),
+        formatCell(school.city ?? ""),
+        formatCell(school.totalLicenses ?? 0),
+        formatCell(school.usedLicenses ?? 0),
+        formatCell(getLicenseStatus(school) ?? ""),
+        formatCell(school.users.length ?? 0),
+        formatCell(school.users.filter((u) => !u.isCompliant).length ?? 0),
+      ]),
+    ];
+
+    const csvContent = csvData.map((row) => row.join(";")).join("\n");
+    const bom = "\uFEFF"; // BOM para Excel/PT-BR ler UTF-8 sem acentos quebrados
+    const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "escolas-licencas.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("Dados exportados com sucesso");
   };
 
   const handleViewDetails = (school: School) => {
@@ -161,28 +239,26 @@ export const SchoolLicenseManagement = () => {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-medium">Gestão de Licenças por Escola</h2>
-          <p className="text-sm text-muted-foreground">
-            Gerencie usuários, licenças e conformidade das escolas
-          </p>
+          <h2 className="text-xl font-medium">Painel de escolas e licenças</h2>
+          <p className="text-sm text-muted-foreground">Gerencie usuários, licenças e conformidade das escolas</p>
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatsCard
           title="Total de Escolas"
           value={totalSchools.toString()}
-          description={`${activeSchools} ativas`}
+          description={`${activeSchools} com licenças ativas`}
           icon={<Building2 className="h-4 w-4" />}
         />
         <StatsCard
           title="Licenças Utilizadas"
           value={`${usedLicenses}/${totalLicenses}`}
-          description={`${((usedLicenses/totalLicenses)*100).toFixed(1)}% ocupação`}
+          description={
+            totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupação` : "Sem dados de licença"
+          }
           icon={<Users className="h-4 w-4" />}
         />
         <StatsCard
@@ -195,42 +271,51 @@ export const SchoolLicenseManagement = () => {
         <StatsCard
           title="Usuários Não Conformes"
           value={nonCompliantUsers.toString()}
-          description="Fora da política"
+          description="Fora da politica"
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={nonCompliantUsers > 0 ? "destructive" : "default"}
         />
         <StatsCard
           title="Domínios Não Maple Bear"
           value={nonMapleBearCount.toString()}
-          description={`${domainCounts.slice(0, 2).map(d => d.domain).join(', ')}`}
+          description={`${domainCounts.slice(0, 2).map((d) => d.domain).join(", ")}`}
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={nonMapleBearCount > 0 ? "destructive" : "default"}
         />
       </div>
 
-      {/* Domain Compliance Alert */}
-
-
-      {/* Filters */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Filtros</CardTitle>
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={handleExport} className="gap-2">
+              <Download className="h-4 w-4" />
+              Exportar CSV
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-3">
-            {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Nome da escola, cluster, usuário, email ou perfil (estudante, professor, administrador)"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
                 className="pl-8"
               />
             </div>
 
-            {/* Cluster Filter */}
-            <Select value={clusterFilter} onValueChange={setClusterFilter}>
+            <Select
+              value={clusterFilter}
+              onValueChange={(value) => {
+                setClusterFilter(value);
+                setPage(1);
+              }}
+            >
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue placeholder="Cluster/Região" />
               </SelectTrigger>
@@ -244,93 +329,89 @@ export const SchoolLicenseManagement = () => {
               </SelectContent>
             </Select>
 
-            {/* License Status Filter */}
-            <Select value={licenseFilter} onValueChange={setLicenseFilter}>
+            <Select
+              value={licenseFilter}
+              onValueChange={(value) => {
+                setLicenseFilter(value);
+                setPage(1);
+              }}
+            >
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue placeholder="Status das Licenças" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Disponível">Liberada</SelectItem>
+                <SelectItem value="Disponível">Disponível</SelectItem>
                 <SelectItem value="Completo">Completa</SelectItem>
                 <SelectItem value="Excedido">Excedida</SelectItem>
               </SelectContent>
             </Select>
 
-            {/* Role Filter */}
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <Select
+              value={roleFilter}
+              onValueChange={(value) => {
+                setRoleFilter(value);
+                setPage(1);
+              }}
+            >
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue placeholder="Perfil do Usuário" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Perfis</SelectItem>
+                <SelectItem value="all">Todos os perfis</SelectItem>
                 <SelectItem value="Estudante">Estudante</SelectItem>
                 <SelectItem value="Professor">Professor</SelectItem>
                 <SelectItem value="Administrador">Administrador</SelectItem>
               </SelectContent>
             </Select>
 
-            {/* Clear Filters */}
             <Button variant="outline" onClick={handleClearFilters}>
               <X className="h-4 w-4 mr-2" />
               Limpar Filtros
             </Button>
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2 mt-3 justify-end">
-            <Button variant="outline" onClick={handleExport} className="gap-2">
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
-            <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-2">
-              <Upload className="h-4 w-4" />
-              Importar CSV
-            </Button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept=".csv"
-              style={{ display: 'none' }}
-              onChange={handleImportFile}
-            />
-          </div>
         </CardContent>
       </Card>
 
-      {/* Schools Grid */}
-      <div className="rounded-3xl border border-border/40 bg-background/90 shadow-lg">
-        <div className="max-h-[70vh] overflow-y-auto pr-3 glass-scrollbar">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredSchools.map((school) => (
-              <SchoolLicenseCard
-                key={school.id}
-                school={school}
-                onViewDetails={handleViewDetails}
-                onManage={handleManage}
-              />
-            ))}
+      <div className="space-y-4">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {visibleSchools.map((school) => (
+            <SchoolLicenseCard
+              key={school.id}
+              school={school}
+              onViewDetails={handleViewDetails}
+              onManage={handleManage}
+            />
+          ))}
+        </div>
+        {filteredSchools.length === 0 && (
+          <div className="text-center py-10 text-sm text-muted-foreground">
+            Nenhuma escola encontrada com os filtros aplicados.
           </div>
-          {filteredSchools.length === 0 && (
-            <div className="text-center py-10 text-sm text-muted-foreground">
-              Nenhuma escola encontrada com os filtros aplicados.
-            </div>
-          )}
+        )}
+        <div className="flex justify-between items-center px-1 sm:px-2 py-4 text-sm text-muted-foreground">
+          <Button
+            variant="outline"
+            disabled={currentPage === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className="rounded-full px-4"
+          >
+            Anterior
+          </Button>
+          <span>
+            {currentPage} / {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            disabled={currentPage === totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            className="rounded-full px-4"
+          >
+            Próxima
+          </Button>
         </div>
       </div>
 
-      {/* Import Dialog */}
-      <ImportPreviewDialog
-        open={showImportDialog}
-        onOpenChange={setShowImportDialog}
-        data={importData}
-        onConfirm={(data) => {
-          // Handle import logic here
-          setShowImportDialog(false);
-          setImportData([]);
-          toast.success(`${data.length} usuários importados com sucesso`);
-        }}
-      />
     </div>
   );
 };

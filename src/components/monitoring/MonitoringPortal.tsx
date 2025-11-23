@@ -4,9 +4,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, User, AlertCircle, CheckCircle, XCircle, Plus, Search } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Calendar,
+  Clock,
+  User,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Plus,
+  Search,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,7 +36,7 @@ interface Ticket {
   numero: string;
   responsavel: string;
   diasPendente: number;
-  status: 'Pendente' | 'Resolvido' | 'Em Andamento';
+  status: "Pendente" | "Resolvido" | "Em Andamento";
   observacao: string;
   dataUltimaAtualizacao: Date;
   historico: Array<{
@@ -29,29 +50,39 @@ interface Ticket {
 // Mock data baseado na planilha fornecida
 const mockTickets: Ticket[] = [
   {
-    id: '1',
-    numero: '#258209',
-    responsavel: 'João',
+    id: "1",
+    numero: "#258209",
+    responsavel: "João",
     diasPendente: 22,
-    status: 'Pendente',
-    observacao: 'aguardando dados, para Douglas colocar no dominio o PC do CRM',
-    dataUltimaAtualizacao: new Date('2024-08-31'),
+    status: "Pendente",
+    observacao: "aguardando dados, para Douglas colocar no dominio o PC do CRM",
+    dataUltimaAtualizacao: new Date("2024-08-31"),
     historico: [
-      { data: new Date('2024-08-31'), usuario: 'João', acao: 'Criou ticket', detalhes: 'Ticket criado para configuração CRM' }
-    ]
+      {
+        data: new Date("2024-08-31"),
+        usuario: "João",
+        acao: "Criou ticket",
+        detalhes: "Ticket criado para configuração CRM",
+      },
+    ],
   },
   {
-    id: '2',
-    numero: '#258809',
-    responsavel: 'João',
+    id: "2",
+    numero: "#258809",
+    responsavel: "João",
     diasPendente: 17,
-    status: 'Pendente',
-    observacao: 'esse caso quem está verificando é Fernanda Inacio de Edtech',
-    dataUltimaAtualizacao: new Date('2024-09-05'),
+    status: "Pendente",
+    observacao: "esse caso quem está verificando é Fernanda Inacio de Edtech",
+    dataUltimaAtualizacao: new Date("2024-09-05"),
     historico: [
-      { data: new Date('2024-09-05'), usuario: 'João', acao: 'Atualização', detalhes: 'Transferido para Fernanda Inacio de Edtech' }
-    ]
-  }
+      {
+        data: new Date("2024-09-05"),
+        usuario: "João",
+        acao: "Atualização",
+        detalhes: "Transferido para Fernanda Inacio de Edtech",
+      },
+    ],
+  },
 ];
 
 const MonitoringPortal = () => {
@@ -62,17 +93,18 @@ const MonitoringPortal = () => {
   const { toast } = useToast();
 
   const [newTicket, setNewTicket] = useState({
-    numero: '',
-    responsavel: '',
-    observacao: '',
-    status: 'Pendente' as const
+    numero: "",
+    responsavel: "",
+    observacao: "",
+    status: "Pendente" as const,
   });
 
-  const filteredTickets = tickets.filter(ticket => {
-    const matchesSearch = ticket.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ticket.responsavel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ticket.observacao.toLowerCase().includes(searchTerm.toLowerCase());
-    
+  const filteredTickets = tickets.filter((ticket) => {
+    const matchesSearch =
+      ticket.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ticket.responsavel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ticket.observacao.toLowerCase().includes(searchTerm.toLowerCase());
+
     if (statusFilter === "all") return matchesSearch;
     return matchesSearch && ticket.status === statusFilter;
   });
@@ -98,43 +130,53 @@ const MonitoringPortal = () => {
       historico: [
         {
           data: new Date(),
-          usuario: 'Sistema',
-          acao: 'Ticket criado',
-          detalhes: `Ticket criado por Sistema`
-        }
-      ]
+          usuario: "Sistema",
+          acao: "Ticket criado",
+          detalhes: `Ticket criado por Sistema`,
+        },
+      ],
     };
 
     setTickets([ticket, ...tickets]);
-    setNewTicket({ numero: '', responsavel: '', observacao: '', status: 'Pendente' });
+    setNewTicket({
+      numero: "",
+      responsavel: "",
+      observacao: "",
+      status: "Pendente",
+    });
     setIsCreateDialogOpen(false);
-    
+
     toast({
       title: "Sucesso",
       description: "Ticket criado com sucesso!",
     });
   };
 
-  const handleUpdateTicketStatus = (ticketId: string, newStatus: Ticket['status']) => {
-    setTickets(tickets.map(ticket => {
-      if (ticket.id === ticketId) {
-        return {
-          ...ticket,
-          status: newStatus,
-          dataUltimaAtualizacao: new Date(),
-          historico: [
-            ...ticket.historico,
-            {
-              data: new Date(),
-              usuario: 'Sistema',
-              acao: 'Status alterado',
-              detalhes: `Status alterado para ${newStatus}`
-            }
-          ]
-        };
-      }
-      return ticket;
-    }));
+  const handleUpdateTicketStatus = (
+    ticketId: string,
+    newStatus: Ticket["status"]
+  ) => {
+    setTickets(
+      tickets.map((ticket) => {
+        if (ticket.id === ticketId) {
+          return {
+            ...ticket,
+            status: newStatus,
+            dataUltimaAtualizacao: new Date(),
+            historico: [
+              ...ticket.historico,
+              {
+                data: new Date(),
+                usuario: "Sistema",
+                acao: "Status alterado",
+                detalhes: `Status alterado para ${newStatus}`,
+              },
+            ],
+          };
+        }
+        return ticket;
+      })
+    );
 
     toast({
       title: "Status Atualizado",
@@ -149,7 +191,7 @@ const MonitoringPortal = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10">
-              <AlertCircle className="w-6 h-6 text-primary" />
+              <AlertCircle className="w-6 h-6 text-primary-dark" />
             </div>
             Portal de Monitoramento
           </h1>
@@ -176,12 +218,19 @@ const MonitoringPortal = () => {
                   id="numero"
                   placeholder="#123456"
                   value={newTicket.numero}
-                  onChange={(e) => setNewTicket({ ...newTicket, numero: e.target.value })}
+                  onChange={(e) =>
+                    setNewTicket({ ...newTicket, numero: e.target.value })
+                  }
                 />
               </div>
               <div>
                 <Label htmlFor="responsavel">Responsável*</Label>
-                <Select value={newTicket.responsavel} onValueChange={(value) => setNewTicket({ ...newTicket, responsavel: value })}>
+                <Select
+                  value={newTicket.responsavel}
+                  onValueChange={(value) =>
+                    setNewTicket({ ...newTicket, responsavel: value })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o responsável" />
                   </SelectTrigger>
@@ -202,7 +251,9 @@ const MonitoringPortal = () => {
                   id="observacao"
                   placeholder="Descreva o problema ou solicitação..."
                   value={newTicket.observacao}
-                  onChange={(e) => setNewTicket({ ...newTicket, observacao: e.target.value })}
+                  onChange={(e) =>
+                    setNewTicket({ ...newTicket, observacao: e.target.value })
+                  }
                 />
               </div>
               <Button onClick={handleCreateTicket} className="w-full">
@@ -213,6 +264,34 @@ const MonitoringPortal = () => {
         </Dialog>
       </div>
 
+      {/* Filtros */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="flex items-center gap-2">
+          <Search className="w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por número, responsável ou observação"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Filtrar status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="Pendente">Pendentes</SelectItem>
+            <SelectItem value="Em Andamento">Em andamento</SelectItem>
+            <SelectItem value="Resolvido">Resolvidos</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={() => setSearchTerm("")}>
+            Limpar filtros
+          </Button>
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -221,7 +300,9 @@ const MonitoringPortal = () => {
               <AlertCircle className="w-5 h-5 text-red-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Pendentes</p>
-                <p className="text-2xl font-bold">{tickets.filter(t => t.status === 'Pendente').length}</p>
+                <p className="text-2xl font-bold">
+                  {tickets.filter((t) => t.status === "Pendente").length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -232,7 +313,9 @@ const MonitoringPortal = () => {
               <Clock className="w-5 h-5 text-orange-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Em Andamento</p>
-                <p className="text-2xl font-bold">{tickets.filter(t => t.status === 'Em Andamento').length}</p>
+                <p className="text-2xl font-bold">
+                  {tickets.filter((t) => t.status === "Em Andamento").length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -243,7 +326,9 @@ const MonitoringPortal = () => {
               <CheckCircle className="w-5 h-5 text-green-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Resolvidos</p>
-                <p className="text-2xl font-bold">{tickets.filter(t => t.status === 'Resolvido').length}</p>
+                <p className="text-2xl font-bold">
+                  {tickets.filter((t) => t.status === "Resolvido").length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -253,8 +338,12 @@ const MonitoringPortal = () => {
             <div className="flex items-center gap-2">
               <XCircle className="w-5 h-5 text-red-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Críticos (20+ dias)</p>
-                <p className="text-2xl font-bold">{tickets.filter(t => t.diasPendente >= 20).length}</p>
+                <p className="text-sm text-muted-foreground">
+                  Críticos (20+ dias)
+                </p>
+                <p className="text-2xl font-bold">
+                  {tickets.filter((t) => t.diasPendente >= 20).length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -269,12 +358,23 @@ const MonitoringPortal = () => {
         <CardContent>
           <div className="space-y-4">
             {filteredTickets.map((ticket) => (
-              <div key={ticket.id} className="border rounded-lg p-4 border-l-4 border-l-red-500">
+              <div
+                key={ticket.id}
+                className="border rounded-lg p-4 border-l-4 border-l-red-500"
+              >
                 <div className="flex items-start justify-between">
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-3">
                       <h3 className="font-semibold text-lg">{ticket.numero}</h3>
-                      <Badge variant={ticket.status === 'Pendente' ? 'destructive' : ticket.status === 'Resolvido' ? 'default' : 'secondary'}>
+                      <Badge
+                        variant={
+                          ticket.status === "Pendente"
+                            ? "destructive"
+                            : ticket.status === "Resolvido"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {ticket.status}
                       </Badge>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -289,10 +389,12 @@ const MonitoringPortal = () => {
                     <p className="text-muted-foreground">{ticket.observacao}</p>
                   </div>
                   <div className="flex gap-2">
-                    {ticket.status === 'Pendente' && (
+                    {ticket.status === "Pendente" && (
                       <Button
                         size="sm"
-                        onClick={() => handleUpdateTicketStatus(ticket.id, 'Resolvido')}
+                        onClick={() =>
+                          handleUpdateTicketStatus(ticket.id, "Resolvido")
+                        }
                       >
                         Resolver
                       </Button>

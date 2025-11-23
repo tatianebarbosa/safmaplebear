@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { SchoolCanvaData, CanvaUser } from '@/lib/canvaDataProcessor';
-import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import { useLicenseLimit } from '@/config/licenseLimits';
 
 interface LicenseManagementProps {
   schoolsData: SchoolCanvaData[];
@@ -23,6 +23,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
   const [justification, setJustification] = useState('');
   const [targetSchoolId, setTargetSchoolId] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const licenseLimit = useLicenseLimit();
 
   const totalLicenses = schoolsData.reduce((sum, school) => sum + school.maxLicenses, 0);
   const usedLicenses = schoolsData.reduce((sum, school) => sum + school.usedLicenses, 0);
@@ -145,7 +146,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
               Usuários Fora da Política ({nonCompliantUsers.length})
             </CardTitle>
             <CardDescription>
-              Usuários sem domínio autorizado (@maplebear.com.br, @sebsa.com.br, @seb.com.br)
+              Usuários sem domínio autorizado (@maplebear.com.br, @mbcentral.com.br, @sebsa.com.br, @seb.com.br)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -180,7 +181,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
         <CardHeader>
           <CardTitle>Gerenciamento de Licenças por Escola</CardTitle>
           <CardDescription>
-            {`Cada escola tem direito a ${MAX_LICENSES_PER_SCHOOL} licenças. Use as ações abaixo para gerenciar licenças e usuários.`}
+            {`Cada escola tem direito a ${licenseLimit} licenças. Use as ações abaixo para gerenciar licenças e usuários.`}
           </CardDescription>
         </CardHeader>
         <CardContent>

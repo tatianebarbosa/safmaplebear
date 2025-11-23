@@ -4,8 +4,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+// Base copy: adotamos o mesmo shape dos botões da área de filtros (raio suave, altura confortável, gap para ícones)
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -17,11 +18,11 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-11 px-4 py-2",  /* 44px - Touch-friendly */
-        sm: "h-9 rounded-md px-3",   /* 36px - Minimum touch */
-        lg: "h-12 rounded-md px-8",  /* 48px - Large touch */
-        icon: "h-11 w-11",           /* 44x44px - Touch-friendly */
-        "icon-sm": "h-9 w-9",       /* 36x36px - Small icon */
+        default: "h-12 px-5 text-base",     /* Formato dos filtros */
+        sm: "h-10 px-4 text-sm",             /* Leve redução mantendo pílula */
+        lg: "h-14 px-6 text-lg",             /* Botão maior mantendo pílula */
+        icon: "h-12 w-12",                   /* Pílula quadrada para ícones */
+        "icon-sm": "h-10 w-10",             /* Versão compacta para ícones */
       },
     },
     defaultVariants: {

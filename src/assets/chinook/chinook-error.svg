@@ -1,0 +1,46 @@
+<svg width="640" height="360" viewBox="0 0 640 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="360" rx="24" fill="#F8FAFC"/>
+  <ellipse cx="320" cy="296" rx="240" ry="34" fill="#E2E8F0"/>
+  <g filter="url(#shadow)">
+    <rect x="150" y="136" width="340" height="118" rx="18" fill="url(#body)"/>
+    <rect x="164" y="150" width="312" height="90" rx="12" fill="#0F172A"/>
+    <rect x="184" y="164" width="48" height="40" rx="6" fill="#E2E8F0"/>
+    <rect x="244" y="164" width="48" height="40" rx="6" fill="#E2E8F0"/>
+    <rect x="304" y="164" width="48" height="40" rx="6" fill="#E2E8F0"/>
+    <rect x="364" y="164" width="48" height="40" rx="6" fill="#E2E8F0"/>
+    <rect x="424" y="164" width="36" height="40" rx="6" fill="#E11D48"/>
+    <rect x="164" y="188" width="312" height="6" rx="3" fill="#E11D48" opacity=".35"/>
+  </g>
+  <path d="M120 146H520" stroke="#0F172A" stroke-width="8" stroke-linecap="round"/>
+  <path d="M236 124H404" stroke="#0F172A" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="222" cy="252" r="22" fill="#0F172A"/>
+  <circle cx="222" cy="252" r="11" fill="#F8FAFC"/>
+  <circle cx="418" cy="252" r="22" fill="#0F172A"/>
+  <circle cx="418" cy="252" r="11" fill="#F8FAFC"/>
+  <g>
+    <rect x="292" y="96" width="56" height="16" rx="4" fill="#0F172A"/>
+    <rect x="248" y="90" width="56" height="10" rx="3" fill="#0F172A" opacity=".5"/>
+    <rect x="336" y="90" width="56" height="10" rx="3" fill="#0F172A" opacity=".5"/>
+  </g>
+  <g fill="#E11D48">
+    <circle cx="320" cy="204" r="20"/>
+    <path d="M320 174c5.523 0 10 4.477 10 10v36c0 5.523-4.477 10-10 10s-10-4.477-10-10v-36c0-5.523 4.477-10 10-10Z"/>
+  </g>
+  <text x="320" y="320" text-anchor="middle" fill="#0F172A" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="700">Ops! Algo saiu do plano de voo</text>
+  <text x="320" y="346" text-anchor="middle" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="500">O Chinook pousou para você tentar novamente.</text>
+  <defs>
+    <linearGradient id="body" x1="150" y1="136" x2="490" y2="254" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#1E293B"/>
+    </linearGradient>
+    <filter id="shadow" x="130" y="116" width="380" height="178" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feGaussianBlur in="BackgroundImageFix" stdDeviation="8"/>
+      <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur"/>
+      <feOffset dy="8"/>
+      <feGaussianBlur stdDeviation="12"/>
+      <feColorMatrix values="0 0 0 0 0.0588 0 0 0 0 0.0863 0 0 0 0 0.1529 0 0 0 0.22 0"/>
+      <feBlend in="SourceGraphic" in2="effect1_backgroundBlur" result="shape"/>
+    </filter>
+  </defs>
+</svg>

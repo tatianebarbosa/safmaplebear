@@ -84,7 +84,7 @@ Após a correção, use estas credenciais para testar:
 
 **Administrador:**
 - Email: `admin@mbcentral.com.br`
-- Senha: `maplebear2025`
+- Senha: `admin2025`
 
 **Usuário SAF:**
 - Email: `saf@seb.com.br`

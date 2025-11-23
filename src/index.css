@@ -1,97 +1,101 @@
 @tailwind base;
-@tailwind components;@tailwind utilities;
+@tailwind components;
+@tailwind utilities;
 
 /* Maple Bear SAF Design System - Cores em HSL */
 
-@import './styles/spacing.css';
-@import './styles/typography.css';
-@import './styles/borders.css';
-@import './styles/responsive.css';
+@import "./styles/spacing.css";
+@import "./styles/typography.css";
+@import "./styles/borders.css";
+@import "./styles/responsive.css";
 
 @layer base {
   :root {
     /* Maple Bear Brand Colors */
     --maple-red: 359 76% 44%; /* #cc1316 - Pantone 186 C */
-    --maple-red-light: 359 76% 55%;
+    --maple-red-light: 359 76% 49%;
     --maple-red-dark: 359 76% 35%;
     /* --maple-gold: 45 93% 58%; */
     /* --maple-gold-light: 45 93% 75%; */
-    
+
     /* Base Colors */
     --background: 220 13% 97%;
     --foreground: 0 0% 0%; /* #000000 - Preto */
-    
+
     /* Surface Colors */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 0%; /* #000000 - Preto */
-    
+
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%; /* #000000 - Preto */
-    
+
     /* Brand Primary (Maple Red) */
     --primary: var(--maple-red);
     --primary-foreground: 0 0% 100%;
     --primary-light: var(--maple-red-light);
     --primary-dark: var(--maple-red-dark);
-    
+
     /* Secondary (Redefinido para Primary para remover amarelo) */
     --secondary: var(--maple-red-light);
     --secondary-foreground: 220 9% 13%;
     --secondary-light: var(--maple-red-light);
-    
+
     /* Success States */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
     --success-light: 142 76% 45%;
     --success-bg: 142 76% 95%;
-    
+
     /* Warning States */
     --warning: 32 95% 44%;
     --warning-foreground: 0 0% 100%;
     --warning-light: 32 95% 60%;
     --warning-bg: 32 95% 95%;
-    
+
     /* Error States */
     --destructive: 359 84% 40%; /* #aa0414 - Vermelho Vívido */
     --destructive-foreground: 0 0% 100%;
     --destructive-light: 0 84% 70%;
     --destructive-bg: 0 84% 95%;
-    
+
     /* Info States */
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
     --info-light: 217 91% 70%;
     --info-bg: 217 91% 95%;
-    
+
     /* Neutral Colors */
     --muted: 0 0% 93%; /* #ededed - Cinza Claro */
-    --muted-foreground: 220 9% 46%;
-    
+    --muted-foreground: 220 9% 28%;
+
     --accent: 220 13% 95%;
     --accent-foreground: 0 0% 0%; /* #000000 - Preto */
-    
+
     /* Border & Input */
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: var(--maple-red);
-    
-    /* Gradients */
-    --gradient-maple: linear-gradient(135deg, hsl(var(--maple-red)), hsl(var(--maple-red-light)));
-    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-light)));
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
-    
+
+    /* Gradients desativados para fundo sólido */
+    --gradient-maple: hsl(var(--primary));
+    --gradient-success: hsl(var(--success));
+    --gradient-subtle: hsl(var(--background));
+
     /* Backgrounds & Effects */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--card)));
-    --gradient-pattern: radial-gradient(circle at 20% 50%, hsl(var(--primary) / 0.05) 0%, transparent 50%);
-    
+    --gradient-primary: hsl(var(--primary));
+    --gradient-subtle: hsl(var(--background));
+    --gradient-pattern: hsl(var(--background));
+
     /* Shadows */
     --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red) / 0.3);
     --shadow-card: 0 4px 12px hsl(220 9% 13% / 0.08);
     --shadow-elevated: 0 8px 24px hsl(220 9% 13% / 0.12);
-    
+
     /* Border Radius */
     --radius: 0.9rem;
+
+    /* Global scale (1 = 100%) - aplicado apenas no conteúdo, não no header */
+    --ui-zoom: 1;
 
     --sidebar-background: 0 0% 98%;
 
@@ -108,49 +112,53 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Global content spacing (mais fluido para diferentes zooms) */
+    --global-content-padding: clamp(10px, 2.5vw, 40px);
+    --layout-max-width: 1100px;
   }
 
   .dark {
     --background: 220 9% 9%;
     --foreground: 220 13% 95%;
-    
+
     --card: 220 9% 11%;
     --card-foreground: 220 13% 95%;
-    
+
     --popover: 220 9% 11%;
     --popover-foreground: 220 13% 95%;
-    
+
     --primary: var(--maple-red-light);
     --primary-foreground: 0 0% 100%;
-    
+
     --secondary: var(--maple-red-light);
     --secondary-foreground: 220 9% 9%;
-    
+
     --success: 142 76% 45%;
     --success-bg: 142 76% 15%;
-    
+
     --warning: 32 95% 60%;
     --warning-bg: 32 95% 15%;
-    
+
     --destructive: 0 84% 70%;
     --destructive-bg: 0 84% 15%;
-    
+
     --info: 217 91% 70%;
     --info-bg: 217 91% 15%;
-    
+
     --muted: 220 9% 15%;
     --muted-foreground: 220 9% 65%;
-    
+
     --accent: 220 9% 15%;
     --accent-foreground: 220 13% 95%;
-    
+
     --border: 220 9% 20%;
     --input: 220 9% 20%;
-    
+
     --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red-light) / 0.4);
     --shadow-card: 0 4px 12px hsl(0 0% 0% / 0.3);
     --shadow-elevated: 0 8px 24px hsl(0 0% 0% / 0.4);
-    
+
     --sidebar-background: 220 9% 8%;
     --sidebar-foreground: 220 13% 95%;
     --sidebar-primary: var(--maple-red-light);
@@ -163,19 +171,62 @@
 }
 
 @layer base {
+  html {
+    font-size: 13px; /* base size antes do zoom do conteúdo */
+  }
+
+  @supports not (zoom: 1) {
+    html {
+      font-size: calc(13px * var(--ui-zoom));
+    }
+  }
+
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: 700;
     letter-spacing: -0.025em;
+  }
+
+  /* Elements marked with .no-zoom ficam no tamanho original mesmo com zoom global */
+  .no-zoom {
+    zoom: 1;
+  }
+
+  /* Aplica zoom efetivo de 75% mesmo com zoom global diferente */
+  .zoom-75 {
+    zoom: 1;
+  }
+
+  /* Aplica o zoom ao conteúdo (exceto header) mantendo centralizado */
+  .app-content-zoom {
+    display: block;
+  }
+
+  .app-content-inner {
+    width: 100%;
+    max-width: var(--layout-max-width);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 2rem;
+    box-sizing: border-box;
+    margin: 0 auto; 
+
   }
 }
 
@@ -184,50 +235,60 @@
   .status-badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide;
   }
-  
+
   .status-active {
     @apply bg-success-bg text-success border border-success/20;
   }
-  
+
   .status-inactive {
     @apply bg-muted text-muted-foreground border border-border;
   }
-  
+
   .status-warning {
     @apply bg-warning-bg text-warning border border-warning/20;
   }
-  
+
   /* Card Variants */
   .card-maple {
     @apply bg-card border border-border rounded-lg shadow-[var(--shadow-card)] transition-all duration-300;
   }
-  
+
+  /* Layout container to keep dashboard content readable on wide screens */
+  .layout-wide {
+    width: 100%;
+    max-width: var(--layout-max-width, 1440px);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--global-content-padding);
+    padding-right: var(--global-content-padding);
+  }
+
   .card-elevated {
     @apply shadow-[var(--shadow-elevated)] hover:shadow-[var(--shadow-maple)] hover:-translate-y-1;
   }
-  
+
   /* Button Variants */
   .btn-maple {
     @apply bg-primary text-primary-foreground hover:bg-primary-dark shadow-[var(--shadow-maple)] transition-all duration-200;
   }
-  
+
   .btn-maple-outline {
     @apply border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground;
   }
-  
+
   /* Priority Indicators */
   .priority-high {
     @apply border-l-4 border-l-destructive bg-destructive-bg/50;
   }
-  
+
   .priority-medium {
     @apply border-l-4 border-l-warning bg-warning-bg/50;
   }
-  
+
   .priority-low {
     @apply border-l-4 border-l-success bg-success-bg/50;
   }
-  
+
   /* Backgrounds */
   .bg-gradient-pattern {
     background: var(--gradient-pattern);
@@ -235,9 +296,10 @@
   .animate-maple-pulse {
     animation: maple-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
-  
+
   @keyframes maple-pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
       transform: scale(1);
     }
@@ -246,11 +308,11 @@
       transform: scale(1.02);
     }
   }
-  
+
   .animate-slide-up {
     animation: slide-up 0.3s ease-out;
   }
-  
+
   @keyframes slide-up {
     from {
       opacity: 0;
@@ -262,35 +324,48 @@
     }
   }
 
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass-scrollbar {
+    -ms-overflow-style: thin;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  }
+
+  .glass-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .glass-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .glass-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: rgba(148, 163, 184, 0.4);
+  }
+
+  .glass-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.5);
+  }
 }
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+@layer base {
+  /* Remove gradientes globais para garantir fundos sólidos */
+  [class*="bg-gradient"] {
+    background-image: none !important;
+  }
 }
 
-.glass-scrollbar {
-  -ms-overflow-style: thin;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
-}
 
-.glass-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
 
-.glass-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
 
-.glass-scrollbar::-webkit-scrollbar-thumb {
-  border-radius: 9999px;
-  background: linear-gradient(180deg, rgba(148, 163, 184, 0.5), rgba(148, 163, 184, 0.2));
-}
 
-.glass-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.6), rgba(148, 163, 184, 0.3));
-}
-}
+

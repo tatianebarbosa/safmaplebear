@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import { getMaxLicensesPerSchool } from '@/config/licenseLimits';
 import {
   School,
   LicenseUser,
@@ -23,6 +23,30 @@ const COMPLIANT_DOMAINS = [
   'sebsa.com.br',
   'seb.com.br'
 ];
+
+const MAPLE_BEAR_CORE_DOMAINS = ['maplebear.com.br', 'mbcentral.com.br'];
+
+const domainMatches = (domain: string, allowed: string): boolean => {
+  return domain === allowed || domain.endsWith(`.${allowed}`);
+};
+
+const isCorporateDomain = (domain: string): boolean => {
+  return COMPLIANT_DOMAINS.some(valid => domainMatches(domain, valid));
+};
+
+const isMapleBearDomain = (domain: string): boolean => {
+  if (!domain) return false;
+  return (
+    MAPLE_BEAR_CORE_DOMAINS.some(valid => domainMatches(domain, valid)) ||
+    domain.includes('maplebear') ||
+    domain.includes('mbcentral')
+  );
+};
+
+const hasMapleBearSchoolIdentifier = (localPart: string): boolean => {
+  const normalized = (localPart || '').toLowerCase();
+  return /(?:^|[.\\-_])(maplebear|mb)[a-z0-9]{2,}/.test(normalized);
+};
 
 type CsvRecord = Record<string, string>;
 
@@ -145,12 +169,27 @@ const fetchCsvText = async (path: string): Promise<string> => {
 export const isEmailCompliant = (email: string): boolean => {
   const normalized = email.trim().toLowerCase();
   if (!normalized.includes('@')) return false;
-  const domain = normalized.split('@')[1];
-  if (!domain) return false;
-  if (COMPLIANT_DOMAINS.some(valid => domain === valid || domain.endsWith(`.${valid}`))) {
+
+  const [localPart, domainRaw] = normalized.split('@');
+  const domain = domainRaw ?? '';
+
+  // Domínios corporativos aceitos
+  const domainKeywords = ['maplebear', 'mbcentral', 'sebsa', 'seb'];
+  if (domainKeywords.some((kw) => domain.includes(kw))) {
     return true;
   }
-  return domain?.includes('maplebear') ?? false;
+
+  // Domínios que começam com mb + nome da escola (ex: mbmogidascruzes.com.br)
+  if (/^mb[a-z0-9.-]{2,}$/.test(domain)) {
+    return true;
+  }
+
+  // E-mails com identificador da escola no local part (ex: mbmogidascruzes@qualquerdominio)
+  if (/^mb[a-z0-9._-]{2,}$/.test(localPart)) {
+    return true;
+  }
+
+  return false;
 };
 
 export const loadFranchisingSchools = async (): Promise<School[]> => {
@@ -235,7 +274,7 @@ export const calculateSchoolCanvaStats = (
   schoolId: number | 'UNASSIGNED' | 'CENTRAL',
   schoolName: string,
   users: LicenseUser[],
-  totalLicenses: number = MAX_LICENSES_PER_SCHOOL
+  totalLicenses: number = getMaxLicensesPerSchool()
 ): SchoolCanvaStats => {
   const totalUsuarios = users.length;
   const foraDaPolitica = users.filter(user => !isEmailCompliant(user.email)).length;
@@ -290,7 +329,7 @@ export const buildSchoolCardViews = (
     let school: School | null = null;
     let schoolId: number | 'CENTRAL' | 'UNASSIGNED' = key;
     let label = 'Usuários sem escola definida';
-    let totalLicenses = key === 'CENTRAL' ? Math.max(MAX_LICENSES_PER_SCHOOL, groupUsers.length) : MAX_LICENSES_PER_SCHOOL;
+    let totalLicenses = key === 'CENTRAL' ? Math.max(getMaxLicensesPerSchool(), groupUsers.length) : getMaxLicensesPerSchool();
 
     if (key === 'CENTRAL') {
       school = CENTRAL_SCHOOL_PLACEHOLDER;

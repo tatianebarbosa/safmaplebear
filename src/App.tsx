@@ -1,10 +1,12 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Skeleton } from "@/components/ui/Skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import Header from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,20 @@ const TicketsPage = lazy(() => import("@/pages/TicketsPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const KnowledgeBasePage = lazy(() => import("@/pages/KnowledgeBasePage"));
 
+const ProtectedShell = () => (
+  <ProtectedRoute>
+    <div className="flex min-h-screen flex-col bg-background">
+      <Header />
+      <div className="app-content-inner layout-wide flex-1 w-full">
+        <main className="w-full pb-8">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </div>
+  </ProtectedRoute>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -32,82 +48,18 @@ const App = () => (
         <Suspense fallback={<Skeleton className="h-screen w-full" />}>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/dashboard/canva" 
-              element={
-                <ProtectedRoute>
-                  <CanvaDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/dashboard/vouchers" 
-              element={
-                <ProtectedRoute>
-                  <VoucherDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/dashboard/vouchers-2026" 
-              element={
-                <ProtectedRoute>
-                  <Voucher2026Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/insights" 
-              element={
-                <ProtectedRoute>
-                  <InsightsAnalytics />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/monitoring" 
-              element={
-                <ProtectedRoute>
-                  <MonitoringPortal />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/tickets" 
-              element={
-                <ProtectedRoute>
-                  <TicketsPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute>
-                  <AdminPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/knowledge-base" 
-              element={
-                <ProtectedRoute>
-                  <KnowledgeBasePage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/access-control" 
-              element={<AccessControl />} 
-            />
+            <Route element={<ProtectedShell />}>
+              <Route path="/dashboard" element={<Index />} />
+              <Route path="/dashboard/canva" element={<CanvaDashboard />} />
+              <Route path="/dashboard/vouchers" element={<VoucherDashboard />} />
+              <Route path="/dashboard/vouchers-2026" element={<Voucher2026Dashboard />} />
+              <Route path="/insights" element={<InsightsAnalytics />} />
+              <Route path="/monitoring" element={<MonitoringPortal />} />
+              <Route path="/tickets" element={<TicketsPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/knowledge-base" element={<KnowledgeBasePage />} />
+              <Route path="/access-control" element={<AccessControl />} />
+            </Route>
             <Route 
               path="/" 
               element={<Navigate to="/dashboard" replace />} 

@@ -41,7 +41,7 @@ Seu projeto **safmaplebear** foi revisado e corrigido com sucesso! Todos os prob
 #### **Administrador (Acesso Completo)**
 ```
 Email: admin@mbcentral.com.br
-Senha: maplebear2025
+Senha: admin2025
 ```
 
 #### **Usuário SAF (Acesso Padrão)**
@@ -139,7 +139,7 @@ https://github.com/tatianebarbosa/safmaplebear
 
 2. **Acesse e teste:**
    - Abra http://localhost:3000
-   - Faça login com: `admin@mbcentral.com.br` / `maplebear2025`
+   - Faça login com: `admin@mbcentral.com.br` / `admin2025`
    - Explore o dashboard
 
 3. **Verifique as funcionalidades:**

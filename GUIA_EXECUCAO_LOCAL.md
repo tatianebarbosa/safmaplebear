@@ -72,7 +72,7 @@ Use uma das credenciais abaixo:
 
 **Administrador:**
 - Email: `admin@mbcentral.com.br`
-- Senha: `maplebear2025`
+- Senha: `admin2025`
 
 **Usuário SAF:**
 - Email: `saf@seb.com.br`
@@ -113,7 +113,7 @@ safmaplebear/
 
 | Perfil | Email | Senha | Acesso |
 |--------|-------|-------|--------|
-| Administrador | admin@mbcentral.com.br | maplebear2025 | Completo |
+| Administrador | admin@mbcentral.com.br | admin2025 | Completo |
 | Usuário SAF | saf@seb.com.br | saf2025 | Padrão |
 | Coordenador | coordenador@sebsa.com.br | coord2025 | Padrão |
 
@@ -130,7 +130,7 @@ Edite o arquivo `src/components/auth/AuthService.ts`, linha 43:
 
 ```typescript
 private readonly VALID_CREDENTIALS = [
-  { email: 'admin@mbcentral.com.br', password: 'maplebear2025', role: 'admin' as const },
+  { email: 'admin@mbcentral.com.br', password: 'admin2025', role: 'admin' as const },
   { email: 'saf@seb.com.br', password: 'saf2025', role: 'user' as const },
   { email: 'coordenador@sebsa.com.br', password: 'coord2025', role: 'user' as const },
   // Adicione novos usuários aqui:

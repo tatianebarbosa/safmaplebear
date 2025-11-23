@@ -1,25 +1,50 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import RankingTable from "./RankingTable";
 import StatsCard from "@/components/dashboard/StatsCard";
-import { Trophy, Users, TrendingUp, Star, Upload, Calendar } from "lucide-react";
-import { loadReportData, compareRankings, CanvaUserData, RankingComparison } from "@/lib/csvProcessor";
+import {
+  Trophy,
+  Users,
+  TrendingUp,
+  Star,
+  Upload,
+  Calendar,
+} from "lucide-react";
+import {
+  loadReportData,
+  compareRankings,
+  CanvaUserData,
+  RankingComparison,
+} from "@/lib/csvProcessor";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 
 const RankingDashboard = () => {
-  const [currentPeriod, setCurrentPeriod] = useState<'30_dias' | '3_meses' | '6_meses' | '12_meses'>('30_dias');
-  const [comparisonPeriod, setComparisonPeriod] = useState<'3_meses' | '6_meses' | '12_meses'>('3_meses');
-  const [rankingData, setRankingData] = useState<RankingComparison | null>(null);
+  const [currentPeriod, setCurrentPeriod] = useState<
+    "30_dias" | "3_meses" | "6_meses" | "12_meses"
+  >("30_dias");
+  const [comparisonPeriod, setComparisonPeriod] = useState<
+    "3_meses" | "6_meses" | "12_meses"
+  >("3_meses");
+  const [rankingData, setRankingData] = useState<RankingComparison | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const periodLabels = {
-    '30_dias': '30 Dias',
-    '3_meses': '3 Meses',
-    '6_meses': '6 Meses',
-    '12_meses': '12 Meses'
+    "30_dias": "30 Dias",
+    "3_meses": "3 Meses",
+    "6_meses": "6 Meses",
+    "12_meses": "12 Meses",
   };
 
   useEffect(() => {
@@ -31,21 +56,22 @@ const RankingDashboard = () => {
     try {
       const [currentData, previousData] = await Promise.all([
         loadReportData(currentPeriod),
-        loadReportData(comparisonPeriod)
+        loadReportData(comparisonPeriod),
       ]);
 
       const comparison = compareRankings(currentData, previousData);
       setRankingData(comparison);
-      
+
       toast({
         title: "Dados carregados com sucesso!",
         description: `Ranking de ${periodLabels[currentPeriod]} vs ${periodLabels[comparisonPeriod]} atualizado.`,
       });
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
       toast({
         title: "Erro ao carregar dados",
-        description: "Verifique se os arquivos CSV estão disponíveis.",
+        description: `Verifique se os arquivos CSV estão disponíveis. Detalhe: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {
@@ -57,9 +83,13 @@ const RankingDashboard = () => {
     if (!rankingData) return null;
 
     const totalUsers = rankingData.current.length;
-    const activeUsers = rankingData.current.filter(u => u.score > 0).length;
-    const topPerformers = rankingData.changes.filter(c => c.trend === 'up').length;
-    const newUsers = rankingData.changes.filter(c => c.trend === 'new').length;
+    const activeUsers = rankingData.current.filter((u) => u.score > 0).length;
+    const topPerformers = rankingData.changes.filter(
+      (c) => c.trend === "up"
+    ).length;
+    const newUsers = rankingData.changes.filter(
+      (c) => c.trend === "new"
+    ).length;
 
     return { totalUsers, activeUsers, topPerformers, newUsers };
   };
@@ -68,15 +98,24 @@ const RankingDashboard = () => {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type === 'text/csv') {
+    if (file && file.type === "text/csv") {
       // Aqui implementaríamos o upload de novos CSVs
       toast({
         title: "Upload de arquivo",
-        description: "Para persistir novos dados, conecte seu projeto ao Supabase.",
+        description:
+          "Para persistir novos dados, conecte seu projeto ao Supabase.",
         variant: "destructive",
       });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-96">
+        <LoadingSkeleton type="dashboard" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -84,7 +123,7 @@ const RankingDashboard = () => {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
-            <Trophy className="w-6 h-6 text-primary" />
+            <Trophy className="w-6 h-6 text-primary-dark" />
           </div>
           Ranking de Atividade Canva
         </h1>
@@ -105,7 +144,10 @@ const RankingDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div className="space-y-2">
               <label className="text-sm font-medium">Período Atual</label>
-              <Select value={currentPeriod} onValueChange={(value: any) => setCurrentPeriod(value)}>
+              <Select
+                value={currentPeriod}
+                onValueChange={(value: any) => setCurrentPeriod(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -120,7 +162,10 @@ const RankingDashboard = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Comparar com</label>
-              <Select value={comparisonPeriod} onValueChange={(value: any) => setComparisonPeriod(value)}>
+              <Select
+                value={comparisonPeriod}
+                onValueChange={(value: any) => setComparisonPeriod(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -134,9 +179,9 @@ const RankingDashboard = () => {
 
             <div className="flex gap-2">
               <Button onClick={loadRankingData} disabled={loading}>
-                {loading ? 'Carregando...' : 'Atualizar Ranking'}
+                {loading ? "Carregando..." : "Atualizar Ranking"}
               </Button>
-              
+
               <Button variant="outline" className="relative">
                 <input
                   type="file"
@@ -190,16 +235,17 @@ const RankingDashboard = () => {
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="p-2 rounded-full bg-primary/10">
-              <Upload className="w-5 h-5 text-primary" />
+              <Upload className="w-5 h-5 text-primary-dark" />
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-2">
                 Atualizações Automáticas
               </h3>
               <p className="text-sm text-muted-foreground mb-3">
-                Para manter os rankings sempre atualizados e armazenar o histórico de dados, 
-                conecte seu projeto ao Supabase. Isso permitirá uploads automáticos e 
-                comparações históricas mais precisas.
+                Para manter os rankings sempre atualizados e armazenar o
+                histórico de dados, conecte seu projeto ao Supabase. Isso
+                permitirá uploads automáticos e comparações históricas mais
+                precisas.
               </p>
               <Button size="sm" className="btn-maple">
                 Conectar Supabase

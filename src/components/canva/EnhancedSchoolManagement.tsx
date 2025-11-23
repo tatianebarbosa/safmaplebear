@@ -317,8 +317,8 @@ export const EnhancedSchoolManagement = ({
                                     {user.name || user.email.split('@')[0]}
                                   </span>
                                   <Badge 
-                                    variant={user.isCompliant ? "secondary" : "destructive"}
-                                    className="text-xs"
+                                    variant={user.isCompliant ? "success" : "destructive"}
+                                    size="sm"
                                   >
                                     {user.isCompliant ? 'Conforme' : 'Fora da política'}
                                   </Badge>

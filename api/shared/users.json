@@ -1,4 +1,11 @@
 {
+    "admin": {
+        "username": "admin",
+        "name": "Administrador",
+        "role": "Admin",
+        "hashed_password": "8a73da447a3e5cd1a95cf687343a7351e833d5018db071d24262c7c499f761db",
+        "salt": "08f60cafe73b310f8ca4431f79446e4adc9a0c4983c7784e2a428e19c2ef7318"
+    },
     "temp_admin@mbcentral.com.br": {
         "username": "temp_admin@mbcentral.com.br",
         "name": "Admin Temporario",

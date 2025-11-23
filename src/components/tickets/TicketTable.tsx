@@ -1,34 +1,39 @@
-import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
-import { Ticket } from '@/types/tickets';
-import { useTicketStore } from '@/stores/ticketStore';
-import { useAuthStore } from '@/stores/authStore';
-import { format, differenceInDays } from 'date-fns';
-import { Edit, CheckCircle, MoreVertical } from 'lucide-react';
+} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import { Ticket, TicketStatus } from "@/types/tickets";
+import { useAuthStore } from "@/stores/authStore";
+import { format, differenceInDays } from "date-fns";
+import { Edit, CheckCircle, MoreVertical, MessageSquare } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
+import { useTicketStatusJustification } from "@/hooks/useTicketStatusJustification";
 
 interface TicketTableProps {
   tickets: Ticket[];
+  onOpenDetails: (ticket: Ticket) => void;
 }
 
-export const TicketTable = ({ tickets }: TicketTableProps) => {
-  const { moveTicket } = useTicketStore();
-  const { canManageTicket } = useAuthStore();
+export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
+  const { currentUser, isCoordinator, isAdmin } = useAuthStore();
+  const { requestStatusChange, justificationDialog } = useTicketStatusJustification();
+
+  const canEditTicket = (ticket: Ticket) => {
+    const me = currentUser?.name || currentUser?.agente;
+    return isAdmin() || isCoordinator() || (me ? ticket.createdBy === me : false);
+  };
 
   const getSLABadge = (diasAberto: number) => {
     if (diasAberto >= 15) {
@@ -85,23 +90,32 @@ export const TicketTable = ({ tickets }: TicketTableProps) => {
     };
   };
 
+  const handleStatusChange = (ticket: Ticket, status: TicketStatus) => {
+    if (!canEditTicket(ticket)) return;
+    requestStatusChange(ticket, status);
+  };
+
   const handleResolve = (ticket: Ticket) => {
-    moveTicket(ticket.id, 'Resolvido');
+    handleStatusChange(ticket, 'Resolvido');
   };
 
   if (tickets.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-16 text-center">
-          <p className="text-muted-foreground">Nenhum ticket encontrado</p>
-        </CardContent>
-      </Card>
+      <>
+        <Card>
+          <CardContent className="py-16 text-center">
+            <p className="text-muted-foreground">Nenhum ticket encontrado</p>
+          </CardContent>
+        </Card>
+        {justificationDialog}
+      </>
     );
   }
 
   return (
-    <Card>
-      <CardContent className="p-0">
+    <>
+      <Card>
+        <CardContent className="p-0">
         <Table>
           <TableHeader>
             <TableRow>
@@ -117,7 +131,7 @@ export const TicketTable = ({ tickets }: TicketTableProps) => {
           </TableHeader>
           <TableBody>
             {tickets.map((ticket) => {
-              const canManage = canManageTicket(ticket.agente);
+              const canEdit = canEditTicket(ticket);
               const dueDateInfo = getDueDateInfo(ticket.dueDate);
               
               return (
@@ -162,7 +176,7 @@ export const TicketTable = ({ tickets }: TicketTableProps) => {
                   </TableCell>
                   
                   <TableCell>
-                    {canManage && (
+                    {canEdit && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon-sm">
@@ -170,6 +184,10 @@ export const TicketTable = ({ tickets }: TicketTableProps) => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onOpenDetails(ticket)}>
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Ver detalhes
+                          </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Edit className="h-4 w-4 mr-2" />
                             Editar
@@ -189,7 +207,9 @@ export const TicketTable = ({ tickets }: TicketTableProps) => {
             })}
           </TableBody>
         </Table>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+      {justificationDialog}
+    </>
   );
 };

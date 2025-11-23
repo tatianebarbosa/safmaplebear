@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import BackToDashboard from '@/components/common/BackToDashboard';
 
 const MonitoringPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,7 +34,8 @@ const MonitoringPage = () => {
   // Redirect if not authorized
   if (!hasRole('Coordinator')) {
     return (
-      <div className="container mx-auto px-6 py-8">
+      <div className="w-full py-8 space-y-4">
+        <BackToDashboard />
         <Card>
           <CardContent className="py-16 text-center">
             <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-orange-500" />
@@ -127,7 +129,8 @@ const MonitoringPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
+    <div className="w-full py-8 space-y-6">
+      <BackToDashboard />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

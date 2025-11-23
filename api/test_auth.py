@@ -12,8 +12,8 @@ def run_tests():
     print("\n--- Testando SecureAuthService ---")
 
     # Teste 1: Login bem-sucedido
-    print("\nTeste 1: Login bem-sucedido (admin@mbcentral.com.br, maplebear2025)")
-    auth_result = secure_auth.authenticate_user("tatiane.barbosa", "maplebear2025")
+    print("\nTeste 1: Login bem-sucedido (admin, admin2025)")
+    auth_result = secure_auth.authenticate_user("admin", "admin2025")
     if auth_result.get("success"):
         print("  ✅ Login bem-sucedido!")
         user = auth_result["user"]
@@ -33,7 +33,7 @@ def run_tests():
 
     # Teste 2: Login com senha incorreta
     print("\nTeste 2: Login com senha incorreta")
-    auth_result = secure_auth.authenticate_user("tatiane.barbosa", "senha_errada")
+    auth_result = secure_auth.authenticate_user("admin", "senha_errada")
     if not auth_result.get("success"):
         print(f"  ✅ Falha no login esperada: {auth_result.get('message')}")
     else:

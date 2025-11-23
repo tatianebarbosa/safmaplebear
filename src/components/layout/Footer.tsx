@@ -6,31 +6,14 @@ interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
 export const Footer = ({ className, ...props }: FooterProps) => {
   return (
     <footer
-      // Alterado para fundo vermelho (destructive) e texto branco (foreground)
       className={cn(
-        "bg-card text-muted-foreground border-t border-border p-4 text-center text-sm",
+        "bg-slate-50 text-muted-foreground border-t-2 border-border/60 px-6 sm:px-12 py-10 sm:py-12 mt-12",
         className
       )}
       {...props}
     >
-      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
-        <p className="mb-2 md:mb-0">
-          &copy; 2025 Maplebear SAF. Todos os direitos reservados.
-        </p>
-        <div className="space-x-4">
-          <a 
-            href="#" 
-            className="hover:text-foreground transition-colors"
-          >
-            Termos de Serviço
-          </a>
-          <a 
-            href="#" 
-            className="hover:text-foreground transition-colors"
-          >
-            Política de Privacidade
-          </a>
-        </div>
+      <div className="w-full text-center text-xs sm:text-sm text-muted-foreground">
+        <p>&copy; 2025 Maple Bear SAF. Todos os direitos reservados.</p>
       </div>
     </footer>
   );

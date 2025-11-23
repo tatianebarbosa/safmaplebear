@@ -1,57 +1,89 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
-import { authService } from "@/components/auth/AuthService";
-import { Mascot } from "@/components/ui/mascot";
 import { Logos } from "@/assets/maplebear";
+import { login, saveAuthToken, saveUser } from "@/services/authService";
+import { useAuthStore } from "@/stores/authStore";
+import userService from "@/services/userService";
+import type { Role, User } from "@/types/tickets";
+
+const mapRole = (role?: string): Role => {
+  const normalized = (role ?? "").trim().toLowerCase();
+  if (normalized === "admin") return "Admin";
+  if (normalized === "coord" || normalized === "coordinator") return "Coordinator";
+  if (normalized === "agent") return "Agent";
+
+  console.warn(`[auth] Papel desconhecido recebido: "${role}". Usando "Agent" como padrão.`);
+  return "Agent";
+};
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  
   const { toast } = useToast();
+  const canSubmit =
+    username.trim().length > 0 && password.trim().length > 0 && !isLoading;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
+    if (!trimmedUsername || !trimmedPassword || isLoading) return;
+
     setIsLoading(true);
 
     try {
-      // Limpar o localStorage antes de tentar o login para evitar dados corrompidos
-      authService.logout();
-      const response = await authService.login({ email, password });
-
-      if (response.success) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo ao Portal SAF Maple Bear",
+      const response = await login({
+        username: trimmedUsername,
+        password: trimmedPassword,
+      });
+      saveAuthToken(response.token);
+      localStorage.setItem("userEmail", response.user.username);
+      saveUser(response.user);
+      try {
+        userService.logAction({
+          actor: response.user.username,
+          action: "login",
+          detail: "user logged in",
         });
-        
-        // Manter compatibilidade com código existente
-        localStorage.setItem("authenticated", "true");
-        localStorage.setItem("userEmail", email);
-        
-        // Redirecionamento usando navigate para evitar full page reload
-        navigate("/dashboard", { replace: true });
-      } else {
-        toast({
-          title: "Erro de autenticação",
-          description: response.message || "Erro desconhecido",
-          variant: "destructive",
-        });
+      } catch (logError) {
+        console.warn("[auth] Falha ao registrar log de login", logError);
       }
-    } catch (error) {
+
+      const setCurrentUser = useAuthStore.getState().setCurrentUser;
+      const appUser: User = {
+        id: response.user.id ?? response.user.username,
+        name: response.user.username,
+        email: response.user.username,
+        role: mapRole(response.user.role),
+      };
+      setCurrentUser(appUser);
+
       toast({
-        title: "Erro de conexão",
-        description: "Não foi possível conectar ao servidor. Tente novamente.",
+        title: "Login realizado com sucesso!",
+        description: "Bem-vindo ao Portal SAF Maple Bear",
+      });
+
+      navigate("/dashboard", { replace: true });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
+      toast({
+        title: "Erro de autenticação",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -60,87 +92,107 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gradient-pattern opacity-50" />
-      
-      <Card className="w-full max-w-md relative backdrop-blur-sm bg-card/95 border-border/50 shadow-2xl">
-        <CardHeader className="text-center space-y-4 pb-6">
-          <div className="flex justify-center mb-4">
-		            <Mascot src={Logos.Triple} size="lg" alt="Maple Bear - Bem-vindo!" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-foreground">
-            Maple Bear SAF
-          </CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Sistema de Gestão de Licenças Canva
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu.email@mbcentral.com.br"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full"
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8 sm:px-6">
+      <div className="w-full max-w-sm">
+        <Card className="bg-card/95 border border-border/60 shadow-lg rounded-xl">
+          <CardHeader className="text-center space-y-2.5 pb-4 pt-6 px-5 sm:px-6">
+            <div className="flex justify-center">
+              <img
+                src={Logos.SAF}
+                alt="Maple Bear SAF"
+                className="object-contain drop-shadow-sm mx-auto"
+                style={{
+                  height: "88px",
+                  maxWidth: "240px",
+                  width: "auto",
+                }}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                Senha
-              </Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Digite sua senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
+            <div className="space-y-0">
+              <CardTitle className="text-3xl sm:text-4xl font-bold text-primary tracking-tight leading-tight">
+                Maple Bear
+              </CardTitle>
             </div>
+          </CardHeader>
 
-            <Button 
-              type="submit" 
-              className="w-full mt-6" 
-              size="lg"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Entrando...
-                </>
-              ) : (
-                "Entrar"
-              )}
-            </Button>
-          </form>
+          <CardContent className="pb-6 pt-0 px-5 sm:px-6">
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="username"
+                  className="text-sm font-semibold text-foreground/90"
+                >
+                  Usuário ou E-mail
+                </Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Digite seu e-mail ou usuário"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  autoComplete="username"
+                  className="w-full text-foreground h-10 text-sm sm:text-base border border-border px-3 focus:border-primary transition-colors"
+                  disabled={isLoading}
+                />
+              </div>
 
+              <div className="space-y-2">
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-semibold text-foreground/90"
+                >
+                  Senha
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Digite sua senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    className="w-full pr-10 h-10 text-sm sm:text-base text-foreground border border-border px-3 focus:border-primary transition-colors"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
 
-        </CardContent>
-      </Card>
+              <Button
+                type="submit"
+                className="w-full h-10 mt-4 text-sm sm:text-base font-semibold rounded-lg"
+                disabled={!canSubmit}
+                aria-busy={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Autenticando...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Entrar
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

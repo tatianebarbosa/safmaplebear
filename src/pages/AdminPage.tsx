@@ -1,47 +1,102 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Users, Globe, Shield, Eye } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
-import { toast } from 'sonner';
-import { Textarea } from '@/components/ui/textarea';
-import UserManagementTable from '@/components/admin/UserManagementTable';
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Settings, Users, Shield, Building2 } from "lucide-react";
+import { useAuthStore } from "@/stores/authStore";
+import { toast } from "sonner";
+import AccessManagement from "@/components/admin/AccessManagement";
+import {
+  getMaxLicensesPerSchool,
+  resetMaxLicensesPerSchool,
+  setMaxLicensesPerSchool,
+  useLicenseLimit,
+} from "@/config/licenseLimits";
+import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 
-interface SiteConfig {
-  title: string;
-  heroTitle: string;
-  heroDescription: string;
-  menuItems: { name: string; url: string }[];
-}
+type LicenseHistoryEntry = {
+  value: number;
+  performedBy: string;
+  date: string;
+  reason: string;
+};
 
 const AdminPage = () => {
-  const { hasRole } = useAuthStore();
-  const [siteConfig, setSiteConfig] = useState<SiteConfig>(() => {
-    const savedConfig = localStorage.getItem('saf-site-config');
-    if (savedConfig) {
-      return JSON.parse(savedConfig);
+  const { hasRole, currentUser } = useAuthStore();
+  const licenseLimit = useLicenseLimit();
+  const [licenseInput, setLicenseInput] = useState<number>(licenseLimit);
+  const applyLicenseLimit = useSchoolLicenseStore((state) => state.applyLicenseLimit);
+  const [history, setHistory] = useState<LicenseHistoryEntry[]>([]);
+  const [justification, setJustification] = useState("");
+  const HISTORY_KEY = "saf_license_limit_history";
+  
+
+  useEffect(() => {
+    setLicenseInput(licenseLimit);
+    try {
+      const stored = localStorage.getItem(HISTORY_KEY);
+      if (stored) {
+        setHistory(JSON.parse(stored));
+      }
+    } catch {
+      setHistory([]);
     }
-    return {
-      title: 'Maple Bear SAF',
-      heroTitle: 'Centro de Controle SAF',
-      heroDescription: 'Visão geral dos seus atendimentos, monitorias e alertas importantes',
-      menuItems: [
-        { name: 'Início', url: '/dashboard' },
-        { name: 'Canva', url: '/dashboard/canva' },
-        { name: 'Vouchers', url: '/dashboard/vouchers' },
-        { name: 'Tickets', url: '/tickets' },
-        { name: 'Monitoria', url: '/monitoring' }
-      ]
-    };
-  });
+  }, [licenseLimit]);
+
+  const persistHistory = (entries: LicenseHistoryEntry[]) => {
+    setHistory(entries);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+  };
+
+  const handleSaveLicenseLimit = () => {
+    if (!justification.trim()) {
+      toast.error("Informe uma justificativa para a alteracao.");
+      return;
+    }
+    const parsed = Math.max(1, Math.floor(Number(licenseInput)));
+    setLicenseInput(parsed);
+    setMaxLicensesPerSchool(parsed);
+    applyLicenseLimit(parsed);
+    const actor = currentUser?.name || currentUser?.email || "Admin";
+    persistHistory([
+      { value: parsed, performedBy: actor, date: new Date().toISOString(), reason: justification.trim() },
+      ...history,
+    ]);
+    setJustification("");
+    toast.success(`Limite ajustado para ${parsed} licencas por escola`);
+  };
+
+  const handleResetLicenseLimit = () => {
+    if (!justification.trim()) {
+      toast.error("Informe uma justificativa para a alteracao.");
+      return;
+    }
+    resetMaxLicensesPerSchool();
+    const fallback = getMaxLicensesPerSchool();
+    setLicenseInput(fallback);
+    applyLicenseLimit(fallback);
+    const actor = currentUser?.name || currentUser?.email || "Admin";
+    persistHistory([
+      { value: fallback, performedBy: actor, date: new Date().toISOString(), reason: justification.trim() },
+      ...history,
+    ]);
+    setJustification("");
+    toast.success(`Limite restaurado para ${fallback} licencas por escola`);
+  };
 
   // Redirect if not authorized
-  if (!hasRole('Admin')) {
+  if (!hasRole("Admin")) {
     return (
-      <div className="container mx-auto px-6 py-8">
+      <div className="w-full py-8 space-y-4">
         <Card>
           <CardContent className="py-16 text-center">
             <Shield className="h-16 w-16 mx-auto mb-4 text-red-500" />
@@ -55,13 +110,10 @@ const AdminPage = () => {
     );
   }
 
-  const saveSiteConfig = () => {
-    localStorage.setItem('saf-site-config', JSON.stringify(siteConfig));
-    toast.success('Configurações do site salvas com sucesso');
-  };
+  
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
+    <div className="w-full py-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -76,90 +128,122 @@ const AdminPage = () => {
       </div>
 
       <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="users" className="gap-2">
             <Users className="h-4 w-4" />
-            Usuários e Perfis
+            Usuarios e Perfis
           </TabsTrigger>
-          <TabsTrigger value="site" className="gap-2">
-            <Globe className="h-4 w-4" />
-            Configurações do Site
-          </TabsTrigger>
-          <TabsTrigger value="preview" className="gap-2">
-            <Eye className="h-4 w-4" />
-            Pré-visualização
+          <TabsTrigger value="licenses" className="gap-2">
+            <Building2 className="h-4 w-4" />
+            Licencas Canva
           </TabsTrigger>
         </TabsList>
 
-        {/* Users Management */}
+{/* Users Management */}
         <TabsContent value="users" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Gerenciamento de Usuários</CardTitle>
               <CardDescription>
-                Adicione, edite e remova usuários, e gerencie seus perfis de acesso.
+                Adicione, edite e remova usuários, e gerencie seus perfis de
+                acesso.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <UserManagementTable />
+              <AccessManagement />
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Site Settings */}
-        <TabsContent value="site" className="space-y-6">
+        {/* Licenses settings */}
+        <TabsContent value="licenses" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Configurações do Site</CardTitle>
+              <CardTitle>Limite de licencas por escola</CardTitle>
               <CardDescription>
-                Personalize o título, descrição e itens do menu.
+                Ajuste quantas licencas do Canva cada escola recebe. Padrao atual: {licenseLimit}.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="siteTitle">Título do Site</Label>
-                <Input
-                  id="siteTitle"
-                  value={siteConfig.title}
-                  onChange={(e) => setSiteConfig({ ...siteConfig, title: e.target.value })}
-                />
+              <div className="grid gap-4 md:grid-cols-[1fr_auto] items-end">
+                <div className="space-y-2">
+                  <Label htmlFor="licenseLimit">Licencas por escola</Label>
+                  <Input
+                    id="licenseLimit"
+                    type="number"
+                    min={1}
+                    value={licenseInput}
+                    onChange={(e) => setLicenseInput(Number(e.target.value || 0))}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Use 2 licencas como padrao. A alteracao atualiza todo o site imediatamente.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 md:items-end">
+                  <Button
+                    variant="outline"
+                    className="w-full md:w-auto"
+                    onClick={handleResetLicenseLimit}
+                  >
+                    Voltar para 2 licencas
+                  </Button>
+                  <Button
+                    className="w-full md:w-auto"
+                    onClick={handleSaveLicenseLimit}
+                  >
+                    Atualizar limite
+                  </Button>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="heroTitle">Título do Herói</Label>
-                <Input
-                  id="heroTitle"
-                  value={siteConfig.heroTitle}
-                  onChange={(e) => setSiteConfig({ ...siteConfig, heroTitle: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="heroDescription">Descrição do Herói</Label>
+              <div className="space-y-2">
+                <Label htmlFor="licenseJustification">Justificativa</Label>
                 <Textarea
-                  id="heroDescription"
-                  value={siteConfig.heroDescription}
-                  onChange={(e) => setSiteConfig({ ...siteConfig, heroDescription: e.target.value })}
+                  id="licenseJustification"
+                  value={justification}
+                  onChange={(e) => setJustification(e.target.value)}
+                  placeholder="Descreva o motivo da alteracao e o impacto esperado."
+                  rows={3}
                 />
+                <p className="text-xs text-muted-foreground">
+                  Uma justificativa e obrigatoria e ficara registrada com o autor e data.
+                </p>
               </div>
-              <Button onClick={saveSiteConfig}>Salvar Configurações</Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Historico de alteracoes</CardTitle>
+              <CardDescription>Registro de quem ajustou o limite e quando.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {history.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nenhuma alteracao registrada ainda.</p>
+              ) : (
+                <div className="space-y-2">
+                  {history.map((entry, index) => (
+                    <div
+                      key={`${entry.date}-${index}`}
+                      className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"
+                    >
+                      <div className="space-y-1">
+                        <div className="font-medium">{entry.performedBy}</div>
+                        <div className="text-muted-foreground">
+                          Ajustou para {entry.value} licenca(s)
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(entry.date).toLocaleString("pt-BR")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Preview */}
-        <TabsContent value="preview">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pré-visualização</CardTitle>
-              <CardDescription>Como as configurações aparecerão no site.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="p-8 border rounded-lg bg-background">
-                <h1 className="text-4xl font-bold">{siteConfig.heroTitle}</h1>
-                <p className="text-lg text-muted-foreground mt-2">{siteConfig.heroDescription}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        
       </Tabs>
     </div>
   );

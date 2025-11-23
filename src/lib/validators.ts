@@ -22,9 +22,34 @@ export const ALLOWED_DOMAINS = [
  */
 export const COMPLIANT_DOMAINS = [
   'maplebear.com.br',
+  'mbcentral.com.br',
   'seb.com.br',
   'sebsa.com.br'
 ] as const;
+
+const MAPLEBEAR_CORE_DOMAINS = ['maplebear.com.br', 'mbcentral.com.br'] as const;
+
+const domainMatches = (domain: string, allowed: string): boolean => {
+  return domain === allowed || domain.endsWith(`.${allowed}`);
+};
+
+const isCorporateDomain = (domain: string): boolean => {
+  return COMPLIANT_DOMAINS.some(compliantDomain => domainMatches(domain, compliantDomain));
+};
+
+const isMapleBearDomain = (domain: string): boolean => {
+  if (!domain) return false;
+  return (
+    MAPLEBEAR_CORE_DOMAINS.some(base => domainMatches(domain, base)) ||
+    domain.includes('maplebear') ||
+    domain.includes('mbcentral')
+  );
+};
+
+const hasMapleBearSchoolIdentifier = (localPart: string): boolean => {
+  const normalized = (localPart || '').toLowerCase();
+  return /(?:^|[.\\-_])(maplebear|mb)[a-z0-9]{2,}/.test(normalized);
+};
 
 // ============================================================================
 // VALIDAÇÃO DE EMAIL
@@ -89,7 +114,7 @@ export function isAllowedDomain(email: string): boolean {
   }
   
   const domain = getEmailDomain(email);
-  return ALLOWED_DOMAINS.some(allowedDomain => domain === allowedDomain);
+  return ALLOWED_DOMAINS.some(allowedDomain => domainMatches(domain, allowedDomain));
 }
 
 /**
@@ -105,7 +130,17 @@ export function isCompliantEmail(email: string): boolean {
   }
   
   const domain = getEmailDomain(email);
-  return COMPLIANT_DOMAINS.some(compliantDomain => domain === compliantDomain);
+  const localPart = getEmailUsername(email);
+
+  if (!isCorporateDomain(domain)) {
+    return false;
+  }
+
+  if (isMapleBearDomain(domain)) {
+    return hasMapleBearSchoolIdentifier(localPart);
+  }
+
+  return true;
 }
 
 /**
@@ -117,24 +152,33 @@ export function isCompliantEmail(email: string): boolean {
  */
 export function getNonComplianceReason(email: string): string {
   if (!email || typeof email !== 'string') {
-    return 'Email não fornecido';
+    return 'Email nao fornecido';
   }
   
   if (!validateEmail(email)) {
-    return 'Formato de email inválido';
+    return 'Formato de email invalido';
   }
   
   const domain = getEmailDomain(email);
+  const localPart = getEmailUsername(email);
   
   if (!domain) {
-    return 'Email inválido';
+    return 'Email invalido';
+  }
+  
+  if (!isCorporateDomain(domain)) {
+    return `Dominio nao autorizado: ${domain}`;
+  }
+
+  if (isMapleBearDomain(domain) && !hasMapleBearSchoolIdentifier(localPart)) {
+    return 'Email deve conter "maplebear" ou "mb" e o nome da escola (ex: mbmogidascruzes)';
   }
   
   if (isCompliantEmail(email)) {
     return 'Email em compliance';
   }
   
-  return `Domínio não autorizado: ${domain}`;
+  return 'Email fora da politica';
 }
 
 /**
@@ -145,7 +189,7 @@ export function getNonComplianceReason(email: string): string {
  */
 export function isMaplebearEmail(email: string): boolean {
   const domain = getEmailDomain(email);
-  return domain === 'maplebear.com.br';
+  return domainMatches(domain, 'maplebear.com.br');
 }
 
 /**
@@ -156,7 +200,7 @@ export function isMaplebearEmail(email: string): boolean {
  */
 export function isSEBEmail(email: string): boolean {
   const domain = getEmailDomain(email);
-  return domain === 'seb.com.br' || domain === 'sebsa.com.br';
+  return domainMatches(domain, 'seb.com.br') || domainMatches(domain, 'sebsa.com.br');
 }
 
 // ============================================================================

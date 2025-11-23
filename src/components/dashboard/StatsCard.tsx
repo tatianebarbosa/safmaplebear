@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface StatsCardProps {
@@ -15,21 +14,41 @@ interface StatsCardProps {
   className?: string;
 }
 
-const StatsCard = ({ title, value, icon, description, variant = "default", trend, className }: StatsCardProps) => {
+const StatsCard = ({
+  title,
+  value,
+  icon,
+  description,
+  variant = "default",
+  trend,
+  className,
+}: StatsCardProps) => {
   return (
-    <Card className={cn(
-      "rounded-[var(--radius)] shadow-sm border-border/40 hover:shadow-md transition-all", 
-      variant === "destructive" ? "border-destructive/20 bg-destructive/5" : "border-border/40 bg-card",
-      className
-    )}>
+    <Card
+      className={cn(
+        "rounded-[var(--radius)] shadow-sm border-border/40 hover:shadow-md transition-all",
+        variant === "destructive"
+          ? "border-destructive/20 bg-destructive/5"
+          : "border-border/40 bg-card",
+        className
+      )}
+    >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">{title}</p>
-            <p className={cn(
-              "text-2xl font-semibold",
-              variant === "destructive" ? "text-destructive" : "text-foreground"
-            )}>{value}</p>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              {title}
+            </p>
+            <p
+              className={cn(
+                "text-2xl font-semibold",
+                variant === "destructive"
+                  ? "text-destructive"
+                  : "text-foreground"
+              )}
+            >
+              {value}
+            </p>
             {description && (
               <p className="text-sm text-muted-foreground">{description}</p>
             )}
@@ -41,20 +60,29 @@ const StatsCard = ({ title, value, icon, description, variant = "default", trend
                     trend.isPositive ? "text-success" : "text-destructive"
                   )}
                 >
-                  {trend.isPositive ? "+" : ""}{trend.value}%
+                  {trend.isPositive ? "+" : ""}
+                  {trend.value}%
                 </span>
-                <span className="text-xs text-muted-foreground">vs. mês anterior</span>
+                <span className="text-xs text-muted-foreground">
+                  vs. mês anterior
+                </span>
               </div>
             )}
           </div>
-          <div className={cn(
-            "p-2 rounded-full",
-            variant === "destructive" ? "bg-destructive/10" : "bg-primary/10"
-          )}>
-            <div className={cn(
-              "w-5 h-5",
-              variant === "destructive" ? "text-destructive" : "text-primary"
-            )}>
+          <div
+            className={cn(
+              "p-2 rounded-full",
+              variant === "destructive" ? "bg-destructive/10" : "bg-primary/10"
+            )}
+          >
+            <div
+              className={cn(
+                "w-5 h-5",
+                variant === "destructive"
+                  ? "text-destructive"
+                  : "text-primary-dark"
+              )}
+            >
               {icon}
             </div>
           </div>

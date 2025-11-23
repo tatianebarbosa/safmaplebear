@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import StatsCard from '@/components/dashboard/StatsCard';
 import { loadUsageReport, loadModelUsageRanking, ModelUsage, TimeSeriesPoint } from '@/lib/canvaUsageService';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from 'recharts';
+import { filterRecentTimeSeries } from '@/lib/chartUtils';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar, ReferenceLine } from 'recharts';
 import { AlertTriangle, Activity, Sparkles, Database } from 'lucide-react';
 
 type HistoryEvent = {
@@ -37,7 +38,8 @@ export const CanvaAdvancedInsights = () => {
           loadModelUsageRanking('12m'),
           fetch('/data/canva_history.json').then((res) => res.json()),
         ]);
-        setTimeData(timeSeries);
+        const cleanedSeries = filterRecentTimeSeries(timeSeries);
+        setTimeData(cleanedSeries);
         setModelRanking(models.slice(0, 5));
         setHistory(historyData ?? []);
       } catch (err) {
@@ -133,6 +135,12 @@ export const CanvaAdvancedInsights = () => {
                 <XAxis dataKey="period" />
                 <YAxis />
                 <Tooltip formatter={(value: number) => [numberFormatter.format(value), 'Designs']} />
+                <ReferenceLine
+                  y={timelineInsights.average}
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeDasharray="4 4"
+                  label={{ position: 'right', value: 'Média', fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                />
                 <Line type="monotone" dataKey="designs" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>

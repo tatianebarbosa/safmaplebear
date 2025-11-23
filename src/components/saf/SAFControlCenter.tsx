@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +37,7 @@ interface Alert {
 }
 
 const SAFControlCenter = () => {
-  const [tickets, setTickets] = useState<Ticket[]>([
+  const [tickets] = useState<Ticket[]>([
     { id: '#258209', quem: 'João', quando: '22 dias', dias: 22, status: 'Pendente', observacao: 'aguardando dados, para Douglas colocar no dominio o PC do CRM' },
     { id: '#258809', quem: 'João', quando: '17 dias', dias: 17, status: 'Pendente', observacao: 'esse caso quem está verificando é Fernanda Inacio de Edtech' },
     { id: '#259134', quem: 'Tati', quando: '25 dias', dias: 25, status: 'Pendente', observacao: 'Ainda sendo tratado deste caso com o Iago' },

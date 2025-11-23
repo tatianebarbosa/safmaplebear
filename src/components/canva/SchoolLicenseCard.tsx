@@ -1,28 +1,13 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { 
-  Edit, 
-  Trash2, 
-  Plus, 
-  Users, 
-  AlertTriangle, 
-  Paperclip,
-  MapPin,
-  Settings,
-  RefreshCw
-} from 'lucide-react';
-import { isEmailCompliant } from '@/lib/officialDataProcessor'; // Importar a função de validação de email
+import { Users, AlertTriangle, Paperclip, Settings } from 'lucide-react';
 import { School, type LicenseStatus } from '@/types/schoolLicense';
-import { UserDialog } from './UserDialog';
-import { SwapUserDialog } from './SwapUserDialog';
-import { JustificationsDialog } from './JustificationsDialog';
-import { JustificationRequiredDialog } from './JustificationRequiredDialog';
 import { SchoolDetailsDialog } from './SchoolDetailsDialog';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
-import { toast } from 'sonner';
+import { getNonComplianceReason } from '@/lib/validators';
 
 interface SchoolLicenseCardProps {
   school: School;
@@ -30,53 +15,15 @@ interface SchoolLicenseCardProps {
   onManage: (school: School) => void;
 }
 
-export const SchoolLicenseCard = ({ 
-  school, 
-  onViewDetails, 
-  onManage 
-}: SchoolLicenseCardProps) => {
-  const [showUserDialog, setShowUserDialog] = useState(false);
-  const [showSwapDialog, setShowSwapDialog] = useState(false);
-  const [showJustificationsDialog, setShowJustificationsDialog] = useState(false);
-  const [showJustificationDialog, setShowJustificationDialog] = useState(false);
+export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLicenseCardProps) => {
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
-  const [pendingAction, setPendingAction] = useState<{
-    type: 'edit' | 'remove' | 'swap';
-    data?: any;
-  } | null>(null);
-  const [editingUser, setEditingUser] = useState<any>(null);
-  const [swappingUserId, setSwappingUserId] = useState<string | null>(null);
-  
-  const { 
-    addUser, 
-    updateUser, 
-    removeUser, 
-    swapUser,
-    getLicenseStatus,
-    getJustificationsBySchool
-  } = useSchoolLicenseStore();
+  const { getLicenseStatus } = useSchoolLicenseStore();
 
   const licenseStatus = getLicenseStatus(school) as LicenseStatus;
   const AVAILABLE_STATUS: LicenseStatus = 'Disponível';
   const utilizationPercent = Math.min(100, (school.usedLicenses / school.totalLicenses) * 100);
-  const nonCompliantUsers = school.users.filter(u => !u.isCompliant);
-  
-  // A lógica de getNonComplianceReason deve ser movida para um utilitário se for complexa.
-  // Por enquanto, vamos simplificar, pois a store já faz a marcação de isCompliant.
-  const getNonComplianceReason = (email: string) => {
-    const domain = email.toLowerCase().split('@')[1];
-    if (!domain) return 'Email inválido';
-    
-    if (domain.includes('gmail.com') || domain.includes('hotmail.com') || domain.includes('yahoo.com')) {
-      return 'Email pessoal não autorizado';
-    }
-    
-    if (!domain.includes('maplebear') && domain !== 'mbcentral.com.br') {
-      return 'Domínio não autorizado pela política Maple Bear';
-    }
-    
-    return 'Email fora da política';
-  };
+  const nonCompliantUsers = school.users.filter((u) => !u.isCompliant);
+
 
   const getLicensesBadgeColor = () => {
     switch (licenseStatus) {
@@ -97,108 +44,6 @@ export const SchoolLicenseCard = ({
     return 'bg-success';
   };
 
-  const handleAddUser = (userData: any) => {
-    // Verificar se a escola ja tem 2 usuarios
-    if (school.users.length >= 2) {
-      toast.error('Esta escola ja possui o limite maximo de 2 usuarios. Para adicionar um novo usuario, voce deve transferir ou excluir um usuario existente.');
-      return;
-    }
-
-    addUser(school.id, userData, {
-      origemSolicitacao: 'E-mail',
-      solicitadoPorNome: userData?.name || 'Portal SAF',
-      solicitadoPorEmail: userData?.email || 'nao-informado@saf.com',
-      observacao: 'Inclusao direta pelo painel',
-      performedBy: 'Portal SAF',
-    });
-    setShowUserDialog(false);
-    toast.success('Usuario adicionado com sucesso');
-  };
-
-  const handleEditUser = (userData: any) => {
-    setPendingAction({ type: 'edit', data: userData });
-    setShowJustificationDialog(true);
-  };
-
-  const handleRemoveUser = (userId: string) => {
-    setPendingAction({ type: 'remove', data: { userId } });
-    setShowJustificationDialog(true);
-  };
-
-  const handleSwapUser = (data: any) => {
-    setPendingAction({ type: 'swap', data });
-    setShowJustificationDialog(true);
-  };
-
-  const handleJustificationConfirm = (justificationData: any) => {
-    if (!pendingAction) return;
-
-    const timestamp = new Date().toISOString();
-    
-    switch (pendingAction.type) {
-      case 'edit':
-        if (editingUser) {
-          updateUser(school.id, editingUser.id, pendingAction.data, {
-            performedBy: justificationData.performedBy,
-            reason: justificationData.reason
-          });
-          setEditingUser(null);
-          setShowUserDialog(false);
-          toast.success('Usuario atualizado com sucesso');
-        }
-        break;
-        
-      case 'remove':
-        removeUser(school.id, pendingAction.data.userId, {
-          performedBy: justificationData.performedBy,
-          reason: justificationData.reason
-        });
-        toast.success('Usuario removido com sucesso');
-        break;
-        
-      case 'swap':
-        if (swappingUserId) {
-          const oldUser = school.users.find(u => u.id === swappingUserId);
-          if (oldUser) {
-            swapUser(school.id, swappingUserId, pendingAction.data.newUser, {
-              schoolId: school.id,
-              schoolName: school.name,
-              oldUser: {
-                name: oldUser.name,
-                email: oldUser.email,
-                role: oldUser.role,
-              },
-              newUser: {
-                name: pendingAction.data.newUser.name,
-                email: pendingAction.data.newUser.email,
-                role: pendingAction.data.newUser.role,
-              },
-              reason: justificationData.reason,
-              performedBy: justificationData.performedBy,
-              // timestamp
-            });
-          }
-          setSwappingUserId(null);
-          setShowSwapDialog(false);
-          toast.success('Usuario substituido com sucesso');
-        }
-        break;
-    }
-    
-    setPendingAction(null);
-    setShowJustificationDialog(false);
-  };
-
-  const openEditDialog = (user: any) => {
-    setEditingUser(user);
-    setShowUserDialog(true);
-  };
-
-  const openSwapDialog = (userId: string) => {
-    setSwappingUserId(userId);
-    setShowSwapDialog(true);
-  };
-
   const handleManageSchool = () => {
     onViewDetails(school);
     onManage(school);
@@ -207,81 +52,85 @@ export const SchoolLicenseCard = ({
 
   return (
     <>
-      <Card className="w-full rounded-xl shadow-sm border-border/40">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <CardTitle className="text-base font-semibold">{school.name}</CardTitle>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                {school.city && (
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <MapPin className="h-3 w-3" />
-                    {school.city}
-                  </div>
-                )}
-                <Badge variant="outline" className="text-xs">
-                  {school.cluster}
-                </Badge>
-              </div>
-            </div>
-          </div>
+      {/* Borda igual ao container de Filtros (Card padrão = rounded-lg) */}
+      <Card className="w-full rounded-lg overflow-hidden shadow-lg border border-border/30 h-full min-h-[420px] flex flex-col bg-white pt-2">
+        <CardHeader className="px-6 sm:px-7 pt-6 pb-2">
+          <CardTitle className="text-lg font-bold leading-snug text-slate-900 break-words max-w-full">
+            {school.name}
+          </CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          {/* License Status */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${getLicensesBadgeColor()}`}>
-                {school.usedLicenses}/{school.totalLicenses} Licencas
-                {licenseStatus === 'Excedido' && ' (Excesso)'}
-              </span>
-              <span className="text-xs text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 flex-1 pt-1 pb-4">
+          <div className="space-y-3 rounded-lg border border-border/40 bg-white/90 p-3 shadow-sm ring-1 ring-border/30">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${getLicensesBadgeColor()}`}>
+                  {school.usedLicenses}/{school.totalLicenses} Licenças
+                </span>
+                {licenseStatus === 'Excedido' && (
+                  <Badge variant="destructive" size="sm">
+                    Excesso
+                  </Badge>
+                )}
+              </div>
+              <span className="text-[11px] text-muted-foreground font-semibold">
                 {utilizationPercent.toFixed(0)}%
               </span>
             </div>
-            <div className="w-full bg-muted rounded-full h-1.5">
-              <div 
-                className={`h-1.5 rounded-full transition-all ${getProgressColor()}`}
+            <div className="w-full bg-muted/50 rounded-full h-3">
+              <div
+                className={`h-3 rounded-full transition-all ${getProgressColor()}`}
                 style={{ width: `${Math.min(100, utilizationPercent)}%` }}
               />
             </div>
-          </div>
-
-          {/* Indicators */}
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <span>{school.users.length} usuarios</span>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <Badge variant="outline" className="bg-background">
+                <Users className="h-3 w-3 mr-1" />
+                {school.users.length} usuarios
+              </Badge>
+              {nonCompliantUsers.length > 0 && (
+                <Badge variant="destructive" className="text-[11px]">
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  {nonCompliantUsers.length} fora da politica
+                </Badge>
+              )}
+              {school.hasRecentJustifications && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background border text-primary text-[11px]">
+                  <Paperclip className="h-3 w-3" />
+                  Referencias
+                </span>
+              )}
             </div>
-            {nonCompliantUsers.length > 0 && (
-              <div className="flex items-center gap-1 text-destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <span>{nonCompliantUsers.length} fora da politica</span>
-              </div>
-            )}
-            {school.hasRecentJustifications && (
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <Paperclip className="h-4 w-4 text-primary" />
-                <span className="text-primary">Referencias (Email/Ticket)</span>
-              </div>
-            )}
           </div>
 
           {/* Users List */}
-          <div className="space-y-2 max-h-40 overflow-y-auto">
-            {school.users.slice(0, 5).map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-2 border-b border-border/50 last:border-b-0">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm font-medium truncate">{user.name}</span>
-                    <Badge variant={user.isCompliant ? "secondary" : "destructive"}>
+          <div className="space-y-1.5 max-h-40 overflow-y-auto rounded-lg border border-border/30 bg-slate-50/80 px-3 py-2 flex-1 shadow-inner">
+            {school.users.slice(0, 3).map((user) => (
+              <button
+                key={user.id}
+                className="w-full text-left"
+                onClick={handleManageSchool}
+              >
+                <div className="flex items-center justify-between gap-3 py-1.5 px-2.5 rounded-[14px] hover:bg-white/80 transition border border-transparent hover:border-border/50">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold truncate">{user.name}</div>
+                    <div className="text-xs text-muted-foreground truncate leading-snug">
+                      {user.email}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge
+                      variant={user.isCompliant ? "muted" : "destructive"}
+                      size="sm"
+                      className="whitespace-nowrap"
+                    >
                       {user.role}
                     </Badge>
                     {!user.isCompliant && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <div className="w-2 h-2 bg-destructive rounded-full"></div>
+                            <div className="w-2 h-2 bg-destructive rounded-full" />
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>{getNonComplianceReason(user.email)}</p>
@@ -290,114 +139,37 @@ export const SchoolLicenseCard = ({
                       </TooltipProvider>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground truncate ml-1">
-                    {user.email}
-                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => openEditDialog(user)}
-                  >
-                    <Edit className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleRemoveUser(user.id)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
+              </button>
             ))}
-            {school.users.length > 5 && (
-              <div className="text-xs text-muted-foreground text-center py-1">
-                +{school.users.length - 5} usuarios adicionais
-              </div>
+            {school.users.length > 3 && (
+              <button
+                className="w-full text-center text-xs text-primary hover:underline py-1"
+                onClick={handleManageSchool}
+              >
+                +{school.users.length - 3} usuários adicionais
+              </button>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col space-y-2 pt-2 border-t">
-            {/* Botao de Acao Principal Condicional */}
-            {licenseStatus === AVAILABLE_STATUS ? (
-              <Button 
-                size="sm" 
-                variant="default" 
-                onClick={() => setShowUserDialog(true)}
-                className="w-full"
+          <div className="flex flex-col space-y-2 pt-1 mt-auto">
+            <div className="grid grid-cols-1 gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleManageSchool}
+                className="w-full justify-center rounded-full border-border/60 shadow-sm font-semibold hover:border-foreground/40 hover:bg-foreground/5"
               >
-                <Plus className="h-3 w-3 mr-1" />
-                Conceder Licenca
+                <Settings className="h-4 w-4 mr-2" />
+                Gerenciar
               </Button>
-            ) : licenseStatus === 'Excedido' ? (
-              <Button 
-                size="sm" 
-                variant="secondary" 
-                onClick={() => openSwapDialog(school.users[0].id)} // Assumindo que o primeiro usuario e o que sera trocado por padrao
-                className="w-full"
-              >
-                <RefreshCw className="h-3 w-3 mr-1" />
-                Transferir Licenca
-              </Button>
-            ) : (
-              <Button 
-                size="sm" 
-                variant="outline" 
-                disabled
-                className="w-full"
-              >
-                Licencas Completas
-              </Button>
-            )}
-            
-            {/* Botao Gerenciar (Substitui Detalhes) */}
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={handleManageSchool}
-              className="w-full"
-            >
-              <Settings className="h-3 w-3 mr-1" />
-              Gerenciar
-            </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Dialogs */}
-      <UserDialog
-        open={showUserDialog}
-        onOpenChange={setShowUserDialog}
-        onSave={editingUser ? handleEditUser : handleAddUser}
-        initialData={editingUser}
-        title={editingUser ? 'Editar Usuario' : 'Adicionar Usuario'}
-      />
-
-      <SwapUserDialog
-        open={showSwapDialog}
-        onOpenChange={setShowSwapDialog}
-        onConfirm={handleSwapUser}
-        currentUser={swappingUserId ? school.users.find(u => u.id === swappingUserId) : null}
-      />
-
-      <JustificationsDialog
-        open={showJustificationsDialog}
-        onOpenChange={setShowJustificationsDialog}
-        schoolId={school.id}
-        schoolName={school.name}
-      />
-
-      <JustificationRequiredDialog
-        open={showJustificationDialog}
-        onOpenChange={setShowJustificationDialog}
-        onConfirm={handleJustificationConfirm}
-        title="Referencia Necessaria"
-        description="Para realizar esta alteracao de licenca, informe o titulo do e-mail ou numero do ticket."
-      />
-
+      {/* Dialog */}
       <SchoolDetailsDialog
         open={showDetailsDialog}
         onOpenChange={setShowDetailsDialog}
@@ -406,5 +178,3 @@ export const SchoolLicenseCard = ({
     </>
   );
 };
-
-

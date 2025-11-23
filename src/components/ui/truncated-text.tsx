@@ -76,17 +76,17 @@ export const TruncatedEmail: React.FC<TruncatedEmailProps> = ({
   const [localPart, domain] = email.split("@");
   
   if (!domain) {
-    return <TruncatedText text={email} className={className} />;
+    return <TruncatedText text={email} className={cn("text-sm leading-tight", className)} />;
   }
 
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className={cn("inline-flex items-center gap-1 cursor-help", className)}>
-            <span className="truncate max-w-[120px]">{localPart}</span>
-            <span className="text-muted-foreground">@</span>
-            <span className="flex-shrink-0">{domain}</span>
+          <span className={cn("inline-flex items-center gap-1 cursor-help text-sm leading-tight", className)}>
+            <span className="truncate max-w-[120px] leading-tight">{localPart}</span>
+            <span className="text-muted-foreground leading-tight">@</span>
+            <span className="flex-shrink-0 leading-tight">{domain}</span>
           </span>
         </TooltipTrigger>
         <TooltipContent side="top">

@@ -76,5 +76,57 @@
     "updatedAt": "2025-11-17T12:20:00Z",
     "createdBy": "Sistema",
     "usageCount": 0
+  },
+  {
+    "id": "kb-auth-header",
+    "title": "Login, papéis e avatar do header",
+    "content": "Login.tsx autentica com login/saveAuthToken/saveUser, salva userEmail no localStorage e configura o estado global via useAuthStore com mapRole (Admin/Coordinator/Agent, padrão Agent). Após autenticar exibe toast e redireciona para /dashboard. O Header lê userEmail para montar iniciais do avatar e mostra o item Gerenciamento somente para Admin; o dropdown também leva para Base de Conhecimento e faz logout via authService.logout + toast.",
+    "category": "onboarding",
+    "tags": ["login", "auth", "papéis", "header", "avatar"],
+    "status": "ativo",
+    "priority": "alta",
+    "createdAt": "2025-11-17T12:25:00Z",
+    "updatedAt": "2025-11-17T12:25:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  },
+  {
+    "id": "kb-dashboard-home",
+    "title": "Tela inicial com atalhos e painel Canva embutido",
+    "content": "Index.tsx traz a home com cards rápidos (Painel Canva, Tickets, Base de Conhecimento) e estatísticas destacadas. A seção \"Painel completo, já na tela inicial\" renderiza CanvaDashboard dentro da própria home, com CTA para abrir em tela cheia. Há botões para navegar às rotas /dashboard/canva, /tickets e /knowledge-base e o FloatingAIChat fica disponível no rodapé para consultas rápidas.",
+    "category": "dashboard",
+    "tags": ["home", "atalhos", "canva", "tickets", "conhecimento", "ia"],
+    "status": "ativo",
+    "priority": "media",
+    "createdAt": "2025-11-17T12:27:00Z",
+    "updatedAt": "2025-11-17T12:27:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  },
+  {
+    "id": "kb-agenda-saf",
+    "title": "Agenda SAF mensal e eventos",
+    "content": "AgendaSafPage.tsx exibe calendário mensal com navegação por mês e lista de eventos do dia selecionado. Os eventos são carregados por React Query (queryKey [\"agenda-events\", mês]) via fetchEvents e gravados com createEvent/updateEvent/deleteEvent. NovoEventoModal abre para criar/editar; cada card mostra horário formatado, tipo, criador e botões de editar/remover; toasts notificam sucesso ou erro.",
+    "category": "agenda",
+    "tags": ["eventos", "calendario", "react-query", "modal", "toasts"],
+    "status": "ativo",
+    "priority": "media",
+    "createdAt": "2025-11-17T12:30:00Z",
+    "updatedAt": "2025-11-17T12:30:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
+  },
+  {
+    "id": "kb-knowledge-base",
+    "title": "Base de conhecimento e prompts da IA",
+    "content": "KnowledgeBasePage.tsx carrega AIKnowledgeBase com abas \"Base de Conhecimento\" e \"Prompts da IA\". Os artigos ficam no localStorage (chave saf_knowledge_base) e são semeados por public/knowledge-base/default_knowledge.json na primeira carga. Uploads de .txt/.md/.csv/.json viram artigos (categoria \"documentos\" por padrão) e prompts ficam em saf_ai_prompts. O FloatingAIChat usa buildKnowledgeSummaries + subscribeToKnowledgeBase para anexar esse contexto às respostas.",
+    "category": "conhecimento",
+    "tags": ["knowledge-base", "ia", "prompts", "upload", "localStorage"],
+    "status": "ativo",
+    "priority": "alta",
+    "createdAt": "2025-11-17T12:32:00Z",
+    "updatedAt": "2025-11-17T12:32:00Z",
+    "createdBy": "Sistema",
+    "usageCount": 0
   }
 ]

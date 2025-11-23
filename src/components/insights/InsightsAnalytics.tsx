@@ -36,7 +36,6 @@ const InsightsAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<string>("30d");
-  const [selectedMetric, setSelectedMetric] = useState<string>("vouchers");
 
   useEffect(() => {
     loadAnalyticsData();

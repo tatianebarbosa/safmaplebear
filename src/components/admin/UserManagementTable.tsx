@@ -109,11 +109,11 @@ const api = {
 const getRoleBadge = (role: Role) => {
   switch (role) {
     case 'Admin':
-      return <Badge className="bg-red-100 text-red-800 hover:bg-red-200">Administrador</Badge>;
+      return <Badge variant="muted" size="sm">Administrador</Badge>;
     case 'Coordinator':
-      return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">Coordenador</Badge>;
+      return <Badge variant="muted" size="sm">Coordenador</Badge>;
     case 'Agent':
-      return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Agente</Badge>;
+      return <Badge variant="muted" size="sm">Agente</Badge>;
     default:
       return <Badge variant="outline">{role}</Badge>;
   }

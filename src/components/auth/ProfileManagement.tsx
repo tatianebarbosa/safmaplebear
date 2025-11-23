@@ -1,25 +1,47 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { DELAY_PROFILE_UPDATE } from "@/lib/constants";
 import { User, Users, Key, Trash2, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface UserProfile {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user' | 'maintenance';
+  role: "admin" | "user" | "maintenance";
   profileImage?: string;
-  status: 'active' | 'pending' | 'blocked';
+  status: "active" | "pending" | "blocked";
   createdAt: string;
   lastLogin: string;
   sessionExpiry: string;
@@ -32,7 +54,7 @@ interface PendingUser {
   name: string;
   email: string;
   requestedAt: string;
-  status: 'pending' | 'approved' | 'denied';
+  status: "pending" | "approved" | "denied";
 }
 
 const ProfileManagement = () => {
@@ -46,11 +68,11 @@ const ProfileManagement = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   // Carregar dados do usuário atual e listas
@@ -60,28 +82,29 @@ const ProfileManagement = () => {
     loadAllUsers();
   }, []);
 
+
   const loadUserData = () => {
-    const userData = localStorage.getItem('saf_current_user');
+    const userData = localStorage.getItem("saf_current_user");
     if (userData) {
       const user = JSON.parse(userData);
       setCurrentUser(user);
       setFormData({
         ...formData,
         name: user.name,
-        email: user.email
+        email: user.email,
       });
     }
   };
 
   const loadPendingUsers = () => {
-    const pending = localStorage.getItem('saf_pending_users');
+    const pending = localStorage.getItem("saf_pending_users");
     if (pending) {
       setPendingUsers(JSON.parse(pending));
     }
   };
 
   const loadAllUsers = () => {
-    const users = localStorage.getItem('saf_all_users');
+    const users = localStorage.getItem("saf_all_users");
     if (users) {
       setAllUsers(JSON.parse(users));
     }
@@ -89,23 +112,29 @@ const ProfileManagement = () => {
 
   // Verificar se domínio é permitido
   const isAllowedDomain = (email: string): boolean => {
-    const allowedDomains = ['@mbcentral.com.br', '@seb.com.br', '@sebsa.com.br'];
-    return allowedDomains.some(domain => email.toLowerCase().includes(domain));
+    const allowedDomains = [
+      "@maplebear.com.br",
+      "@mbcentral.com.br",
+      "@seb.com.br",
+      "@sebsa.com.br",
+    ];
+    return allowedDomains.some((domain) =>
+      email.toLowerCase().includes(domain)
+    );
   };
-
 
 
   // Atualizar perfil
   const updateProfile = async () => {
     setIsLoading(true);
     // Simulacao de chamada de API
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, DELAY_PROFILE_UPDATE));
 
     if (!isAllowedDomain(formData.email)) {
       toast({
         title: "Email nao permitido",
-        description: "Use emails corporativos @mbcentral, @seb ou @sebsa",
-        variant: "destructive"
+        description: "Use emails corporativos @maplebear, @mbcentral, @seb ou @sebsa",
+        variant: "destructive",
       });
       setIsLoading(false);
       return;
@@ -119,18 +148,18 @@ const ProfileManagement = () => {
     const updatedUser = {
       ...currentUser,
       name: formData.name,
-      email: formData.email
+      email: formData.email,
     };
 
     setCurrentUser(updatedUser);
-    localStorage.setItem('saf_current_user', JSON.stringify(updatedUser));
-    localStorage.setItem('userEmail', formData.email);
-    
+    localStorage.setItem("saf_current_user", JSON.stringify(updatedUser));
+    localStorage.setItem("userEmail", formData.email);
+
     toast({
       title: "Perfil atualizado",
-      description: "Suas informacoes foram atualizadas com sucesso"
+      description: "Suas informacoes foram atualizadas com sucesso",
     });
-    
+
     setIsProfileOpen(false);
     setIsLoading(false);
   };
@@ -141,7 +170,7 @@ const ProfileManagement = () => {
       toast({
         title: "Senhas não conferem",
         description: "A nova senha e confirmação devem ser iguais",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -150,7 +179,7 @@ const ProfileManagement = () => {
       toast({
         title: "Senha muito fraca",
         description: "A senha deve ter pelo menos 8 caracteres",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -158,49 +187,51 @@ const ProfileManagement = () => {
     // Simular alteração de senha
     toast({
       title: "Senha alterada",
-      description: "Sua senha foi alterada com sucesso"
+      description: "Sua senha foi alterada com sucesso",
     });
-    
+
     setFormData({
       ...formData,
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     });
-    
+
     setIsPasswordOpen(false);
   };
 
   // Aprovar usuário pendente
   const approveUser = (userId: string) => {
-    const user = pendingUsers.find(u => u.id === userId);
+    const user = pendingUsers.find((u) => u.id === userId);
     if (!user) return;
 
     const newUser: UserProfile = {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: 'user',
-      status: 'active',
+      role: "user",
+      status: "active",
       createdAt: user.requestedAt,
       lastLogin: new Date().toISOString(),
-      sessionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 semana
+      sessionExpiry: new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
+      ).toISOString(), // 1 semana
       approvedBy: currentUser?.email,
-      approvedAt: new Date().toISOString()
+      approvedAt: new Date().toISOString(),
     };
 
-    const updatedPending = pendingUsers.filter(u => u.id !== userId);
+    const updatedPending = pendingUsers.filter((u) => u.id !== userId);
     const updatedAllUsers = [...allUsers, newUser];
 
     setPendingUsers(updatedPending);
     setAllUsers(updatedAllUsers);
-    
-    localStorage.setItem('saf_pending_users', JSON.stringify(updatedPending));
-    localStorage.setItem('saf_all_users', JSON.stringify(updatedAllUsers));
+
+    localStorage.setItem("saf_pending_users", JSON.stringify(updatedPending));
+    localStorage.setItem("saf_all_users", JSON.stringify(updatedAllUsers));
 
     toast({
       title: "Usuário aprovado",
-      description: `${user.name} foi aprovado e pode acessar o sistema`
+      description: `${user.name} foi aprovado e pode acessar o sistema`,
     });
   };
 
@@ -215,22 +246,22 @@ const ProfileManagement = () => {
 
   const denyUser = (userId: string) => {
     // Ação real de negação (simulada)
-    const updatedPending = pendingUsers.filter(u => u.id !== userId);
+    const updatedPending = pendingUsers.filter((u) => u.id !== userId);
     setPendingUsers(updatedPending);
-    localStorage.setItem('saf_pending_users', JSON.stringify(updatedPending));
+    localStorage.setItem("saf_pending_users", JSON.stringify(updatedPending));
 
     toast({
       title: "Acesso negado",
       description: "Usuário foi removido da lista de pendentes",
-      variant: "destructive"
+      variant: "destructive",
     });
   };
   const createUser = () => {
     if (!isAllowedDomain(formData.email)) {
       toast({
         title: "Email não permitido",
-        description: "Use emails corporativos @mbcentral, @seb ou @sebsa",
-        variant: "destructive"
+        description: "Use emails corporativos @maplebear, @mbcentral, @seb ou @sebsa",
+        variant: "destructive",
       });
       return;
     }
@@ -239,37 +270,45 @@ const ProfileManagement = () => {
       id: `user_${Date.now()}`,
       name: formData.name,
       email: formData.email,
-      role: 'user',
-      status: 'active',
+      role: "user",
+      status: "active",
       createdAt: new Date().toISOString(),
       lastLogin: new Date().toISOString(),
-      sessionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      sessionExpiry: new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
+      ).toISOString(),
       approvedBy: currentUser?.email,
-      approvedAt: new Date().toISOString()
+      approvedAt: new Date().toISOString(),
     };
 
     const updatedUsers = [...allUsers, newUser];
     setAllUsers(updatedUsers);
-    localStorage.setItem('saf_all_users', JSON.stringify(updatedUsers));
+    localStorage.setItem("saf_all_users", JSON.stringify(updatedUsers));
 
     toast({
       title: "Usuário criado",
-      description: `${formData.name} foi adicionado ao sistema`
+      description: `${formData.name} foi adicionado ao sistema`,
     });
 
-    setFormData({ ...formData, name: '', email: '' });
+    setFormData({ ...formData, name: "", email: "" });
     setNewUserOpen(false);
   };
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'default';
-      case 'maintenance': return 'destructive';
-      default: return 'secondary';
+      case "admin":
+      case "maintenance":
+      default:
+        return "muted";
     }
   };
 
@@ -282,17 +321,23 @@ const ProfileManagement = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Gerenciamento de Perfil</h1>
-          <p className="text-muted-foreground">Configure seu perfil e gerencie usuários</p>
+          <p className="text-muted-foreground">
+            Configure seu perfil e gerencie usuários
+          </p>
         </div>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">Meu Perfil</TabsTrigger>
-          {currentUser.role === 'admin' && (
+          {currentUser.role === "admin" && (
             <>
-              <TabsTrigger value="pending">Aprovações ({pendingUsers.length})</TabsTrigger>
-              <TabsTrigger value="users">Usuários ({allUsers.length})</TabsTrigger>
+              <TabsTrigger value="pending">
+                Aprovações ({pendingUsers.length})
+              </TabsTrigger>
+              <TabsTrigger value="users">
+                Usuários ({allUsers.length})
+              </TabsTrigger>
             </>
           )}
         </TabsList>
@@ -302,7 +347,9 @@ const ProfileManagement = () => {
           <Card>
             <CardHeader>
               <CardTitle>Informações do Perfil</CardTitle>
-              <CardDescription>Gerencie suas informações pessoais e segurança</CardDescription>
+              <CardDescription>
+                Gerencie suas informações pessoais e segurança
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center space-x-4">
@@ -319,9 +366,7 @@ const ProfileManagement = () => {
                     <Badge variant={getRoleColor(currentUser.role) as any}>
                       {currentUser.role}
                     </Badge>
-                    <Badge variant="outline">
-                      {currentUser.status}
-                    </Badge>
+                    <Badge variant="outline">{currentUser.status}</Badge>
                   </div>
                 </div>
               </div>
@@ -330,13 +375,15 @@ const ProfileManagement = () => {
                 <div>
                   <Label className="text-sm font-medium">Último Login</Label>
                   <p className="text-sm text-muted-foreground">
-                    {new Date(currentUser.lastLogin).toLocaleString('pt-BR')}
+                    {new Date(currentUser.lastLogin).toLocaleString("pt-BR")}
                   </p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">Sessão Expira</Label>
                   <p className="text-sm text-muted-foreground">
-                    {new Date(currentUser.sessionExpiry).toLocaleString('pt-BR')}
+                    {new Date(currentUser.sessionExpiry).toLocaleString(
+                      "pt-BR"
+                    )}
                   </p>
                 </div>
               </div>
@@ -362,7 +409,9 @@ const ProfileManagement = () => {
                         <Input
                           id="name"
                           value={formData.name}
-                          onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                          }
                         />
                       </div>
                       <div>
@@ -371,13 +420,20 @@ const ProfileManagement = () => {
                           id="email"
                           type="email"
                           value={formData.email}
-                          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                          onChange={(e) =>
+                            setFormData({ ...formData, email: e.target.value })
+                          }
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          Apenas emails @mbcentral, @seb ou @sebsa são permitidos
+                          Apenas emails @maplebear, @mbcentral, @seb ou @sebsa são
+                          permitidos
                         </p>
                       </div>
-                      <Button onClick={updateProfile} className="w-full" isLoading={isLoading}>
+                      <Button
+                        onClick={updateProfile}
+                        className="w-full"
+                        isLoading={isLoading}
+                      >
                         Salvar Alterações
                       </Button>
                     </div>
@@ -405,7 +461,12 @@ const ProfileManagement = () => {
                           id="currentPassword"
                           type="password"
                           value={formData.currentPassword}
-                          onChange={(e) => setFormData({...formData, currentPassword: e.target.value})}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              currentPassword: e.target.value,
+                            })
+                          }
                         />
                       </div>
                       <div>
@@ -414,16 +475,28 @@ const ProfileManagement = () => {
                           id="newPassword"
                           type="password"
                           value={formData.newPassword}
-                          onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              newPassword: e.target.value,
+                            })
+                          }
                         />
                       </div>
                       <div>
-                        <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                        <Label htmlFor="confirmPassword">
+                          Confirmar Nova Senha
+                        </Label>
                         <Input
                           id="confirmPassword"
                           type="password"
                           value={formData.confirmPassword}
-                          onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              confirmPassword: e.target.value,
+                            })
+                          }
                         />
                       </div>
                       <Button onClick={changePassword} className="w-full">
@@ -438,7 +511,7 @@ const ProfileManagement = () => {
         </TabsContent>
 
         {/* Aprovações - apenas para admin */}
-        {currentUser.role === 'admin' && (
+        {currentUser.role === "admin" && (
           <TabsContent value="pending" className="space-y-6">
             <Card>
               <CardHeader>
@@ -455,58 +528,72 @@ const ProfileManagement = () => {
                     </p>
                   ) : (
                     pendingUsers.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div
+                        key={user.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
                         <div className="flex items-center gap-4">
                           <Avatar>
-                            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                            <AvatarFallback>
+                              {getInitials(user.name)}
+                            </AvatarFallback>
                           </Avatar>
                           <div>
                             <h4 className="font-semibold">{user.name}</h4>
-                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {user.email}
+                            </p>
                             <p className="text-xs text-muted-foreground">
-                              Solicitado em: {new Date(user.requestedAt).toLocaleString('pt-BR')}
+                              Solicitado em:{" "}
+                              {new Date(user.requestedAt).toLocaleString(
+                                "pt-BR"
+                              )}
                             </p>
                           </div>
                         </div>
-              <div className="flex gap-2">
-                <Button 
-                  size="sm" 
-                  onClick={() => approveUser(user.id)}
-                  className="bg-success hover:bg-success/80 text-success-foreground"
-                >
-                  <CheckCircle className="w-4 h-4 mr-1" />
-                  Aprovar
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button 
-                      size="sm" 
-                      variant="destructive"
-                      onClick={() => setDenyUserId(user.id)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Negar
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Tem certeza que deseja negar o acesso?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Esta ação removerá o usuário da lista de pendentes. Ele precisará refazer a solicitação.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction 
-                        onClick={handleDenyUser} 
-                        className="bg-destructive hover:bg-destructive/90"
-                      >
-                        Negar Acesso
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => approveUser(user.id)}
+                            className="bg-success hover:bg-success/80 text-success-foreground"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Aprovar
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => setDenyUserId(user.id)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Negar
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Tem certeza que deseja negar o acesso?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Esta ação removerá o usuário da lista de
+                                  pendentes. Ele precisará refazer a
+                                  solicitação.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={handleDenyUser}
+                                  className="bg-destructive hover:bg-destructive/90"
+                                >
+                                  Negar Acesso
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </div>
                     ))
                   )}
@@ -517,14 +604,16 @@ const ProfileManagement = () => {
         )}
 
         {/* Usuários - apenas para admin */}
-        {currentUser.role === 'admin' && (
+        {currentUser.role === "admin" && (
           <TabsContent value="users" className="space-y-6">
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
                     <CardTitle>Usuários do Sistema</CardTitle>
-                    <CardDescription>Gerencie todos os usuários ativos</CardDescription>
+                    <CardDescription>
+                      Gerencie todos os usuários ativos
+                    </CardDescription>
                   </div>
                   <Dialog open={newUserOpen} onOpenChange={setNewUserOpen}>
                     <DialogTrigger asChild>
@@ -546,16 +635,25 @@ const ProfileManagement = () => {
                           <Input
                             id="newUserName"
                             value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
+                            onChange={(e) =>
+                              setFormData({ ...formData, name: e.target.value })
+                            }
                           />
                         </div>
                         <div>
-                          <Label htmlFor="newUserEmail">Email Corporativo</Label>
+                          <Label htmlFor="newUserEmail">
+                            Email Corporativo
+                          </Label>
                           <Input
                             id="newUserEmail"
                             type="email"
                             value={formData.email}
-                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                email: e.target.value,
+                              })
+                            }
                           />
                         </div>
                         <Button onClick={createUser} className="w-full">
@@ -569,17 +667,27 @@ const ProfileManagement = () => {
               <CardContent>
                 <div className="space-y-4">
                   {allUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center gap-4">
                         <Avatar>
                           <AvatarImage src={user.profileImage} />
-                          <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                          <AvatarFallback>
+                            {getInitials(user.name)}
+                          </AvatarFallback>
                         </Avatar>
                         <div>
                           <h4 className="font-semibold">{user.name}</h4>
-                          <p className="text-sm text-muted-foreground">{user.email}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {user.email}
+                          </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge variant={getRoleColor(user.role) as any} className="text-xs">
+                            <Badge
+                              variant={getRoleColor(user.role) as any}
+                              className="text-xs"
+                            >
                               {user.role}
                             </Badge>
                             <Badge variant="outline" className="text-xs">

@@ -11,7 +11,7 @@ interface RankingTableProps {
 }
 
 const RankingTable = ({ changes, showComparison = true }: RankingTableProps) => {
-  const getTrendIcon = (trend: string, positionChange: number) => {
+  const getTrendIcon = (trend: string) => {
     switch (trend) {
       case 'up':
         return <TrendingUp className="w-4 h-4 text-success" />;
@@ -68,7 +68,7 @@ const RankingTable = ({ changes, showComparison = true }: RankingTableProps) => 
                 key={change.email}
                 className={cn(
                   "animate-slide-up",
-                  change.currentPosition <= 3 && "bg-gradient-to-r from-secondary/10 to-transparent"
+                  change.currentPosition <= 3 && "bg-secondary/10"
                 )}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
@@ -132,7 +132,7 @@ const RankingTable = ({ changes, showComparison = true }: RankingTableProps) => 
                 {showComparison && (
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
-                      {getTrendIcon(change.trend, change.positionChange)}
+                      {getTrendIcon(change.trend)}
                       <span className={cn(
                         "text-xs font-medium",
                         change.trend === 'up' ? "text-success" :

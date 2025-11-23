@@ -2,6 +2,7 @@ import { generateCanvaOverview, processSchoolsWithUsers } from '@/lib/officialDa
 import type { CanvaOverviewData, ProcessedSchoolData } from '@/types/officialData';
 
 const CANVA_HISTORY_PATH = '/data/canva_history.json';
+const MAX_LICENSES_PER_SCHOOL = 2;
 
 type NullableNumber = number | null | undefined;
 
@@ -38,6 +39,12 @@ const formatNumber = (value: NullableNumber): string => {
 const formatPercent = (value: NullableNumber): string => {
   if (typeof value !== 'number' || Number.isNaN(value)) return 'N/A';
   return `${value.toFixed(1).replace('.', ',')}%`;
+};
+
+const buildSchoolPanelUrl = (schoolId?: string, basePath?: string): string | null => {
+  if (!schoolId || !basePath) return null;
+  const normalizedBase = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
+  return `${normalizedBase}/${schoolId}`;
 };
 
 const formatDate = (value?: string): string => {
@@ -111,6 +118,35 @@ export const loadDashboardBIContext = async (): Promise<DashboardBIContext | nul
 const sanitizeText = (value: string): string =>
   normalizeText(value).replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
 
+const levenshteinDistance = (a: string, b: string): number => {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+
+  const matrix = Array.from({ length: a.length + 1 }, () =>
+    Array.from({ length: b.length + 1 }, () => 0)
+  );
+
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+
+  return matrix[a.length][b.length];
+};
+
+const hasFuzzyMatch = (token: string, haystack: string[], tolerance = 1): boolean =>
+  haystack.some((term) => levenshteinDistance(token, term) <= tolerance);
+
 const KEYWORDS = [
   'canva',
   'licenca',
@@ -145,17 +181,45 @@ const findSchoolInsight = (question: string, schools: ProcessedSchoolData[]): Pr
   const sanitizedQuestion = sanitizeText(question);
   const explicitTerm = extractSchoolTerm(question);
   const normalizedTerm = explicitTerm ? sanitizeText(explicitTerm) : '';
-  const minScore = normalizedTerm ? 0.7 : 0.5;
+  const genericTokens = new Set(['maple', 'bear', 'mb', 'escola', 'unidade', 'colegio', 'colegio']);
+  const minScore = normalizedTerm ? 0.8 : 0.5;
+
+  const questionTokens = sanitizedQuestion
+    .split(' ')
+    .filter((token) => token.length > 2 && !genericTokens.has(token));
+
   let best: { data: ProcessedSchoolData; score: number } | null = null;
 
-  for (const entry of schools) {
+  const pool = normalizedTerm
+    ? schools.filter((entry) => sanitizeText(entry.school?.name ?? '').includes(normalizedTerm))
+    : schools;
+
+  if (normalizedTerm && pool.length === 0) {
+    return null;
+  }
+
+  for (const entry of pool) {
     const schoolName = entry.school?.name;
     if (!schoolName) continue;
     const normalizedName = sanitizeText(schoolName);
     if (!normalizedName) continue;
 
-    const tokens = normalizedName.split(' ').filter((token) => token.length > 3);
-    const tokenMatches = tokens.filter((token) => sanitizedQuestion.includes(token)).length;
+    const tokens = normalizedName
+      .split(' ')
+      .filter((token) => token.length > 2 && !genericTokens.has(token));
+
+    if (!tokens.length) continue;
+
+    const tokenMatches = tokens.filter(
+      (token) => sanitizedQuestion.includes(token) || hasFuzzyMatch(token, questionTokens, 1)
+    ).length;
+    const specificMatches = tokens.filter(
+      (token) => questionTokens.includes(token) || hasFuzzyMatch(token, questionTokens, 1)
+    ).length;
+
+    if (questionTokens.length && specificMatches === 0) {
+      continue;
+    }
 
     let score = tokens.length ? tokenMatches / tokens.length : 0;
     if (tokenMatches >= 2) {
@@ -177,6 +241,33 @@ const findSchoolInsight = (question: string, schools: ProcessedSchoolData[]): Pr
     return best.data;
   }
   return null;
+};
+
+export const resolveSchoolPanelSource = (
+  question: string,
+  context: DashboardBIContext | null,
+  panelBasePath?: string
+):
+  | {
+      id: string;
+      title: string;
+      summary: string;
+      url: string;
+    }
+  | null => {
+  if (!context) return null;
+  const targetSchool = findSchoolInsight(question, context.schools);
+  if (!targetSchool) return null;
+
+  const url = buildSchoolPanelUrl(targetSchool.school?.id, panelBasePath);
+  if (!url) return null;
+
+  return {
+    id: targetSchool.school.id,
+    title: `Abrir escola no Painel (ID: ${targetSchool.school.id})`,
+    summary: targetSchool.school.name,
+    url,
+  };
 };
 
 const buildHistoryHighlights = (history: CanvaHistoryEntry[]) => {
@@ -334,45 +425,22 @@ const buildVisualizationSuggestions = (
   return suggestions.join(' ');
 };
 
-const buildSchoolAnswer = (schoolData: ProcessedSchoolData, history: CanvaHistoryEntry[]): string => {
-  const { school, totalUsers, estimatedLicenses, licenseStatus, nonCompliantUsers, compliantUsers } = schoolData;
-  const usagePercent = estimatedLicenses
-    ? (totalUsers / Math.max(estimatedLicenses, 1)) * 100
-    : null;
-  const complianceRate = totalUsers > 0 ? (compliantUsers / totalUsers) * 100 : null;
-  const historySummary = buildHistoryHighlights(history) || 'Sem histórico recente registrado no canva_history.json.';
+const buildSchoolAnswer = (schoolData: ProcessedSchoolData): string => {
+  const { school, totalUsers } = schoolData;
+  if (typeof totalUsers !== 'number') {
+    return 'Nao encontrei essa informacao na base local. No sistema SAF, voce pode verificar isso na tela de Licencas Canva pesquisando o nome da escola.';
+  }
 
-  const highlights = [
-    `${formatNumber(totalUsers)} usuários ativos (${licenseStatus})`,
-    `Ocupação estimada: ${formatPercent(usagePercent)}`,
-    `Taxa de conformidade: ${formatPercent(complianceRate)}${nonCompliantUsers ? ` (${formatNumber(nonCompliantUsers)} fora da política)` : ''}`,
-  ]
-    .filter(Boolean)
-    .join(' | ');
+  const licenseLimit = MAX_LICENSES_PER_SCHOOL;
+  const overLimit = Math.max(totalUsers - licenseLimit, 0);
+  const limitNote =
+    totalUsers > licenseLimit
+      ? `Atencao: limite de ${licenseLimit} licencas por escola, excesso de ${formatNumber(overLimit)} usuarios.`
+      : `Dentro do limite de ${licenseLimit} licencas por escola.`;
 
-  const causes = nonCompliantUsers
-    ? 'Usuários fora da política sugerem cadastros manuais com domínios externos ou contas sem revisão recente.'
-    : 'Sem riscos aparentes; mantenha apenas o monitoramento das próximas matrículas.';
-
-  const metricsLine = [
-    `Comparar evolução semanal de usuários vs. limite (${formatNumber(estimatedLicenses)} licenças previstas).`,
-    'Acompanhar conformidade segmentada por função (aluno x professor x administrador).',
-  ].join(' ');
-
-  const visualizationLine = [
-    'Linha do tempo dedicada para a escola com checkpoints das últimas coletas.',
-    'Gráfico circular de conformidade e ranking interno por função para priorizar ajustes.',
-  ].join(' ');
-
-  return [
-    `- **Visão geral do período:** ${school.name} mantém ${formatNumber(
-      totalUsers
-    )} usuários vinculados (${licenseStatus}). ${historySummary}`,
-    `- **Destaques:** ${highlights}`,
-    `- **Possíveis causas:** ${causes}`,
-    `- **Sugestões de métricas extras:** ${metricsLine}`,
-    `- **Sugestões de melhoria de visualização:** ${visualizationLine}`,
-  ].join('\n');
+  return `${school.name} esta com ${formatNumber(totalUsers)} usuarios ativos/vinculados. Licencas usadas: ${formatNumber(
+    totalUsers
+  )}. ${limitNote}`;
 };
 
 export const buildBIAnswer = (question: string, context: DashboardBIContext | null): string | null => {
@@ -389,7 +457,7 @@ export const buildBIAnswer = (question: string, context: DashboardBIContext | nu
 
   const targetSchool = findSchoolInsight(question, schools);
   if (targetSchool) {
-    return buildSchoolAnswer(targetSchool, history);
+    return buildSchoolAnswer(targetSchool);
   }
 
   const historySummary = buildHistoryHighlights(history);

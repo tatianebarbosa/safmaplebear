@@ -11,7 +11,7 @@ import {
   isEmailCompliant
 } from '@/lib/safDataService';
 import { School } from '@/types/safData';
-import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+import { getMaxLicensesPerSchool } from '@/config/licenseLimits';
 import {
 
 
@@ -175,7 +175,7 @@ export const processSchoolsWithUsers = async (): Promise<ProcessedSchoolData[]> 
 const estimateSchoolLicenses = (school: OfficialSchool, userCount: number): number => {
   return school.id === 'no-school'
     ? Math.max(userCount, 1)
-    : MAX_LICENSES_PER_SCHOOL;
+    : getMaxLicensesPerSchool();
 };
 
 export const generateCanvaOverview = async (): Promise<CanvaOverviewData> => {
@@ -334,6 +334,13 @@ export const buildFallbackData = async (): Promise<{
   const officialSchools = new Map<string, OfficialSchool>();
   const usersBySchool = new Map<string, OfficialUser[]>();
 
+  // Inclui todas as escolas mesmo antes de processar licen\u00e7as para mant\u00ea-las vis\u00edveis.
+  schools.forEach((school) => {
+    const key = school.id.toString();
+    officialSchools.set(key, toOfficialSchool(school));
+    usersBySchool.set(key, []);
+  });
+
   licenseUsers.forEach((user, idx) => {
     const matchedSchool = findSchool(user.escolaId, user.escolaNome);
     if (matchedSchool) {
@@ -362,28 +369,13 @@ export const buildFallbackData = async (): Promise<{
   });
 
   const processedData: ProcessedSchoolData[] = [];
-  usersBySchool.forEach((bucket, schoolId) => {
-    const officialSchool =
-      schoolId !== 'no-school' ? officialSchools.get(schoolId) : undefined;
-
+  officialSchools.forEach((officialSchool, schoolId) => {
+    const bucket = usersBySchool.get(schoolId) ?? [];
     const totalUsers = bucket.length;
-    const estimatedLicenses =
-      schoolId === 'no-school'
-        ? Math.max(totalUsers, 1)
-        : MAX_LICENSES_PER_SCHOOL;
+    const estimatedLicenses = getMaxLicensesPerSchool();
 
     processedData.push({
-      school:
-        officialSchool ??
-        ({
-          id: 'no-school',
-          name: 'Usuários sem escola',
-          status: 'Ativa',
-          cluster: 'Outros',
-          city: '',
-          state: '',
-          region: ''
-        } as OfficialSchool),
+      school: officialSchool,
       users: bucket,
       totalUsers,
       compliantUsers: bucket.filter((user) => user.isCompliant).length,
@@ -392,6 +384,32 @@ export const buildFallbackData = async (): Promise<{
       licenseStatus: calculateLicenseStatusUtil(totalUsers, estimatedLicenses)
     });
   });
+
+  const usersWithoutSchool = usersBySchool.get('no-school') || [];
+  if (usersWithoutSchool.length > 0) {
+    const compliantUsers = usersWithoutSchool.filter((u) => u.isCompliant).length;
+
+    processedData.push({
+      school: {
+        id: 'no-school',
+        name: 'Usuarios sem escola',
+        status: 'Ativa',
+        cluster: 'Outros',
+        city: '',
+        state: '',
+        region: ''
+      } as OfficialSchool,
+      users: usersWithoutSchool,
+      totalUsers: usersWithoutSchool.length,
+      compliantUsers,
+      nonCompliantUsers: usersWithoutSchool.length - compliantUsers,
+      estimatedLicenses: Math.max(usersWithoutSchool.length, 1),
+      licenseStatus: calculateLicenseStatusUtil(
+        usersWithoutSchool.length,
+        Math.max(usersWithoutSchool.length, 1)
+      )
+    });
+  }
 
   const compliantUsers = licenseUsers.filter((u) => isEmailCompliant(u.email)).length;
   const nonCompliantUsers = licenseUsers.length - compliantUsers;
@@ -411,8 +429,8 @@ export const buildFallbackData = async (): Promise<{
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  const schoolsWithUsers = Array.from(usersBySchool.keys()).filter(
-    (key) => key !== 'no-school'
+  const schoolsWithUsers = Array.from(usersBySchool.entries()).filter(
+    ([key, bucket]) => key !== 'no-school' && bucket.length > 0
   ).length;
 
   const overview: CanvaOverviewData = {

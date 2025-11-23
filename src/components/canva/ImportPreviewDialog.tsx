@@ -148,7 +148,7 @@ export const ImportPreviewDialog = ({
                               <AlertTriangle className="h-4 w-4 text-destructive" />
                             )}
                             <span className="font-medium text-sm">{item.name}</span>
-                            <Badge variant={item.validRole ? "default" : "destructive"} className="text-xs">
+                            <Badge variant={item.validRole ? "success" : "destructive"} className="text-xs">
                               {item.role}
                             </Badge>
                           </div>

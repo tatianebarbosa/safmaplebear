@@ -1,4 +1,5 @@
-﻿import { MAX_LICENSES_PER_SCHOOL } from '@/config/licenseLimits';
+﻿import { getMaxLicensesPerSchool } from '@/config/licenseLimits';
+import { isEmailCompliant } from '@/lib/safDataService';
 
 export interface CanvaUser {
   id: string;
@@ -12,7 +13,7 @@ export interface CanvaUser {
   designsViewed: number;
   school?: string;
   schoolId?: string;
-  isCompliant: boolean; // Se está dentro da política de domínio
+  isCompliant: boolean; // Se est� dentro da pol�tica de dom�nio
   complianceIssue?: string;
   period: '30d' | '3m' | '6m' | '12m';
 }
@@ -85,13 +86,7 @@ interface LicenseAction {
   performedBy: string;
 }
 
-// Domínios permitidos pela política
-const COMPLIANT_DOMAINS = ['maplebear.com.br', 'sebsa.com.br', 'seb.com.br'];
-
-const isEmailCompliant = (email: string): boolean => {
-  return COMPLIANT_DOMAINS.some(domain => email.toLowerCase().includes(domain));
-};
-
+// Dom�nios permitidos pela pol�tica
 const parseCanvaReportCSV = (csvContent: string, period: '30d' | '3m' | '6m' | '12m'): CanvaUser[] => {
   const lines = csvContent.split('\n');
   const users: CanvaUser[] = [];
@@ -118,7 +113,7 @@ const parseCanvaReportCSV = (csvContent: string, period: '30d' | '3m' | '6m' | '
     if (!name || !email) continue;
 
     const isCompliant = isEmailCompliant(email);
-    const complianceIssue = !isCompliant ? 'Domínio fora da política corporativa' : undefined;
+    const complianceIssue = !isCompliant ? 'Dom�nio fora da pol�tica corporativa' : undefined;
 
     users.push({
       id: `${email}-${period}`,
@@ -171,16 +166,16 @@ const extractClusterFromSchool = (schoolName: string): string => {
   if (!schoolName) return 'Indefinido';
   
   // Extract cluster from school name patterns
-  if (schoolName.includes('São Paulo') || schoolName.includes('SP')) return 'São Paulo';
+  if (schoolName.includes('S�o Paulo') || schoolName.includes('SP')) return 'S�o Paulo';
   if (schoolName.includes('Rio de Janeiro') || schoolName.includes('RJ')) return 'Rio de Janeiro';
   if (schoolName.includes('Belo Horizonte') || schoolName.includes('BH')) return 'Minas Gerais';
   if (schoolName.includes('Salvador') || schoolName.includes('Bahia')) return 'Bahia';
   if (schoolName.includes('Recife') || schoolName.includes('Caruaru')) return 'Pernambuco';
-  if (schoolName.includes('Brasília') || schoolName.includes('DF')) return 'Distrito Federal';
+  if (schoolName.includes('Bras�lia') || schoolName.includes('DF')) return 'Distrito Federal';
   if (schoolName.includes('Porto Alegre') || schoolName.includes('RS')) return 'Rio Grande do Sul';
-  if (schoolName.includes('Curitiba') || schoolName.includes('PR')) return 'Paraná';
-  if (schoolName.includes('Fortaleza') || schoolName.includes('CE')) return 'Ceará';
-  if (schoolName.includes('Goiânia') || schoolName.includes('GO')) return 'Goiás';
+  if (schoolName.includes('Curitiba') || schoolName.includes('PR')) return 'Paran�';
+  if (schoolName.includes('Fortaleza') || schoolName.includes('CE')) return 'Cear�';
+  if (schoolName.includes('Goi�nia') || schoolName.includes('GO')) return 'Goi�s';
   
   return 'Outros Estados';
 };
@@ -216,7 +211,7 @@ export const loadCanvaData = async (period: '30d' | '3m' | '6m' | '12m' = '30d')
 export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] => {
   const schoolMap = new Map<string, CanvaUser[]>();
 
-  // Agrupar usuários por escola
+  // Agrupar usu�rios por escola
   users.forEach(user => {
     const schoolKey = user.schoolId || 'unassigned';
     if (!schoolMap.has(schoolKey)) {
@@ -228,10 +223,10 @@ export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] =
   const schoolsData: SchoolCanvaData[] = [];
 
   schoolMap.forEach((schoolUsers, schoolId) => {
-    const schoolName = schoolUsers[0]?.school || 'Escola não definida';
+    const schoolName = schoolUsers[0]?.school || 'Escola n�o definida';
     const cluster = extractClusterFromSchool(schoolName);
     const nonCompliantUsers = schoolUsers.filter(u => !u.isCompliant);
-    const licenseLimit = MAX_LICENSES_PER_SCHOOL;
+    const licenseLimit = getMaxLicensesPerSchool();
     
     const totalActivity = schoolUsers.reduce((acc, user) => ({
       designsCreated: acc.designsCreated + user.designsCreated,
@@ -300,7 +295,7 @@ export const generateCanvaAnalytics = (users: CanvaUser[]): CanvaAnalytics => {
     topPerformingSchools,
     complianceRate,
     totalActivity,
-    periodComparison: [] // Implementar comparação de períodos
+    periodComparison: [] // Implementar compara��o de per�odos
   };
 };
 
@@ -380,9 +375,9 @@ export const filterCanvaUsers = (
 
 export const exportCanvaData = (users: CanvaUser[]): string => {
   const headers = [
-    'Nome', 'Email', 'Função', 'Escola', 'Status Política', 
+    'Nome', 'Email', 'Fun��o', 'Escola', 'Status Pol�tica', 
     'Designs Criados', 'Designs Publicados', 'Links Compartilhados', 
-    'Designs Visualizados', 'Última Atividade'
+    'Designs Visualizados', '�ltima Atividade'
   ];
 
   const rows = users.map(user => [
@@ -390,7 +385,7 @@ export const exportCanvaData = (users: CanvaUser[]): string => {
     user.email,
     user.role,
     user.school || 'A preencher',
-    user.isCompliant ? 'Conforme' : 'Fora da política',
+    user.isCompliant ? 'Conforme' : 'Fora da pol�tica',
     user.designsCreated.toString(),
     user.designsPublished.toString(),
     user.sharedLinks.toString(),
@@ -441,6 +436,8 @@ export const filterLicenseHistory = (filters: {
   
   return history;
 };
+
+
 
 
 

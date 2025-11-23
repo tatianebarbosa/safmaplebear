@@ -124,7 +124,7 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
                   ⚠️ {analytics.nonCompliantUsers} usuários com domínio não autorizado
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Domínios permitidos: @maplebear.com.br, @sebsa.com.br, @seb.com.br
+                  Domínios permitidos: @maplebear.com.br, @mbcentral.com.br, @sebsa.com.br, @seb.com.br
                 </div>
               </div>
             )}

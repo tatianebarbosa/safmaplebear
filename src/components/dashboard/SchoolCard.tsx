@@ -37,12 +37,12 @@ const SchoolCard = ({ school, onViewDetails }: SchoolCardProps) => {
 
   return (
     <Card className={cn(
-      "card-maple hover:card-elevated animate-slide-up",
+      "card-maple hover:card-elevated animate-slide-up h-full min-h-[320px] flex flex-col",
       school.priority === 'high' && "priority-high",
       school.priority === 'medium' && "priority-medium",
       school.priority === 'low' && "priority-low"
     )}>
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-4 px-6 sm:px-7">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -63,7 +63,7 @@ const SchoolCard = ({ school, onViewDetails }: SchoolCardProps) => {
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5 px-6 sm:px-7 pb-6 pt-2 flex-1 flex flex-col">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -91,20 +91,22 @@ const SchoolCard = ({ school, onViewDetails }: SchoolCardProps) => {
           </div>
           <div className="w-full bg-muted rounded-full h-2">
             <div 
-              className="bg-gradient-to-r from-success to-success-light h-2 rounded-full transition-all duration-500"
+              className="bg-success h-2 rounded-full transition-all duration-500"
               style={{ width: `${(school.activeUsers / school.totalUsers) * 100}%` }}
             />
           </div>
         </div>
 
-        <Button 
-          onClick={() => onViewDetails(school.id)}
-          className="w-full gap-2"
-          variant="outline"
-        >
-          <Eye className="w-4 h-4" />
-          Ver Detalhes
-        </Button>
+        <div className="mt-auto pt-2">
+          <Button 
+            onClick={() => onViewDetails(school.id)}
+            className="w-full gap-2"
+            variant="outline"
+          >
+            <Eye className="w-4 h-4" />
+            Ver Detalhes
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

@@ -51,7 +51,7 @@
 
 1. **Administrador**
    - Email: admin@mbcentral.com.br
-   - Senha: maplebear2025
+   - Senha: admin2025
    - Perfil: Administrador (acesso completo)
 
 2. **Usuário SAF**
