@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
 import CanvaManagement from "@/components/canva/CanvaDashboard";
+import UniformPromoCard from "@/components/dashboard/UniformPromoCard";
 import {
   Activity,
   ArrowUpRight,
@@ -169,6 +170,22 @@ const Index = () => {
                 </CardContent>
               </Card>
             </div>
+          </section>
+
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-wide text-muted-foreground">Comunicado rapido</p>
+                <h2 className="text-2xl font-bold text-foreground">Banner do uniforme</h2>
+                <p className="text-sm text-muted-foreground">
+                  Troque o visual do card direto da tela inicial. Admin e coordenador podem subir novas imagens ou escolher um banner oficial.
+                </p>
+              </div>
+              <Badge variant="outline" className="rounded-full border-primary/30 text-primary bg-primary/5">
+                Editavel no site
+              </Badge>
+            </div>
+            <UniformPromoCard />
           </section>
 
           <section className="space-y-4">

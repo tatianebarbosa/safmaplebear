@@ -418,7 +418,7 @@ const FloatingAIChat = () => {
             <Bot className="h-5 w-5 text-primary" />
             <CardTitle className="text-sm">Assistente SAF</CardTitle>
             <Badge variant="default" className="text-xs">
-              ChatGPT 4.1-mini
+              ChatGPT 4.1
             </Badge>
           </div>
           <div className="flex items-center gap-2">

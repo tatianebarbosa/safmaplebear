@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ const InfoRow = ({
 }: {
   icon: any;
   label: string;
-  value: string | JSX.Element;
+  value: ReactNode;
 }) => (
   <div className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/30 px-3 py-2 text-sm">
     <div className="flex items-center gap-2 text-muted-foreground">

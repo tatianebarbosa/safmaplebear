@@ -6,7 +6,7 @@ import userService from "@/services/userService";
 const VALID_CREDENTIALS = [
   { username: "admin", password: "admin2025", role: "admin" },
   { username: "saf@seb.com.br", password: "saf2025", role: "user" },
-  { username: "coordenador@sebsa.com.br", password: "coord2025", role: "user" },
+  { username: "coordenador@sebsa.com.br", password: "coord2025", role: "coord" },
 ];
 
 // Esquema de validação para o login

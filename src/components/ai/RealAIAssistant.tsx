@@ -25,6 +25,8 @@ interface AIResponse {
   timestamp: string;
 }
 
+const OPENAI_MODEL = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4.1';
+
 const RealAIAssistant = () => {
   const [inputText, setInputText] = useState('');
   const [apiKey, setApiKey] = useState('');
@@ -195,7 +197,7 @@ Responda apenas com o texto melhorado, sem explicações adicionais.`
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+          model: OPENAI_MODEL,
           messages: [
             {
               role: 'system',
@@ -277,7 +279,7 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+          model: OPENAI_MODEL,
           messages: [
             {
               role: 'system',
@@ -349,6 +351,9 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
           </h1>
           <p className="text-muted-foreground">
             IA real powered by ChatGPT + Dados das Escolas Maple Bear
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Modelo OpenAI ativo: {OPENAI_MODEL}
           </p>
         </div>
         <div className="flex gap-2">

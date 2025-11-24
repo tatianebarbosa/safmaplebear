@@ -25,6 +25,7 @@ import { format, differenceInDays } from 'date-fns';
 
 interface TicketKanbanProps {
   tickets: Ticket[];
+  onOpenDetails?: (ticket: Ticket) => void;
 }
 
 const columns: { status: TicketStatus; title: string; icon: any; color: string }[] = [
@@ -33,7 +34,7 @@ const columns: { status: TicketStatus; title: string; icon: any; color: string }
   { status: 'Resolvido', title: 'Resolvido', icon: CheckCircle, color: 'bg-green-100 border-green-200' }
 ];
 
-export const TicketKanban = ({ tickets }: TicketKanbanProps) => {
+export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
   const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
   const { moveTicket } = useTicketStore();
   const { canManageTicket } = useAuthStore();
@@ -133,6 +134,7 @@ export const TicketKanban = ({ tickets }: TicketKanbanProps) => {
                       key={ticket.id} 
                       ticket={ticket}
                       canManage={canManageTicket(ticket.agente)}
+                      onOpenDetails={onOpenDetails}
                     />
                   ))}
                 </SortableContext>

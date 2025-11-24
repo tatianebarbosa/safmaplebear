@@ -8,6 +8,7 @@ import {
   HistoryEntry,
   HistoryAction,
   HistoryChangeSet,
+  LicenseStatus,
 } from "@/types/schoolLicense";
 import { ProcessedSchoolData, CanvaOverviewData } from "@/types/officialData";
 import type { OfficialSchool, OfficialUser } from "@/types/officialData";
@@ -122,7 +123,7 @@ interface SchoolLicenseState {
   applyLicenseLimit: (limit: number) => void;
 
   // Helpers
-  getLicenseStatus: (school: School) => "DisponÃ­vel" | "Completo" | "Excedido";
+  getLicenseStatus: (school: School) => LicenseStatus;
   getNonMapleBearCount: () => number;
   getDomainCounts: () => Array<{ domain: string; count: number }>;
   isEmailValid: (email: string) => boolean;

@@ -497,7 +497,7 @@ export const CanvaUsageDashboard = ({
               <SelectItem value="20">Top 20</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={onNavigateToUsers} className="gap-2">
+          <Button variant="outline" onClick={() => onNavigateToUsers()} className="gap-2">
             <Users className="h-4 w-4" />
             Ver usuarios
             <ExternalLink className="h-3 w-3" />

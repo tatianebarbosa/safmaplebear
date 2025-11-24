@@ -64,7 +64,7 @@
     },
     {
       "id": "chat-ia",
-      "description": "api/ChatIA lê o arquivo integrado + contexto site_context.json e recebe anexos do usuário para responder via OpenAI gpt-4.1-mini.",
+      "description": "api/ChatIA lê o arquivo integrado + contexto site_context.json e recebe anexos do usuário para responder via OpenAI gpt-4.1 (configurável via CHAT_IA_MODEL).",
       "inputs": ["question", "knowledge[]"],
       "outputs": ["response"]
     }

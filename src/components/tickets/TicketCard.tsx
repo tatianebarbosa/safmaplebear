@@ -17,9 +17,10 @@ import { useTicketStore } from '@/stores/ticketStore';
 interface TicketCardProps {
   ticket: Ticket;
   canManage: boolean;
+  onOpenDetails?: (ticket: Ticket) => void;
 }
 
-export const TicketCard = ({ ticket, canManage }: TicketCardProps) => {
+export const TicketCard = ({ ticket, canManage, onOpenDetails }: TicketCardProps) => {
   const { moveTicket } = useTicketStore();
   
   const {
@@ -78,6 +79,7 @@ export const TicketCard = ({ ticket, canManage }: TicketCardProps) => {
         isDragging ? 'opacity-50' : ''
       } ${canManage ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
       {...(canManage ? { ...attributes, ...listeners } : {})}
+      onClick={() => onOpenDetails?.(ticket)}
     >
       <div className="flex items-start justify-between mb-2">
         <span className="font-mono text-sm font-bold">{ticket.id}</span>

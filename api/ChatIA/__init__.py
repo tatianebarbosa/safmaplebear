@@ -176,7 +176,7 @@ def build_system_prompt(
 
 def call_openai(system_prompt: str, user_question: str, user_documents: Optional[str] = None) -> str:
   """Envia a pergunta do usuario para o modelo configurado."""
-  model = os.environ.get(MODEL_ENV, "gpt-4.1-mini")
+  model = os.environ.get(MODEL_ENV, "gpt-4.1")
 
   try:
     temperature = float(os.environ.get(TEMPERATURE_ENV, "0.2"))
