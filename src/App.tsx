@@ -45,9 +45,7 @@ const ProtectedShell = () => (
       <Header />
 
       <main className="flex-1 w-full">
-        <div className="layout-wide">
-          <Outlet />
-        </div>
+        <Outlet />
       </main>
 
       <Footer />
