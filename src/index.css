@@ -131,7 +131,7 @@
     /* Layout / centralização:
        1120px → mais comprimido, parecido com o retângulo vermelho que você marcou */
     --global-content-padding: clamp(18px, 3vw, 36px);
-    --layout-max-width: 950px;
+    --layout-max-width: 900px;
   }
 
   .dark {

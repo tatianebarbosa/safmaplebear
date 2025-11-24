@@ -1,10 +1,14 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
-import CanvaManagement from "@/components/canva/CanvaDashboard";
-import UniformPromoCard from "@/components/dashboard/UniformPromoCard";
+import BannerECE2 from "@/assets/bannerinicial/ECE (2).png";
+import BannerECE from "@/assets/bannerinicial/ECE.png";
+import BannerELE from "@/assets/bannerinicial/ELE.png";
+import BannerHS from "@/assets/bannerinicial/HS.png";
+import BannerMY from "@/assets/bannerinicial/MY.png";
 import {
   Activity,
   ArrowUpRight,
@@ -18,6 +22,23 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
+  const [currentBanner, setCurrentBanner] = useState(0);
+
+  const bannerImages = [
+    { id: "ece2", src: BannerECE2, alt: "Banner ECE 2" },
+    { id: "ece", src: BannerECE, alt: "Banner ECE" },
+    { id: "ele", src: BannerELE, alt: "Banner ELE" },
+    { id: "hs", src: BannerHS, alt: "Banner HS" },
+    { id: "my", src: BannerMY, alt: "Banner MY" },
+  ];
+
+  useEffect(() => {
+    if (!bannerImages.length) return;
+    const interval = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % bannerImages.length);
+    }, 20000);
+    return () => clearInterval(interval);
+  }, [bannerImages.length]);
 
   const quickActions = [
     {
@@ -53,6 +74,22 @@ const Index = () => {
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-rose-50/70 via-white to-white">
       <main className="flex-grow py-10 sm:py-12 w-full flex justify-center">
         <div className="w-full max-w-6xl space-y-10 sm:space-y-12">
+          <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-none">
+            <div className="relative w-full bg-muted shadow-2xl overflow-hidden aspect-[21/8] sm:aspect-[21/7] md:aspect-[21/6]">
+              {bannerImages.map((banner, index) => (
+                <img
+                  key={banner.id}
+                  src={banner.src}
+                  alt={banner.alt}
+                  className={`w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+                    index === currentBanner ? "opacity-100" : "opacity-0 absolute inset-0"
+                  }`}
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          </section>
+
           <section className="grid md:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
             <div className="rounded-3xl border bg-white/80 backdrop-blur shadow-xl p-8 space-y-6">
               <div className="flex items-center gap-3">
@@ -172,22 +209,6 @@ const Index = () => {
             </div>
           </section>
 
-          <section className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-wide text-muted-foreground">Comunicado rapido</p>
-                <h2 className="text-2xl font-bold text-foreground">Banner do uniforme</h2>
-                <p className="text-sm text-muted-foreground">
-                  Troque o visual do card direto da tela inicial. Admin e coordenador podem subir novas imagens ou escolher um banner oficial.
-                </p>
-              </div>
-              <Badge variant="outline" className="rounded-full border-primary/30 text-primary bg-primary/5">
-                Editavel no site
-              </Badge>
-            </div>
-            <UniformPromoCard />
-          </section>
-
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -221,26 +242,6 @@ const Index = () => {
             </div>
           </section>
 
-          <section className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-wide text-muted-foreground">Dashboard Canva</p>
-                <h2 className="text-2xl font-bold text-foreground">Painel completo, já na tela inicial</h2>
-                <p className="text-sm text-muted-foreground">
-                  Veja e interaja com o painel de licenças sem sair da página inicial.
-                </p>
-              </div>
-              <Button variant="outline" className="gap-2 border-primary/30 text-primary" onClick={() => navigate("/dashboard/canva")}>
-                Abrir em tela cheia
-                <ArrowUpRight className="w-4 h-4" />
-              </Button>
-            </div>
-            <Card className="rounded-3xl border shadow-xl overflow-hidden">
-              <CardContent className="p-0">
-                <CanvaManagement />
-              </CardContent>
-            </Card>
-          </section>
         </div>
       </main>
 

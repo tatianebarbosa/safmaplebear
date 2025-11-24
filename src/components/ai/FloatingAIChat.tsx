@@ -287,7 +287,7 @@ const FloatingAIChat = () => {
         }
       }
 
-      return "Não encontrei essa informação na base local. No sistema SAF, você pode verificar isso na tela de Licenças Canva pesquisando o nome da escola.";
+      return "Nao localizei essa escola agora. Me envie o nome completo, cidade ou cluster para tentar de novo. Se preferir, abra no SAF em Licencas Canva > buscar escola para ver status, email e carteira.";
     }
 
     return null;
