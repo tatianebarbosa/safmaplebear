@@ -59,7 +59,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white shadow-[0_10px_20px_-12px_rgba(0,0,0,0.25)] mb-4">
+    <header className="sticky top-0 z-40 w-full bg-white shadow-[0_10px_20px_-12px_rgba(0,0,0,0.25)]">
       <div className="w-full px-8 py-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-6">
           <div className="flex items-center gap-6">
