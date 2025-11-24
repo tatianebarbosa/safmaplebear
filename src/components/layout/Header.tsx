@@ -59,7 +59,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white shadow-[0_10px_20px_-12px_rgba(0,0,0,0.25)] mb-4 zoom-75">
+    <header className="sticky top-0 z-40 w-full bg-white shadow-[0_10px_20px_-12px_rgba(0,0,0,0.25)] mb-4">
       <div className="w-full px-8 py-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-6">
           <div className="flex items-center gap-6">
@@ -155,6 +155,7 @@ const Header = () => {
               size="icon" 
               className="rounded-full h-11 w-11"
               aria-label="Buscar"
+              onClick={() => toast({ title: "Busca em breve", description: "Funcionalidade de busca será implementada em breve." })}
             >
               <Search className="w-5 h-5" />
             </Button>
@@ -163,6 +164,7 @@ const Header = () => {
               size="icon" 
               className="rounded-full h-11 w-11"
               aria-label="Notificações"
+              onClick={() => toast({ title: "Notificações em breve", description: "Painel de notificações será implementado em breve." })}
             >
               <Bell className="w-5 h-5" />
             </Button>

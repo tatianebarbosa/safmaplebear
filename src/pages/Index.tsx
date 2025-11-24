@@ -71,7 +71,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-rose-50/70 via-white to-white">
+    <div className="flex flex-col min-h-screen bg-background">
       <main className="flex-grow py-10 sm:py-12 w-full flex justify-center">
         <div className="w-full max-w-6xl space-y-10 sm:space-y-12">
           <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-none">
@@ -81,9 +81,7 @@ const Index = () => {
                   key={banner.id}
                   src={banner.src}
                   alt={banner.alt}
-                  className={`w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
-                    index === currentBanner ? "opacity-100" : "opacity-0 absolute inset-0"
-                  }`}
+                  className={`w-full h-full object-cover transition-opacity duration-700 ease-in-out ${index === currentBanner ? "opacity-100" : "opacity-0 absolute inset-0"}`}
                   loading="lazy"
                 />
               ))}
@@ -140,14 +138,11 @@ const Index = () => {
                     key={item.label}
                     className="rounded-2xl border bg-gradient-to-br from-white to-primary/5 p-4 shadow-sm flex flex-col gap-2"
                   >
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <span className="flex items-center gap-2">
-                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                          {item.icon}
-                        </span>
-                        {item.label}
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                        {item.icon}
                       </span>
-                      <ArrowUpRight className="w-4 h-4 text-primary" />
+                      {item.label}
                     </div>
                     <p className="text-2xl font-bold text-foreground">{item.value}</p>
                     <p className="text-xs text-muted-foreground">{item.note}</p>
@@ -157,7 +152,7 @@ const Index = () => {
             </div>
 
             <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-br from-primary/10 via-white to-rose-50 blur-3xl" />
+              <div className="absolute -inset-4 bg-gradient-to-br from-primary/10 via-white to-white blur-3xl" />
               <Card className="relative overflow-hidden rounded-3xl border shadow-2xl bg-white/90 backdrop-blur">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
@@ -177,10 +172,10 @@ const Index = () => {
                       <p className="text-2xl font-semibold text-primary mt-1">12</p>
                       <p className="text-xs text-primary mt-1">Domínios não conformes</p>
                     </div>
-                    <div className="rounded-2xl border bg-emerald-50 p-4">
+                    <div className="rounded-2xl border bg-success-bg p-4">
                       <p className="text-xs text-muted-foreground">Escolas sincronizadas</p>
-                      <p className="text-2xl font-semibold text-emerald-700 mt-1">241</p>
-                      <p className="text-xs text-emerald-700 mt-1">Dados oficiais</p>
+                      <p className="text-2xl font-semibold text-success mt-1">241</p>
+                      <p className="text-xs text-success mt-1">Dados oficiais</p>
                     </div>
                   </div>
                   <div className="rounded-2xl border bg-white p-4 space-y-3">
@@ -221,8 +216,12 @@ const Index = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {quickActions.map((item) => (
-                <Card key={item.title} className="rounded-2xl border hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6 space-y-4">
+                <Card 
+                  key={item.title} 
+                  className="rounded-2xl border hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col"
+                  onClick={() => navigate(item.path)}
+                >
+                  <CardContent className="p-6 space-y-4 flex flex-col h-full">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                         <span className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-primary/10">
@@ -232,8 +231,8 @@ const Index = () => {
                       </div>
                       <ArrowUpRight className="w-4 h-4 text-primary" />
                     </div>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                    <Button className="gap-2" variant="secondary" onClick={() => navigate(item.path)}>
+                    <p className="text-sm text-muted-foreground flex-grow">{item.description}</p>
+                    <Button className="gap-2 mt-auto" variant="secondary">
                       {item.action}
                     </Button>
                   </CardContent>

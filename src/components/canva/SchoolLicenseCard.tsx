@@ -28,11 +28,11 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
   const getLicensesBadgeColor = () => {
     switch (licenseStatus) {
       case AVAILABLE_STATUS:
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-success-bg text-success border-success/20';
       case 'Completo':
         return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'Excedido':
-        return 'bg-rose-50 text-rose-700 border-rose-200';
+        return 'bg-destructive-bg text-destructive border-destructive/20';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }

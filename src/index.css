@@ -17,32 +17,39 @@
 
 @layer base {
   :root {
-    /* Maple Bear Brand Colors */
-    --maple-red: 359 76% 44%; /* #cc1316 - Pantone 186 C */
-    --maple-red-light: 359 76% 55%;
-    --maple-red-dark: 359 76% 35%;
+    /* BRAND OFICIAL - Maple Bear */
+    --brand-red-main: 359 83% 44%;   /* #cc1316 Pantone 186 C */
+    --brand-red-deep: 354 95% 34%;   /* #aa0414 Vermelho vívido */
+    --brand-gray-light: 0 0% 93%;    /* #ededed */
+    --brand-black: 0 0% 0%;          /* #000000 */
 
-    /* Base Colors */
-    --background: 220 13% 97%;
-    --foreground: 0 0% 0%;
+    /* PRIMÁRIAS DO DESIGN SYSTEM */
+    --primary: var(--brand-red-main);
+    --primary-light: 359 83% 52%;    /* ~#ea1f22 – para hover/surfaces */
+    --primary-dark: var(--brand-red-deep);
+    --primary-foreground: 0 0% 100%;
 
-    /* Surface Colors */
+    /* NEUTRAS / FUNDOS */
+    --background: 0 0% 98%;          /* quase branco, base do app */
+    --foreground: var(--brand-black);
+
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: var(--brand-black);
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: var(--brand-black);
 
-    /* Brand Primary (Maple Red) */
-    --primary: var(--maple-red);
-    --primary-foreground: 0 0% 100%;
-    --primary-light: var(--maple-red-light);
-    --primary-dark: var(--maple-red-dark);
+    --muted: var(--brand-gray-light);
+    --muted-foreground: 220 9% 46%;
+
+    --border: 0 0% 87%;
+    --input: var(--border);
+    --ring: var(--brand-red-main);
 
     /* Secondary */
-    --secondary: var(--maple-red-light);
+    --secondary: var(--primary-light);
     --secondary-foreground: 220 9% 13%;
-    --secondary-light: var(--maple-red-light);
+    --secondary-light: var(--primary-light);
 
     /* Success States */
     --success: 142 76% 36%;
@@ -68,23 +75,15 @@
     --info-light: 217 91% 70%;
     --info-bg: 217 91% 95%;
 
-    /* Neutral Colors */
-    --muted: 0 0% 93%;
-    --muted-foreground: 220 9% 46%;
-
+    /* Accent */
     --accent: 220 13% 95%;
-    --accent-foreground: 0 0% 0%;
-
-    /* Border & Input */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: var(--maple-red);
+    --accent-foreground: var(--brand-black);
 
     /* Gradients & Effects */
     --gradient-maple: linear-gradient(
       135deg,
-      hsl(var(--maple-red)),
-      hsl(var(--maple-red-light))
+      hsl(var(--brand-red-main)),
+      hsl(var(--primary-light))
     );
     --gradient-success: linear-gradient(
       135deg,
@@ -113,7 +112,7 @@
     );
 
     /* Shadows */
-    --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red) / 0.3);
+    --shadow-maple: 0 10px 30px -10px hsl(var(--brand-red-main) / 0.3);
     --shadow-card: 0 4px 12px hsl(220 9% 13% / 0.08);
     --shadow-elevated: 0 8px 24px hsl(220 9% 13% / 0.12);
 
@@ -122,11 +121,11 @@
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: var(--maple-red);
+    --sidebar-foreground: var(--brand-black);
+    --sidebar-primary: var(--brand-red-main);
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-accent-foreground: var(--brand-black);
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
@@ -146,10 +145,10 @@
     --popover: 220 9% 11%;
     --popover-foreground: 220 13% 95%;
 
-    --primary: var(--maple-red-light);
+    --primary: var(--primary-light);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--maple-red-light);
+    --secondary: var(--primary-light);
     --secondary-foreground: 220 9% 9%;
 
     --success: 142 76% 45%;
@@ -173,7 +172,7 @@
     --border: 220 9% 20%;
     --input: 220 9% 20%;
 
-    --shadow-maple: 0 10px 30px -10px hsl(var(--maple-red-light) / 0.4);
+    --shadow-maple: 0 10px 30px -10px hsl(var(--primary-light) / 0.4);
     --shadow-card: 0 4px 12px hsl(0 0% 0% / 0.3);
     --shadow-elevated: 0 8px 24px hsl(0 0% 0% / 0.4);
   }

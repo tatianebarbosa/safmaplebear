@@ -90,8 +90,8 @@ const UniformPromoCard = () => {
       updatedBy: actor,
     });
     toast({
-      title: "Card atualizado",
-      description: "Imagem oficial aplicada para todos.",
+      title: "Banner oficial aplicado",
+      description: "Imagem padrão da SAF foi restaurada.",
     });
   };
 
@@ -118,8 +118,8 @@ const UniformPromoCard = () => {
         updatedBy: actor,
       });
       toast({
-        title: "Nova imagem aplicada",
-        description: "O banner foi atualizado e salvo neste navegador.",
+        title: "Banner personalizado aplicado",
+        description: "Imagem aplicada neste navegador (armazenamento local).",
       });
     };
     reader.readAsDataURL(file);
@@ -146,13 +146,23 @@ const UniformPromoCard = () => {
       </div>
 
       <div className="relative z-10 flex h-full flex-col justify-end p-6 sm:p-8 text-white">
-        <div className="space-y-1 drop-shadow">
-          <p className="text-xs uppercase tracking-[0.2em] text-white/80">
-            Banner do uniforme
-          </p>
+        <div className="space-y-2 drop-shadow">
+          <div className="flex items-center gap-2">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/80">
+              Banner do uniforme
+            </p>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white/90">
+              {promoImage.source === "default" ? "Oficial" : "Personalizado"}
+            </span>
+          </div>
           <h3 className="text-3xl sm:text-4xl font-bold leading-tight">
             {promoImage.label}
           </h3>
+          {promoImage.updatedBy && (
+            <p className="text-xs text-white/70">
+              Atualizado por {promoImage.updatedBy} em {new Date(promoImage.updatedAt).toLocaleDateString('pt-BR')}
+            </p>
+          )}
         </div>
 
         {canEdit && (
