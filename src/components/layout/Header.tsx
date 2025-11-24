@@ -9,7 +9,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, User, LogOut, BookOpenText, FileSpreadsheet, ExternalLink, Search, Grid, Bell } from "lucide-react";
+import {
+  ChevronDown,
+  User,
+  LogOut,
+  BookOpenText,
+  FileSpreadsheet,
+  ExternalLink,
+  Search,
+  Grid,
+  Bell,
+} from "lucide-react";
 import { SPREADSHEET_LINKS, CRM_LINKS } from "@/config/links";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/components/auth/AuthService";
@@ -23,7 +33,10 @@ const Header = () => {
   const { currentUser } = useAuthStore();
 
   const userEmail = localStorage.getItem("userEmail") || "admin@maplebear.com.br";
-  const initials = useMemo(() => userEmail.split("@")[0].slice(0, 2).toUpperCase(), [userEmail]);
+  const initials = useMemo(
+    () => userEmail.split("@")[0].slice(0, 2).toUpperCase(),
+    [userEmail]
+  );
   const showManagement = currentUser?.role === "Admin";
 
   const navItems = [
@@ -50,10 +63,18 @@ const Header = () => {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2.5">
-              <img src={Logos.Triple} alt="SAF Maple Bear" className="h-11 w-auto object-contain" />
+              <img
+                src={Logos.Triple}
+                alt="SAF Maple Bear"
+                className="h-11 w-auto object-contain"
+              />
               <div className="flex items-baseline gap-1.5">
-                <span className="text-[22px] font-semibold text-foreground leading-tight">SAF</span>
-                <span className="text-[22px] font-semibold text-primary leading-tight">Maple Bear</span>
+                <span className="text-[22px] font-semibold text-foreground leading-tight">
+                  SAF
+                </span>
+                <span className="text-[22px] font-semibold text-primary leading-tight">
+                  Maple Bear
+                </span>
               </div>
             </div>
             <nav className="hidden md:flex items-center gap-3">
@@ -79,12 +100,21 @@ const Header = () => {
               })}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="secondary" size="sm" className="rounded-full px-4 gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="group px-0 py-1 h-auto gap-1.5 rounded-none border-b-2 border-transparent text-sm font-medium text-foreground hover:text-primary hover:bg-transparent data-[state=open]:border-primary"
+                  >
                     Links
-                    <ChevronDown className="w-3 h-3" />
+                    <ChevronDown className="w-3 h-3 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-72">
+                <DropdownMenuContent
+                  align="start"
+                  side="bottom"
+                  sideOffset={8}
+                  className="w-72 rounded-xl shadow-[0_18px_34px_-18px_rgba(30,32,36,0.4)]"
+                >
                   {SPREADSHEET_LINKS.map((item) => (
                     <DropdownMenuItem key={item.href} asChild>
                       <a
@@ -127,7 +157,11 @@ const Header = () => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 bg-primary text-white">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full h-10 w-10 bg-primary text-white"
+                >
                   <Avatar className="w-10 h-10">
                     <AvatarFallback className="bg-primary text-white text-sm font-semibold">
                       {initials}
@@ -135,7 +169,13 @@ const Header = () => {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuContent
+                align="center"
+                side="bottom"
+                sideOffset={10}
+                avoidCollisions={false}
+                className="w-52 rounded-xl shadow-[0_18px_34px_-18px_rgba(30,32,36,0.4)]"
+              >
                 <DropdownMenuItem className="text-sm">
                   <User className="w-4 h-4 mr-2" />
                   {userEmail}
@@ -155,7 +195,10 @@ const Header = () => {
                     <DropdownMenuSeparator />
                   </>
                 )}
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive"
+                >
                   <LogOut className="w-4 h-4 mr-2" />
                   Sair
                 </DropdownMenuItem>
