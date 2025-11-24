@@ -132,7 +132,7 @@ const Login = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   autoComplete="username"
-                  className="w-full text-foreground h-10 text-sm sm:text-base border border-border px-3 focus:border-primary transition-colors"
+                  className="w-full text-foreground h-11 text-sm sm:text-base border border-border px-3 focus:border-primary transition-colors"
                   disabled={isLoading}
                 />
               </div>
@@ -153,14 +153,15 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
-                    className="w-full pr-10 h-10 text-sm sm:text-base text-foreground border border-border px-3 focus:border-primary transition-colors"
+                    className="w-full pr-14 h-11 text-sm sm:text-base text-foreground border border-border px-3 focus:border-primary transition-colors"
                     disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                     disabled={isLoading}
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" />
@@ -173,7 +174,7 @@ const Login = () => {
 
               <Button
                 type="submit"
-                className="w-full h-10 mt-4 text-sm sm:text-base font-semibold rounded-lg"
+                className="w-full h-12 mt-4 text-sm sm:text-base font-semibold rounded-lg"
                 disabled={!canSubmit}
                 aria-busy={isLoading}
               >

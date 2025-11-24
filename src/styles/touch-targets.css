@@ -1,0 +1,115 @@
+/**
+ * Touch Targets - Tamanhos mínimos para áreas de toque
+ * Baseado em Apple HIG, Material Design e WCAG 2.1
+ * 
+ * Referências:
+ * - Apple HIG: 44x44pt mínimo
+ * - Material Design: 48x48dp mínimo
+ * - WCAG 2.1 (AAA): 44x44px mínimo
+ */
+
+/* Tamanhos de toque padrão */
+.touch-target-xs {
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.touch-target-sm {
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.touch-target-md {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.touch-target-lg {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+.touch-target-xl {
+  min-width: 56px;
+  min-height: 56px;
+}
+
+/* Utilitários para botões de ícone */
+.icon-button-sm {
+  @apply touch-target-sm rounded-full flex items-center justify-center;
+}
+
+.icon-button-md {
+  @apply touch-target-md rounded-full flex items-center justify-center;
+}
+
+.icon-button-lg {
+  @apply touch-target-lg rounded-full flex items-center justify-center;
+}
+
+/* Utilitários para áreas clicáveis */
+.clickable-area {
+  @apply touch-target-md cursor-pointer;
+}
+
+.clickable-area-sm {
+  @apply touch-target-sm cursor-pointer;
+}
+
+.clickable-area-lg {
+  @apply touch-target-lg cursor-pointer;
+}
+
+/* Padding interno para ícones */
+.icon-padding-sm {
+  @apply p-2;
+}
+
+.icon-padding-md {
+  @apply p-2.5;
+}
+
+.icon-padding-lg {
+  @apply p-3;
+}
+
+/* Garantir que elementos interativos tenham tamanho adequado */
+button:not(.no-touch-target),
+a.button:not(.no-touch-target),
+[role="button"]:not(.no-touch-target) {
+  min-height: 44px;
+}
+
+/* Exceção para botões em tabelas densas */
+.table-dense button,
+.compact-layout button {
+  min-height: 36px;
+}
+
+/* Estados de foco visíveis (acessibilidade) */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary;
+}
+
+/* Área de toque expandida (invisível) para elementos pequenos */
+.touch-expand::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
+  z-index: -1;
+}
+
+/* Garantir que ícones clicáveis tenham área adequada */
+.icon-clickable {
+  @apply relative inline-flex items-center justify-center touch-target-md;
+}
+
+.icon-clickable svg {
+  @apply pointer-events-none;
+}

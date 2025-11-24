@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/components/auth/AuthService";
 import { Logos } from "@/assets/maplebear";
 import { useAuthStore } from "@/stores/authStore";
+import MobileMenu from "./MobileMenu";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -148,10 +149,21 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
+            <MobileMenu />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full h-11 w-11"
+              aria-label="Buscar"
+            >
               <Search className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full h-11 w-11"
+              aria-label="Notificações"
+            >
               <Bell className="w-5 h-5" />
             </Button>
 
@@ -160,7 +172,8 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full h-10 w-10 bg-primary text-white"
+                  className="rounded-full h-11 w-11 bg-primary text-white"
+                  aria-label="Menu do usuário"
                 >
                   <Avatar className="w-10 h-10">
                     <AvatarFallback className="bg-primary text-white text-sm font-semibold">

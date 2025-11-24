@@ -1,13 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Maple Bear SAF Design System - Cores em HSL */
 
 @import "./styles/spacing.css";
 @import "./styles/typography.css";
 @import "./styles/borders.css";
 @import "./styles/responsive.css";
+@import "./styles/touch-targets.css";
+@import "./styles/responsive-utils.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ===================================================================== */
 /* 1) TOKENS DE COR / TEMA                                               */
