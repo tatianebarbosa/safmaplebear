@@ -73,8 +73,7 @@ const Index = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <main className="flex-grow w-full">
-        <div className="layout-wide space-y-10 sm:space-y-12 pt-10 sm:pt-12">
-          <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-none">
+        <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-none">
             <div className="relative w-full bg-muted shadow-2xl overflow-hidden aspect-[21/8] sm:aspect-[21/7] md:aspect-[21/6]">
               {bannerImages.map((banner, index) => (
                 <img
@@ -87,7 +86,7 @@ const Index = () => {
               ))}
             </div>
           </section>
-
+        <div className="layout-wide space-y-10 sm:space-y-12 pt-10 sm:pt-12">
           <section className="grid md:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
             <div className="rounded-3xl border bg-white/80 backdrop-blur shadow-xl p-8 space-y-6">
               <div className="flex items-center gap-3">
@@ -241,6 +240,7 @@ const Index = () => {
             </div>
           </section>
 
+          </section>
         </div>
       </main>
 
