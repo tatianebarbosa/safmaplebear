@@ -6,23 +6,22 @@ import { Button } from '@/components/ui/button';
 import { Ticket } from '@/types/tickets';
 import { format, differenceInDays } from 'date-fns';
 import { MoreVertical, Edit, CheckCircle } from 'lucide-react';
+import { getAgentDisplayName } from '@/data/teamMembers';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTicketStore } from '@/stores/ticketStore';
 
 interface TicketCardProps {
   ticket: Ticket;
   canManage: boolean;
   onOpenDetails?: (ticket: Ticket) => void;
+  onResolve?: (ticket: Ticket) => void;
 }
 
-export const TicketCard = ({ ticket, canManage, onOpenDetails }: TicketCardProps) => {
-  const { moveTicket } = useTicketStore();
-  
+export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: TicketCardProps) => {
   const {
     attributes,
     listeners,
@@ -68,8 +67,10 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails }: TicketCardProps
   };
 
   const handleResolve = () => {
-    moveTicket(ticket.id, 'Resolvido');
+    onResolve?.(ticket);
   };
+
+  const agentLabel = getAgentDisplayName(ticket.agente);
 
   return (
     <Card 
@@ -115,7 +116,7 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails }: TicketCardProps
       </p>
       
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span className="font-medium">{ticket.agente}</span>
+        <span className="font-medium">{agentLabel}</span>
         <span>{format(new Date(ticket.updatedAt), 'dd/MM')}</span>
       </div>
       

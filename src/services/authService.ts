@@ -7,6 +7,7 @@ const VALID_CREDENTIALS = [
   { username: "admin", password: "admin2025", role: "admin" },
   { username: "saf@seb.com.br", password: "saf2025", role: "user" },
   { username: "coordenador@sebsa.com.br", password: "coord2025", role: "coord" },
+  { username: "tatiane.barbosa", password: "tatiane.barbosa", role: "user" },
 ];
 
 // Esquema de validação para o login

@@ -166,7 +166,7 @@ export const NonCompliantUsersDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[960px] max-h-[85vh] overflow-hidden">
+      <DialogContent className="sm:max-w-[960px] max-h-[80vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShieldAlert className="h-5 w-5 text-destructive" />
@@ -177,24 +177,24 @@ export const NonCompliantUsersDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 overflow-y-auto pr-1">
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-lg border bg-card/70 p-3 shadow-sm">
+        <div className="space-y-3 overflow-y-auto pr-1">
+          <div className="grid gap-2 md:grid-cols-3">
+            <div className="rounded-lg border bg-card/70 p-2 shadow-sm">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Total de Usuários</p>
-              <p className="text-3xl font-semibold text-destructive">{users.length}</p>
+              <p className="text-2xl font-semibold text-destructive">{users.length}</p>
             </div>
-            <div className="rounded-lg border bg-card/70 p-3 shadow-sm">
+            <div className="rounded-lg border bg-card/70 p-2 shadow-sm">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Escolas Impactadas</p>
-              <p className="text-3xl font-semibold">{impactedSchools}</p>
+              <p className="text-2xl font-semibold">{impactedSchools}</p>
             </div>
-            <div className="rounded-lg border bg-card/70 p-3 shadow-sm">
+            <div className="rounded-lg border bg-card/70 p-2 shadow-sm">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Domínios Diferentes</p>
-              <p className="text-3xl font-semibold">{Object.keys(domainStats).length}</p>
+              <p className="text-2xl font-semibold">{Object.keys(domainStats).length}</p>
             </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+          <div className="grid gap-2 md:grid-cols-2">
+            <div className="rounded-lg border bg-muted/30 p-2 space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Search className="h-4 w-4" />
                 <span>Buscar por nome, email, escola ou perfil</span>
@@ -203,20 +203,21 @@ export const NonCompliantUsersDialog = ({
                 placeholder="Digite para filtrar rapidamente"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
+                className="h-9 text-sm"
               />
             </div>
 
-            <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+            <div className="rounded-lg border bg-muted/30 p-2 space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Filter className="h-4 w-4" />
                 <span>Filtrar por domínio</span>
                 {(searchTerm || domainFilter) && (
-                  <Button size="sm" variant="ghost" onClick={handleClearFilters}>
+                  <Button size="sm" variant="ghost" onClick={handleClearFilters} className="h-8 px-2">
                     Limpar
                   </Button>
                 )}
               </div>
-              <div className="flex max-h-24 flex-wrap gap-2 overflow-y-auto pr-1">
+              <div className="flex max-h-20 flex-wrap gap-2 overflow-y-auto pr-1">
                 {topDomains.length === 0 && (
                   <span className="text-xs text-muted-foreground">Nenhum domínio encontrado</span>
                 )}
@@ -238,8 +239,8 @@ export const NonCompliantUsersDialog = ({
           </div>
 
           <div className="rounded-lg border bg-muted/20 p-3 space-y-2">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="space-y-1 flex-1 min-w-[220px]">
                 <p className="text-sm font-semibold">Contato ativo com escolas</p>
                 <p className="text-xs text-muted-foreground">
                   Envie um e-mail pedindo ajuste para manter apenas 2 licenças.
@@ -262,24 +263,18 @@ export const NonCompliantUsersDialog = ({
             {selectedSchool ? (
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>Usuários envolvidos:</span>
-                {selectedSchool.users.map((u) => (
+                {selectedSchool.users.slice(0, 4).map((u) => (
                   <Badge key={u.email} variant="outline" className="bg-background">
                     {u.email}
                   </Badge>
                 ))}
+                {selectedSchool.users.length > 4 && (
+                  <span className="text-[11px]">+{selectedSchool.users.length - 4} usuários</span>
+                )}
               </div>
             ) : (
               <p className="text-xs text-muted-foreground">Nenhuma escola com usuários listados.</p>
             )}
-            <div className="flex justify-end">
-              <Button
-                size="sm"
-                disabled={!selectedSchool}
-                onClick={() => window.open(buildEmailLink(), '_blank')}
-              >
-                Disparar e-mail para a escola
-              </Button>
-            </div>
           </div>
 
           <div className="hidden rounded-t-lg bg-muted/30 px-4 py-2 text-xs font-medium uppercase text-muted-foreground md:grid md:grid-cols-[minmax(180px,2fr)_120px_minmax(180px,2fr)_150px]">

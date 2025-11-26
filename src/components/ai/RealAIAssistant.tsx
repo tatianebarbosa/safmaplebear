@@ -14,7 +14,9 @@ import {
   searchSchoolsByCluster,
   searchSchoolsByStatus,
   generateSchoolContext,
-  formatSchoolData
+  formatSchoolData,
+  summarizeSchoolsByCluster,
+  summarizeSchoolsBySafAgent
 } from "@/lib/schoolDataQuery";
 
 interface AIResponse {
@@ -73,7 +75,28 @@ const RealAIAssistant = () => {
       // Detecta o tipo de consulta e busca os dados apropriados
       const lowerMessage = message.toLowerCase();
 
-      if (lowerMessage.includes('qual') && lowerMessage.includes('escola')) {
+      if (
+        lowerMessage.includes('quant') &&
+        lowerMessage.includes('cluster')
+      ) {
+        schoolInfo = await summarizeSchoolsByCluster();
+      } else if (
+        (lowerMessage.includes('agente') ||
+          lowerMessage.includes('carteira saf') ||
+          lowerMessage.includes('consultor') ||
+          lowerMessage.includes('responsavel') ||
+          lowerMessage.includes('responsável')) &&
+        (lowerMessage.includes('quant') ||
+          lowerMessage.includes('lista') ||
+          lowerMessage.includes('listar') ||
+          lowerMessage.includes('quais'))
+      ) {
+        const includeSchools =
+          lowerMessage.includes('lista') ||
+          lowerMessage.includes('listar') ||
+          lowerMessage.includes('quais');
+        schoolInfo = await summarizeSchoolsBySafAgent({ includeSchools });
+      } else if (lowerMessage.includes('qual') && lowerMessage.includes('escola')) {
         // Busca por nome de escola
         const schoolName = message.replace(/qual|escola|é|o|da|de|/gi, '').trim();
         const school = await searchSchoolByName(schoolName);

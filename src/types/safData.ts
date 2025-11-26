@@ -26,6 +26,8 @@ export interface School {
   performanceMeta: string | null;
   atualSerie: string | null;
   avancandoSegmento: string | null;
+  ticketMedio?: string | null;
+  ultimaAtualizacao?: string | null;
 }
 
 export interface LicenseUser {

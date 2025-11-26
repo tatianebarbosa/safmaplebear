@@ -71,11 +71,11 @@ export interface UserRanking {
 
 
 
-interface LicenseAction {
+export interface LicenseAction {
   id: string;
   schoolId: string;
   schoolName: string;
-  action: 'add' | 'remove' | 'transfer' | 'delete';
+  action: 'add' | 'remove' | 'transfer' | 'delete' | 'update';
   userId?: string;
   userName?: string;
   userEmail?: string;

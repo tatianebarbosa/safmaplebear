@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -15,6 +14,7 @@ import { useTicketStore } from "@/stores/ticketStore";
 import { useAuthStore } from "@/stores/authStore";
 import { Ticket, TicketStatus, Agente, TicketPriority } from "@/types/tickets";
 import { toast } from "sonner";
+import { getAgentDisplayName } from "@/data/teamMembers";
 
 interface TicketDialogProps {
   open: boolean;
@@ -25,6 +25,24 @@ interface TicketDialogProps {
 const statusOptions: TicketStatus[] = ["Pendente", "Em andamento", "Resolvido"];
 const priorityOptions: TicketPriority[] = ["Baixa", "Media", "Alta", "Critica"];
 
+const canonicalAgentMap: Record<Agente, Agente> = {
+  Tati: "Tatiane",
+  Rafha: "Rafhael",
+  Jaque: "Jaqueline",
+  Joao: "Joao",
+  Ingrid: "Ingrid",
+  Rafhael: "Rafhael",
+  Tatiane: "Tatiane",
+  Jaqueline: "Jaqueline",
+  Jessika: "Jessika",
+  Yasmin: "Yasmin Martins",
+  "Yasmin Martins": "Yasmin Martins",
+  Fernanda: "Fernanda",
+};
+
+const normalizeAgent = (agent?: Agente): Agente =>
+  agent ? canonicalAgentMap[agent] || agent : "Joao";
+
 export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) => {
   const { createTicket, updateTicket } = useTicketStore();
   const { currentUser, isCoordinator, isAdmin, users } = useAuthStore();
@@ -32,28 +50,34 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
   const agentes = useMemo<Agente[]>(() => {
     const mapped = (users || [])
       .filter((u) => !!u.agente)
-      .map((u) => u.agente as Agente);
-    return mapped.length ? mapped : ["Tati", "Rafha", "Ingrid", "Joao", "Jaque", "Jessika", "Fernanda"];
+      .map((u) => normalizeAgent(u.agente as Agente));
+    const fallback: Agente[] = [
+      "Joao",
+      "Rafhael",
+      "Ingrid",
+      "Yasmin Martins",
+      "Tatiane",
+      "Jaqueline",
+      "Jessika",
+      "Fernanda",
+    ];
+    return Array.from(new Set((mapped.length ? mapped : fallback).map((a) => normalizeAgent(a))));
   }, [users]);
 
-  const watcherOptions = useMemo<(Agente | "Coordinator" | "Admin")[]>(
-    () => [...agentes, "Coordinator", "Admin"],
-    [agentes]
+  const defaultAgente = normalizeAgent(
+    (ticket?.agente || currentUser?.agente || (currentUser?.name as Agente) || agentes[0]) as Agente
   );
-
-  const defaultAgente = (ticket?.agente || currentUser?.agente || (currentUser?.name as Agente) || agentes[0]) as Agente;
   const defaultCreatedBy = ticket?.createdBy || currentUser?.name || currentUser?.agente || "Usuario logado";
   const creationMoment = useMemo(() => (ticket?.createdAt ? new Date(ticket.createdAt) : new Date()), [ticket]);
 
   const [formData, setFormData] = useState({
     id: ticket?.id || "",
-    agente: defaultAgente,
+    agente: defaultAgente as Agente,
     createdBy: defaultCreatedBy,
     status: ticket?.status || ("Pendente" as TicketStatus),
     priority: ticket?.priority || ("Media" as TicketPriority),
     observacao: ticket?.observacao || "",
     dueDate: ticket?.dueDate ? new Date(ticket.dueDate) : (undefined as Date | undefined),
-    watchers: ticket?.watchers || ["Coordinator", defaultAgente],
   });
 
   const isEditing = !!ticket;
@@ -104,22 +128,13 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
   const resetForm = () => {
     setFormData({
       id: "",
-      agente: (currentUser?.agente as Agente) || "Joao",
+      agente: normalizeAgent((currentUser?.agente as Agente) || "Joao"),
       createdBy: currentUser?.name || currentUser?.agente || "Usuario logado",
       status: "Pendente",
       priority: "Media",
       observacao: "",
       dueDate: undefined,
-      watchers: ["Coordinator", currentUser?.agente || "Joao"],
     });
-  };
-
-  const handleWatcherToggle = (watcher: Agente | "Coordinator" | "Admin", checked: boolean) => {
-    if (isReadOnly) return;
-    setFormData((prev) => ({
-      ...prev,
-      watchers: checked ? [...prev.watchers, watcher] : prev.watchers.filter((w) => w !== watcher),
-    }));
   };
 
   return (
@@ -170,14 +185,14 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
                   <SelectContent>
                     {agentes.map((agente) => (
                       <SelectItem key={agente} value={agente}>
-                        {agente}
+                        {getAgentDisplayName(agente)}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               ) : (
                 <>
-                  <Input value={formData.agente} disabled />
+                  <Input value={getAgentDisplayName(formData.agente)} disabled />
                   {!canEditAgent && (
                     <p className="text-xs text-muted-foreground">Assumido automaticamente pelo usuario logado.</p>
                   )}
@@ -265,25 +280,6 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
             />
           </div>
 
-          <div className="space-y-3">
-            <Label>Watchers (quem será notificado)</Label>
-            <div className="grid grid-cols-3 gap-3">
-              {watcherOptions.map((watcher) => (
-                <div key={watcher} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`watcher-${watcher}`}
-                    checked={formData.watchers.includes(watcher)}
-                    onCheckedChange={(checked) => handleWatcherToggle(watcher, checked as boolean)}
-                    disabled={isReadOnly}
-                  />
-                  <Label htmlFor={`watcher-${watcher}`} className="text-sm">
-                    {watcher}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </div>
-
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
@@ -297,3 +293,4 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
     </Dialog>
   );
 };
+

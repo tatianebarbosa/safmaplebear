@@ -38,6 +38,13 @@ const defaultUsers: DevUser[] = [
     role: "coord",
     createdAt: new Date().toISOString(),
   },
+  {
+    id: uuidv4(),
+    username: "tatiane.barbosa",
+    password: "tatiane.barbosa",
+    role: "user",
+    createdAt: new Date().toISOString(),
+  },
 ];
 
 const migrateLegacyAdminPassword = (

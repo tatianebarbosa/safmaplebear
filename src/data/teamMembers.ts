@@ -36,6 +36,11 @@ export const TEAM_MEMBERS: TeamMember[] = [
     role: 'agente'
   },
   {
+    username: 'yasmin.martins',
+    fullName: 'Yasmin Martins',
+    role: 'agente'
+  },
+  {
     username: 'fernanda.louise',
     fullName: 'Fernanda Louise de Almeida Inacio',
     role: 'agente'
@@ -66,5 +71,40 @@ export const getTeamMemberByUsername = (username: string): TeamMember | undefine
 // Função para obter membro por nome completo
 export const getTeamMemberByFullName = (fullName: string): TeamMember | undefined => {
   return TEAM_MEMBERS.find(member => member.fullName === fullName);
+};
+
+const normalizeKey = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\s._-]+/g, '')
+    .toLowerCase()
+    .trim();
+
+const AGENT_ALIASES: Record<string, string> = {
+  joao: 'joao.felipe',
+  ingrid: 'ingrid.vania',
+  rafha: 'rafhael.nazeazeno',
+  rafhael: 'rafhael.nazeazeno',
+  tati: 'tatiane.barbosa',
+  tatiane: 'tatiane.barbosa',
+  jaque: 'jaqueline.floriano',
+  jaqueline: 'jaqueline.floriano',
+  jessika: 'jessika.queiroz',
+  fernanda: 'fernanda.louise',
+};
+
+export const getAgentDisplayName = (agent: string): string => {
+  const normalized = normalizeKey(agent);
+  const username = AGENT_ALIASES[normalized] ?? agent;
+  const normalizedUsername = normalizeKey(username);
+
+  const member =
+    TEAM_MEMBERS.find(
+      (m) => normalizeKey(m.username) === normalizedUsername || normalizeKey(m.fullName) === normalized
+    ) ||
+    TEAM_MEMBERS.find((m) => normalizeKey(m.username) === normalized);
+
+  return member?.fullName || agent;
 };
 

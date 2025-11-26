@@ -13,6 +13,7 @@ import { Ticket, TicketStatus } from "@/types/tickets";
 import { useAuthStore } from "@/stores/authStore";
 import { format, differenceInDays } from "date-fns";
 import { Edit, CheckCircle, MoreVertical, MessageSquare } from "lucide-react";
+import { getAgentDisplayName } from "@/data/teamMembers";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -146,7 +147,7 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
                   </TableCell>
                   
                   <TableCell>
-                    <span className="font-medium">{ticket.agente}</span>
+                    <span className="font-medium">{getAgentDisplayName(ticket.agente)}</span>
                   </TableCell>
                   
                   <TableCell>

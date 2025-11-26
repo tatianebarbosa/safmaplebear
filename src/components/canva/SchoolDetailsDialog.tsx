@@ -152,13 +152,15 @@ export const SchoolDetailsDialog = ({
     const user = school.users.find(u => u.id === userId);
     if (!user) return;
     setRemoveTarget(user);
+    setRemoveTicket('');
+    setRemoveObservation('');
     setShowRemoveDialog(true);
   };
 
   return (
     <>
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[97vw] min-w-[720px] min-h-[65vh] max-h-[90vh] overflow-y-auto px-6 py-6 sm:min-w-[900px] sm:min-h-[70vh] sm:max-w-[1240px] lg:max-w-[1380px] xl:max-w-[1460px] sm:px-9 sm:py-7">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
@@ -170,20 +172,35 @@ export const SchoolDetailsDialog = ({
         </DialogHeader>
         
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Visao Geral</TabsTrigger>
-            <TabsTrigger value="users">Usuarios</TabsTrigger>
-            <TabsTrigger value="history">Historico</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 gap-2 bg-muted/70 p-2 rounded-xl">
+            <TabsTrigger
+              value="overview"
+              className="w-full h-11 text-base font-semibold rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              Visao Geral
+            </TabsTrigger>
+            <TabsTrigger
+              value="users"
+              className="w-full h-11 text-base font-semibold rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              Usuarios
+            </TabsTrigger>
+            <TabsTrigger
+              value="history"
+              className="w-full h-11 text-base font-semibold rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
+              Historico
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
+          <TabsContent value="overview" className="space-y-6 md:space-y-7 min-h-[55vh] sm:min-h-[60vh]">
             {/* School Information */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Informacoes da Escola</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-6 lg:gap-8">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -232,7 +249,7 @@ export const SchoolDetailsDialog = ({
             </Card>
           </TabsContent>
 
-          <TabsContent value="users" className="space-y-4">
+          <TabsContent value="users" className="space-y-4 min-h-[55vh] sm:min-h-[60vh]">
             {/* Users List */}
             <Card>
               <CardHeader className="space-y-2">
@@ -361,7 +378,7 @@ export const SchoolDetailsDialog = ({
             </Card>
           </TabsContent>
 
-	          <TabsContent value="history" className="space-y-4">
+	          <TabsContent value="history" className="space-y-4 min-h-[55vh] sm:min-h-[60vh]">
 	            {/* History */}
 	            <Card>
 	              <CardHeader>
@@ -481,7 +498,7 @@ export const SchoolDetailsDialog = ({
             Confirmar
           </Button>
         </div>
-      </DialogContent>
+    </DialogContent>
     </Dialog>
 
     {/* Dialogs de acao em "Gerenciar Usuarios" */}

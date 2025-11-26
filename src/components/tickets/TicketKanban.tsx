@@ -5,6 +5,7 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  useDroppable,
   useSensor,
   useSensors,
   closestCenter,
@@ -15,13 +16,13 @@ import {
 } from '@dnd-kit/sortable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Ticket, TicketStatus } from '@/types/tickets';
-import { useTicketStore } from '@/stores/ticketStore';
 import { useAuthStore } from '@/stores/authStore';
 import { TicketCard } from './TicketCard';
 import { Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
+import { getAgentDisplayName } from '@/data/teamMembers';
+import { useTicketStatusJustification } from '@/hooks/useTicketStatusJustification';
 
 interface TicketKanbanProps {
   tickets: Ticket[];
@@ -36,8 +37,8 @@ const columns: { status: TicketStatus; title: string; icon: any; color: string }
 
 export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
   const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
-  const { moveTicket } = useTicketStore();
   const { canManageTicket } = useAuthStore();
+  const { requestStatusChange, justificationDialog } = useTicketStatusJustification();
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -54,17 +55,21 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
-    if (over && active.id !== over.id) {
-      const ticket = tickets.find(t => t.id === active.id);
-      
-      if (ticket && canManageTicket(ticket.agente)) {
-        const newStatus = over.id as TicketStatus;
-        moveTicket(ticket.id, newStatus);
-      }
-    }
-    
     setActiveTicket(null);
+
+    if (!over) return;
+
+    const ticket = tickets.find(t => t.id === active.id);
+    if (!ticket || !canManageTicket(ticket.agente)) return;
+
+    const overId = over.id as string;
+    const overContainer = over.data?.current?.sortable?.containerId as TicketStatus | undefined;
+    const targetStatus =
+      columns.find((column) => column.status === overId)?.status || overContainer;
+
+    if (!targetStatus || ticket.status === targetStatus) return;
+
+    requestStatusChange(ticket, targetStatus);
   };
 
   const getTicketsByStatus = (status: TicketStatus) => {
@@ -112,6 +117,7 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
         {columns.map((column) => {
           const columnTickets = getTicketsByStatus(column.status);
           const Icon = column.icon;
+          const { setNodeRef: setColumnRef } = useDroppable({ id: column.status });
           
           return (
             <Card key={column.status} className={column.color}>
@@ -124,8 +130,9 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3" ref={setColumnRef}>
                 <SortableContext
+                  id={column.status}
                   items={columnTickets.map(t => t.id)}
                   strategy={verticalListSortingStrategy}
                 >
@@ -135,6 +142,7 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
                       ticket={ticket}
                       canManage={canManageTicket(ticket.agente)}
                       onOpenDetails={onOpenDetails}
+                      onResolve={(t) => requestStatusChange(t, 'Resolvido')}
                     />
                   ))}
                 </SortableContext>
@@ -165,12 +173,13 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
               {activeTicket.observacao}
             </p>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{activeTicket.agente}</span>
+              <span>{getAgentDisplayName(activeTicket.agente)}</span>
               <span>{format(new Date(activeTicket.updatedAt), 'dd/MM/yyyy')}</span>
             </div>
           </div>
         ) : null}
       </DragOverlay>
+      {justificationDialog}
     </DndContext>
   );
 };

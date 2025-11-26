@@ -34,125 +34,230 @@ interface TicketStore {
   shouldNotify: (ticketId: string, type: string) => boolean;
 }
 
+const DEFAULT_SLA_DAYS = 3;
+
+// Map agentes -> email para notificacao
+const agentEmails: Record<Agente, string> = {
+  Joao: "joao@mbcentral.com.br",
+  Ingrid: "ingrid@mbcentral.com.br",
+  Rafha: "rafha@mbcentral.com.br",
+  Rafhael: "rafhael@mbcentral.com.br",
+  Tati: "tati@mbcentral.com.br",
+  Tatiane: "tatiane@mbcentral.com.br",
+  Jaque: "jaque@mbcentral.com.br",
+  Jaqueline: "jaqueline@mbcentral.com.br",
+  Jessika: "jessika@mbcentral.com.br",
+  Yasmin: "yasmin.martins@mbcentral.com.br",
+  "Yasmin Martins": "yasmin.martins@mbcentral.com.br",
+  Fernanda: "fernanda@mbcentral.com.br",
+};
+
+const normalizeAgentName = (agente?: Agente): Agente | undefined => {
+  if (!agente) return undefined;
+  const map: Partial<Record<Agente, Agente>> = {
+    Tati: "Tatiane",
+    Rafha: "Rafhael",
+    Jaque: "Jaqueline",
+    Yasmin: "Yasmin Martins",
+  };
+  return map[agente] || agente;
+};
+
 // Calculate createdAt from diasAberto
 const calculateCreatedAt = (diasAberto: number): string => {
   return subDays(new Date(), diasAberto).toISOString();
 };
 
-// Initial seed data
-const seedTickets: Ticket[] = [
+const calculateDueDate = (createdAt: string, slaDias?: number) => {
+  const sla = slaDias ?? DEFAULT_SLA_DAYS;
+  return addDays(new Date(createdAt), sla).toISOString();
+};
+
+const normalizeTicketId = (id: string) => (id.startsWith("#") ? id : `#${id}`);
+
+const getPriorityFromSla = (diasAberto: number): TicketPriority => {
+  if (diasAberto >= 20) return "Critica";
+  if (diasAberto >= 12) return "Alta";
+  if (diasAberto >= 6) return "Media";
+  return "Baixa";
+};
+
+type PendingSeedTicket = {
+  id: string;
+  agente: Agente;
+  diasAberto: number;
+  observacao?: string;
+  slaDias?: number;
+};
+
+// Fila pendente consolidada enviada pela equipe
+const pendingSeedTickets: PendingSeedTicket[] = [
+  { id: "#261509", agente: "Joao", diasAberto: 9, observacao: "cobrei time mkt novamente 28-10" },
+  { id: "#262156", agente: "Joao", diasAberto: 4, observacao: "cobrei Joao teams mkt 28-10" },
+  { id: "#262272", agente: "Joao", diasAberto: 3, observacao: "cobrei Isis teams 28-10" },
+  { id: "#262862", agente: "Joao", diasAberto: 2, observacao: "cobrei Isis teams 28-10" },
+  { id: "#262966", agente: "Joao", diasAberto: 1, observacao: "cobrei Teams Isis 28-10" },
+  { id: "#265282", agente: "Joao", diasAberto: 1, observacao: "cobrado Leila teams 28-10" },
+  { id: "#265162", agente: "Joao", diasAberto: 3, observacao: "cobrado chamado clickup 28-10" },
+  { id: "#265014", agente: "Joao", diasAberto: 4, observacao: "cobrei chamado clickup 28-10" },
   {
-    id: "#258209",
+    id: "#265475",
     agente: "Joao",
-    createdBy: "Joao",
+    diasAberto: 5,
+    observacao: "cobrei Julio-Jaque, esta verificando com a LEX 28-10 // Cobrado Julio 05/11",
+  },
+  { id: "#266547", agente: "Ingrid", diasAberto: 34, observacao: "crm" },
+  { id: "#266426", agente: "Joao", diasAberto: 35, observacao: "cobrei Leila Teams 28-10" },
+  { id: "#267560", agente: "Rafhael", diasAberto: 25, observacao: "Aguardando retorno Visoni" },
+  {
+    id: "#267771",
+    agente: "Yasmin Martins",
+    diasAberto: 21,
+    observacao: "Julio e Gabriel ja retornaram e ja informei as escolas que foi resolvido, chamado aberto conexia 267722",
+  },
+  { id: "#267834", agente: "Tatiane", diasAberto: 21, observacao: "Aguardando retorno embalarte" },
+  { id: "#267582", agente: "Joao", diasAberto: 22, observacao: "chamado aberto CRM 267582, aguardando retorno" },
+  {
+    id: "#267827",
+    agente: "Joao",
     diasAberto: 22,
-    status: "Pendente",
-    priority: "Alta",
-    observacao: "aguardando dados... PC do CRM",
-    createdAt: calculateCreatedAt(22),
-    resolvedAt: null,
-    updatedAt: new Date().toISOString(),
-    dueDate: subDays(new Date(), 1).toISOString(), // ontem
-    watchers: ["Coordinator", "Joao"],
-    notes: [
-      {
-        id: "note-1",
-        author: "Coordinator",
-        content: "Pendencia aguardando evidencias do CRM",
-        createdAt: new Date().toISOString(),
-      },
-    ],
+    observacao: "aguardando retorno Ana Flavia teams, esta em contato com a Sponte sobre o caso",
   },
   {
-    id: "#258809",
+    id: "#267569",
     agente: "Joao",
-    createdBy: "Joao",
-    diasAberto: 17,
-    status: "Pendente",
-    priority: "Media",
-    observacao: "verificacao Fernanda Edtech",
-    createdAt: calculateCreatedAt(17),
-    resolvedAt: null,
-    updatedAt: new Date().toISOString(),
-    dueDate: addDays(new Date(), 1).toISOString(), // +1 dia
-    watchers: ["Coordinator", "Joao"],
-    notes: [],
+    diasAberto: 22,
+    observacao: "aguardando retorno email Voucher 10% e parcelamento 8x unidade Cascavel ticket #267569",
   },
-  {
-    id: "#259134",
-    agente: "Tati",
-    createdBy: "Tati",
-    diasAberto: 25,
-    status: "Pendente",
-    priority: "Alta",
-    observacao: "tratativa com Iago",
-    createdAt: calculateCreatedAt(25),
-    resolvedAt: null,
-    updatedAt: new Date().toISOString(),
-    dueDate: subDays(new Date(), 2).toISOString(), // -2 dias
-    watchers: ["Coordinator", "Tati"],
-    notes: [],
-  },
-  {
-    id: "#258993",
-    agente: "Ingrid",
-    createdBy: "Ingrid",
-    diasAberto: 20,
-    status: "Pendente",
-    priority: "Media",
-    observacao: "aguardando Eduardo",
-    createdAt: calculateCreatedAt(20),
-    resolvedAt: null,
-    updatedAt: new Date().toISOString(),
-    dueDate: addDays(new Date(), 2).toISOString(), // +2 dias
-    watchers: ["Coordinator", "Ingrid"],
-    notes: [],
-  },
-  {
-    id: "#261211",
-    agente: "Joao",
-    createdBy: "Joao",
-    diasAberto: 1,
-    status: "Pendente",
-    priority: "Baixa",
-    observacao: "evidencias recebidas",
-    createdAt: calculateCreatedAt(1),
-    resolvedAt: null,
-    updatedAt: new Date().toISOString(),
-    dueDate: addDays(new Date(), 3).toISOString(), // +3 dias
-    watchers: ["Coordinator", "Joao"],
-    notes: [],
-  },
-  {
-    id: "#263147",
-    agente: "Joao",
-    createdBy: "Joao",
-    diasAberto: 1,
-    status: "Resolvido",
-    priority: "Baixa",
-    observacao: "resposta enviada",
-    createdAt: calculateCreatedAt(1),
-    resolvedAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    dueDate: addDays(new Date(), 5).toISOString(), // +5 dias
-    watchers: ["Coordinator", "Joao"],
-    notes: [],
-  },
+  { id: "#267476", agente: "Joao", diasAberto: 26, observacao: "chamado aberto CRM 267476 sem retorno" },
+  { id: "#267127", agente: "Joao", diasAberto: 27, observacao: "chamado aberto CRM 267127, aguardando retorno Isis" },
+  { id: "#266617", agente: "Joao", diasAberto: 33, observacao: "chamado aberto CRM cobrando retorno Isis" },
+  { id: "#266602", agente: "Joao", diasAberto: 33, observacao: "cobrado chamado CRM 265916" },
+  { id: "#308727", agente: "Joao", diasAberto: 0, observacao: "" },
+  { id: "#304959", agente: "Joao", diasAberto: 1, observacao: "" },
+  { id: "#308212", agente: "Joao", diasAberto: 0, observacao: "" },
+  { id: "#308228", agente: "Rafhael", diasAberto: 0, observacao: "" },
+  { id: "#308216", agente: "Rafhael", diasAberto: 0, observacao: "" },
+  { id: "#304967", agente: "Jaqueline", diasAberto: 1, observacao: "" },
+  { id: "#304944", agente: "Jessika", diasAberto: 1, observacao: "" },
+  { id: "#274664", agente: "Tatiane", diasAberto: 1, observacao: "" },
+  { id: "#300244", agente: "Tatiane", diasAberto: 1, observacao: "" },
+  { id: "#305672", agente: "Jaqueline", diasAberto: 1, observacao: "" },
+  { id: "#292724", agente: "Joao", diasAberto: 6, observacao: "" },
+  { id: "#304970", agente: "Joao", diasAberto: 1, observacao: "" },
+  { id: "#304873", agente: "Jessika", diasAberto: 1, observacao: "" },
+  { id: "#304949", agente: "Joao", diasAberto: 1, observacao: "" },
+  { id: "#304879", agente: "Joao", diasAberto: 1, observacao: "" },
+  { id: "#304951", agente: "Joao", diasAberto: 1, observacao: "" },
+  { id: "#296495", agente: "Tatiane", diasAberto: 0, observacao: "" },
+  { id: "#304922", agente: "Joao", diasAberto: 1, observacao: "" },
+  { id: "#304926", agente: "Rafhael", diasAberto: 1, observacao: "" },
+  { id: "#304905", agente: "Tatiane", diasAberto: 1, observacao: "" },
+  { id: "#274678", agente: "Tatiane", diasAberto: 1, observacao: "" },
+  { id: "#268155", agente: "Joao", diasAberto: 19, observacao: "" },
+  { id: "#304888", agente: "Yasmin Martins", diasAberto: 1, observacao: "" },
+  { id: "#304878", agente: "Jessika", diasAberto: 1, observacao: "" },
+  { id: "#289354", agente: "Joao", diasAberto: 8, observacao: "" },
+  { id: "#304572", agente: "Tatiane", diasAberto: 6, observacao: "" },
+  { id: "#304598", agente: "Joao", diasAberto: 6, observacao: "" },
+  { id: "#274637", agente: "Joao", diasAberto: 6, observacao: "" },
+  { id: "#289425", agente: "Joao", diasAberto: 7, observacao: "" },
+  { id: "#302336", agente: "Tatiane", diasAberto: 6, observacao: "" },
+  { id: "#302048", agente: "Joao", diasAberto: 7, observacao: "" },
+  { id: "#299813", agente: "Rafhael", diasAberto: 7, observacao: "" },
+  { id: "#299183", agente: "Joao", diasAberto: 7, observacao: "" },
+  { id: "#267386", agente: "Joao", diasAberto: 7, observacao: "" },
+  { id: "#291899", agente: "Tatiane", diasAberto: 7, observacao: "" },
+  { id: "#293404", agente: "Joao", diasAberto: 8, observacao: "" },
+  { id: "#289454", agente: "Joao", diasAberto: 8, observacao: "" },
+  { id: "#290280", agente: "Joao", diasAberto: 8, observacao: "" },
+  { id: "#289991", agente: "Jaqueline", diasAberto: 8, observacao: "" },
+  { id: "#289605", agente: "Joao", diasAberto: 8, observacao: "" },
+  { id: "#289435", agente: "Joao", diasAberto: 8, observacao: "" },
+  { id: "#289444", agente: "Joao", diasAberto: 8, observacao: "" },
+  { id: "#289338", agente: "Joao", diasAberto: 11, observacao: "" },
+  { id: "#289193", agente: "Joao", diasAberto: 11, observacao: "" },
+  { id: "#289325", agente: "Rafhael", diasAberto: 11, observacao: "" },
+  { id: "#289329", agente: "Tatiane", diasAberto: 11, observacao: "" },
+  { id: "#289114", agente: "Joao", diasAberto: 11, observacao: "" },
+  { id: "#289111", agente: "Joao", diasAberto: 11, observacao: "" },
+  { id: "#282670", agente: "Joao", diasAberto: 12, observacao: "" },
+  { id: "#282900", agente: "Tatiane", diasAberto: 12, observacao: "" },
+  { id: "#281857", agente: "Joao", diasAberto: 12, observacao: "" },
+  { id: "#271625", agente: "Joao", diasAberto: 12, observacao: "" },
+  { id: "#283793", agente: "Joao", diasAberto: 12, observacao: "" },
+  { id: "#282905", agente: "Joao", diasAberto: 12, observacao: "" },
+  { id: "#282875", agente: "Joao", diasAberto: 12, observacao: "" },
+  { id: "#279416", agente: "Joao", diasAberto: 13, observacao: "" },
+  { id: "#276323", agente: "Joao", diasAberto: 13, observacao: "" },
+  { id: "#277156", agente: "Joao", diasAberto: 13, observacao: "" },
+  { id: "#276338", agente: "Yasmin Martins", diasAberto: 13, observacao: "" },
+  { id: "#272751", agente: "Joao", diasAberto: 14, observacao: "" },
+  { id: "#274674", agente: "Joao", diasAberto: 14, observacao: "" },
+  { id: "#272748", agente: "Tatiane", diasAberto: 14, observacao: "" },
+  { id: "#272771", agente: "Tatiane", diasAberto: 14, observacao: "" },
+  { id: "#272765", agente: "Joao", diasAberto: 14, observacao: "" },
+  { id: "#271954", agente: "Tatiane", diasAberto: 15, observacao: "" },
+  { id: "#271496", agente: "Tatiane", diasAberto: 18, observacao: "" },
+  { id: "#267874", agente: "Yasmin Martins", diasAberto: 20, observacao: "" },
+  { id: "#308916", agente: "Joao", diasAberto: 0, observacao: "" },
+  { id: "#304935", agente: "Joao", diasAberto: 0, observacao: "" },
+  { id: "#308900", agente: "Jessika", diasAberto: 0, observacao: "" },
+  { id: "#308229", agente: "Jessika", diasAberto: 0, observacao: "" },
+  { id: "#308225", agente: "Tatiane", diasAberto: 0, observacao: "" },
 ];
+
+const seedTickets: Ticket[] = pendingSeedTickets.map((ticket) => {
+  const createdAt = calculateCreatedAt(ticket.diasAberto);
+  const dueDate = calculateDueDate(createdAt, ticket.slaDias);
+
+  return {
+    id: normalizeTicketId(ticket.id),
+    agente: ticket.agente,
+    createdBy: ticket.agente,
+    diasAberto: ticket.diasAberto,
+    status: "Pendente",
+    priority: getPriorityFromSla(ticket.diasAberto),
+    observacao: ticket.observacao?.trim() || "Sem observacao registrada",
+    createdAt,
+    resolvedAt: null,
+    updatedAt: new Date().toISOString(),
+    watchers: [ticket.agente],
+    notes: [],
+    slaDias: ticket.slaDias ?? DEFAULT_SLA_DAYS,
+    dueDate,
+    assigneeEmail: agentEmails[ticket.agente],
+  };
+});
+
+const mergeSeedTickets = (tickets: Ticket[]) => {
+  const existingIds = new Set(tickets.map((ticket) => ticket.id));
+  const merged = [...tickets];
+
+  seedTickets.forEach((ticket) => {
+    if (!existingIds.has(ticket.id)) {
+      merged.push(ticket);
+    }
+  });
+
+  return merged;
+};
 
 export const useTicketStore = create<TicketStore>()(
   persist(
     (set, get) => ({
-      tickets: [],
+      tickets: seedTickets,
       filters: {},
       dueLog: {},
 
       setTickets: (tickets) => set({ tickets }),
 
-  setFilters: (filters) => set({ filters }),
+      setFilters: (filters) => set({ filters }),
 
       createTicket: (ticketData) => {
         const now = new Date().toISOString();
+        const slaDias = ticketData.slaDias ?? DEFAULT_SLA_DAYS;
+        const dueDate = ticketData.dueDate || calculateDueDate(now, slaDias);
         const newTicket: Ticket = {
           ...ticketData,
           createdBy: ticketData.createdBy || ticketData.agente,
@@ -161,8 +266,11 @@ export const useTicketStore = create<TicketStore>()(
           updatedAt: now,
           diasAberto: 0,
           priority: ticketData.priority || "Media",
-          watchers: ticketData.watchers || ["Coordinator", ticketData.agente],
+          watchers: ticketData.watchers || [ticketData.agente],
           notes: ticketData.notes || [],
+          slaDias,
+          dueDate,
+          assigneeEmail: agentEmails[ticketData.agente] || ticketData.assigneeEmail,
         };
 
         set((state) => ({
@@ -231,9 +339,11 @@ export const useTicketStore = create<TicketStore>()(
 
       getFilteredTickets: () => {
         const { tickets, filters } = get();
+        const normalizedFilterAgente = normalizeAgentName(filters.agente);
         return tickets.filter((ticket) => {
           if (filters.status && ticket.status !== filters.status) return false;
-          if (filters.agente && ticket.agente !== filters.agente) return false;
+          const ticketAgente = normalizeAgentName(ticket.agente);
+          if (normalizedFilterAgente && ticketAgente !== normalizedFilterAgente) return false;
           if (filters.priority && ticket.priority !== filters.priority) return false;
           if (filters.search) {
             const search = filters.search.toLowerCase();
@@ -278,9 +388,9 @@ export const useTicketStore = create<TicketStore>()(
     {
       name: "saf-tickets-storage",
       onRehydrateStorage: () => (state) => {
-        // Initialize with seed data if no tickets exist
-        if (state && state.tickets.length === 0) {
-          state.setTickets(seedTickets);
+        if (state) {
+          state.setTickets(mergeSeedTickets(state.tickets || []));
+          state.setFilters({});
         }
       },
     }

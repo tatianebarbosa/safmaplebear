@@ -4,7 +4,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useTicketStore } from "@/stores/ticketStore";
 import { Ticket, TicketStatus } from "@/types/tickets";
 
-const statusesRequiringJustification: TicketStatus[] = ["Pendente", "Resolvido"];
+const statusesRequiringJustification: TicketStatus[] = ["Pendente", "Em andamento", "Resolvido"];
 
 export const requiresTicketJustification = (status: TicketStatus) =>
   statusesRequiringJustification.includes(status);
@@ -12,17 +12,25 @@ export const requiresTicketJustification = (status: TicketStatus) =>
 export const useTicketStatusJustification = () => {
   const { moveTicket, addNoteToTicket } = useTicketStore();
   const { currentUser } = useAuthStore();
-  const [pendingChange, setPendingChange] = useState<{ ticket: Ticket; status: TicketStatus } | null>(null);
+  const [pendingChange, setPendingChange] = useState<{
+    ticket: Ticket;
+    status: TicketStatus;
+    onAfterChange?: () => void;
+  } | null>(null);
 
-  const requestStatusChange = (ticket: Ticket, status: TicketStatus) => {
-    if (ticket.status === status) return;
+  const requestStatusChange = (ticket: Ticket, status: TicketStatus, onAfterChange?: () => void) => {
+    if (ticket.status === status) {
+      onAfterChange?.();
+      return;
+    }
 
     if (requiresTicketJustification(status)) {
-      setPendingChange({ ticket, status });
+      setPendingChange({ ticket, status, onAfterChange });
       return;
     }
 
     moveTicket(ticket.id, status);
+    onAfterChange?.();
   };
 
   const handleConfirm = (justification: string) => {
@@ -38,6 +46,7 @@ export const useTicketStatusJustification = () => {
       content: `Status alterado para ${pendingChange.status}. Motivo: ${trimmedJustification}`,
       createdAt: noteTimestamp,
     });
+    pendingChange.onAfterChange?.();
     setPendingChange(null);
   };
 

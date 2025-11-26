@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,6 +16,7 @@ import { School } from "@/types/schoolLicense";
 import { toast } from "sonner";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { useLicenseLimit } from "@/config/licenseLimits";
+import { cn } from "@/lib/utils";
 
 interface SchoolLicenseManagementProps {
   externalSearchTerm?: string;
@@ -285,19 +286,13 @@ export const SchoolLicenseManagement = ({
       </div>
 
       <Card>
-        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle>Filtros</CardTitle>
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={handleExport} className="gap-2">
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
-          </div>
+        <CardHeader className="flex flex-col gap-2 pt-4 pb-2">
+          <CardTitle className="text-base">Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex-1 min-w-[320px] relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Nome da escola, cluster, usuário, email ou perfil (estudante, professor, administrador)"
                 value={searchTerm}
@@ -305,7 +300,7 @@ export const SchoolLicenseManagement = ({
                   setSearchTerm(e.target.value);
                   setPage(1);
                 }}
-                className="pl-8"
+                className="h-10 pl-10 pr-4 text-sm rounded-md"
               />
             </div>
 
@@ -316,7 +311,12 @@ export const SchoolLicenseManagement = ({
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-full md:w-[200px]">
+              <SelectTrigger
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                  "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
+                )}
+              >
                 <SelectValue placeholder="Cluster/Região" />
               </SelectTrigger>
               <SelectContent>
@@ -336,7 +336,12 @@ export const SchoolLicenseManagement = ({
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-full md:w-[200px]">
+              <SelectTrigger
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                  "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
+                )}
+              >
                 <SelectValue placeholder="Status das Licenças" />
               </SelectTrigger>
               <SelectContent>
@@ -354,7 +359,12 @@ export const SchoolLicenseManagement = ({
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-full md:w-[200px]">
+              <SelectTrigger
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                  "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
+                )}
+              >
                 <SelectValue placeholder="Perfil do Usuário" />
               </SelectTrigger>
               <SelectContent>
@@ -365,16 +375,31 @@ export const SchoolLicenseManagement = ({
               </SelectContent>
             </Select>
 
-            <Button variant="outline" onClick={handleClearFilters}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearFilters}
+              className="whitespace-nowrap h-10 text-sm px-4 rounded-md w-[150px]"
+            >
               <X className="h-4 w-4 mr-2" />
               Limpar Filtros
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              className="gap-2 h-10 text-sm px-3 rounded-md w-[150px]"
+            >
+              <Download className="h-4 w-4" />
+              Exportar CSV
             </Button>
           </div>
         </CardContent>
       </Card>
 
       <div className="space-y-4">
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 [grid-auto-rows:minmax(360px,1fr)]">
           {visibleSchools.map((school) => (
             <SchoolLicenseCard
               key={school.id}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Search,
@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 const TicketsPage = () => {
   const [view, setView] = useState<"kanban" | "table">("kanban");
@@ -68,10 +69,32 @@ const TicketsPage = () => {
     return () => document.removeEventListener("keydown", handleKeyPress);
   }, [hasRole]);
 
-  const agentes: Agente[] = ["Tati", "Rafha", "Ingrid", "Joao", "Jaque", "Jessika", "Fernanda"];
+  const normalizeAgent = (agente?: Agente): Agente | undefined => {
+    if (!agente) return undefined;
+    const map: Partial<Record<Agente, Agente>> = {
+      Tati: "Tatiane",
+      Rafha: "Rafhael",
+      Jaque: "Jaqueline",
+      Yasmin: "Yasmin Martins",
+    };
+    return map[agente] || agente;
+  };
+
+  const agentOptions: { value: Agente; label: string }[] = [
+    { value: "Joao", label: "Joao" },
+    { value: "Rafhael", label: "Rafhael" },
+    { value: "Ingrid", label: "Ingrid" },
+    { value: "Yasmin Martins", label: "Yasmin Martins" },
+    { value: "Tatiane", label: "Tatiane" },
+    { value: "Jaqueline", label: "Jaqueline" },
+    { value: "Jessika", label: "Jessika" },
+    { value: "Fernanda", label: "Fernanda" },
+  ];
+
+  const selectedAgent = normalizeAgent(filters.agente);
 
   return (
-    <div className="w-full py-8 space-y-6">
+    <div className="layout-wide w-full py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Tickets SAF</h1>
@@ -132,12 +155,12 @@ const TicketsPage = () => {
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por ID ou observacao..."
                 value={filters.search || ""}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="pl-9"
+                className="h-10 pl-10 pr-4 text-sm rounded-md"
               />
             </div>
 
@@ -147,7 +170,12 @@ const TicketsPage = () => {
                 setFilters({ ...filters, status: value === "all" ? undefined : (value as TicketStatus) })
               }
             >
-              <SelectTrigger className="w-48">
+              <SelectTrigger
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "default" }),
+                  "h-10 w-48 px-4 text-sm justify-between rounded-md"
+                )}
+              >
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -159,19 +187,27 @@ const TicketsPage = () => {
             </Select>
 
             <Select
-              value={filters.agente || "all"}
+              value={selectedAgent || "all"}
               onValueChange={(value) =>
-                setFilters({ ...filters, agente: value === "all" ? undefined : (value as Agente) })
+                setFilters({
+                  ...filters,
+                  agente: value === "all" ? undefined : (value as Agente),
+                })
               }
             >
-              <SelectTrigger className="w-48">
+              <SelectTrigger
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "default" }),
+                  "h-10 w-48 px-4 text-sm justify-between rounded-md"
+                )}
+              >
                 <SelectValue placeholder="Agente" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os agentes</SelectItem>
-                {agentes.map((agente) => (
-                  <SelectItem key={agente} value={agente}>
-                    {agente}
+                {agentOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -239,3 +275,4 @@ const TicketsPage = () => {
 };
 
 export default TicketsPage;
+

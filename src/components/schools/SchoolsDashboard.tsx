@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -64,7 +64,7 @@ const SchoolsDashboard = () => {
       setSchools(voucherData.schools);
       setExceptions(voucherData.exceptions);
       
-      // Calcular total de usuários dos dados reais
+      // Calcular total de usuÃ¡rios dos dados reais
       const totalUsersCount = schoolData.reduce((sum, school) => sum + school.users.length, 0);
       setTotalUsers(totalUsersCount);
       
@@ -79,7 +79,7 @@ const SchoolsDashboard = () => {
   const applyFilters = () => {
     let filtered = schools;
     
-    // Se uma escola específica foi selecionada, mostrar apenas ela
+    // Se uma escola especÃ­fica foi selecionada, mostrar apenas ela
     if (selectedSchool) {
       const school = schools.find(s => s.id === selectedSchool);
       filtered = school ? [school] : [];
@@ -102,7 +102,7 @@ const SchoolsDashboard = () => {
 
   const handleVoucherSearch = () => {
     if (!searchTerm.trim()) {
-      toast.error("Digite um código de voucher para buscar");
+      toast.error("Digite um cÃ³digo de voucher para buscar");
       return;
     }
 
@@ -113,10 +113,10 @@ const SchoolsDashboard = () => {
         toast.success(`Voucher encontrado na escola: ${result.school.name}`);
         setFilteredSchools([result.school]);
       } else if (result.exception) {
-        toast.success(`Voucher de exceção encontrado: ${result.exception.unit}`);
+        toast.success(`Voucher de exceÃ§Ã£o encontrado: ${result.exception.unit}`);
       }
     } else {
-      toast.error("Voucher não encontrado");
+      toast.error("Voucher nÃ£o encontrado");
     }
   };
 
@@ -126,7 +126,7 @@ const SchoolsDashboard = () => {
   };
 
   const handleSaveException = (exception: Partial<ExceptionVoucher>) => {
-    // Salvar exceção no localStorage por enquanto
+    // Salvar exceÃ§Ã£o no localStorage por enquanto
     const existingExceptions = JSON.parse(localStorage.getItem('voucherExceptions') || '[]');
     const newException = {
       ...exception,
@@ -139,13 +139,13 @@ const SchoolsDashboard = () => {
 
   const generatePDFReport = () => {
     generateVoucherReport(filteredSchools, exceptions);
-    toast.success("Relatório PDF gerado com sucesso!");
+    toast.success("RelatÃ³rio PDF gerado com sucesso!");
   };
 
   const generateUsersPDFReport = () => {
     loadSchoolData().then(schoolData => {
       generateUserReport(totalUsers, schoolData);
-      toast.success("Relatório de usuários PDF gerado com sucesso!");
+      toast.success("RelatÃ³rio de usuÃ¡rios PDF gerado com sucesso!");
     });
   };
 
@@ -176,7 +176,7 @@ const SchoolsDashboard = () => {
     const existingJustifications = JSON.parse(localStorage.getItem('voucherJustifications') || '[]');
     localStorage.setItem('voucherJustifications', JSON.stringify([...existingJustifications, newJustification]));
 
-    toast.success(`${voucherAction === 'exception' ? 'Exceção adicionada' : 'Voucher editado'} com sucesso!`);
+    toast.success(`${voucherAction === 'exception' ? 'ExceÃ§Ã£o adicionada' : 'Voucher editado'} com sucesso!`);
     setShowJustification(false);
     setJustification("");
     setCurrentSchool(null);
@@ -193,7 +193,7 @@ const SchoolsDashboard = () => {
   };
 
   const getSafConsultants = () => {
-    return ['Tatiane', 'Rafhael', 'João', 'Ingrid', 'Ana Paula'];
+    return ['Tatiane', 'Rafhael', 'Joao', 'Ingrid', 'Ana Paula'];
   };
 
   const getSchoolOptions = () => {
@@ -228,17 +228,17 @@ const SchoolsDashboard = () => {
         <div>
           <h1 className="text-3xl font-bold">Dashboard de Escolas</h1>
           <p className="text-muted-foreground">
-            Gerenciamento de licenças Canva e vouchers por escola
+            Gerenciamento de licenÃ§as Canva e vouchers por escola
           </p>
         </div>
         <div className="flex gap-2">
           <Button onClick={generatePDFReport}>
             <FileText className="w-4 h-4 mr-2" />
-            Relatório PDF
+            RelatÃ³rio PDF
           </Button>
           <Button variant="outline" onClick={generateUsersPDFReport}>
             <Users className="w-4 h-4 mr-2" />
-            Relatório Usuários
+            RelatÃ³rio UsuÃ¡rios
           </Button>
           <Button variant="outline" onClick={() => exportVoucherReport(filteredSchools)}>
             <Download className="w-4 h-4 mr-2" />
@@ -250,7 +250,7 @@ const SchoolsDashboard = () => {
         </div>
       </div>
 
-      {/* Estatísticas */}
+      {/* EstatÃ­sticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Total de Escolas"
@@ -265,12 +265,12 @@ const SchoolsDashboard = () => {
           icon={<Ticket className="h-4 w-4" />}
         />
         <StatsCard
-          title="Exceções"
+          title="ExceÃ§Ãµes"
           value={stats.exceptionVouchers.toString()}
           icon={<Plus className="h-4 w-4" />}
         />
         <StatsCard
-          title="Total de Usuários"
+          title="Total de UsuÃ¡rios"
           value={totalUsers.toString()}
           trend={{ value: totalUsers > 800 ? 2.5 : -1.2, isPositive: totalUsers > 800 }}
           icon={<Users className="h-4 w-4" />}
@@ -302,7 +302,7 @@ const SchoolsDashboard = () => {
                 <Label className="text-sm font-medium">Ou buscar por texto</Label>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Nome, ID ou código do voucher..."
+                    placeholder="Nome, ID ou cÃ³digo do voucher..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -367,12 +367,12 @@ const SchoolsDashboard = () => {
               <div className="min-w-[120px]">
                 <Select value={voucherEligible} onValueChange={setVoucherEligible}>
                   <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Elegível" />
+                    <SelectValue placeholder="ElegÃ­vel" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border shadow-md">
                     <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="true">Elegíveis</SelectItem>
-                    <SelectItem value="false">Não Elegíveis</SelectItem>
+                    <SelectItem value="true">ElegÃ­veis</SelectItem>
+                    <SelectItem value="false">NÃ£o ElegÃ­veis</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -385,7 +385,7 @@ const SchoolsDashboard = () => {
                   <SelectContent className="bg-background border shadow-md">
                     <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="true">Enviados</SelectItem>
-                    <SelectItem value="false">Não Enviados</SelectItem>
+                    <SelectItem value="false">NÃ£o Enviados</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -434,14 +434,14 @@ const SchoolsDashboard = () => {
 
               {school.voucherCode && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Código do Voucher</p>
+                  <p className="text-sm text-muted-foreground">CÃ³digo do Voucher</p>
                   <code className="text-sm bg-muted px-2 py-1 rounded">{school.voucherCode}</code>
                 </div>
               )}
 
               <div className="flex flex-wrap gap-2">
                 <Badge variant={school.voucherEligible ? "default" : "secondary"}>
-                  {school.voucherEligible ? "Elegível" : "Não Elegível"}
+                  {school.voucherEligible ? "ElegÃ­vel" : "NÃ£o ElegÃ­vel"}
                 </Badge>
                 {school.voucherSent && (
                   <Badge variant="outline" className="bg-green-50 text-green-700">
@@ -478,7 +478,7 @@ const SchoolsDashboard = () => {
                   className="flex-1"
                 >
                   <Plus className="w-3 h-3 mr-1" />
-                  Exceção
+                  ExceÃ§Ã£o
                 </Button>
               </div>
             </CardContent>
@@ -502,12 +502,12 @@ const SchoolsDashboard = () => {
         onSave={handleSaveException}
       />
 
-      {/* Dialog de Justificativa (para edição) */}
+      {/* Dialog de Justificativa (para ediÃ§Ã£o) */}
       <Dialog open={showJustification} onOpenChange={setShowJustification}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {voucherAction === 'exception' ? 'Adicionar Exceção de Voucher' : 'Editar Voucher'}
+              {voucherAction === 'exception' ? 'Adicionar ExceÃ§Ã£o de Voucher' : 'Editar Voucher'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import userService, { DevUser, AuditEntry } from "@/services/userService";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function AccessManagement() {
   const MIN_PASSWORD_LENGTH = 6;
@@ -14,6 +15,8 @@ export default function AccessManagement() {
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [showAudit, setShowAudit] = useState(false);
   const { toast } = useToast();
+  const { hasRole } = useAuthStore();
+  const canManageAccess = hasRole("Admin") || hasRole("Coordinator");
 
   const reload = () => setUsers(userService.listUsers());
 
@@ -30,6 +33,15 @@ export default function AccessManagement() {
   }, [users]);
 
   const handleCreate = () => {
+    if (!canManageAccess) {
+      toast({
+        title: "Sem permissao",
+        description: "Somente Coordenadores e Admin podem criar usuarios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       if (!username || !password) {
         toast({
@@ -66,6 +78,14 @@ export default function AccessManagement() {
   };
 
   const handleDelete = (id: string) => {
+    if (!canManageAccess) {
+      toast({
+        title: "Sem permissao",
+        description: "Somente Coordenadores e Admin podem excluir usuarios.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!confirm("Confirma exclusao deste usuario?")) return;
     try {
       const target = users.find((u) => u.id === id);
@@ -90,6 +110,14 @@ export default function AccessManagement() {
   };
 
   const handleChangePassword = (id: string) => {
+    if (!canManageAccess) {
+      toast({
+        title: "Sem permissao",
+        description: "Somente Coordenadores e Admin podem trocar senhas.",
+        variant: "destructive",
+      });
+      return;
+    }
     const newPass = prompt("Digite a nova senha (min. 6 caracteres):");
     if (!newPass) return;
     const cleanPass = newPass.trim();
@@ -118,6 +146,19 @@ export default function AccessManagement() {
     setAudit(userService.getAuditEntries(200));
     setShowAudit(true);
   };
+
+  if (!canManageAccess) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Gerenciamento de Acessos</CardTitle>
+        </CardHeader>
+        <CardContent className="text-muted-foreground">
+          Apenas Coordenadores e Administradores podem gerenciar acessos.
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">

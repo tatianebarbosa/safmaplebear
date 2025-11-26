@@ -137,7 +137,7 @@ const Login = () => {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 mt-2">
                 <Label
                   htmlFor="password"
                   className="text-sm font-semibold text-foreground/90"

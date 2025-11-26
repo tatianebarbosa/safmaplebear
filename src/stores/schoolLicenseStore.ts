@@ -31,6 +31,7 @@ import {
   buildProcessedSchoolsFromIntegration,
   fetchIntegratedCanvaData,
 } from "@/lib/integratedCanvaService";
+import { saveLicenseAction, type LicenseAction } from "@/lib/canvaDataProcessor";
 
 const calculateLicenseStatus = (
   usedLicenses: number,
@@ -56,6 +57,8 @@ type AddUserMeta = {
   solicitadoPorEmail: string;
   observacao: string;
   performedBy?: string;
+  ticketNumber?: string;
+  emailTitle?: string;
 };
 
 type ActionMeta = {
@@ -191,6 +194,24 @@ const ensureCentralSchool = (schools: School[]): School[] => {
 };
 
 const seedSchools: School[] = [centralSchool];
+
+const recordLicenseAction = (
+  action: Omit<LicenseAction, "id" | "timestamp">
+) => {
+  if (typeof window === "undefined") return;
+  try {
+    saveLicenseAction({
+      ...action,
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error(
+      "[schoolLicenseStore] Falha ao registrar historico de licencas",
+      error
+    );
+  }
+};
 
 export const useSchoolLicenseStore = create<SchoolLicenseState>()(
   persist(
@@ -340,6 +361,26 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           },
         });
 
+        const justificationText =
+          meta.ticketNumber?.trim()
+            ? `Ticket: ${meta.ticketNumber}`
+            : meta.emailTitle?.trim()
+            ? `Email: ${meta.emailTitle}`
+            : meta.observacao?.trim()
+            ? meta.observacao.trim()
+            : "Justificativa nao informada";
+
+        recordLicenseAction({
+          schoolId: school.id,
+          schoolName: school.name,
+          action: "add",
+          userId: newUser.id,
+          userName: newUser.name,
+          userEmail: newUser.email,
+          justification: justificationText,
+          performedBy: meta.performedBy || "Sistema/Usuario",
+        });
+
         set((state) => ({
           schools: state.schools.map((s) =>
             s.id === schoolId
@@ -390,6 +431,18 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           },
         });
 
+        recordLicenseAction({
+          schoolId: school.id,
+          schoolName: school.name,
+          action: "update",
+          userId: updatedUser.id,
+          userName: updatedUser.name,
+          userEmail: updatedUser.email,
+          justification:
+            actionMeta.reason?.trim() || "Justificativa nao informada",
+          performedBy: actionMeta.performedBy || "Sistema/Usuario",
+        });
+
         set((state) => ({
           schools: state.schools.map((s) =>
             s.id === schoolId
@@ -428,6 +481,18 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             type: "REMOVE_USER",
             user: userToRemove,
           },
+        });
+
+        recordLicenseAction({
+          schoolId: school.id,
+          schoolName: school.name,
+          action: "delete",
+          userId: userToRemove.id,
+          userName: userToRemove.name,
+          userEmail: userToRemove.email,
+          justification:
+            actionMeta.reason?.trim() || "Justificativa nao informada",
+          performedBy: actionMeta.performedBy || "Sistema/Usuario",
         });
 
         set((state) => ({
@@ -494,6 +559,19 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
 
         // 2. Adicionar justificativa
         state.addJustification(justification);
+
+        recordLicenseAction({
+          schoolId: school.id,
+          schoolName: school.name,
+          action: "transfer",
+          userId: oldUser.id,
+          userName: updatedUserData.name,
+          userEmail: updatedUserData.email,
+          justification:
+            justificationData.reason?.trim() ||
+            "Justificativa nao informada",
+          performedBy: justificationData.performedBy || "Sistema/Usuario",
+        });
 
         // 3. Atualizar o usuÃ¡rio na store
         set((state) => ({
@@ -582,6 +660,20 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             email: targetUser.email,
             role: targetUser.role,
           },
+        });
+
+        recordLicenseAction({
+          schoolId: sourceSchool.id,
+          schoolName: sourceSchool.name,
+          action: "transfer",
+          userId: sourceUser.id,
+          userName: sourceUser.name,
+          userEmail: sourceUser.email,
+          targetSchoolId: targetSchool.id,
+          targetSchoolName: targetSchool.name,
+          justification:
+            justification.reason?.trim() || "Justificativa nao informada",
+          performedBy: justification.performedBy || "Sistema/Usuario",
         });
 
         // 3. Atualizar as escolas
@@ -751,6 +843,11 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
 
       // Helpers
       getLicenseStatus: (school: School) => {
+        const isCentral =
+          school.id === centralSchool.id ||
+          (school.name || "").toLowerCase().includes("central");
+        if (isCentral) return "Disponível";
+
         const totalLicenses =
           school.totalLicenses || getLicenseLimitForSchool(school.totalLicenses);
         return calculateLicenseStatus(school.usedLicenses, totalLicenses);

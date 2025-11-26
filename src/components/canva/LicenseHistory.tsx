@@ -66,7 +66,8 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
       add: 'Licença Adicionada',
       remove: 'Licença Removida',
       transfer: 'Usuário Transferido',
-      delete: 'Usuário Excluído'
+      delete: 'Usuário Excluído',
+      update: 'Usuário Atualizado',
     };
     return labels[action as keyof typeof labels] || action;
   };
@@ -76,7 +77,8 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
       add: 'default',
       remove: 'secondary',
       transfer: 'outline',
-      delete: 'destructive'
+      delete: 'destructive',
+      update: 'secondary',
     };
     return variants[action as keyof typeof variants] || 'outline';
   };
@@ -132,17 +134,18 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
               <label className="text-sm font-medium mb-2 block">Ação</label>
               <Select value={actionFilter} onValueChange={setActionFilter}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Todas as ações" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as ações</SelectItem>
-                  <SelectItem value="add">Licença Adicionada</SelectItem>
-                  <SelectItem value="remove">Licença Removida</SelectItem>
-                  <SelectItem value="transfer">Usuário Transferido</SelectItem>
-                  <SelectItem value="delete">Usuário Excluído</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <SelectValue placeholder="Todas as ações" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as ações</SelectItem>
+              <SelectItem value="add">Licença Adicionada</SelectItem>
+              <SelectItem value="remove">Licença Removida</SelectItem>
+              <SelectItem value="transfer">Usuário Transferido</SelectItem>
+              <SelectItem value="delete">Usuário Excluído</SelectItem>
+              <SelectItem value="update">Usuário Atualizado</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
             <div>
               <label className="text-sm font-medium mb-2 block">Data Início</label>

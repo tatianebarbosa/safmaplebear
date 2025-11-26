@@ -225,7 +225,20 @@ export const loadFranchisingSchools = async (): Promise<School[]> => {
         statusVisitaLideranca: optionalString(getField(record, fieldMap, 'Status Visita Lideranca') || getField(record, fieldMap, 'Status Visita Liderança') || ''),
         performanceMeta: optionalString(getField(record, fieldMap, 'Performance da Meta') || ''),
         atualSerie: optionalString(getField(record, fieldMap, 'Atual Serie') || getField(record, fieldMap, 'Atual Série') || ''),
-        avancandoSegmento: optionalString(getField(record, fieldMap, 'Avancando de Segmento') || ('')),
+        avancandoSegmento: optionalString(getField(record, fieldMap, 'Avancando de Segmento') || ''),
+        ticketMedio: optionalString(
+          getField(record, fieldMap, 'Ticket Medio') ||
+            getField(record, fieldMap, 'Ticket Médio') ||
+            getField(record, fieldMap, 'Ticket MǸdio') ||
+            ''
+        ),
+        ultimaAtualizacao:
+          parseDateTime(
+            getField(record, fieldMap, 'Data de Modificacao') ||
+              getField(record, fieldMap, 'Data de Modificação') ||
+              getField(record, fieldMap, '(Não Modificar) Data de Modificação') ||
+              ''
+          )?.toISOString() || null,
       };
     })
     .filter((school): school is School => school !== null);

@@ -1,5 +1,17 @@
 export type TicketStatus = "Pendente" | "Em andamento" | "Resolvido";
-export type Agente = "Tati" | "Rafha" | "Ingrid" | "Joao" | "Joǜo" | "Jaque" | "Jessika" | "Fernanda";
+export type Agente =
+  | "Joao"
+  | "Ingrid"
+  | "Rafha"
+  | "Rafhael"
+  | "Tati"
+  | "Tatiane"
+  | "Jaque"
+  | "Jaqueline"
+  | "Jessika"
+  | "Yasmin"
+  | "Yasmin Martins"
+  | "Fernanda";
 export type Role = "Agent" | "Coordinator" | "Admin";
 export type TicketPriority = "Baixa" | "Media" | "Alta" | "Critica";
 
@@ -25,6 +37,8 @@ export interface Ticket {
   watchers?: (Agente | "Coordinator" | "Admin")[]; // quem recebe alerta
   tags?: string[];
   notes?: TicketNote[];
+  slaDias?: number;
+  assigneeEmail?: string;
 }
 
 export interface User {

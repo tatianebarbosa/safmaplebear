@@ -1,20 +1,25 @@
-import { ReactNode, useMemo, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ReactNode, useEffect, useMemo, useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Ticket } from "@/types/tickets";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Ticket, TicketStatus } from "@/types/tickets";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useAuthStore } from "@/stores/authStore";
-import { CalendarIcon, MessageSquare, User2, Clock3, Tag, Bell, Star, Shield } from "lucide-react";
+import { CalendarIcon, MessageSquare, User2, Clock3, Tag, Bell, Star, Shield, Pencil } from "lucide-react";
 import { format } from "date-fns";
+import { getAgentDisplayName } from "@/data/teamMembers";
+import { useTicketStatusJustification } from "@/hooks/useTicketStatusJustification";
 
 interface TicketDetailsDialogProps {
   open: boolean;
@@ -22,30 +27,88 @@ interface TicketDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const InfoRow = ({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: any;
-  label: string;
-  value: ReactNode;
-}) => (
-  <div className="flex items-center justify-between rounded-lg border border-border/70 bg-muted/30 px-3 py-2 text-sm">
-    <div className="flex items-center gap-2 text-muted-foreground">
-      <Icon className="h-4 w-4" />
-      <span>{label}</span>
-    </div>
-    <div className="font-medium text-foreground">{value}</div>
-  </div>
-);
-
 export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetailsDialogProps) => {
-  const { addNoteToTicket } = useTicketStore();
-  const { currentUser } = useAuthStore();
+  const { addNoteToTicket, updateTicket } = useTicketStore();
+  const { currentUser, canManageTicket } = useAuthStore();
+  const { requestStatusChange, justificationDialog } = useTicketStatusJustification();
   const [note, setNote] = useState("");
+  const [form, setForm] = useState({
+    status: ticket?.status || "Pendente",
+    priority: ticket?.priority || "Media",
+    agente: ticket?.agente || "",
+    dueDate: ticket?.dueDate || "",
+    slaDias: ticket?.slaDias?.toString() || "",
+    observacao: ticket?.observacao || "",
+  });
 
   const notes = useMemo(() => ticket?.notes || [], [ticket]);
+  const canEdit = ticket ? canManageTicket(ticket.agente) : false;
+
+  useEffect(() => {
+    if (!ticket) return;
+    setForm({
+      status: ticket.status,
+      priority: ticket.priority || "Media",
+      agente: ticket.agente,
+      dueDate: ticket.dueDate || "",
+      slaDias: ticket.slaDias?.toString() || "",
+      observacao: ticket.observacao || "",
+    });
+    setNote("");
+  }, [ticket]);
+
+  const hasChanges = useMemo(() => {
+    if (!ticket) return false;
+    return (
+      form.status !== ticket.status ||
+      (form.priority || "Media") !== (ticket.priority || "Media") ||
+      form.agente !== ticket.agente ||
+      (form.dueDate || "") !== (ticket.dueDate || "") ||
+      (form.slaDias || "") !== (ticket.slaDias?.toString() || "") ||
+      form.observacao !== ticket.observacao
+    );
+  }, [form, ticket]);
+
+  const handleSave = () => {
+    if (!ticket || !canEdit || !hasChanges) return;
+
+    const updates: Partial<Ticket> = {
+      priority: form.priority as any,
+      agente: form.agente as any,
+      dueDate: form.dueDate || undefined,
+      slaDias: form.slaDias ? Number(form.slaDias) : undefined,
+      observacao: form.observacao,
+    };
+
+    const changes: string[] = [];
+    if ((form.priority || "Media") !== (ticket.priority || "Media"))
+      changes.push(`Prioridade: ${ticket.priority || "N/A"} -> ${form.priority}`);
+    if (form.agente !== ticket.agente) changes.push(`Responsavel: ${ticket.agente} -> ${form.agente}`);
+    if ((form.dueDate || "") !== (ticket.dueDate || "")) changes.push(`Vencimento: ${ticket.dueDate || "Sem"} -> ${form.dueDate || "Sem"}`);
+    if ((form.slaDias || "") !== (ticket.slaDias?.toString() || ""))
+      changes.push(`SLA: ${ticket.slaDias ?? "-"} -> ${form.slaDias || "-"}`);
+    if (form.observacao !== ticket.observacao) changes.push("Descricao editada");
+
+    const applyFieldUpdates = () => {
+      if (!changes.length) return;
+
+      updateTicket(ticket.id, updates);
+      addNoteToTicket(ticket.id, {
+        id: `${ticket.id}-change-${Date.now()}`,
+        author: currentUser?.name || currentUser?.agente || "Usuario",
+        content: `Atualizacoes: ${changes.join(" | ")}`,
+        createdAt: new Date().toISOString(),
+      });
+    };
+
+    if (form.status !== ticket.status) {
+      requestStatusChange(ticket, form.status as TicketStatus, applyFieldUpdates);
+      return;
+    }
+
+    applyFieldUpdates();
+  };
+
   const handleAddNote = () => {
     if (!ticket || !note.trim()) return;
     addNoteToTicket(ticket.id, {
@@ -61,84 +124,168 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
 
   const createdLabel = ticket.createdAt ? format(new Date(ticket.createdAt), "dd/MM/yyyy HH:mm") : "-";
   const dueLabel = ticket.dueDate ? format(new Date(ticket.dueDate), "dd/MM/yyyy") : "Sem vencimento";
+  const agentDisplay = getAgentDisplayName(form.agente || ticket.agente);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl w-full">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-2xl">
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl w-[96vw] max-h-[85vh] p-0 overflow-hidden border border-border/70 shadow-2xl flex flex-col">
+        <DialogHeader className="border-b border-border/60 bg-muted/40 px-6 py-4">
+          <DialogTitle className="flex items-center gap-3 text-xl sm:text-2xl">
             <Badge variant="secondary" className="font-mono">
               {ticket.id}
             </Badge>
-            <span>{ticket.observacao.slice(0, 60) || "Ticket SAF"}</span>
+            <span className="leading-tight text-base sm:text-lg">
+              {ticket.observacao.slice(0, 80) || "Ticket SAF"}
+            </span>
           </DialogTitle>
-          <DialogDescription>Resumo do ticket, responsáveis e atividade recente.</DialogDescription>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Resumo do ticket, responsaveis e atividade recente.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline">{ticket.status}</Badge>
-              {ticket.priority && <Badge variant="destructive">Prioridade {ticket.priority}</Badge>}
-              <Badge variant="outline">Criado por {ticket.createdBy || "N/A"}</Badge>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <InfoRow icon={User2} label="Responsavel" value={ticket.agente} />
-              <InfoRow icon={Shield} label="Criador" value={ticket.createdBy || "N/A"} />
-              <InfoRow icon={Clock3} label="Criado em" value={createdLabel} />
-              <InfoRow icon={CalendarIcon} label="Vencimento" value={dueLabel} />
-              <InfoRow icon={Bell} label="Watchers" value={(ticket.watchers || []).join(", ") || "Nenhum"} />
-              <InfoRow icon={Star} label="SLA (dias)" value={`${ticket.diasAberto ?? 0}`} />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Tag className="h-4 w-4" />
-                Descrição
-              </div>
-              <div className="rounded-lg border border-dashed bg-muted/30 p-3 text-sm text-foreground">
-                {ticket.observacao || "Sem descrição"}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-xl border border-border/60 bg-muted/30 p-4">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <MessageSquare className="h-4 w-4" />
-              Atividade
-            </div>
-            <Separator />
-
-            <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
-              {notes.length === 0 && (
-                <p className="text-sm text-muted-foreground">Nenhum comentário ainda.</p>
-              )}
-              {notes.map((n) => (
-                <div key={n.id} className="rounded-md border border-border/60 bg-background p-2">
-                  <div className="flex items-center justify-between text-[12px] text-muted-foreground mb-1">
-                    <span className="font-medium text-foreground">{n.author}</span>
-                    <span>{format(new Date(n.createdAt), "dd/MM HH:mm")}</span>
+        <div className="space-y-6 px-6 py-5 overflow-y-auto flex-1">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.9fr] gap-5">
+            <div className="space-y-4">
+              <div className="rounded-xl border bg-card p-4 shadow-sm space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Status</Label>
+                    <Select
+                      value={form.status}
+                      onValueChange={(value) => setForm((prev) => ({ ...prev, status: value as any }))}
+                      disabled={!canEdit}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Pendente">Pendente</SelectItem>
+                        <SelectItem value="Em andamento">Em andamento</SelectItem>
+                        <SelectItem value="Resolvido">Resolvido</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <p className="text-sm">{n.content}</p>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Prioridade</Label>
+                    <Select
+                      value={form.priority}
+                      onValueChange={(value) => setForm((prev) => ({ ...prev, priority: value as any }))}
+                      disabled={!canEdit}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Prioridade" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Baixa">Baixa</SelectItem>
+                        <SelectItem value="Media">Media</SelectItem>
+                        <SelectItem value="Alta">Alta</SelectItem>
+                        <SelectItem value="Critica">Critica</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Responsavel</Label>
+                    <Input
+                      value={form.agente}
+                      onChange={(e) => setForm((prev) => ({ ...prev, agente: e.target.value as any }))}
+                      disabled={!canEdit}
+                    />
+                    <p className="text-[11px] text-muted-foreground">Nome completo: {agentDisplay}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Vencimento</Label>
+                    <Input
+                      type="date"
+                      value={form.dueDate ? form.dueDate.slice(0, 10) : ""}
+                      onChange={(e) => setForm((prev) => ({ ...prev, dueDate: e.target.value }))}
+                      disabled={!canEdit}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">SLA (dias)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={form.slaDias}
+                      onChange={(e) => setForm((prev) => ({ ...prev, slaDias: e.target.value }))}
+                      disabled={!canEdit}
+                    />
+                  </div>
                 </div>
-              ))}
+                <div className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                  <span className="flex items-center gap-1">
+                    <Clock3 className="h-4 w-4" /> Criado em <span className="font-medium text-foreground">{createdLabel}</span>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Shield className="h-4 w-4" /> Criador <span className="font-medium text-foreground">{ticket.createdBy || "N/A"}</span>
+                  </span>
+                </div>
+                <div className="flex justify-end">
+                  <Button onClick={handleSave} disabled={!canEdit || !hasChanges} className="min-w-[180px]">
+                    Salvar alterações
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
+                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <Tag className="h-4 w-4" />
+                  Descrição
+                </div>
+                <Textarea
+                  className="min-h-[120px]"
+                  value={form.observacao}
+                  onChange={(e) => setForm((prev) => ({ ...prev, observacao: e.target.value }))}
+                  disabled={!canEdit}
+                  placeholder="Atualize a descricao do ticket"
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Textarea
-                placeholder="Escreva um comentário"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={3}
-              />
-              <Button onClick={handleAddNote} disabled={!note.trim()}>
-                Adicionar comentário
-              </Button>
+            <div className="space-y-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <MessageSquare className="h-4 w-4" />
+                  Atividade
+                </div>
+                <Badge variant="outline">{notes.length} registros</Badge>
+              </div>
+              <Separator />
+
+              <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+                {notes.length === 0 && (
+                  <p className="text-sm text-muted-foreground">Nenhum comentario ainda.</p>
+                )}
+                {notes.map((n) => (
+                  <div key={n.id} className="rounded-md border border-border/60 bg-background p-2">
+                    <div className="flex items-center justify-between text-[12px] text-muted-foreground mb-1">
+                      <span className="font-medium text-foreground">{n.author}</span>
+                      <span>{format(new Date(n.createdAt), "dd/MM HH:mm")}</span>
+                    </div>
+                    <p className="text-sm">{n.content}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-2">
+                <Textarea
+                  placeholder="Escreva um comentario"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={3}
+                  className="rounded-lg"
+                />
+                <Button onClick={handleAddNote} disabled={!note.trim()}>
+                  Adicionar comentario
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </DialogContent>
-    </Dialog>
+      </Dialog>
+      {justificationDialog}
+    </>
   );
 };

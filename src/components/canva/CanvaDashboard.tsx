@@ -83,9 +83,9 @@ const CanvaDashboard = () => {
 
   return (
     <div className="w-full pb-10">
-      <div className="space-y-6 mt-4">
+      <div className="layout-wide space-y-6 mt-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="flex w-full overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50">
+          <TabsList className="flex w-full overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50 justify-center gap-4 px-2">
             <TabsTrigger
               value="overview"
               className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"

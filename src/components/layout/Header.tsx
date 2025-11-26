@@ -18,14 +18,13 @@ import {
   ExternalLink,
   Search,
   Grid,
-  Bell,
 } from "lucide-react";
 import { SPREADSHEET_LINKS, CRM_LINKS } from "@/config/links";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/components/auth/AuthService";
 import { Logos } from "@/assets/maplebear";
 import { useAuthStore } from "@/stores/authStore";
-import MobileMenu from "./MobileMenu";
+import NotificationBell from "@/components/layout/NotificationBell";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -149,7 +148,6 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <MobileMenu />
             <Button 
               variant="ghost" 
               size="icon" 
@@ -159,15 +157,7 @@ const Header = () => {
             >
               <Search className="w-5 h-5" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full h-11 w-11"
-              aria-label="Notificações"
-              onClick={() => toast({ title: "Notificações em breve", description: "Painel de notificações será implementado em breve." })}
-            >
-              <Bell className="w-5 h-5" />
-            </Button>
+            <NotificationBell />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -227,3 +217,4 @@ const Header = () => {
 };
 
 export default Header;
+

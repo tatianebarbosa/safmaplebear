@@ -26,14 +26,30 @@ interface AuthStore {
 const seedUsers: User[] = [
   { id: "1", name: "Tati", email: "tati@mbcentral.com.br", role: "Agent", agente: "Tati" },
   { id: "2", name: "Rafha", email: "rafha@mbcentral.com.br", role: "Agent", agente: "Rafha" },
-  { id: "3", name: "Ingrid", email: "ingrid@mbcentral.com.br", role: "Agent", agente: "Ingrid" },
-  { id: "4", name: "Joao", email: "joao@mbcentral.com.br", role: "Agent", agente: "Joao" },
-  { id: "5", name: "Jaque", email: "jaque@mbcentral.com.br", role: "Agent", agente: "Jaque" },
-  { id: "6", name: "Jessika", email: "jessika@mbcentral.com.br", role: "Agent", agente: "Jessika" },
-  { id: "7", name: "Fernanda", email: "fernanda@mbcentral.com.br", role: "Agent", agente: "Fernanda" },
-  { id: "8", name: "Coordenador", email: "coordenador@mbcentral.com.br", role: "Coordinator" },
-  { id: "9", name: "Admin", email: "admin@mbcentral.com.br", role: "Admin" },
+  { id: "3", name: "Rafhael", email: "rafhael@mbcentral.com.br", role: "Agent", agente: "Rafhael" },
+  { id: "4", name: "Ingrid", email: "ingrid@mbcentral.com.br", role: "Agent", agente: "Ingrid" },
+  { id: "5", name: "Joao", email: "joao@mbcentral.com.br", role: "Agent", agente: "Joao" },
+  { id: "6", name: "Jaque", email: "jaque@mbcentral.com.br", role: "Agent", agente: "Jaque" },
+  { id: "7", name: "Jaqueline", email: "jaqueline@mbcentral.com.br", role: "Agent", agente: "Jaqueline" },
+  { id: "8", name: "Jessika", email: "jessika@mbcentral.com.br", role: "Agent", agente: "Jessika" },
+  { id: "9", name: "Tatiane", email: "tatiane@mbcentral.com.br", role: "Agent", agente: "Tatiane" },
+  { id: "10", name: "Yasmin Martins", email: "yasmin.martins@mbcentral.com.br", role: "Agent", agente: "Yasmin Martins" },
+  { id: "11", name: "Fernanda", email: "fernanda@mbcentral.com.br", role: "Agent", agente: "Fernanda" },
+  { id: "12", name: "Ana Paula Oliveira de Andrade", email: "ana.paula@mbcentral.com.br", role: "Coordinator" },
+  { id: "13", name: "Admin", email: "admin@mbcentral.com.br", role: "Admin" },
+  { id: "14", name: "tatiane.barbosa", email: "tatiane.barbosa", role: "Agent", agente: "Tatiane" },
 ];
+
+const normalizeAgentName = (agente?: Agente): Agente | undefined => {
+  if (!agente) return undefined;
+  const map: Partial<Record<Agente, Agente>> = {
+    Tati: "Tatiane",
+    Rafha: "Rafhael",
+    Jaque: "Jaqueline",
+    Yasmin: "Yasmin Martins",
+  };
+  return map[agente] || agente;
+};
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -89,7 +105,9 @@ export const useAuthStore = create<AuthStore>()(
         if (currentUser.role === "Admin" || currentUser.role === "Coordinator") return true;
 
         // Agent can only manage their own tickets
-        return currentUser.role === "Agent" && currentUser.agente === ticketAgente;
+        const userAgente = normalizeAgentName(currentUser.agente as Agente | undefined);
+        const ticketAgent = normalizeAgentName(ticketAgente);
+        return currentUser.role === "Agent" && userAgente === ticketAgent;
       },
 
       isAgent: () => get().currentUser?.role === "Agent",

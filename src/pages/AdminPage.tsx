@@ -93,16 +93,18 @@ const AdminPage = () => {
     toast.success(`Limite restaurado para ${fallback} licencas por escola`);
   };
 
+  const canAccess = hasRole("Admin") || hasRole("Coordinator");
+
   // Redirect if not authorized
-  if (!hasRole("Admin")) {
+  if (!canAccess) {
     return (
-      <div className="w-full py-8 space-y-4">
+      <div className="layout-wide w-full py-8 space-y-4">
         <Card>
           <CardContent className="py-16 text-center">
             <Shield className="h-16 w-16 mx-auto mb-4 text-red-500" />
             <h2 className="text-2xl font-bold mb-2">Acesso Negado</h2>
             <p className="text-muted-foreground">
-              Apenas Administradores podem acessar esta área.
+              Apenas Coordenadores e Administradores podem acessar esta area.
             </p>
           </CardContent>
         </Card>
@@ -113,39 +115,43 @@ const AdminPage = () => {
   
 
   return (
-    <div className="w-full py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Settings className="h-8 w-8 text-primary" />
-            Administração
-          </h1>
-          <p className="text-muted-foreground">
-            Gerencie usuários, papéis e configurações do sistema
-          </p>
-        </div>
+    <div className="layout-wide w-full py-8 space-y-8">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <Settings className="h-8 w-8 text-primary" />
+          Administracao
+        </h1>
+        <p className="text-muted-foreground">
+          Gerencie usuarios, papeis e configuracoes do sistema
+        </p>
       </div>
 
       <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="users" className="gap-2">
-            <Users className="h-4 w-4" />
-            Usuarios e Perfis
-          </TabsTrigger>
-          <TabsTrigger value="licenses" className="gap-2">
-            <Building2 className="h-4 w-4" />
-            Licencas Canva
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex justify-center">
+          <TabsList className="grid w-full max-w-md grid-cols-2 rounded-2xl bg-muted/70 p-0.5 shadow-sm">
+            <TabsTrigger
+              value="users"
+              className="h-11 px-3 gap-2 rounded-xl data-[state=active]:bg-background"
+            >
+              <Users className="h-4 w-4" />
+              Usuarios e Perfis
+            </TabsTrigger>
+            <TabsTrigger
+              value="licenses"
+              className="h-11 px-3 gap-2 rounded-xl data-[state=active]:bg-background"
+            >
+              <Building2 className="h-4 w-4" />
+              Licencas Canva
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-{/* Users Management */}
         <TabsContent value="users" className="space-y-6">
-          <Card>
+          <Card className="border-border/70 shadow-[var(--shadow-card)]">
             <CardHeader>
-              <CardTitle>Gerenciamento de Usuários</CardTitle>
+              <CardTitle>Gerenciamento de Usuarios</CardTitle>
               <CardDescription>
-                Adicione, edite e remova usuários, e gerencie seus perfis de
+                Adicione, edite e remova usuarios, e gerencie seus perfis de
                 acesso.
               </CardDescription>
             </CardHeader>
@@ -155,9 +161,8 @@ const AdminPage = () => {
           </Card>
         </TabsContent>
 
-        {/* Licenses settings */}
         <TabsContent value="licenses" className="space-y-6">
-          <Card>
+          <Card className="border-border/70 shadow-[var(--shadow-card)]">
             <CardHeader>
               <CardTitle>Limite de licencas por escola</CardTitle>
               <CardDescription>
@@ -211,7 +216,7 @@ const AdminPage = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-border/70 shadow-[var(--shadow-card)]">
             <CardHeader>
               <CardTitle>Historico de alteracoes</CardTitle>
               <CardDescription>Registro de quem ajustou o limite e quando.</CardDescription>
@@ -242,8 +247,6 @@ const AdminPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
-
-        
       </Tabs>
     </div>
   );
