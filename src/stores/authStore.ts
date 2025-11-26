@@ -22,7 +22,6 @@ interface AuthStore {
   isAdmin: () => boolean;
 }
 
-// Initial seed users
 const seedUsers: User[] = [
   { id: "1", name: "Tati", email: "tati@mbcentral.com.br", role: "Agent", agente: "Tati" },
   { id: "2", name: "Rafha", email: "rafha@mbcentral.com.br", role: "Agent", agente: "Rafha" },
@@ -33,23 +32,11 @@ const seedUsers: User[] = [
   { id: "7", name: "Jaqueline", email: "jaqueline@mbcentral.com.br", role: "Agent", agente: "Jaqueline" },
   { id: "8", name: "Jessika", email: "jessika@mbcentral.com.br", role: "Agent", agente: "Jessika" },
   { id: "9", name: "Tatiane", email: "tatiane@mbcentral.com.br", role: "Agent", agente: "Tatiane" },
-  { id: "10", name: "Yasmin Martins", email: "yasmin.martins@mbcentral.com.br", role: "Agent", agente: "Yasmin Martins" },
+  { id: "10", name: "Yasmin", email: "yasmin@mbcentral.com.br", role: "Agent", agente: "Yasmin" },
   { id: "11", name: "Fernanda", email: "fernanda@mbcentral.com.br", role: "Agent", agente: "Fernanda" },
-  { id: "12", name: "Ana Paula Oliveira de Andrade", email: "ana.paula@mbcentral.com.br", role: "Coordinator" },
+  { id: "12", name: "Coordenador", email: "coordenador@mbcentral.com.br", role: "Coordinator" },
   { id: "13", name: "Admin", email: "admin@mbcentral.com.br", role: "Admin" },
-  { id: "14", name: "tatiane.barbosa", email: "tatiane.barbosa", role: "Agent", agente: "Tatiane" },
 ];
-
-const normalizeAgentName = (agente?: Agente): Agente | undefined => {
-  if (!agente) return undefined;
-  const map: Partial<Record<Agente, Agente>> = {
-    Tati: "Tatiane",
-    Rafha: "Rafhael",
-    Jaque: "Jaqueline",
-    Yasmin: "Yasmin Martins",
-  };
-  return map[agente] || agente;
-};
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -88,10 +75,7 @@ export const useAuthStore = create<AuthStore>()(
         const { currentUser } = get();
         if (!currentUser) return false;
 
-        // Admin has all permissions
         if (currentUser.role === "Admin") return true;
-
-        // Coordinator has Agent + Coordinator permissions
         if (currentUser.role === "Coordinator" && (role === "Agent" || role === "Coordinator")) return true;
 
         return currentUser.role === role;
@@ -101,13 +85,8 @@ export const useAuthStore = create<AuthStore>()(
         const { currentUser } = get();
         if (!currentUser) return false;
 
-        // Admin and Coordinator can manage any ticket
         if (currentUser.role === "Admin" || currentUser.role === "Coordinator") return true;
-
-        // Agent can only manage their own tickets
-        const userAgente = normalizeAgentName(currentUser.agente as Agente | undefined);
-        const ticketAgent = normalizeAgentName(ticketAgente);
-        return currentUser.role === "Agent" && userAgente === ticketAgent;
+        return currentUser.role === "Agent" && currentUser.agente === ticketAgente;
       },
 
       isAgent: () => get().currentUser?.role === "Agent",
@@ -121,7 +100,6 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: "saf-auth-storage",
       onRehydrateStorage: () => (state) => {
-        // Initialize with seed data if no users exist
         if (state && state.users.length === 0) {
           state.setUsers(seedUsers);
         }

@@ -10,7 +10,6 @@ export type Agente =
   | "Jaqueline"
   | "Jessika"
   | "Yasmin"
-  | "Yasmin Martins"
   | "Fernanda";
 export type Role = "Agent" | "Coordinator" | "Admin";
 export type TicketPriority = "Baixa" | "Media" | "Alta" | "Critica";
@@ -27,18 +26,18 @@ export interface Ticket {
   agente: Agente; // responsavel atual
   diasAberto: number; // p/ badge de SLA
   status: TicketStatus;
-  createdBy: string; // nome do usuario logado que criou
   observacao: string;
+  createdBy?: string; // nome do usuario logado que criou
   createdAt: string; // ISO
-  resolvedAt: string | null; // ISO quando resolvido, null se aberto
   updatedAt: string; // ISO
+  resolvedAt?: string | null; // ISO quando resolvido, null se aberto
   dueDate?: string; // ISO (vencimento)
   priority?: TicketPriority;
   watchers?: (Agente | "Coordinator" | "Admin")[]; // quem recebe alerta
   tags?: string[];
-  notes?: TicketNote[];
   slaDias?: number;
   assigneeEmail?: string;
+  notes?: TicketNote[];
 }
 
 export interface User {

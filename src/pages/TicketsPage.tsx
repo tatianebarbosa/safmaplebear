@@ -1,17 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Search,
-  Plus,
-  BarChart3,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  Table,
-  Kanban,
-} from "lucide-react";
+import { Search, Plus, BarChart3, Clock, CheckCircle, AlertTriangle, Table, Kanban } from "lucide-react";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useAuthStore } from "@/stores/authStore";
 import { TicketKanban } from "@/components/tickets/TicketKanban";
@@ -19,14 +10,21 @@ import { TicketTable } from "@/components/tickets/TicketTable";
 import { TicketDialog } from "@/components/tickets/TicketDialog";
 import { TicketDetailsDialog } from "@/components/tickets/TicketDetailsDialog";
 import { TicketStatus, Agente } from "@/types/tickets";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const agentes: Agente[] = [
+  "Joao",
+  "Rafhael",
+  "Ingrid",
+  "Yasmin",
+  "Tatiane",
+  "Jaqueline",
+  "Jessika",
+  "Rafha",
+  "Tati",
+  "Jaque",
+  "Fernanda",
+];
 
 const TicketsPage = () => {
   const [view, setView] = useState<"kanban" | "table">("kanban");
@@ -69,32 +67,8 @@ const TicketsPage = () => {
     return () => document.removeEventListener("keydown", handleKeyPress);
   }, [hasRole]);
 
-  const normalizeAgent = (agente?: Agente): Agente | undefined => {
-    if (!agente) return undefined;
-    const map: Partial<Record<Agente, Agente>> = {
-      Tati: "Tatiane",
-      Rafha: "Rafhael",
-      Jaque: "Jaqueline",
-      Yasmin: "Yasmin Martins",
-    };
-    return map[agente] || agente;
-  };
-
-  const agentOptions: { value: Agente; label: string }[] = [
-    { value: "Joao", label: "Joao" },
-    { value: "Rafhael", label: "Rafhael" },
-    { value: "Ingrid", label: "Ingrid" },
-    { value: "Yasmin Martins", label: "Yasmin Martins" },
-    { value: "Tatiane", label: "Tatiane" },
-    { value: "Jaqueline", label: "Jaqueline" },
-    { value: "Jessika", label: "Jessika" },
-    { value: "Fernanda", label: "Fernanda" },
-  ];
-
-  const selectedAgent = normalizeAgent(filters.agente);
-
   return (
-    <div className="layout-wide w-full py-8 space-y-6">
+    <div className="container mx-auto px-6 py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Tickets SAF</h1>
@@ -109,7 +83,7 @@ const TicketsPage = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total</CardTitle>
@@ -153,14 +127,14 @@ const TicketsPage = () => {
 
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col gap-4 md:flex-row">
             <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por ID ou observacao..."
                 value={filters.search || ""}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="h-10 pl-10 pr-4 text-sm rounded-md"
+                className="pl-10"
               />
             </div>
 
@@ -170,12 +144,7 @@ const TicketsPage = () => {
                 setFilters({ ...filters, status: value === "all" ? undefined : (value as TicketStatus) })
               }
             >
-              <SelectTrigger
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "default" }),
-                  "h-10 w-48 px-4 text-sm justify-between rounded-md"
-                )}
-              >
+              <SelectTrigger className="w-48">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -187,27 +156,19 @@ const TicketsPage = () => {
             </Select>
 
             <Select
-              value={selectedAgent || "all"}
+              value={filters.agente || "all"}
               onValueChange={(value) =>
-                setFilters({
-                  ...filters,
-                  agente: value === "all" ? undefined : (value as Agente),
-                })
+                setFilters({ ...filters, agente: value === "all" ? undefined : (value as Agente) })
               }
             >
-              <SelectTrigger
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "default" }),
-                  "h-10 w-48 px-4 text-sm justify-between rounded-md"
-                )}
-              >
+              <SelectTrigger className="w-48">
                 <SelectValue placeholder="Agente" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os agentes</SelectItem>
-                {agentOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                {agentes.map((agente) => (
+                  <SelectItem key={agente} value={agente}>
+                    {agente}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -258,7 +219,7 @@ const TicketsPage = () => {
       </div>
 
       <div className="text-xs text-muted-foreground">
-        <span className="font-medium">Atalhos:</span> N (novo) - K (kanban) - T (tabela)
+        <span className="font-medium">Atalhos:</span> N (novo) • K (kanban) • T (tabela)
       </div>
 
       <TicketDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
@@ -275,4 +236,3 @@ const TicketsPage = () => {
 };
 
 export default TicketsPage;
-

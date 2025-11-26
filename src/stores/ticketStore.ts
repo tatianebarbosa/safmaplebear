@@ -36,7 +36,6 @@ interface TicketStore {
 
 const DEFAULT_SLA_DAYS = 3;
 
-// Map agentes -> email para notificacao
 const agentEmails: Record<Agente, string> = {
   Joao: "joao@mbcentral.com.br",
   Ingrid: "ingrid@mbcentral.com.br",
@@ -47,23 +46,10 @@ const agentEmails: Record<Agente, string> = {
   Jaque: "jaque@mbcentral.com.br",
   Jaqueline: "jaqueline@mbcentral.com.br",
   Jessika: "jessika@mbcentral.com.br",
-  Yasmin: "yasmin.martins@mbcentral.com.br",
-  "Yasmin Martins": "yasmin.martins@mbcentral.com.br",
+  Yasmin: "yasmin@mbcentral.com.br",
   Fernanda: "fernanda@mbcentral.com.br",
 };
 
-const normalizeAgentName = (agente?: Agente): Agente | undefined => {
-  if (!agente) return undefined;
-  const map: Partial<Record<Agente, Agente>> = {
-    Tati: "Tatiane",
-    Rafha: "Rafhael",
-    Jaque: "Jaqueline",
-    Yasmin: "Yasmin Martins",
-  };
-  return map[agente] || agente;
-};
-
-// Calculate createdAt from diasAberto
 const calculateCreatedAt = (diasAberto: number): string => {
   return subDays(new Date(), diasAberto).toISOString();
 };
@@ -74,13 +60,6 @@ const calculateDueDate = (createdAt: string, slaDias?: number) => {
 };
 
 const normalizeTicketId = (id: string) => (id.startsWith("#") ? id : `#${id}`);
-
-const getPriorityFromSla = (diasAberto: number): TicketPriority => {
-  if (diasAberto >= 20) return "Critica";
-  if (diasAberto >= 12) return "Alta";
-  if (diasAberto >= 6) return "Media";
-  return "Baixa";
-};
 
 type PendingSeedTicket = {
   id: string;
@@ -111,7 +90,7 @@ const pendingSeedTickets: PendingSeedTicket[] = [
   { id: "#267560", agente: "Rafhael", diasAberto: 25, observacao: "Aguardando retorno Visoni" },
   {
     id: "#267771",
-    agente: "Yasmin Martins",
+    agente: "Yasmin",
     diasAberto: 21,
     observacao: "Julio e Gabriel ja retornaram e ja informei as escolas que foi resolvido, chamado aberto conexia 267722",
   },
@@ -155,7 +134,7 @@ const pendingSeedTickets: PendingSeedTicket[] = [
   { id: "#304905", agente: "Tatiane", diasAberto: 1, observacao: "" },
   { id: "#274678", agente: "Tatiane", diasAberto: 1, observacao: "" },
   { id: "#268155", agente: "Joao", diasAberto: 19, observacao: "" },
-  { id: "#304888", agente: "Yasmin Martins", diasAberto: 1, observacao: "" },
+  { id: "#304888", agente: "Yasmin", diasAberto: 1, observacao: "" },
   { id: "#304878", agente: "Jessika", diasAberto: 1, observacao: "" },
   { id: "#289354", agente: "Joao", diasAberto: 8, observacao: "" },
   { id: "#304572", agente: "Tatiane", diasAberto: 6, observacao: "" },
@@ -191,7 +170,7 @@ const pendingSeedTickets: PendingSeedTicket[] = [
   { id: "#279416", agente: "Joao", diasAberto: 13, observacao: "" },
   { id: "#276323", agente: "Joao", diasAberto: 13, observacao: "" },
   { id: "#277156", agente: "Joao", diasAberto: 13, observacao: "" },
-  { id: "#276338", agente: "Yasmin Martins", diasAberto: 13, observacao: "" },
+  { id: "#276338", agente: "Yasmin", diasAberto: 13, observacao: "" },
   { id: "#272751", agente: "Joao", diasAberto: 14, observacao: "" },
   { id: "#274674", agente: "Joao", diasAberto: 14, observacao: "" },
   { id: "#272748", agente: "Tatiane", diasAberto: 14, observacao: "" },
@@ -199,7 +178,7 @@ const pendingSeedTickets: PendingSeedTicket[] = [
   { id: "#272765", agente: "Joao", diasAberto: 14, observacao: "" },
   { id: "#271954", agente: "Tatiane", diasAberto: 15, observacao: "" },
   { id: "#271496", agente: "Tatiane", diasAberto: 18, observacao: "" },
-  { id: "#267874", agente: "Yasmin Martins", diasAberto: 20, observacao: "" },
+  { id: "#267874", agente: "Yasmin", diasAberto: 20, observacao: "" },
   { id: "#308916", agente: "Joao", diasAberto: 0, observacao: "" },
   { id: "#304935", agente: "Joao", diasAberto: 0, observacao: "" },
   { id: "#308900", agente: "Jessika", diasAberto: 0, observacao: "" },
@@ -214,19 +193,19 @@ const seedTickets: Ticket[] = pendingSeedTickets.map((ticket) => {
   return {
     id: normalizeTicketId(ticket.id),
     agente: ticket.agente,
-    createdBy: ticket.agente,
     diasAberto: ticket.diasAberto,
     status: "Pendente",
-    priority: getPriorityFromSla(ticket.diasAberto),
     observacao: ticket.observacao?.trim() || "Sem observacao registrada",
     createdAt,
-    resolvedAt: null,
     updatedAt: new Date().toISOString(),
-    watchers: [ticket.agente],
-    notes: [],
+    resolvedAt: null,
+    createdBy: ticket.agente,
+    priority: "Media",
+    watchers: ["Coordinator", ticket.agente],
     slaDias: ticket.slaDias ?? DEFAULT_SLA_DAYS,
     dueDate,
     assigneeEmail: agentEmails[ticket.agente],
+    notes: [],
   };
 });
 
@@ -260,17 +239,18 @@ export const useTicketStore = create<TicketStore>()(
         const dueDate = ticketData.dueDate || calculateDueDate(now, slaDias);
         const newTicket: Ticket = {
           ...ticketData,
+          id: normalizeTicketId(ticketData.id),
           createdBy: ticketData.createdBy || ticketData.agente,
           createdAt: now,
           resolvedAt: ticketData.status === "Resolvido" ? now : null,
           updatedAt: now,
           diasAberto: 0,
           priority: ticketData.priority || "Media",
-          watchers: ticketData.watchers || [ticketData.agente],
-          notes: ticketData.notes || [],
+          watchers: ticketData.watchers || ["Coordinator", ticketData.agente],
           slaDias,
           dueDate,
           assigneeEmail: agentEmails[ticketData.agente] || ticketData.assigneeEmail,
+          notes: ticketData.notes || [],
         };
 
         set((state) => ({
@@ -290,6 +270,7 @@ export const useTicketStore = create<TicketStore>()(
                   } else if (status) {
                     resolvedAt = null;
                   }
+
                   return {
                     ...ticket,
                     ...updates,
@@ -339,11 +320,9 @@ export const useTicketStore = create<TicketStore>()(
 
       getFilteredTickets: () => {
         const { tickets, filters } = get();
-        const normalizedFilterAgente = normalizeAgentName(filters.agente);
         return tickets.filter((ticket) => {
           if (filters.status && ticket.status !== filters.status) return false;
-          const ticketAgente = normalizeAgentName(ticket.agente);
-          if (normalizedFilterAgente && ticketAgente !== normalizedFilterAgente) return false;
+          if (filters.agente && ticket.agente !== filters.agente) return false;
           if (filters.priority && ticket.priority !== filters.priority) return false;
           if (filters.search) {
             const search = filters.search.toLowerCase();
