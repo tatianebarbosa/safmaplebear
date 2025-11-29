@@ -58,6 +58,9 @@ export interface CanvaUsageData {
     name: string;
     email: string;
     designs: number;
+    published?: number;
+    shared?: number;
+    viewed?: number;
     schoolName?: string;
     schoolId?: string;
     cluster?: string;

@@ -37,6 +37,8 @@ import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import { showCanvaSyncReminder } from '@/lib/canvaReminder';
+import { dialogLayouts } from './dialogLayouts';
 
 interface SchoolDetailsDialogProps {
   open: boolean;
@@ -116,6 +118,7 @@ export const SchoolDetailsDialog = ({
     if (success) {
       setRevertDialogOpen(false);
       setRevertTarget(null);
+      showCanvaSyncReminder();
     }
   };
 
@@ -160,7 +163,7 @@ export const SchoolDetailsDialog = ({
   return (
     <>
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[97vw] min-w-[720px] min-h-[65vh] max-h-[90vh] overflow-y-auto px-6 py-6 sm:min-w-[900px] sm:min-h-[70vh] sm:max-w-[1240px] lg:max-w-[1380px] xl:max-w-[1460px] sm:px-9 sm:py-7">
+      <DialogContent className={`${dialogLayouts.lg} flex flex-col`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
@@ -171,23 +174,23 @@ export const SchoolDetailsDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 gap-2 bg-muted/70 p-2 rounded-xl">
+        <Tabs defaultValue="overview" className="w-full flex-1 overflow-y-auto">
+          <TabsList className="grid w-full grid-cols-3 gap-3 bg-muted/70 p-3 rounded-2xl">
             <TabsTrigger
               value="overview"
-              className="w-full h-11 text-base font-semibold rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              className="w-full h-12 text-base font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm"
             >
               Visao Geral
             </TabsTrigger>
             <TabsTrigger
               value="users"
-              className="w-full h-11 text-base font-semibold rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              className="w-full h-12 text-base font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm"
             >
               Usuarios
             </TabsTrigger>
             <TabsTrigger
               value="history"
-              className="w-full h-11 text-base font-semibold rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              className="w-full h-12 text-base font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm"
             >
               Historico
             </TabsTrigger>
@@ -208,8 +211,12 @@ export const SchoolDetailsDialog = ({
                       <span>{school.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline">{school.status}</Badge>
-                      <Badge variant="muted">{school.cluster}</Badge>
+                      <Badge variant="outline" size="md" className="px-3 py-1 text-sm rounded-full">
+                        {school.status}
+                      </Badge>
+                      <Badge variant="muted" size="md" className="px-3 py-1 text-sm rounded-full">
+                        {school.cluster}
+                      </Badge>
                     </div>
                     {school.city && (
                       <div className="flex items-center gap-2">
@@ -232,6 +239,8 @@ export const SchoolDetailsDialog = ({
                             ? 'success'
                             : 'muted'
                         }
+                        size="md"
+                        className="px-3 py-1 text-sm rounded-full"
                       >
                         {licenseStatus}
                       </Badge>
@@ -467,7 +476,7 @@ export const SchoolDetailsDialog = ({
     </Dialog>
 
     <Dialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>Reverter alteracao</DialogTitle>
           <DialogDescription>
@@ -587,6 +596,7 @@ export const SchoolDetailsDialog = ({
         setSwappingUserId(null);
         setShowSwapDialog(false);
         toast({ title: "Licenca transferida" });
+        showCanvaSyncReminder();
       }}
       users={school.users}
       selectedUserId={swappingUserId}
@@ -596,7 +606,7 @@ export const SchoolDetailsDialog = ({
 
     {/* Dialog de justificativa para edicao */}
     <Dialog open={showEditJustify} onOpenChange={setShowEditJustify}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>Justificar edicao</DialogTitle>
           <DialogDescription>Informe o ticket para registrar no historico.</DialogDescription>
@@ -650,6 +660,7 @@ export const SchoolDetailsDialog = ({
               setEditTicket('');
               setEditObservation('');
               toast({ title: "Usuario atualizado" });
+              showCanvaSyncReminder();
             }}
           >
             Confirmar
@@ -660,7 +671,7 @@ export const SchoolDetailsDialog = ({
 
     {/* Dialog de remocao com ticket/observacao */}
     <Dialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>Remover usuario</DialogTitle>
           <DialogDescription>
@@ -706,6 +717,7 @@ export const SchoolDetailsDialog = ({
                 performedBy: actorName,
               });
               toast({ title: "Usuario removido" });
+              showCanvaSyncReminder();
               setShowRemoveDialog(false);
               setRemoveTarget(null);
               setRemoveTicket("");

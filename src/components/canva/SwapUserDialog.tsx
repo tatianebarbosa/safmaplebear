@@ -17,6 +17,7 @@ import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, ShieldCheck, ArrowLeftRight } from "lucide-react";
 import { Combobox } from "@/components/ui/combobox";
+import { dialogLayouts } from "./dialogLayouts";
 
 interface SwapUserDialogProps {
   open: boolean;
@@ -248,7 +249,7 @@ export const SwapUserDialog = ({
         if (!nextOpen) resetForm();
       }}
     >
-      <DialogContent className="w-full max-w-3xl sm:max-w-3xl md:max-w-3xl max-h-[88vh] overflow-y-auto overflow-x-hidden gap-3 glass-scrollbar pb-5">
+      <DialogContent className={`${dialogLayouts.md} flex flex-col overflow-x-hidden gap-3 glass-scrollbar pb-5`}>
         <DialogHeader>
           <DialogTitle>Trocar usuario</DialogTitle>
           <DialogDescription>

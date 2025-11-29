@@ -45,6 +45,55 @@ export const SchoolLicenseManagement = ({
     overviewData,
   } = useSchoolLicenseStore();
 
+  const normalizeKey = (value?: string | number | null) =>
+    (value ?? "")
+      .toString()
+      .trim()
+      .toLowerCase();
+
+  const normalizeSchoolName = (value?: string) =>
+    (value ?? "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const uniqueSchools = useMemo(() => {
+    const officialIds = new Set(
+      (officialData || []).map((item) => normalizeKey(item.school.id))
+    );
+    const officialNames = new Set(
+      (officialData || []).map((item) => normalizeSchoolName(item.school.name))
+    );
+    const isAllowed = (school: School) => {
+      const idKey = normalizeKey(school.id);
+      const nameKey = normalizeSchoolName(school.name);
+      if (idKey === "0" || idKey === "no-school" || nameKey.includes("central")) {
+        return true;
+      }
+      if (officialIds.size > 0 || officialNames.size > 0) {
+        if (idKey && officialIds.has(idKey)) return true;
+        if (nameKey && officialNames.has(nameKey)) return true;
+        return false;
+      }
+      return true;
+    };
+
+    const map = new Map<string, School>();
+    schools.forEach((school) => {
+      if (!isAllowed(school)) return;
+      const key =
+        normalizeSchoolName(school.name) ||
+        normalizeKey(school.id) ||
+        `idx-${map.size}`;
+      if (!map.has(key)) {
+        map.set(key, school);
+      }
+    });
+    return Array.from(map.values());
+  }, [schools, officialData]);
+
   const normalizeValue = (value: string) =>
     value
       .toLowerCase()
@@ -60,7 +109,7 @@ export const SchoolLicenseManagement = ({
       return 0;
     };
 
-    const sorted = [...schools].sort((a, b) => {
+    const sorted = [...uniqueSchools].sort((a, b) => {
       const rankA = priorityRank(a);
       const rankB = priorityRank(b);
       if (rankA !== rankB) return rankA - rankB;
@@ -98,7 +147,7 @@ export const SchoolLicenseManagement = ({
 
       return matchesSearch && matchesSelectedSchool && matchesCluster && matchesRole && matchesLicense;
     });
-  }, [schools, normalizedSearch, selectedSchool, clusterFilter, roleFilter, licenseFilter, getLicenseStatus]);
+  }, [uniqueSchools, normalizedSearch, selectedSchool, clusterFilter, roleFilter, licenseFilter, getLicenseStatus]);
 
   const totalPages = Math.max(1, Math.ceil(filteredSchools.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -118,13 +167,21 @@ export const SchoolLicenseManagement = ({
     nonMapleBearCount,
     domainCounts,
   } = useMemo(() => {
+    const envTotalLicenses = Number(
+      (import.meta.env as any)?.VITE_TOTAL_CANVA_LICENSES ??
+        (import.meta.env as any)?.VITE_CANVA_TOTAL_LICENSES
+    );
+    const hasEnvTotal = Number.isFinite(envTotalLicenses) && envTotalLicenses > 0;
+
+    const overviewTotalLicenses = (overviewData as any)?.totalLicenses as number | undefined;
+
     const normalizeText = (value?: string) =>
       (value ?? "")
         .toLowerCase()
         .normalize("NFD")
         .replace(/\p{Diacritic}/gu, "");
 
-    const countedSchools = schools.filter((school) => {
+    const countedSchools = uniqueSchools.filter((school) => {
       const name = normalizeText(school.name);
       return school.id !== "no-school" && !name.includes("central");
     });
@@ -153,17 +210,28 @@ export const SchoolLicenseManagement = ({
       }
     );
 
+    const estimatedTotalFromData =
+      officialData?.reduce((acc, item) => acc + (item.estimatedLicenses ?? licenseLimit), 0) ?? 0;
+    const computedTotalLicenses = hasEnvTotal
+      ? envTotalLicenses
+      : overviewTotalLicenses ??
+        (estimatedTotalFromData > 0
+          ? estimatedTotalFromData
+          : (overviewData?.totalSchools ?? totalSchoolsAll) * licenseLimit);
+    const computedUsedLicenses = overviewData?.totalUsers ?? totals.usedLicenses;
+    const safeTotalLicenses = Math.max(computedTotalLicenses || 0, computedUsedLicenses);
+
     return {
-      totalSchools: totalSchoolsAll,
-      activeSchools: activeWithLicenses,
-      totalLicenses: totalSchoolsAll * licenseLimit,
-      usedLicenses: totals.usedLicenses,
-      exceedingSchools: totals.exceedingSchools,
-      nonCompliantUsers: totals.nonCompliantUsers,
+      totalSchools: overviewData?.totalSchools ?? totalSchoolsAll,
+      activeSchools: overviewData?.schoolsWithUsers ?? activeWithLicenses,
+      totalLicenses: safeTotalLicenses,
+      usedLicenses: computedUsedLicenses,
+      exceedingSchools: overviewData?.schoolsAtCapacity ?? totals.exceedingSchools,
+      nonCompliantUsers: overviewData?.nonCompliantUsers ?? totals.nonCompliantUsers,
       nonMapleBearCount: getNonMapleBearCount(),
       domainCounts: getDomainCounts(),
     };
-  }, [schools, getLicenseStatus, getDomainCounts, getNonMapleBearCount, licenseLimit]);
+  }, [uniqueSchools, getLicenseStatus, getDomainCounts, getNonMapleBearCount, licenseLimit, overviewData, officialData]);
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -235,7 +303,7 @@ export const SchoolLicenseManagement = ({
   };
 
   const handleManage = (school: School) => {
-    toast.info(`Gerenciando escola: ${school.name}`);
+    toast.info(`: ${school.name}`);
   };
 
   return (
@@ -249,10 +317,18 @@ export const SchoolLicenseManagement = ({
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatsCard
+          title="Licenças Totais"
+          value={totalLicenses.toString()}
+          description={`${Math.max(totalLicenses - usedLicenses, 0)} disponíveis`}
+          icon={<Users className="h-4 w-4" />}
+          tooltip="Total de licenças oficiais (do overview, quando disponível). Caso contrário: escolas × limite padrão. Disponíveis = total - usadas."
+        />
+        <StatsCard
           title="Total de Escolas"
           value={totalSchools.toString()}
           description={`${activeSchools} com licenças ativas`}
           icon={<Building2 className="h-4 w-4" />}
+          tooltip="Número de escolas oficiais carregadas; considera todas as escolas sincronizadas."
         />
         <StatsCard
           title="Licenças Utilizadas"
@@ -261,6 +337,7 @@ export const SchoolLicenseManagement = ({
             totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupação` : "Sem dados de licença"
           }
           icon={<Users className="h-4 w-4" />}
+          tooltip="Soma de usuários licenciados em todas as escolas; percentual = usadas / total de licenças."
         />
         <StatsCard
           title="Escolas em Excesso"
@@ -268,20 +345,15 @@ export const SchoolLicenseManagement = ({
           description="Licenças ultrapassadas"
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={exceedingSchools > 0 ? "destructive" : "default"}
+          tooltip="Contagem de escolas onde usuários licenciados > limite padrão por escola."
         />
         <StatsCard
-          title="Usuários Não Conformes"
-          value={nonCompliantUsers.toString()}
-          description="Fora da politica"
+          title="Licenças fora da política"
+          value={nonCompliantUsersAll.toString()}
+          description="Emails não conformes"
           icon={<AlertTriangle className="h-4 w-4" />}
-          variant={nonCompliantUsers > 0 ? "destructive" : "default"}
-        />
-        <StatsCard
-          title="Domínios Não Maple Bear"
-          value={nonMapleBearCount.toString()}
-          description={`${domainCounts.slice(0, 2).map((d) => d.domain).join(", ")}`}
-          icon={<AlertTriangle className="h-4 w-4" />}
-          variant={nonMapleBearCount > 0 ? "destructive" : "default"}
+          variant={nonCompliantUsersAll > 0 ? "destructive" : "default"}
+          tooltip="Total de usuários com email fora da política. Emails válidos: domínios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereço contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
         />
       </div>
 

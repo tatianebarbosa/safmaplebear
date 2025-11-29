@@ -179,8 +179,6 @@ def test_file_structure():
     files_to_check = [
         "shared/canva_collector.py",
         "shared/__init__.py",
-        "TimerSyncCanva/__init__.py",
-        "TimerSyncCanva/function.json",
         "requirements.txt",
         "collect_all_periods.py"
     ]

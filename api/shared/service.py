@@ -1,4 +1,5 @@
 # Business logic service layer
+from collections import Counter
 import pandas as pd
 from typing import Dict, List, Optional, Tuple
 from .blob import blob_service
@@ -7,6 +8,8 @@ from .model import (
     LicenseBadgeHelper, EmailComplianceHelper, StatusLicencaHelper, APIResponse
 )
 from .unit_data_service import unit_data_service
+
+DEFAULT_MAX_LICENSE_LIMIT = 2
 
 class DataProcessingService:
     """Service for processing official data from Blob Storage"""
@@ -225,11 +228,56 @@ class DataProcessingService:
                 "new_limit": new_limit,
                 "motivo": motivo
             })
-            
+
             return APIResponse.success(message="Limite alterado com sucesso")
             
         except Exception as e:
             return APIResponse.error(f"Erro ao alterar limite: {str(e)}")
+
+    def set_global_license_limit(self, new_limit: int, motivo: str, actor: str) -> Dict[str, any]:
+        """Change license limit for all schools and persist in blob storage."""
+        try:
+            if new_limit < 0:
+                return APIResponse.error("Limite deve ser maior ou igual a zero")
+
+            if not self._schools_cache:
+                self.load_official_data()
+
+            # Capture old limits before updating
+            old_limits = {school.id: school.license_limit for school in self._schools_cache}
+
+            for school in self._schools_cache:
+                school.license_limit = new_limit
+                self._school_limits_cache[school.id] = new_limit
+
+            blob_service.write_json_file("config/school-limits.json", self._school_limits_cache)
+
+            for school in self._schools_cache:
+                action = LicenseAction(school_id=school.id, new_limit=new_limit, motivo=motivo)
+                self._log_audit_action("alter_limit", action, actor, {
+                    "old_limit": old_limits.get(school.id, DEFAULT_MAX_LICENSE_LIMIT),
+                    "new_limit": new_limit,
+                    "motivo": motivo
+                })
+
+            return APIResponse.success(
+                data={"updated": len(self._schools_cache), "limit": new_limit},
+                message="Limite global alterado com sucesso"
+            )
+        except Exception as e:
+            return APIResponse.error(f"Erro ao alterar limite global: {str(e)}")
+
+    def get_global_license_limit(self) -> int:
+        """Return the most common license limit value across schools."""
+        if not self._schools_cache:
+            self.load_official_data()
+
+        limits = [s.license_limit for s in self._schools_cache if s.license_limit is not None]
+        if not limits:
+            return DEFAULT_MAX_LICENSE_LIMIT
+
+        most_common = Counter(limits).most_common(1)
+        return int(most_common[0][0]) if most_common else DEFAULT_MAX_LICENSE_LIMIT
     
     def reload_data(self, actor: str) -> Dict[str, any]:
         """Force reload of all data from blob storage"""

@@ -12,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, CheckCircle, Upload } from 'lucide-react';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
+import { dialogLayouts } from './dialogLayouts';
 
 interface ImportPreviewDialogProps {
   open: boolean;
@@ -60,7 +61,7 @@ export const ImportPreviewDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className={`${dialogLayouts.md} flex flex-col`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />

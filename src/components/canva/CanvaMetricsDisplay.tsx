@@ -21,10 +21,12 @@ import { formatNumber, formatDateBR } from "@/lib/formatters";
 import { toast } from "sonner";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
+import { useAuthStore } from "@/stores/authStore";
 import { uploadMemberReport, uploadModelReport, getUploadInfo, clearUploadOverrides } from "@/lib/canvaUsageService";
 
 export const CanvaMetricsDisplay = () => {
   const { overviewData } = useSchoolLicenseStore();
+  const canManageUploads = useAuthStore((s) => s.hasRole("Coordinator"));
   const overviewSummary = overviewData;
   const [canvaData, setCanvaData] = useState<CanvaData | null>(null);
   const [historico, setHistorico] = useState<CanvaHistorico[]>([]);
@@ -34,6 +36,8 @@ export const CanvaMetricsDisplay = () => {
   const [uploadingModels, setUploadingModels] = useState(false);
   const [lastMemberUpload, setLastMemberUpload] = useState<string | null>(null);
   const [lastModelUpload, setLastModelUpload] = useState<string | null>(null);
+  const [lastMemberUploadedAt, setLastMemberUploadedAt] = useState<Date | null>(null);
+  const [lastModelUploadedAt, setLastModelUploadedAt] = useState<Date | null>(null);
   const memberFileRef = useRef<HTMLInputElement | null>(null);
   const modelFileRef = useRef<HTMLInputElement | null>(null);
 
@@ -61,9 +65,11 @@ export const CanvaMetricsDisplay = () => {
       setLastMemberUpload(
         memberInfo ? `${memberInfo.filename} em ${new Date(memberInfo.uploadedAt).toLocaleString("pt-BR")}` : null
       );
+      setLastMemberUploadedAt(memberInfo ? new Date(memberInfo.uploadedAt) : null);
       setLastModelUpload(
         modelInfo ? `${modelInfo.filename} em ${new Date(modelInfo.uploadedAt).toLocaleString("pt-BR")}` : null
       );
+      setLastModelUploadedAt(modelInfo ? new Date(modelInfo.uploadedAt) : null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao carregar dados");
     } finally {
@@ -109,6 +115,7 @@ export const CanvaMetricsDisplay = () => {
           filename: file.name,
           totalPessoas: summary.totalPessoas,
           designsCriados: summary.designsCriados,
+          uploadType: "members",
         });
       }
       await carregarDados();
@@ -137,6 +144,7 @@ export const CanvaMetricsDisplay = () => {
           filename: file.name,
           totalPessoas: summary.totalPessoas,
           designsCriados: summary.designsCriados,
+          uploadType: "models",
         });
       }
       await carregarDados();
@@ -155,6 +163,12 @@ export const CanvaMetricsDisplay = () => {
   const renderHistoricoItem = (item: CanvaHistorico) => {
     const isUpload = item.usuarioAlteracao?.toLowerCase().includes("upload") || item.descricaoAlteracao?.toLowerCase().includes("upload");
     const uploadLabel = item.descricaoAlteracao?.replace("Upload CSV:", "").trim();
+    const uploadKind =
+      item.uploadType === "members"
+        ? "membros"
+        : item.uploadType === "models"
+        ? "modelos"
+        : undefined;
     const snapshot = item.data ?? {
       totalPessoas: item.totalPessoas,
       designsCriados: item.designsCriados,
@@ -177,7 +191,7 @@ export const CanvaMetricsDisplay = () => {
             </p>
             {isUpload && (
               <p className="text-xs text-muted-foreground">
-                Origem: Upload CSV {uploadLabel ? `(${uploadLabel})` : ""}
+                Origem: Upload CSV{uploadKind ? ` de ${uploadKind}` : ""} {uploadLabel ? `(${uploadLabel})` : ""}
               </p>
             )}
           </div>
@@ -197,6 +211,19 @@ export const CanvaMetricsDisplay = () => {
     () => overviewSummary?.nonMapleBearDomains ?? 0,
     [overviewSummary]
   );
+  const { isMemberStale, isModelStale } = useMemo(() => {
+    const now = Date.now();
+    const limitMs = 30 * 24 * 60 * 60 * 1000;
+    const memberStale = !lastMemberUploadedAt || now - lastMemberUploadedAt.getTime() > limitMs;
+    const modelStale = !lastModelUploadedAt || now - lastModelUploadedAt.getTime() > limitMs;
+    return { isMemberStale: memberStale, isModelStale: modelStale };
+  }, [lastMemberUploadedAt, lastModelUploadedAt]);
+  const pendingUploadsLabel = useMemo(() => {
+    const pending: string[] = [];
+    if (isMemberStale) pending.push("membros");
+    if (isModelStale) pending.push("modelos");
+    return pending.join(" e ");
+  }, [isMemberStale, isModelStale]);
 
   return (
     <div className="space-y-6">
@@ -212,41 +239,56 @@ export const CanvaMetricsDisplay = () => {
       </div>
     )}
 
-      <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3">
-        <div className="space-y-1">
-          <h3 className="text-sm font-semibold flex items-center gap-2">
-            <Upload className="h-4 w-4 text-muted-foreground" />
-            Atualizar relatorios (membros e modelos)
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            Envie os CSVs exportados do Canva (período 30 dias). Eles são aplicados em todas as visões (30d/3m/6m/12m) e o snapshot anterior é mantido para histórico.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <input
-            ref={memberFileRef}
-            type="file"
-            accept=".csv,text/csv"
-            className="hidden"
-            onChange={handleMemberUpload}
-          />
-          <input
-            ref={modelFileRef}
-            type="file"
-            accept=".csv,text/csv"
-            className="hidden"
-            onChange={handleModelUpload}
-          />
-          <Button onClick={() => memberFileRef.current?.click()} disabled={uploadingMembers} variant="outline" className="gap-2">
-            <Upload className="h-4 w-4" />
-            {uploadingMembers ? "Enviando membros..." : "Subir membros CSV"}
-          </Button>
-          <Button onClick={() => modelFileRef.current?.click()} disabled={uploadingModels} variant="outline" className="gap-2">
-            <Upload className="h-4 w-4" />
-            {uploadingModels ? "Enviando modelos..." : "Subir modelos CSV"}
-          </Button>
-        </div>
-      </div>
+      {canManageUploads && (
+        <>
+          {(isMemberStale || isModelStale) && (
+            <div className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div className="space-y-1 text-sm">
+                <p className="font-semibold text-amber-800">Uploads do Canva estao vencidos</p>
+                <p className="text-muted-foreground">
+                  Faltam arquivos de {pendingUploadsLabel || "membros e modelos"}; atualize os CSVs (30 dias). Ultimo membros: {lastMemberUpload ?? "nao encontrado"} | Ultimo modelos: {lastModelUpload ?? "nao encontrado"}.
+                </p>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold flex items-center gap-2">
+                <Upload className="h-4 w-4 text-muted-foreground" />
+                Atualizar relatorios (membros e modelos)
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Envie os CSVs exportados do Canva (periodo de 30 dias). Eles sao aplicados em todas as visoes (30d/3m/6m/12m) e o snapshot anterior e mantido para historico.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                ref={memberFileRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={handleMemberUpload}
+              />
+              <input
+                ref={modelFileRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={handleModelUpload}
+              />
+              <Button onClick={() => memberFileRef.current?.click()} disabled={uploadingMembers} variant="outline" className="gap-2">
+                <Upload className="h-4 w-4" />
+                {uploadingMembers ? "Enviando membros..." : "Subir membros CSV"}
+              </Button>
+              <Button onClick={() => modelFileRef.current?.click()} disabled={uploadingModels} variant="outline" className="gap-2">
+                <Upload className="h-4 w-4" />
+                {uploadingModels ? "Enviando modelos..." : "Subir modelos CSV"}
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
 
       {overviewSummary && (
         <div className="space-y-3">

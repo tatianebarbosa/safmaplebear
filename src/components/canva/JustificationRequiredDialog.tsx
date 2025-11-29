@@ -15,6 +15,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { TEAM_MEMBERS, type TeamMember } from '@/data/teamMembers';
+import { dialogLayouts } from './dialogLayouts';
 
 interface JustificationRequiredDialogProps {
   open: boolean;
@@ -82,7 +83,7 @@ export const JustificationRequiredDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>

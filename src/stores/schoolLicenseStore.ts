@@ -32,6 +32,7 @@ import {
   fetchIntegratedCanvaData,
 } from "@/lib/integratedCanvaService";
 import { saveLicenseAction, type LicenseAction } from "@/lib/canvaDataProcessor";
+import { fetchCanvaOverview } from "@/lib/canvaOverviewApi";
 
 const calculateLicenseStatus = (
   usedLicenses: number,
@@ -134,9 +135,21 @@ interface SchoolLicenseState {
 
 // Dados iniciais vazios - serÃ£o carregados dos dados oficiais
 
+const CENTRAL_DOMAINS = ["mbcentral.com.br", "seb.com.br", "sebsa.com.br"];
+
+const normalizeEmail = (email?: string): string =>
+  (email || "").trim().toLowerCase();
+
+const isCentralDomainEmail = (email?: string): boolean => {
+  const domain = normalizeEmail(email).split("@")[1] || "";
+  return CENTRAL_DOMAINS.some(
+    (allowed) => domain === allowed || domain.endsWith(`.${allowed}`)
+  );
+};
+
 const centralSchool: School = {
   id: "0",
-  name: "Central SAF",
+  name: "Central",
   status: "Ativa",
   city: "Escritorio Central",
   cluster: "Alerta" as any,
@@ -178,8 +191,10 @@ const ensureCentralSchool = (schools: School[]): School[] => {
     return school.id === centralSchool.id || normalizedName.includes("central");
   });
 
-  if (findCentralIndex >= 0) {
-    const updated = [...schools];
+  const updated = [...schools];
+  let centralIndex = findCentralIndex;
+
+  if (centralIndex >= 0) {
     const existing = updated[findCentralIndex];
     updated[findCentralIndex] = {
       ...centralSchool,
@@ -187,10 +202,55 @@ const ensureCentralSchool = (schools: School[]): School[] => {
       id: centralSchool.id,
       name: centralSchool.name,
     };
-    return updated;
+  } else {
+    updated.unshift(centralSchool);
+    centralIndex = 0;
   }
 
-  return [centralSchool, ...schools];
+  const collectedForCentral: SchoolUser[] = [];
+
+  const cleanedSchools = updated.map((school, index) => {
+    if (index === centralIndex) {
+      return school;
+    }
+
+    const remainingUsers: SchoolUser[] = [];
+    school.users?.forEach((user) => {
+      if (isCentralDomainEmail(user.email)) {
+        collectedForCentral.push(user);
+      } else {
+        remainingUsers.push(user);
+      }
+    });
+
+    return {
+      ...school,
+      users: remainingUsers,
+      usedLicenses: remainingUsers.length,
+    };
+  });
+
+  const central = cleanedSchools[centralIndex];
+  const mergedCentralUsers = [...(central.users || [])];
+  const seen = new Set(mergedCentralUsers.map((user) => normalizeEmail(user.email)));
+
+  collectedForCentral.forEach((user) => {
+    const key = normalizeEmail(user.email);
+    if (!seen.has(key)) {
+      seen.add(key);
+      mergedCentralUsers.push(user);
+    }
+  });
+
+  cleanedSchools[centralIndex] = {
+    ...central,
+    id: centralSchool.id,
+    name: centralSchool.name,
+    users: mergedCentralUsers,
+    usedLicenses: mergedCentralUsers.length,
+  };
+
+  return cleanedSchools;
 };
 
 const seedSchools: School[] = [centralSchool];
@@ -227,6 +287,93 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       loadOfficialData: async () => {
         set({ loading: true });
         try {
+          // 1) Tenta buscar overview diretamente da API do backend
+          try {
+            const api = await fetchCanvaOverview();
+            const ov = api.overview;
+            const toNumber = (value: unknown) => {
+              const parsed = Number(value);
+              return Number.isFinite(parsed) ? parsed : 0;
+            };
+
+            const totalUsers = toNumber(ov.licencasUtilizadas);
+            const nonCompliant = toNumber(ov.usuariosNaoConformes);
+            const compliant = Math.max(0, totalUsers - nonCompliant);
+
+            const overview: CanvaOverviewData = {
+              totalUsers,
+              totalSchools: toNumber(ov.totalEscolas),
+              compliantUsers: compliant,
+              nonCompliantUsers: nonCompliant,
+              complianceRate:
+                totalUsers > 0 ? (compliant / totalUsers) * 100 : 0,
+              nonMapleBearDomains: toNumber(ov.dominiosNaoMapleBear),
+              topNonCompliantDomains: ov.dominiosNaoMapleBearTop ?? [],
+              schoolsWithUsers: toNumber(ov.escolasComLicenca),
+              schoolsAtCapacity: toNumber(ov.escolasEmExcesso),
+            };
+
+            const mapStatus = (
+              used: number,
+              limit: number
+            ): "Disponível" | "Completo" | "Excedido" => {
+              if (used > limit) return "Excedido";
+              if (used === limit) return "Completo";
+              return "Disponível";
+            };
+
+            const convertedSchools: School[] = api.schools.map((item, index) => {
+              const limit = toNumber(item.limit) || getMaxLicensesPerSchool();
+              const used = toNumber(item.usedLicenses);
+              return {
+                id: String(item.schoolId ?? index),
+                name: item.name,
+                status: "Ativa",
+                city: "",
+                cluster: "Outros/Implantação" as any,
+                contactEmail: undefined,
+                totalLicenses: limit,
+                usedLicenses: used,
+                users: [],
+                hasRecentJustifications: false,
+              };
+            });
+
+            const processedData: ProcessedSchoolData[] = api.schools.map(
+              (item, index) => {
+                const limit = toNumber(item.limit) || getMaxLicensesPerSchool();
+                const used = toNumber(item.usedLicenses);
+                return {
+                  school: {
+                    id: String(item.schoolId ?? index),
+                    name: item.name,
+                    status: "Ativa",
+                    cluster: "Outros",
+                    city: "",
+                    state: "",
+                    region: "",
+                  },
+                  users: [],
+                  totalUsers: used,
+                  compliantUsers: used,
+                  nonCompliantUsers: 0,
+                  estimatedLicenses: limit,
+                  licenseStatus: mapStatus(used, limit),
+                };
+              }
+            );
+
+            set({
+              officialData: processedData,
+              overviewData: overview,
+              schools: ensureCentralSchool(convertedSchools),
+              loading: false,
+            });
+            return;
+          } catch (apiError) {
+            console.warn("[schoolLicenseStore] API overview falhou, usando fallback de CSV", apiError);
+          }
+
           const finalizeData = (
             processedData: ProcessedSchoolData[],
             overview: CanvaOverviewData
@@ -853,14 +1000,27 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         return calculateLicenseStatus(school.usedLicenses, totalLicenses);
       },
       getNonMapleBearCount: () => {
-        return get().officialData.reduce(
-          (acc, data) => acc + data.nonCompliantUsers,
-          0
-        );
+        const state = get();
+        if (state.officialData.length > 0) {
+          return state.officialData.reduce(
+            (acc, data) => acc + data.nonCompliantUsers,
+            0
+          );
+        }
+        if (state.overviewData) {
+          return state.overviewData.nonCompliantUsers ?? 0;
+        }
+        return 0;
       },
       getDomainCounts: () => {
-        const officialData = get().officialData;
-        if (!officialData || officialData.length === 0) return [];
+        const state = get();
+        const officialData = state.officialData;
+        if (!officialData || officialData.length === 0) {
+          if (state.overviewData?.topNonCompliantDomains) {
+            return state.overviewData.topNonCompliantDomains;
+          }
+          return [];
+        }
 
         const allUsers = officialData.flatMap((data) => data.users);
         const nonCompliantUsers = allUsers.filter(

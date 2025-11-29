@@ -32,8 +32,24 @@ type StoredOverride = {
 
 const STORAGE_KEY = (type: ReportType, period: UsagePeriod) => `canva_override_${type}_${period}`;
 const ALL_PERIODS = Object.keys(MEMBER_FILE_MAP) as UsagePeriod[];
+const UPLOAD_HISTORY_KEY = 'canva_usage_upload_history_v1';
 
-const cleanupHeader = (header: string) => header.replace(/\s+/g, ' ').trim().toLowerCase();
+type UploadHistoryEntry = {
+  id: string;
+  type: ReportType;
+  period: UsagePeriod;
+  filename: string;
+  uploadedAt: string;
+};
+
+const cleanupHeader = (header: string) =>
+  header
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 
 const normalizeValue = (value?: unknown) => {
   if (value === null || value === undefined) {
@@ -67,9 +83,16 @@ const parseCsv = async (path: string, overrideText?: string): Promise<Record<str
 };
 
 const findField = (row: Record<string, string>, candidates: string[]) => {
+  const normalizedEntries = Object.entries(row).map(([key, value]) => {
+    const cleaned = cleanupHeader(key);
+    return [cleaned, value] as const;
+  });
+
   for (const candidate of candidates) {
-    const normalized = candidate.toLowerCase();
-    const entry = Object.entries(row).find(([key]) => key.includes(normalized));
+    const normalized = cleanupHeader(candidate);
+    const entry = normalizedEntries.find(
+      ([key]) => key.includes(normalized) || normalized.includes(key)
+    );
     if (entry && entry[1]) return entry[1];
   }
   return '';
@@ -95,6 +118,57 @@ const getStorage = (): Storage | null => {
   return window.localStorage ?? null;
 };
 
+const loadUploadHistory = (): UploadHistoryEntry[] => {
+  const storage = getStorage();
+  if (!storage) return [];
+  const raw = storage.getItem(UPLOAD_HISTORY_KEY);
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) as UploadHistoryEntry[];
+  } catch {
+    return [];
+  }
+};
+
+const saveUploadHistory = (entries: UploadHistoryEntry[]) => {
+  const storage = getStorage();
+  if (!storage) return;
+  const limited = entries.slice(0, 12);
+  storage.setItem(UPLOAD_HISTORY_KEY, JSON.stringify(limited));
+};
+
+const recordHistoryEntries = (entries: UploadHistoryEntry[]) => {
+  if (!entries.length) return;
+  const current = loadUploadHistory();
+  const merged = [...entries, ...current];
+  const seen = new Set<string>();
+  const deduped: UploadHistoryEntry[] = [];
+  merged.forEach((entry) => {
+    const key = `${entry.type}-${entry.period}-${entry.uploadedAt}-${entry.filename}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    deduped.push(entry);
+  });
+  saveUploadHistory(deduped);
+};
+
+const archiveCurrentOverrides = (type: ReportType, periods: UsagePeriod[]) => {
+  const snapshots: UploadHistoryEntry[] = [];
+  periods.forEach((period) => {
+    const existing = loadOverride(type, period);
+    if (existing) {
+      snapshots.push({
+        id: `prev-${type}-${period}-${existing.uploadedAt ?? Date.now()}`,
+        type,
+        period,
+        filename: existing.filename,
+        uploadedAt: existing.uploadedAt ?? new Date().toISOString(),
+      });
+    }
+  });
+  recordHistoryEntries(snapshots);
+};
+
 const saveOverride = (type: ReportType, period: UsagePeriod, payload: StoredOverride) => {
   const storage = getStorage();
   if (!storage) return;
@@ -111,6 +185,12 @@ const loadOverride = (type: ReportType, period: UsagePeriod): StoredOverride | n
   } catch {
     return null;
   }
+};
+
+const getLatestOverride = (type: ReportType): StoredOverride | null => {
+  const overrides = ALL_PERIODS.map((p) => loadOverride(type, p)).filter(Boolean) as StoredOverride[];
+  if (!overrides.length) return null;
+  return overrides.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())[0];
 };
 
 export const getUploadInfo = (type: ReportType, period?: UsagePeriod) => {
@@ -153,7 +233,7 @@ export type TimeSeriesPoint = {
 };
 
 export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD) => {
-  const memberOverride = loadOverride('members', period);
+  const memberOverride = loadOverride('members', period) ?? getLatestOverride('members');
   const [members, licenseMap] = await Promise.all([
     parseCsv(
       MEMBER_FILE_MAP[period] ?? MEMBER_FILE_MAP[DEFAULT_USAGE_PERIOD],
@@ -170,16 +250,25 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
 
   const timeSeriesMap = new Map<string, number>();
 
-  const periodFieldCandidates = ['ultima atividade', 'ultima atividade', 'ultima atividade', 'gltima atividade', 'gltima atividade'];
-  const schoolNameFieldCandidates = ['escola', 'school', 'organizacao', 'organiza��o', 'organization', 'instituicao', 'institution', 'campus'];
-  const schoolIdFieldCandidates = ['escola id', 'escolaid', 'school id'];
+  const periodFieldCandidates = ['ultima atividade', 'ltima atividade', 'last activity', 'periodo', 'period'];
+  const schoolNameFieldCandidates = ['escola', 'school', 'organizacao', 'organization', 'instituicao', 'institution', 'campus', 'org name', 'organizational unit'];
+  const schoolIdFieldCandidates = ['escola id', 'escolaid', 'school id', 'id escola', 'school'];
+  const emailFieldCandidates = ['e-mail', 'email', 'usuario', 'user email', 'user'];
+  const designsCreatedFields = ['designs criados', 'designs created', 'created designs', 'total designs'];
+  const designsPublishedFields = ['designs publicados', 'designs published', 'publicado', 'publicados', 'published designs'];
+  const linksSharedFields = ['links compartilhados', 'compartilhados', 'links shared', 'shared links', 'links compartilhado', 'shared'];
+  const viewsFields = ['designs visualizados', 'visualizacoes', 'views', 'visualizações'];
 
   members.forEach((row) => {
-    const email = findField(row, ['e-mail']);
-    const designsCreated = parseNumber(findField(row, ['designs criados', 'designs criados']));
-    const designsPublished = parseNumber(findField(row, ['designs publicados']));
-    const shared = parseNumber(findField(row, ['links compartilhados']));
-    const views = parseNumber(findField(row, ['designs visualizados']));
+    let email = findField(row, emailFieldCandidates);
+    if (!email) {
+      const emailCandidate = Object.values(row).find((value) => typeof value === 'string' && value.includes('@'));
+      email = emailCandidate ?? '';
+    }
+    const designsCreated = parseNumber(findField(row, designsCreatedFields));
+    const designsPublished = parseNumber(findField(row, designsPublishedFields));
+    const shared = parseNumber(findField(row, linksSharedFields));
+    const views = parseNumber(findField(row, viewsFields));
     const periodLabel = findField(row, periodFieldCandidates);
 
     const license = licenseMap.get(email.toLowerCase());
@@ -220,9 +309,12 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
     entry.stats.designsShared += shared;
     entry.stats.designsViewed += views;
     entry.creators.push({
-      name: findField(row, ['membro', 'member']),
+      name: findField(row, ['membro', 'member', 'nome', 'name', 'usuario']),
       email,
       designs: designsCreated,
+      published: designsPublished,
+      shared,
+      viewed: views,
       schoolName,
       schoolId,
       cluster,
@@ -236,9 +328,7 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
   });
   const usageData = Array.from(schools.values()).map(({ stats, creators }) => ({
     ...stats,
-    topCreators: creators
-      .sort((a, b) => b.designs - a.designs)
-      .slice(0, 3),
+    topCreators: creators.sort((a, b) => b.designs - a.designs).slice(0, 50),
   }));
 
   const timeSeries: TimeSeriesPoint[] = Array.from(timeSeriesMap.entries())
@@ -253,18 +343,18 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
 };
 
 export const loadModelUsageRanking = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD): Promise<ModelUsage[]> => {
-  const modelOverride = loadOverride('models', period);
+  const modelOverride = loadOverride('models', period) ?? getLatestOverride('models');
   const rows = await parseCsv(
     MODEL_FILE_MAP[period] ?? MODEL_FILE_MAP[DEFAULT_USAGE_PERIOD],
     modelOverride?.text
   );
   return rows
     .map((row) => ({
-      modelName: findField(row, ['modelo']),
-      owner: findField(row, ['titular']),
-      uses: parseNumber(findField(row, ['usadas'])),
-      published: parseNumber(findField(row, ['publicado'])),
-      shared: parseNumber(findField(row, ['compartilhados'])),
+      modelName: findField(row, ['modelo', 'template', 'nome do modelo', 'nome do template']),
+      owner: findField(row, ['titular', 'owner', 'proprietario']),
+      uses: parseNumber(findField(row, ['usadas', 'usos', 'uses'])),
+      published: parseNumber(findField(row, ['publicado', 'publicados', 'published'])),
+      shared: parseNumber(findField(row, ['compartilhados', 'compartilhado', 'shared'])),
     }))
     .filter((model) => model.modelName)
     .sort((a, b) => b.uses - a.uses)
@@ -275,6 +365,16 @@ export const uploadMemberReport = async (file: File, period: UsagePeriod | 'all'
   const text = rawText ?? await file.text();
   const uploadedAt = new Date().toISOString();
   const targets = period === 'all' ? ALL_PERIODS : [period];
+  archiveCurrentOverrides('members', targets);
+  recordHistoryEntries(
+    targets.map((p) => ({
+      id: `members-${p}-${uploadedAt}`,
+      type: 'members',
+      period: p,
+      filename: file.name,
+      uploadedAt,
+    }))
+  );
   targets.forEach((p) =>
     saveOverride('members', p, {
       text,
@@ -283,6 +383,9 @@ export const uploadMemberReport = async (file: File, period: UsagePeriod | 'all'
       period: p,
     })
   );
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('canva-upload-refresh'));
+  }
 };
 
 export const clearUploadOverrides = () => {
@@ -298,6 +401,16 @@ export const uploadModelReport = async (file: File, period: UsagePeriod | 'all' 
   const text = rawText ?? await file.text();
   const uploadedAt = new Date().toISOString();
   const targets = period === 'all' ? ALL_PERIODS : [period];
+  archiveCurrentOverrides('models', targets);
+  recordHistoryEntries(
+    targets.map((p) => ({
+      id: `models-${p}-${uploadedAt}`,
+      type: 'models',
+      period: p,
+      filename: file.name,
+      uploadedAt,
+    }))
+  );
   targets.forEach((p) =>
     saveOverride('models', p, {
       text,
@@ -306,4 +419,7 @@ export const uploadModelReport = async (file: File, period: UsagePeriod | 'all' 
       period: p,
     })
   );
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('canva-upload-refresh'));
+  }
 };

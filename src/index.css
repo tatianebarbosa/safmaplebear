@@ -351,3 +351,50 @@
     padding-right: var(--global-content-padding);
   }
 }
+
+@layer components {
+  /* Padrão global de modais: largura/altura limitadas, cantos arredondados e scroll interno. */
+  div[role="dialog"],
+  .modal {
+    width: 100% !important;
+    max-width: 720px !important;
+    max-height: calc(100vh - 2rem) !important;
+    margin: 1rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35) !important;
+    background: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: auto !important; /* fallback caso o corpo não esteja isolado */
+    font-family: inherit !important;
+  }
+
+  div[role="dialog"].has-modal-body,
+  .modal.has-modal-body {
+    overflow: hidden !important;
+  }
+
+  div[role="dialog"] .modal__header,
+  div[role="dialog"] .modal__footer,
+  .modal .modal__header,
+  .modal .modal__footer {
+    padding: 16px 20px !important;
+    flex: 0 0 auto !important;
+  }
+
+  div[role="dialog"] .modal__body,
+  .modal .modal__body {
+    padding: 0 20px 20px !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important; /* garante scroll interno sem estourar o container */
+  }
+
+  @media (max-width: 768px) {
+    div[role="dialog"],
+    .modal {
+      max-width: min(600px, calc(100vw - 1.5rem)) !important;
+      margin: 0.75rem !important;
+    }
+  }
+}

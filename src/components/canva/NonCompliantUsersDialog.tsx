@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Mail, School, ShieldAlert, Search, Filter } from 'lucide-react';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { getMaxLicensesPerSchool } from '@/config/licenseLimits';
+import { dialogLayouts } from './dialogLayouts';
 
 export interface NonCompliantUserDetail {
   id: string;
@@ -166,7 +167,7 @@ export const NonCompliantUsersDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[960px] max-h-[80vh] overflow-hidden">
+      <DialogContent className={`${dialogLayouts.lg} flex flex-col overflow-x-hidden`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShieldAlert className="h-5 w-5 text-destructive" />

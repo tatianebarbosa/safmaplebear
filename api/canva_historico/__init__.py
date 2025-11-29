@@ -39,7 +39,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "timestamp": "2025-11-10T00:00:00Z",
                     "tipo": "Coleta Automática",
                     "descricao": "Sincronização diária de dados do Canva",
-                    "usuario": "TimerSyncCanva",
+                    "usuario": "Coleta manual",
                     "status": "Sucesso",
                     "metadados": {"periodo": "Últimos 30 dias", "usuarios_afetados": 824}
                 },
