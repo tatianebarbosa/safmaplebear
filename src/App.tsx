@@ -38,6 +38,9 @@ const MonitoringPortal = lazy(
 const TicketsPage = lazy(() => import("@/pages/TicketsPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const KnowledgeBasePage = lazy(() => import("@/pages/KnowledgeBasePage"));
+const AssetsPage = lazy(() => import("@/pages/AssetsPage"));
+const AssetDetailPage = lazy(() => import("@/pages/AssetDetailPage"));
+const AssetSchoolPage = lazy(() => import("@/pages/AssetSchoolPage"));
 
 const ProtectedShell = () => (
   <ProtectedRoute>
@@ -77,6 +80,12 @@ const App = () => (
               <Route
                 path="/knowledge-base"
                 element={<KnowledgeBasePage />}
+              />
+              <Route path="/saf/ativos" element={<AssetsPage />} />
+              <Route path="/saf/ativos/:assetId" element={<AssetDetailPage />} />
+              <Route
+                path="/saf/ativos/:assetId/escola/:schoolId"
+                element={<AssetSchoolPage />}
               />
               <Route path="/access-control" element={<AccessControl />} />
             </Route>

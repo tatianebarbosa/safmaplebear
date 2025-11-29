@@ -42,6 +42,7 @@ const Header = () => {
   const navItems = [
     { label: "Início", path: "/dashboard" },
     { label: "Canva", path: "/dashboard/canva" },
+    { label: "Ativos", path: "/saf/ativos" },
     { label: "Tickets", path: "/tickets" },
     { label: "Base de Conhecimento", path: "/knowledge-base" },
   ];
