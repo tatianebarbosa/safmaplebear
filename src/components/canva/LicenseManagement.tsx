@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { dialogLayouts } from './dialogLayouts';
 import { SchoolCanvaData, CanvaUser } from '@/lib/canvaDataProcessor';
 import { useLicenseLimit } from '@/config/licenseLimits';
+import { showCanvaSyncReminder } from '@/lib/canvaReminder';
 
 interface LicenseManagementProps {
   schoolsData: SchoolCanvaData[];
@@ -31,7 +33,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
 
   const handleAction = () => {
     if (!selectedSchool || !justification.trim()) {
-      toast.error('Selecione a escola e informe o titulo do e-mail ou numero do ticket correspondente');
+      toast.error('Selecione a escola e informe o t?tulo do e-mail ou numero do ticket correspondente');
       return;
     }
 
@@ -59,7 +61,8 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
     setTargetSchoolId('');
     setIsDialogOpen(false);
     
-    toast.success('Ação realizada com sucesso');
+    toast.success('Acao realizada com sucesso');
+    showCanvaSyncReminder();
   };
 
   const getActionLabel = () => {
@@ -248,7 +251,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                               Gerenciar
                             </Button>
                           </DialogTrigger>
-                          <DialogContent>
+                          <DialogContent className={`${dialogLayouts.md} flex flex-col`}>
                             <DialogHeader>
                               <DialogTitle>{getActionLabel()}</DialogTitle>
                               <DialogDescription>

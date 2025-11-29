@@ -11,6 +11,7 @@ import { FileText, Calendar, User } from 'lucide-react';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { dialogLayouts } from './dialogLayouts';
 
 interface JustificationsDialogProps {
   open: boolean;
@@ -30,7 +31,7 @@ export const JustificationsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className={`${dialogLayouts.md} flex flex-col`}>
         <DialogHeader>
         <DialogTitle>Historico de Referencias (Email/Ticket)</DialogTitle>
           <DialogDescription>

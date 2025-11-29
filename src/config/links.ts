@@ -13,6 +13,7 @@ export const SPREADSHEET_LINKS: LinkItem[] = [
 ];
 
 export const CRM_LINKS: LinkItem[] = [
-  { label: "Alterar senha CRM", href: "https://sebsa.topdesk.net/tas/public/ssp/content/serviceflow?unid=c6ad3cbd8a2c4608ad4df32d1711f986" },
-  { label: "Alterar autenticador CRM", href: "https://sebsa.topdesk.net/tas/public/ssp/content/serviceflow?unid=71a30b844ae54002b70c00e21dd4d29e" },
+  { label: "Resetar senha CRM", href: "https://passwordreset.microsoftonline.com/" },
+  { label: "Alterar senha CRM (TOPdesk)", href: "https://sebsa.topdesk.net/tas/public/ssp/content/serviceflow?unid=c6ad3cbd8a2c4608ad4df32d1711f986" },
+  { label: "Alterar autenticador CRM (TOPdesk)", href: "https://sebsa.topdesk.net/tas/public/ssp/content/serviceflow?unid=71a30b844ae54002b70c00e21dd4d29e" },
 ];

@@ -133,8 +133,8 @@ const NotificationBell = () => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" sideOffset={12} className="w-96 p-0 shadow-[0_18px_34px_-18px_rgba(30,32,36,0.45)]">
-        <div className="flex items-center justify-between px-4 py-3 border-b">
+      <PopoverContent align="end" sideOffset={12} collisionPadding={16} className="w-[min(340px,calc(100vw-48px))] max-w-[calc(100vw-48px)] p-0 shadow-[0_18px_34px_-18px_rgba(30,32,36,0.45)] flex max-h-[70vh]">
+        <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
           <div>
             <p className="text-sm font-semibold text-foreground">Notificacoes</p>
             <p className="text-xs text-muted-foreground">Tickets com SLA em risco</p>
@@ -144,7 +144,7 @@ const NotificationBell = () => {
           </Badge>
         </div>
 
-        <div className="max-h-80 overflow-y-auto divide-y">
+        <div className="flex-1 min-h-0 overflow-y-auto divide-y">
           {notifications.length === 0 ? (
             <div className="px-4 py-6 text-sm text-muted-foreground text-center">
               Nenhum alerta no momento.
@@ -185,7 +185,7 @@ const NotificationBell = () => {
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-t">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-t flex-shrink-0">
           <Button variant="ghost" size="sm" onClick={markAllAsRead} disabled={!unreadCount}>
             Marcar como lidas
           </Button>
@@ -199,3 +199,4 @@ const NotificationBell = () => {
 };
 
 export default NotificationBell;
+

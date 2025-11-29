@@ -72,6 +72,8 @@ export const CanvaUsageDashboard = ({
   onNavigateToUsers,
 }: CanvaUsageDashboardProps) => {
   const { schools } = useSchoolLicenseStore();
+  type MetricKey = "designsCreated" | "designsPublished" | "designsShared" | "designsViewed";
+  type CreatorMetric = "designs" | "published" | "shared" | "viewed";
   const [filters, setFilters] = useState<UsageFilters>({
     period: "12m",
     cluster: undefined,
@@ -82,6 +84,21 @@ export const CanvaUsageDashboard = ({
   const [annualTimeData, setAnnualTimeData] = useState<TimeSeriesPoint[]>([]);
   const [modelRanking, setModelRanking] = useState<ModelUsage[]>([]);
   const [rankLimit, setRankLimit] = useState(3);
+  const [schoolSort, setSchoolSort] = useState<MetricKey>("designsCreated");
+  const [creatorSort, setCreatorSort] = useState<CreatorMetric>("designs");
+
+  const metricLabels: Record<MetricKey, string> = {
+    designsCreated: "Designs criados",
+    designsPublished: "Designs publicados",
+    designsShared: "Links compartilhados",
+    designsViewed: "Designs visualizados",
+  };
+  const creatorMetricLabels: Record<CreatorMetric, string> = {
+    designs: "Designs criados",
+    published: "Designs publicados",
+    shared: "Links compartilhados",
+    viewed: "Designs visualizados",
+  };
 
   const clusterOptions = [
     { value: "Implantação", label: "Implantação" },
@@ -111,6 +128,20 @@ export const CanvaUsageDashboard = ({
     const handler = () => loadDashboardData();
     window.addEventListener("canva-upload-refresh", handler);
     return () => window.removeEventListener("canva-upload-refresh", handler);
+  }, [loadDashboardData]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        loadDashboardData();
+      }
+    };
+    window.addEventListener("focus", loadDashboardData);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("focus", loadDashboardData);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [loadDashboardData]);
 
   useEffect(() => {
@@ -184,9 +215,12 @@ export const CanvaUsageDashboard = ({
     return Array.from(map.values()).sort((a, b) => b.designs - a.designs);
   }, [filteredUsage]);
 
-  const topSchools = [...filteredUsage]
-    .sort((a, b) => b.designsCreated - a.designsCreated)
-    .slice(0, 10);
+  const topSchools = useMemo(() => {
+    const sorted = [...filteredUsage].sort((a, b) => (b[schoolSort] ?? 0) - (a[schoolSort] ?? 0));
+    return sorted
+      .slice(0, 10)
+      .map((school) => ({ ...school, metricValue: school[schoolSort] ?? 0 }));
+  }, [filteredUsage, schoolSort]);
 
   const excludedEmails = new Set(["comunicacao@maplebear.com.br"]);
 
@@ -214,7 +248,18 @@ export const CanvaUsageDashboard = ({
       }))
     )
     .filter((creator) => !excludedEmails.has(creator.email?.toLowerCase?.() ?? ""))
-    .sort((a, b) => b.designs - a.designs);
+    .map((creator) => ({
+      ...creator,
+      metricValue:
+        creatorSort === "designs"
+          ? creator.designs
+          : creatorSort === "published"
+          ? creator.published ?? 0
+          : creatorSort === "shared"
+          ? creator.shared ?? 0
+          : creator.viewed ?? 0,
+    }))
+    .sort((a, b) => b.metricValue - a.metricValue);
 
   const rankedCreators = allCreators.slice(0, rankLimit);
   const missingSlots = Math.max(0, rankLimit - rankedCreators.length);
@@ -325,6 +370,11 @@ export const CanvaUsageDashboard = ({
               </SelectContent>
             </Select>
           </div>
+          <div className="flex items-end">
+            <Button variant="outline" className="w-full" onClick={loadDashboardData}>
+              Recarregar dados
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -370,33 +420,32 @@ export const CanvaUsageDashboard = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={320}>
-              <LineChart data={timeData} margin={{ top: 16, right: 16, left: 0, bottom: 8 }}>
+                        <ResponsiveContainer width="100%" height={320}>
+              <AreaChart data={condensedTimeData} margin={{ top: 16, right: 16, left: 0, bottom: 8 }}>
+                <defs>
+                  <linearGradient id="usageArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={primaryColor} stopOpacity={0.35} />
+                    <stop offset="100%" stopColor={primaryColor} stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="2 6" stroke={chartStroke} />
                 <XAxis dataKey="period" tick={{ fill: chartText, fontSize: 12 }} />
-                <YAxis tick={{ fill: chartText, fontSize: 12 }} allowDecimals={false} />
+                <YAxis tick={{ fill: chartText, fontSize: 12 }} allowDecimals={false} domain={timeDomain} />
                 <Tooltip
                   labelFormatter={(label) => `Periodo: ${label}`}
                   formatter={(value) => [value, "Designs"]}
                   contentStyle={{ borderRadius: 12, borderColor: "hsl(var(--border))" }}
                 />
-                {timeData.length > 0 && (
-                  <ReferenceLine
-                    y={averageDesigns}
-                    stroke="hsl(var(--muted-foreground))"
-                    strokeDasharray="4 4"
-                    label={{ position: "right", value: "Média", fill: chartText, fontSize: 11 }}
-                  />
-                )}
-                <Line
+                <Area
                   type="monotone"
                   dataKey="designs"
                   stroke={primaryColor}
+                  fill="url(#usageArea)"
                   strokeWidth={3}
-                  dot={false}
-                  activeDot={{ r: 4 }}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5, strokeWidth: 0 }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
@@ -407,6 +456,20 @@ export const CanvaUsageDashboard = ({
             <CardDescription className="text-sm text-muted-foreground">
               Ranking por designs registrados no periodo
             </CardDescription>
+            <div className="flex gap-2 items-center">
+              <Label className="text-xs text-muted-foreground">Ordenar por</Label>
+              <Select value={schoolSort} onValueChange={(value: MetricKey) => setSchoolSort(value)}>
+                <SelectTrigger className="h-9 w-48">
+                  <SelectValue placeholder="Metrica" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="designsCreated">Designs criados</SelectItem>
+                  <SelectItem value="designsPublished">Designs publicados</SelectItem>
+                  <SelectItem value="designsShared">Links compartilhados</SelectItem>
+                  <SelectItem value="designsViewed">Designs visualizados</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={320}>
@@ -424,9 +487,9 @@ export const CanvaUsageDashboard = ({
                   width={170}
                   tick={{ fill: chartText, fontSize: 12 }}
                 />
-                <Tooltip formatter={(value) => [value, "Designs"]} contentStyle={{ borderRadius: 12 }} />
-                <Bar dataKey="designsCreated" fill={primaryColor} radius={[6, 6, 6, 6]} barSize={18}>
-                  <LabelList dataKey="designsCreated" position="right" fill="hsl(var(--foreground))" fontSize={12} />
+                <Tooltip formatter={(value) => [value, metricLabels[schoolSort]]} contentStyle={{ borderRadius: 12 }} />
+                <Bar dataKey="metricValue" fill={primaryColor} radius={[6, 6, 6, 6]} barSize={18}>
+                  <LabelList dataKey="metricValue" position="right" fill="hsl(var(--foreground))" fontSize={12} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -476,9 +539,9 @@ export const CanvaUsageDashboard = ({
       </Card>
 
       <Card className="rounded-xl shadow-sm border-border/40">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
-            <CardTitle className="text-xl font-medium">Top criadores</CardTitle>
+            <CardTitle className="text-xl font-medium">Ranking de criadores</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Ranking priorizado para comunicados de reconhecimento (marketing central excluido)
             </CardDescription>
@@ -486,22 +549,38 @@ export const CanvaUsageDashboard = ({
               Mostrando {rankedCreators.length} de {rankLimit} posicoes com os filtros atuais.
             </p>
           </div>
-          <Select value={String(rankLimit)} onValueChange={(value) => setRankLimit(Number(value))}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Top" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="3">Top 3</SelectItem>
-              <SelectItem value="5">Top 5</SelectItem>
-              <SelectItem value="10">Top 10</SelectItem>
-              <SelectItem value="20">Top 20</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" onClick={() => onNavigateToUsers()} className="gap-2">
-            <Users className="h-4 w-4" />
-            Ver usuarios
-            <ExternalLink className="h-3 w-3" />
-          </Button>
+          <div className="flex flex-wrap items-center gap-3 justify-end">
+            <Select value={String(rankLimit)} onValueChange={(value) => setRankLimit(Number(value))}>
+              <SelectTrigger className="w-28">
+                <SelectValue placeholder="Top" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3">Top 3</SelectItem>
+                <SelectItem value="5">Top 5</SelectItem>
+                <SelectItem value="10">Top 10</SelectItem>
+                <SelectItem value="20">Top 20</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-2">
+              <Label className="text-xs text-muted-foreground">Ordenar por</Label>
+              <Select value={creatorSort} onValueChange={(value: CreatorMetric) => setCreatorSort(value)}>
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="Metrica" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="designs">Designs criados</SelectItem>
+                  <SelectItem value="published">Designs publicados</SelectItem>
+                  <SelectItem value="shared">Links compartilhados</SelectItem>
+                  <SelectItem value="viewed">Designs visualizados</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button variant="outline" onClick={() => onNavigateToUsers()} className="gap-2">
+              <Users className="h-4 w-4" />
+              Ver usuarios
+              <ExternalLink className="h-3 w-3" />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {rankedCreators.length === 0 ? (
@@ -520,7 +599,7 @@ export const CanvaUsageDashboard = ({
                   className={`flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-3 border rounded-xl hover:shadow-sm transition-colors ${rankStyle(index)}`}
                 >
                   <div className="flex flex-1 items-start gap-3">
-                    <Badge variant="secondary" className="min-w-8 justify-center text-xs font-medium">
+                    <Badge variant="secondary" className="min-w-8 justify-center text-xs font-medium bg-red-500 text-white">
                       #{index + 1}
                     </Badge>
                     <div>

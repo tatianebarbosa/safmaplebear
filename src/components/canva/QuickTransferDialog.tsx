@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { School } from "@/types/schoolLicense";
+import { dialogLayouts } from "./dialogLayouts";
 
 type TransferPayload = {
   sourceSchoolId: string;
@@ -119,7 +120,7 @@ export const QuickTransferDialog = ({
         if (!isOpen) resetState();
       }}
     >
-      <DialogContent className="sm:max-w-[720px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className={`${dialogLayouts.md} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>Transferencia rapida de licenca</DialogTitle>
           <DialogDescription>

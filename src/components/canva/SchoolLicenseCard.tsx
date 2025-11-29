@@ -11,6 +11,7 @@ import { getNonComplianceReason } from '@/lib/validators';
 import { UserDialog } from './UserDialog';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
+import { showCanvaSyncReminder } from '@/lib/canvaReminder';
 
 interface SchoolLicenseCardProps {
   school: School;
@@ -28,9 +29,13 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
   const isCentral =
     school.id === '0' ||
     (school.name || '').toLowerCase().includes('central');
-  const utilizationPercent = isCentral
-    ? 0
-    : Math.min(100, (school.usedLicenses / school.totalLicenses) * 100);
+  const isNoSchool =
+    school.id === 'no-school' ||
+    (school.name || '').toLowerCase().includes('sem escola');
+  const utilizationPercent =
+    isCentral || isNoSchool
+      ? 0
+      : Math.min(100, (school.usedLicenses / school.totalLicenses) * 100);
   const nonCompliantUsers = school.users.filter((u) => !u.isCompliant);
   const availableLicenses = isCentral
     ? Number.POSITIVE_INFINITY
@@ -61,11 +66,12 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
     });
 
     if (!newUserId) {
-      toast.error('Nao foi possivel adicionar a licenca. Tente novamente.');
+      toast.error('Não foi possível adicionar a licença. Tente novamente.');
       return;
     }
 
-    toast.success(`${payload.user.name} adicionado(a) com licenca desta escola.`);
+    toast.success(`${payload.user.name} adicionado(a) com licença desta escola.`);
+    showCanvaSyncReminder();
     setShowAddUserDialog(false);
   };
 
@@ -87,36 +93,53 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-extrabold text-slate-900 leading-none">
-                    {school.users.length} usuarios
+                    {school.users.length} usuários
                   </span>
                   <Badge variant="outline" size="sm" className="text-[10px]">
-                    Licencas ilimitadas
+                    Licenças ilimitadas
                   </Badge>
                 </div>
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-extrabold text-slate-900 leading-none">
-                      {school.usedLicenses}/{school.totalLicenses} Licencas
-                    </span>
-                    {licenseStatus === 'Excedido' && (
-                      <Badge variant="destructive" size="sm" className="!text-[9px] !px-2 !py-1 leading-none rounded-full">
-                        Excesso
-                      </Badge>
-                    )}
+                {isNoSchool ? (
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-extrabold text-slate-900 leading-none">
+                        {school.totalLicenses || school.usedLicenses} Licenças
+                      </span>
+                      {licenseStatus === 'Excedido' && (
+                        <Badge variant="destructive" size="sm" className="!text-[9px] !px-2 !py-1 leading-none rounded-full">
+                          Excesso
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <span className="text-xs text-slate-700 font-bold leading-none px-2 py-1 rounded-full bg-muted/60">
-                    {utilizationPercent.toFixed(0)}%
-                  </span>
-                </div>
-                <div className="w-full bg-muted/60 rounded-full h-2 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${getProgressColor()}`}
-                    style={{ width: `${Math.min(100, utilizationPercent)}%` }}
-                  />
-                </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-extrabold text-slate-900 leading-none">
+                          {school.usedLicenses}/{school.totalLicenses} Licenças
+                        </span>
+                        {licenseStatus === 'Excedido' && (
+                          <Badge variant="destructive" size="sm" className="!text-[9px] !px-2 !py-1 leading-none rounded-full">
+                            Excesso
+                          </Badge>
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-700 font-bold leading-none px-2 py-1 rounded-full bg-muted/60">
+                        {utilizationPercent.toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted/60 rounded-full h-2 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${getProgressColor()}`}
+                        style={{ width: `${Math.min(100, utilizationPercent)}%` }}
+                      />
+                    </div>
+                  </>
+                )}
               </>
             )}
             <div className="flex items-center gap-0.5 text-[7px] text-muted-foreground max-w-full overflow-hidden">
@@ -126,7 +149,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                 className="bg-background text-slate-700 border-border !text-[6px] !px-[6px] !py-[2px] gap-0.5 leading-tight whitespace-nowrap h-auto min-h-0"
               >
                 <Users className="h-2 w-2 shrink-0" />
-                {school.users.length} usuarios
+                {school.users.length} usuários
               </Badge>
               {nonCompliantUsers.length > 0 && (
                 <Badge
@@ -135,13 +158,13 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                   className="!text-[6px] !px-[6px] !py-[2px] gap-0.5 leading-tight whitespace-nowrap h-auto min-h-0"
                 >
                   <AlertTriangle className="h-2 w-2 shrink-0" />
-                  {nonCompliantUsers.length} fora da politica
+                  {nonCompliantUsers.length} fora da política
                 </Badge>
               )}
               {school.hasRecentJustifications && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background border text-primary text-[9px] leading-none">
                   <Paperclip className="h-3 w-3" />
-                  Referencias
+                  Referências
                 </span>
               )}
             </div>
@@ -207,7 +230,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                   className="w-full justify-center rounded-full border-border/60 shadow-sm font-semibold text-foreground bg-muted hover:bg-muted/80"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  {isCentral ? 'Adicionar licenca (ilimitado)' : `Adicionar licenca (${availableLicenses} disp.)`}
+                  Adicionar licen?a
                 </Button>
               )}
               <Button
@@ -234,7 +257,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
         open={showAddUserDialog}
         onOpenChange={setShowAddUserDialog}
         onSave={handleAddNewUser}
-        title="Adicionar licenca"
+        title="Adicionar licen?a"
       />
     </>
   );

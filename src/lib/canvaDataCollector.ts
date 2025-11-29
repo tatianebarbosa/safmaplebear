@@ -61,6 +61,7 @@ export interface CanvaHistorico {
   data?: Pick<CanvaData, 'totalPessoas' | 'designsCriados'>;
   usuarioAlteracao: string;
   descricaoAlteracao: string;
+  uploadType?: 'members' | 'models';
 }
 
 type RawHistoryEntry = {
@@ -110,6 +111,7 @@ type UploadHistoryEntry = {
   reverted?: boolean;
   revertedAt?: string;
   revertReason?: string;
+  uploadType?: 'members' | 'models';
 };
 
 export class CanvaDataCollector {
@@ -315,7 +317,7 @@ export class CanvaDataCollector {
     return this.buildCanvaData(rows);
   }
 
-  registrarHistoricoUploadManual(entry: { filename: string; totalPessoas: number; designsCriados: number; uploadedAt?: string }) {
+  registrarHistoricoUploadManual(entry: { filename: string; totalPessoas: number; designsCriados: number; uploadedAt?: string; uploadType?: 'members' | 'models' }) {
     const history = this.loadUploadHistory();
     history.unshift({
       id: `upload-${Date.now()}`,
@@ -323,6 +325,7 @@ export class CanvaDataCollector {
       uploadedAt: entry.uploadedAt ?? new Date().toISOString(),
       totalPessoas: entry.totalPessoas,
       designsCriados: entry.designsCriados,
+      uploadType: entry.uploadType,
     });
     this.saveUploadHistory(history.slice(0, 10));
   }
@@ -362,7 +365,8 @@ export class CanvaDataCollector {
           designsCriados: upload.designsCriados,
         },
         usuarioAlteracao: 'Upload manual',
-        descricaoAlteracao: `Upload CSV: ${upload.filename}`,
+        descricaoAlteracao: `Upload CSV${upload.uploadType === 'members' ? ' (membros)' : upload.uploadType === 'models' ? ' (modelos)' : ''}: ${upload.filename}`,
+        uploadType: upload.uploadType,
       };
     });
 

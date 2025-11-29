@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { UserRole } from '@/types/schoolLicense';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { Badge } from '@/components/ui/badge';
+import { dialogLayouts } from './dialogLayouts';
 
 type NewUserMeta = {
   origemSolicitacao: 'Ticket SAF' | 'E-mail';
@@ -171,7 +172,7 @@ export const UserDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>

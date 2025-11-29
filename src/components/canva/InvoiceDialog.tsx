@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useInvoiceStore } from '@/stores/invoiceStore';
 import { toast } from 'sonner';
+import { dialogLayouts } from './dialogLayouts';
 
 interface InvoiceDialogProps {
   open: boolean;
@@ -110,7 +111,7 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
       onOpenChange(open);
       if (!open) resetForm();
     }}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>Nova Fatura Canva</DialogTitle>
           <DialogDescription>
