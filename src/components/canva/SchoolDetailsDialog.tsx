@@ -128,11 +128,23 @@ export const SchoolDetailsDialog = ({
 
   const resolvedSafManager = (() => {
     if (school.safManager && school.safManager.trim()) return school.safManager.trim();
+
     const match = officialData?.find(
       (item) => item.school.id === school.id || item.school.name === school.name
     );
     const fromOfficial = match?.school.safManager?.trim();
     if (fromOfficial) return fromOfficial;
+
+    // Fallback: tenta usar o consultor/saf manager de qualquer escola do mesmo cluster
+    if (school.cluster) {
+      const clusterMatch = officialData?.find(
+        (item) =>
+          item.school.cluster?.toLowerCase() === school.cluster?.toLowerCase() &&
+          item.school.safManager?.trim()
+      );
+      if (clusterMatch?.school.safManager) return clusterMatch.school.safManager.trim();
+    }
+
     return "Equipe SAF";
   })();
 
