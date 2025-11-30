@@ -349,17 +349,6 @@ export const SchoolDetailsDialog = ({
                   </div>
                 </div>
               </CardContent>
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Nao conformes:</span>
-                        <span className={nonCompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
-                          {nonCompliantUsers.length}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
             </Card>
           </TabsContent>
 
