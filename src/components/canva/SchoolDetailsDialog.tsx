@@ -266,13 +266,7 @@ export const SchoolDetailsDialog = ({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between rounded-lg border border-border/60 bg-muted/30 px-3 py-2">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-foreground">Mensagem pronta para o responsável</p>
-                    <p className="text-xs text-muted-foreground">
-                      Copie e envie o texto abaixo para solicitar liberação/transferência de licença.
-                    </p>
-                  </div>
+                <div className="flex justify-end">
                   <Button
                     type="button"
                     variant="secondary"
