@@ -306,6 +306,7 @@ export const buildFallbackData = async (): Promise<{
     name: school.nome || `Escola ${school.id}`,
     status: mapSchoolStatusFallback(school.statusEscola),
     cluster: school.cluster || 'Outros',
+    safManager: school.carteiraSaf || undefined,
     cnpj: school.cnpj || undefined,
     city: school.cidade || '',
     state: school.estado || '',
