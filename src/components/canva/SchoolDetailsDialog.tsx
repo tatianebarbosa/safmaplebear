@@ -127,6 +127,29 @@ export const SchoolDetailsDialog = ({
 
   if (!school) return null;
 
+  const isGenericCluster = (value?: string | null) =>
+    !value || value.toLowerCase().startsWith('outros');
+
+  const resolvedCluster = (() => {
+    if (school.cluster && !isGenericCluster(school.cluster)) return school.cluster;
+
+    const match = officialData?.find(
+      (item) => item.school.id === school.id || item.school.name === school.name
+    );
+    if (match?.school.cluster && !isGenericCluster(match.school.cluster)) {
+      return match.school.cluster;
+    }
+
+    const storeMatch = schools.find(
+      (s) => s.id === school.id || s.name === school.name
+    );
+    if (storeMatch?.cluster && !isGenericCluster(storeMatch.cluster)) {
+      return storeMatch.cluster;
+    }
+
+    return school.cluster || 'Sem cluster';
+  })();
+
   const resolvedSafManager = (() => {
     if (school.safManager && school.safManager.trim()) return school.safManager.trim();
 
@@ -137,10 +160,10 @@ export const SchoolDetailsDialog = ({
     if (fromOfficial) return fromOfficial;
 
     // Fallback: tenta usar o consultor/saf manager de qualquer escola do mesmo cluster
-    if (school.cluster) {
+    if (resolvedCluster) {
       const clusterMatch = officialData?.find(
         (item) =>
-          item.school.cluster?.toLowerCase() === school.cluster?.toLowerCase() &&
+          item.school.cluster?.toLowerCase() === resolvedCluster?.toLowerCase() &&
           item.school.safManager?.trim()
       );
       if (clusterMatch?.school.safManager) return clusterMatch.school.safManager.trim();
@@ -149,7 +172,7 @@ export const SchoolDetailsDialog = ({
       const storeClusterMatch = schools.find(
         (s) =>
           s.id !== school.id &&
-          s.cluster?.toLowerCase() === school.cluster?.toLowerCase() &&
+          s.cluster?.toLowerCase() === resolvedCluster?.toLowerCase() &&
           s.safManager?.trim()
       );
       if (storeClusterMatch?.safManager) return storeClusterMatch.safManager.trim();
@@ -249,7 +272,7 @@ export const SchoolDetailsDialog = ({
                         {school.status}
                       </Badge>
                       <Badge variant="muted" size="md" className="px-3 py-1 text-sm rounded-full">
-                        {resolvedSafManager || school.cluster}
+                        {resolvedCluster}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
