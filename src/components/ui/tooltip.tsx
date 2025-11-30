@@ -12,9 +12,10 @@ const TooltipTrigger = TooltipPrimitive.Trigger;
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, side = "top", sideOffset = 4, ...props }, ref) => (
   <TooltipPrimitive.Content
     ref={ref}
+    side={side}
     sideOffset={sideOffset}
     className={cn(
       "z-50 overflow-hidden rounded-lg border border-border/60 bg-white px-4 py-2 text-sm text-foreground shadow-xl max-w-md",
