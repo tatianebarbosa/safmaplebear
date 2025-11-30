@@ -69,6 +69,7 @@ export const SchoolDetailsDialog = ({
     transferUsersBetweenSchools,
     addUser,
     officialData,
+    schools,
   } = useSchoolLicenseStore();
   const { toast } = useToast();
   const [revertDialogOpen, setRevertDialogOpen] = useState(false);
@@ -143,6 +144,15 @@ export const SchoolDetailsDialog = ({
           item.school.safManager?.trim()
       );
       if (clusterMatch?.school.safManager) return clusterMatch.school.safManager.trim();
+
+      // Busca tambem nas escolas carregadas localmente
+      const storeClusterMatch = schools.find(
+        (s) =>
+          s.id !== school.id &&
+          s.cluster?.toLowerCase() === school.cluster?.toLowerCase() &&
+          s.safManager?.trim()
+      );
+      if (storeClusterMatch?.safManager) return storeClusterMatch.safManager.trim();
     }
 
     return "Equipe SAF";
