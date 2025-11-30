@@ -260,82 +260,104 @@ export const SchoolDetailsDialog = ({
                 <CardTitle className="text-lg">Informacoes da Escola</CardTitle>
               </CardHeader>
               <CardContent className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-6 lg:gap-8">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Nome:</span>
-                      <span>{school.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" size="md" className="px-3 py-1 text-sm rounded-full">
-                        {school.status}
-                      </Badge>
-                      <Badge variant="muted" size="md" className="px-3 py-1 text-sm rounded-full">
-                        {resolvedCluster}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Responsavel do cluster:</span>
-                      <span className="text-foreground">{resolvedSafManager || 'Não informado'}</span>
+                <div className="grid grid-cols-1 gap-4 lg:gap-6 md:grid-cols-2">
+                  <div className="rounded-2xl border border-border/60 bg-amber-50/70 p-4 space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                      Dados gerais
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Nome:</span>
+                        <span className="text-foreground">{school.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" size="md" className="px-3 py-1 text-sm rounded-full">
+                          {school.status}
+                        </Badge>
+                        <Badge variant="muted" size="md" className="px-3 py-1 text-sm rounded-full">
+                          {resolvedCluster}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4" />
+                        <span>{school.city || 'Localidade nao informada'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Responsavel do cluster:</span>
+                        <span className="text-foreground">{resolvedSafManager || 'Nao informado'}</span>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Licencas:</span>
-                      <span>{school.usedLicenses}/{school.totalLicenses}</span>
-                      <Badge
-                        variant={
-                          licenseStatus === 'Excedido'
-                            ? 'destructive'
-                            : licenseStatus === 'Completo'
-                            ? 'success'
-                            : 'muted'
-                        }
-                        size="md"
-                        className="px-3 py-1 text-sm rounded-full"
+                  <div className="rounded-2xl border border-border/60 bg-amber-50/70 p-4 space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                      Licencas e conformidade
+                    </p>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Licencas:</span>
+                        <span>{school.usedLicenses}/{school.totalLicenses}</span>
+                        <Badge
+                          variant={
+                            licenseStatus === 'Excedido'
+                              ? 'destructive'
+                              : licenseStatus === 'Completo'
+                              ? 'success'
+                              : 'muted'
+                          }
+                          size="md"
+                          className="px-3 py-1 text-sm rounded-full"
+                        >
+                          {licenseStatus}
+                        </Badge>
+                      </div>
+                      <Button
+                        type="button"
+                        variant={licenseStatus === 'Excedido' ? 'destructive' : 'secondary'}
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => {
+                          const emails = school.users.map((u) => u.email).filter(Boolean);
+                          const body = [
+                            `A Escola ${school.name} ja possui ${school.usedLicenses} licencas ativas na plataforma, vinculadas aos seguintes e-mails:`,
+                            '',
+                            ...emails.map((email) => `- ${email}`),
+                            '',
+                            'Cada escola tem direito a duas licencas para uso da plataforma de marketing (Canva). Para que possamos conceder uma nova licenca, e necessario transferir ou remover um dos usuarios existentes. Lembramos que a remocao so pode ser realizada mediante autorizacao do responsavel pelo e-mail vinculado a licenca.',
+                          ].join('\n');
+                          navigator.clipboard?.writeText(body);
+                          toast({
+                            title: 'Mensagem copiada',
+                            description: 'Cole no e-mail ou chat com o responsavel do cluster.',
+                          });
+                        }}
                       >
-                        {licenseStatus}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Nao Conformes:</span>
-                      <span className={nonCompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
-                        {nonCompliantUsers.length}
-                      </span>
+                        <AlertTriangle className="h-4 w-4" />
+                        Copiar aviso de licencas
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Nao conformes:</span>
+                        <span className={nonCompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
+                          {nonCompliantUsers.length}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                <div className="flex justify-end">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="gap-2"
-                    onClick={() => {
-                      const emails = school.users.map((u) => u.email).filter(Boolean);
-                      const body = [
-                        `A Escola ${school.name} já possui ${school.usedLicenses} licenças ativas na plataforma, vinculadas aos seguintes e-mails:`,
-                        '',
-                        ...emails.map((email) => `- ${email}`),
-                        '',
-                        'Cada escola tem direito a duas licenças para uso da plataforma de marketing (Canva). Para que possamos conceder uma nova licença, é necessário transferir ou remover um dos usuários existentes. Lembramos que a remoção só pode ser realizada mediante autorização do responsável pelo e-mail vinculado à licença.'
-                      ].join('\n');
-                      navigator.clipboard?.writeText(body);
-                      toast({
-                        title: 'Mensagem copiada',
-                        description: 'Cole no e-mail ou chat com o responsável do cluster.',
-                      });
-                    }}
-                  >
-                    <Send className="h-4 w-4" />
-                    Copiar e enviar
-                  </Button>
+              </CardContent>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Nao conformes:</span>
+                        <span className={nonCompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
+                          {nonCompliantUsers.length}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -819,8 +841,6 @@ export const SchoolDetailsDialog = ({
     </>
   );
 };
-
-
 
 
 
