@@ -14,7 +14,7 @@ import {
 import { useTicketStore } from '@/stores/ticketStore';
 import { useAuthStore } from '@/stores/authStore';
 import { format, differenceInDays } from 'date-fns';
-import { toast } from 'sonner';
+import { toast } from "@/components/ui/sonner";
 import { Ticket } from '@/types/tickets';
 import {
   Table,

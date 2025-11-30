@@ -21,6 +21,8 @@ import {
   Bar,
   LineChart,
   Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -37,6 +39,9 @@ import {
   Calendar,
   Layers,
   Building2,
+  Activity,
+  BarChart3,
+  Trophy,
 } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { UsageFilters, CanvaUsageData } from "@/types/schoolLicense";
@@ -47,7 +52,7 @@ import {
   TimeSeriesPoint,
 } from "@/lib/canvaUsageService";
 import { filterRecentTimeSeries } from "@/lib/chartUtils";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 
 interface CanvaUsageDashboardProps {
@@ -168,6 +173,21 @@ export const CanvaUsageDashboard = ({
       setFilters((prev) => ({ ...prev, school: undefined }));
     }
   }, [filters.school, schoolOptions]);
+
+  const condensedTimeData = useMemo(() => {
+    if (!timeData?.length) return [];
+    const sanitized = timeData.map((point) => ({
+      period: point.period,
+      designs: Math.max(0, point.designs ?? 0),
+    }));
+    // Limita para os pontos mais recentes para evitar gráfico muito longo
+    return sanitized.slice(-24);
+  }, [timeData]);
+
+  const timeDomain = useMemo<[number, number | "auto"]>(() => {
+    const max = condensedTimeData.reduce((acc, point) => Math.max(acc, point.designs ?? 0), 0);
+    return [0, max ? Math.ceil(max * 1.1) : "auto"];
+  }, [condensedTimeData]);
 
   const averageDesigns =
     timeData.length > 0 ? timeData.reduce((sum, point) => sum + point.designs, 0) / timeData.length : 0;
@@ -378,7 +398,7 @@ export const CanvaUsageDashboard = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
         <StatsCard
           title="Designs criados"
           value={totals.designs.toLocaleString()}
@@ -412,13 +432,16 @@ export const CanvaUsageDashboard = ({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="rounded-xl shadow-sm border-border/40">
-          <CardHeader className="pb-3">
+      <Card className="rounded-xl shadow-sm border-border/40">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Activity className="h-5 w-5 text-primary" />
             <CardTitle className="text-xl font-medium">Designs criados por periodo</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              Evolucao temporal dos designs registrados
-            </CardDescription>
-          </CardHeader>
+          </div>
+          <CardDescription className="text-sm text-muted-foreground">
+            Evolucao temporal dos designs registrados
+          </CardDescription>
+        </CardHeader>
           <CardContent>
                         <ResponsiveContainer width="100%" height={320}>
               <AreaChart data={condensedTimeData} margin={{ top: 16, right: 16, left: 0, bottom: 8 }}>
@@ -452,7 +475,10 @@ export const CanvaUsageDashboard = ({
 
         <Card className="rounded-xl shadow-sm border-border/40">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-medium">Top 10 escolas mais ativas</CardTitle>
+            <div className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-amber-500" />
+              <CardTitle className="text-xl font-medium">Top 10 escolas mais ativas</CardTitle>
+            </div>
             <CardDescription className="text-sm text-muted-foreground">
               Ranking por designs registrados no periodo
             </CardDescription>
@@ -538,50 +564,48 @@ export const CanvaUsageDashboard = ({
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl shadow-sm border-border/40">
-        <CardHeader className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div>
-            <CardTitle className="text-xl font-medium">Ranking de criadores</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              Ranking priorizado para comunicados de reconhecimento (marketing central excluido)
-            </CardDescription>
-            <p className="text-xs text-muted-foreground mt-1">
-              Mostrando {rankedCreators.length} de {rankLimit} posicoes com os filtros atuais.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 justify-end">
-            <Select value={String(rankLimit)} onValueChange={(value) => setRankLimit(Number(value))}>
-              <SelectTrigger className="w-28">
-                <SelectValue placeholder="Top" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="3">Top 3</SelectItem>
-                <SelectItem value="5">Top 5</SelectItem>
-                <SelectItem value="10">Top 10</SelectItem>
-                <SelectItem value="20">Top 20</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex items-center gap-2">
-              <Label className="text-xs text-muted-foreground">Ordenar por</Label>
-              <Select value={creatorSort} onValueChange={(value: CreatorMetric) => setCreatorSort(value)}>
-                <SelectTrigger className="w-44">
-                  <SelectValue placeholder="Metrica" />
+        <Card className="rounded-xl shadow-sm border-border/40">
+          <CardHeader className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-primary" />
+                <CardTitle className="text-xl font-medium">Ranking de criadores</CardTitle>
+              </div>
+              <CardDescription className="text-sm text-muted-foreground">
+                Ranking priorizado para comunicados de reconhecimento (marketing central excluido)
+              </CardDescription>
+              <p className="text-xs text-muted-foreground mt-1">
+                Mostrando {rankedCreators.length} de {rankLimit} posicoes com os filtros atuais.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 justify-end">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-muted-foreground">Ordenar por</Label>
+                <Select value={creatorSort} onValueChange={(value: CreatorMetric) => setCreatorSort(value)}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="Metrica" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="designs">Designs criados</SelectItem>
+                    <SelectItem value="published">Designs publicados</SelectItem>
+                    <SelectItem value="shared">Links compartilhados</SelectItem>
+                    <SelectItem value="viewed">Designs visualizados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Select value={String(rankLimit)} onValueChange={(value) => setRankLimit(Number(value))}>
+                <SelectTrigger className="w-28">
+                  <SelectValue placeholder="Top" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="designs">Designs criados</SelectItem>
-                  <SelectItem value="published">Designs publicados</SelectItem>
-                  <SelectItem value="shared">Links compartilhados</SelectItem>
-                  <SelectItem value="viewed">Designs visualizados</SelectItem>
+                  <SelectItem value="3">Top 3</SelectItem>
+                  <SelectItem value="5">Top 5</SelectItem>
+                  <SelectItem value="10">Top 10</SelectItem>
+                  <SelectItem value="20">Top 20</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <Button variant="outline" onClick={() => onNavigateToUsers()} className="gap-2">
-              <Users className="h-4 w-4" />
-              Ver usuarios
-              <ExternalLink className="h-3 w-3" />
-            </Button>
-          </div>
-        </CardHeader>
+          </CardHeader>
         <CardContent>
           {rankedCreators.length === 0 ? (
             <div className="text-center py-8">
@@ -617,9 +641,6 @@ export const CanvaUsageDashboard = ({
                     <div className="text-sm text-muted-foreground">designs</div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                    <Button size="sm" variant="ghost" className="whitespace-nowrap" onClick={() => handleCopyEmail(creator.email)}>
-                      Copiar email
-                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
@@ -668,7 +689,10 @@ export const CanvaUsageDashboard = ({
 
       <Card className="rounded-xl shadow-sm border-border/40">
         <CardHeader>
-          <CardTitle className="text-xl font-medium">Top modelos mais utilizados</CardTitle>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            <CardTitle className="text-xl font-medium">Top modelos mais utilizados</CardTitle>
+          </div>
           <CardDescription className="text-sm text-muted-foreground">
             Ranking das artes disponibilizadas pela equipe de marketing
           </CardDescription>
@@ -741,3 +765,4 @@ export const CanvaUsageDashboard = ({
 };
 
 export default CanvaUsageDashboard;
+

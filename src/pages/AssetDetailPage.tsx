@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { AssetSchoolCard } from "@/components/assets/AssetSchoolCard";
 import { useAssetStore } from "@/stores/assetStore";
 import { loadSchoolData, type School } from "@/lib/schoolDataProcessor";
@@ -110,6 +111,18 @@ const AssetDetailPage = () => {
           </div>
           <h1 className="text-3xl font-bold">{asset.name}</h1>
           {asset.description && <p className="text-muted-foreground max-w-3xl">{asset.description}</p>}
+          {asset.owners?.length ? (
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Responsáveis:</span>
+              {asset.owners.map((owner) => (
+                <Badge key={owner} variant="outline" className="border-primary/20 bg-primary/5">
+                  {owner}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Defina responsáveis para organizar os contatos deste ativo.</p>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <BadgePill label="Escolas" value={schools.length} icon={<Building className="w-4 h-4" />} />

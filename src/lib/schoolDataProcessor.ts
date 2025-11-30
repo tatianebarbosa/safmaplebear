@@ -29,6 +29,7 @@ export interface SchoolUser {
   schoolId: string;
   licenseStatus: string;
   updatedAt: string;
+  isCompliant: boolean;
 }
 
 export interface LicenseStatus {
@@ -62,17 +63,21 @@ const buildProcessorSchool = (raw: BackendSchoolRecord): School => ({
   users: []
 });
 
-const buildProcessorUser = (user: BackendLicenseUser): SchoolUser => ({
-  name: user.nome,
-  email: user.email,
-  role: user.funcao,
-  school: user.escolaNome ?? '',
-  schoolId: user.escolaId !== null ? String(user.escolaId) : '',
-  licenseStatus: user.statusLicenca ?? '',
-  updatedAt: user.atualizadoEm
-    ? user.atualizadoEm.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
-    : ''
-});
+const buildProcessorUser = (user: BackendLicenseUser): SchoolUser => {
+  const isCompliantUser = isEmailCompliant(user.email);
+  return {
+    name: user.nome,
+    email: user.email,
+    role: user.funcao,
+    school: user.escolaNome ?? '',
+    schoolId: user.escolaId !== null ? String(user.escolaId) : '',
+    licenseStatus: user.statusLicenca ?? '',
+    updatedAt: user.atualizadoEm
+      ? user.atualizadoEm.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+      : '',
+    isCompliant: isCompliantUser,
+  };
+};
 
 export function calculateLicenseStatus(school: School): LicenseStatus {
   const used = school.usedLicenses;
@@ -145,6 +150,10 @@ export function getSchoolStats(schools: School[]) {
   const totalLicenses = schools.reduce((sum, school) => sum + school.maxLicenses, 0);
   const usedLicenses = schools.reduce((sum, school) => sum + school.usedLicenses, 0);
   const availableLicenses = totalLicenses - usedLicenses;
+  const nonCompliantLicenses = schools.reduce(
+    (sum, school) => sum + school.users.filter((u) => !u.isCompliant).length,
+    0
+  );
   
   const schoolsWithExcess = schools.filter(school => {
     const status = calculateLicenseStatus(school);
@@ -160,6 +169,7 @@ export function getSchoolStats(schools: School[]) {
     totalLicenses,
     usedLicenses,
     availableLicenses,
+    nonCompliantLicenses,
     schoolsWithExcess,
     utilizationRate
   };

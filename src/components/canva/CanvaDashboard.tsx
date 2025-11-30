@@ -1,10 +1,9 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
 import { SchoolLicenseManagement } from "./SchoolLicenseManagement";
 import { CanvaUsageDashboard } from "./CanvaUsageDashboard";
 import { CanvaMetricsDisplay } from "./CanvaMetricsDisplay";
@@ -12,9 +11,21 @@ import { CostManagementDashboard } from "./CostManagementDashboard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
 import { NonCompliantUsersDialog } from "./NonCompliantUsersDialog";
+import { useToast } from "@/hooks/use-toast";
+
+const resolveInitialTab = () => {
+  if (typeof window === "undefined") return "overview";
+  const hash = window.location.hash?.replace("#", "").toLowerCase();
+  const searchTab = new URLSearchParams(window.location.search).get("tab")?.toLowerCase();
+  const target = searchTab || hash;
+  if (target === "schools" || target === "escolas") return "schools";
+  if (target === "usage" || target === "usos") return "usage";
+  if (target === "costs" || target === "custos") return "costs";
+  return "overview";
+};
 
 const CanvaDashboard = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(resolveInitialTab());
   const [schoolSearch, setSchoolSearch] = useState("");
   const {
     overviewData,
@@ -24,6 +35,7 @@ const CanvaDashboard = () => {
     getDomainCounts,
     getNonMapleBearCount,
   } = useSchoolLicenseStore();
+  const { toast } = useToast();
 
   const [isNonCompliantDialogOpen, setIsNonCompliantDialogOpen] = useState(false);
 
@@ -56,11 +68,23 @@ const CanvaDashboard = () => {
 
   const handleViewNonCompliantUsers = useCallback(() => {
     if (nonCompliantUserDetails.length === 0) {
-      toast.info("Nenhum usuário fora da política carregado no momento.");
+      toast({
+        title: "Nenhum usuário fora da política carregado no momento.",
+      });
       return;
     }
     setIsNonCompliantDialogOpen(true);
-  }, [nonCompliantUserDetails]);
+  }, [nonCompliantUserDetails, toast]);
+  useEffect(() => {
+    const hashListener = () => {
+      const hash = window.location.hash?.replace("#", "").toLowerCase();
+      if (hash && hash !== activeTab) {
+        setActiveTab(resolveInitialTab());
+      }
+    };
+    window.addEventListener("hashchange", hashListener);
+    return () => window.removeEventListener("hashchange", hashListener);
+  }, [activeTab]);
 
   if (loading) {
     return (
@@ -81,79 +105,60 @@ const CanvaDashboard = () => {
     );
   }
 
+
   return (
     <div className="w-full pb-10">
       <div className="layout-wide space-y-6 mt-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="flex w-full overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50 justify-center gap-4 px-2">
-            <TabsTrigger
-              value="overview"
-              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
-            >
-            Visão Geral
-          </TabsTrigger>
-          <TabsTrigger
-            value="schools"
-            className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
-          >
-            Escolas
-          </TabsTrigger>
-          <TabsTrigger
-            value="usage"
-            className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
-          >
-            Usos
-          </TabsTrigger>
-          <TabsTrigger
-            value="costs"
-            className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
-          >
-            Custos
-          </TabsTrigger>
-        </TabsList>
+          <TabsList className="justify-center gap-6 overflow-x-auto px-2 border-none pb-2">
+            <TabsTrigger value="overview">Visao Geral</TabsTrigger>
+            <TabsTrigger value="schools">Escolas</TabsTrigger>
+            <TabsTrigger value="usage">Usos</TabsTrigger>
+            <TabsTrigger value="costs">Custos</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
-          {overviewData.nonCompliantUsers > 0 && (
-            <Card className="border-destructive/20 bg-destructive/5 shadow-sm">
-              <CardHeader>
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
-                  <div className="space-y-1">
-                    <CardTitle className="text-base font-semibold text-destructive">
-                      Alerta de Conformidade - Alto Risco
-                    </CardTitle>
-                    <CardDescription className="text-sm text-destructive">
-                      {nonCompliantUserCount} usuários com domínios não autorizados identificados
-                    </CardDescription>
+          <TabsContent value="overview" className="space-y-6">
+            {overviewData.nonCompliantUsers > 0 && (
+              <Card className="border-destructive/20 bg-destructive/5 shadow-sm">
+                <CardHeader>
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
+                    <div className="space-y-1">
+                      <CardTitle className="text-base font-semibold text-destructive">
+                        Alerta de Conformidade - Alto Risco
+                      </CardTitle>
+                      <CardDescription className="text-sm text-destructive">
+                        {nonCompliantUserCount} usuários com domínios não autorizados identificados
+                      </CardDescription>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex flex-wrap gap-2">
-                    {(nonCompliantDomainCounts || []).slice(0, 5).map(({ domain, count }) => (
-                      <span
-                        key={domain}
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive text-destructive-foreground"
-                      >
-                        {domain} ({count})
-                      </span>
-                    ))}
-                    {(nonCompliantDomainCounts || []).length > 5 && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
-                        +{(nonCompliantDomainCounts || []).length - 5} domínios
-                      </span>
-                    )}
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      {(nonCompliantDomainCounts || []).slice(0, 5).map(({ domain, count }) => (
+                        <span
+                          key={domain}
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive text-white"
+                        >
+                          {domain} ({count})
+                        </span>
+                      ))}
+                      {(nonCompliantDomainCounts || []).length > 5 && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
+                          +{(nonCompliantDomainCounts || []).length - 5} domínios
+                        </span>
+                      )}
+                    </div>
+                    <Button variant="destructive" size="sm" onClick={handleViewNonCompliantUsers} className="mt-4">
+                      Ver Detalhes dos Usuários Não Conformes
+                    </Button>
                   </div>
-                  <Button variant="destructive" size="sm" onClick={handleViewNonCompliantUsers} className="mt-4">
-                    Ver Detalhes dos Usuários Não Conformes
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          <CanvaMetricsDisplay />
-        </TabsContent>
+                </CardContent>
+              </Card>
+            )}
+            <CanvaMetricsDisplay />
+          </TabsContent>
 
         <TabsContent value="schools" className="space-y-6">
           <SchoolLicenseManagement
@@ -167,7 +172,10 @@ const CanvaDashboard = () => {
             onNavigateToUsers={(email) => {
               setSchoolSearch(email ?? "");
               setActiveTab("schools");
-              toast.info("Buscando na aba Escolas");
+              toast({
+                title: "Buscando na aba Escolas",
+                description: email ? `Filtrando por ${email}` : undefined,
+              });
             }}
           />
         </TabsContent>

@@ -327,7 +327,7 @@ export class CanvaDataCollector {
       designsCriados: entry.designsCriados,
       uploadType: entry.uploadType,
     });
-    this.saveUploadHistory(history.slice(0, 10));
+    this.saveUploadHistory(history);
   }
 
   async obterHistorico(): Promise<CanvaHistorico[]> {
@@ -456,7 +456,7 @@ export class CanvaDataCollector {
       totalPessoas: data.totalPessoas,
       designsCriados: data.designsCriados,
     });
-    this.saveUploadHistory(history.slice(0, 10));
+    this.saveUploadHistory(history);
 
     await this.registrarAlteracao('Upload manual de relatório CSV', usuario, 'Upload CSV', {
       filename: file.name,

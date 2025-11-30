@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { BarChart3, TrendingUp, Users, School, Target, Calendar, Download } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 
@@ -325,3 +325,4 @@ const InsightsAnalytics = () => {
 };
 
 export default InsightsAnalytics;
+

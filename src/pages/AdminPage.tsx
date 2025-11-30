@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings, Users, Shield, Building2 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import AccessManagement from "@/components/admin/AccessManagement";
 import {
   getMaxLicensesPerSchool,
@@ -128,18 +128,12 @@ const AdminPage = () => {
 
       <Tabs defaultValue="users" className="space-y-6">
         <div className="flex justify-center">
-          <TabsList className="grid w-full max-w-md grid-cols-2 rounded-2xl bg-muted/70 p-0.5 shadow-sm">
-            <TabsTrigger
-              value="users"
-              className="h-11 px-3 gap-2 rounded-xl data-[state=active]:bg-background"
-            >
+          <TabsList className="w-full max-w-xl justify-center gap-8 bg-transparent">
+            <TabsTrigger value="users" className="gap-2 text-base">
               <Users className="h-4 w-4" />
               Usuarios e Perfis
             </TabsTrigger>
-            <TabsTrigger
-              value="licenses"
-              className="h-11 px-3 gap-2 rounded-xl data-[state=active]:bg-background"
-            >
+            <TabsTrigger value="licenses" className="gap-2 text-base">
               <Building2 className="h-4 w-4" />
               Licencas Canva
             </TabsTrigger>

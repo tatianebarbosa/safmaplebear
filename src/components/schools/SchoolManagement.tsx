@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,6 @@ import {
   School,
   Users,
   AlertTriangle,
-  CheckCircle,
   Search,
   Filter,
   RefreshCw,
@@ -299,8 +298,8 @@ const SchoolManagement = () => {
         </Card>
       )}
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatsCard
           title="Total de Escolas"
           value={stats.totalSchools}
@@ -308,8 +307,9 @@ const SchoolManagement = () => {
           trend={{ value: 5.2, isPositive: true }}
         />
         <StatsCard
-          title="Licenças Utilizadas"
+          title="Licencas Utilizadas"
           value={`${stats.usedLicenses}/${stats.totalLicenses}`}
+          description={`${stats.availableLicenses} disponiveis`}
           icon={<Users className="h-4 w-4" />}
           trend={{
             value: Math.round(stats.utilizationRate),
@@ -317,7 +317,13 @@ const SchoolManagement = () => {
           }}
         />
         <StatsCard
-          title="Escolas com Excesso"
+          title="Licencas fora da politica"
+          value={stats.nonCompliantLicenses}
+          icon={<AlertTriangle className="h-4 w-4" />}
+          className={stats.nonCompliantLicenses > 0 ? "border-destructive/20 bg-destructive/5" : ""}
+        />
+        <StatsCard
+          title="Escolas em Excesso"
           value={stats.schoolsWithExcess}
           icon={<AlertTriangle className="h-4 w-4" />}
           className={
@@ -327,10 +333,10 @@ const SchoolManagement = () => {
           }
         />
         <StatsCard
-          title="Taxa de Utilização"
-          value={`${Math.round(stats.utilizationRate)}%`}
-          icon={<CheckCircle className="h-4 w-4" />}
-          trend={{ value: 8.5, isPositive: stats.utilizationRate < 85 }}
+          title="Licencas Totais"
+          value={stats.totalLicenses}
+          description={`${stats.availableLicenses} disponiveis`}
+          icon={<Users className="h-4 w-4" />}
         />
       </div>
 
@@ -372,7 +378,7 @@ const SchoolManagement = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="available">Disponível</SelectItem>
+                <SelectItem value="available">Dispon?vel</SelectItem>
                 <SelectItem value="warning">Atenção</SelectItem>
                 <SelectItem value="full">Completo</SelectItem>
                 <SelectItem value="excess">Excesso</SelectItem>
@@ -522,7 +528,7 @@ const SchoolManagement = () => {
               <h3 className="text-lg font-semibold text-foreground">
                 {hasFiltersApplied
                   ? "Nenhuma escola corresponde aos filtros"
-                  : "Ainda não existem escolas carregadas"}
+                  : "Ainda n?o existem escolas carregadas"}
               </h3>
               <p className="text-muted-foreground max-w-xl">
                 {hasFiltersApplied
@@ -580,8 +586,8 @@ const SchoolManagement = () => {
               })
             ) : (
               <div className="col-span-3 text-sm text-muted-foreground">
-                Nenhuma escola está em alerta agora. Continue observando o uso
-                médio nas próximas atualizações.
+                Nenhuma escola est? em alerta agora. Continue observando o uso
+                médio nas próximas atualiza??es.
               </div>
             )}
           </div>
@@ -629,3 +635,6 @@ const SchoolManagement = () => {
 };
 
 export default SchoolManagement;
+
+
+

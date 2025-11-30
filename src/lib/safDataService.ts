@@ -241,7 +241,7 @@ export const loadFranchisingSchools = async (): Promise<School[]> => {
           )?.toISOString() || null,
       };
     })
-    .filter((school): school is School => school !== null);
+    .filter((school): school is NonNullable<typeof school> => school !== null);
 };
 
 export const loadLicenseUsers = async (): Promise<LicenseUser[]> => {

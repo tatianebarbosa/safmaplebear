@@ -11,7 +11,7 @@ const statusBadgeVariants = cva(
         warning: "bg-warning-bg text-warning border border-warning/20",
         available: "bg-success-bg text-success border border-success/20",
         complete: "bg-warning-bg text-warning border border-warning/20",
-        excess: "bg-destructive-bg text-destructive border border-destructive/20"
+        excess: "bg-destructive text-white border border-destructive/20"
       },
     },
     defaultVariants: {

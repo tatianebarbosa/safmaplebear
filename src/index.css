@@ -217,6 +217,51 @@
 /* ===================================================================== */
 
 @layer components {
+  /* Linha vermelha consistente para itens ativos de navegacao e abas */
+  .menu-underline {
+    position: relative;
+    transition: color 150ms ease, opacity 150ms ease;
+  }
+
+  .menu-underline::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -0.4rem;
+    width: 72%;
+    height: 2px;
+    background: hsl(var(--primary));
+    border-radius: 9999px;
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0);
+    transform-origin: center;
+    transition: transform 180ms ease, opacity 180ms ease;
+    pointer-events: none;
+  }
+
+  .menu-underline:hover::after,
+  .menu-underline:focus-visible::after {
+    opacity: 0.6;
+    transform: translateX(-50%) scaleX(0.75);
+  }
+
+  .menu-underline[data-state="active"]::after,
+  .menu-underline[data-state="open"]::after,
+  .menu-underline[data-active="true"]::after,
+  .menu-underline[aria-current="page"]::after,
+  .menu-underline[aria-selected="true"]::after {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  .menu-underline[data-state="active"],
+  .menu-underline[data-state="open"],
+  .menu-underline[data-active="true"],
+  .menu-underline[aria-current="page"],
+  .menu-underline[aria-selected="true"] {
+    color: hsl(var(--foreground));
+  }
+
   /* Status Components */
   .status-badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide;

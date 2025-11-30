@@ -25,7 +25,7 @@ const Toaster = ({ position, toastOptions, ...props }: ToasterProps) => {
           // Force the toast to size to its content and cap long messages.
           width: "auto",
           minWidth: "0",
-          maxWidth: "360px",
+          maxWidth: "520px",
           display: "inline-flex",
           alignItems: "flex-start",
           padding: "12px 14px",
@@ -36,7 +36,7 @@ const Toaster = ({ position, toastOptions, ...props }: ToasterProps) => {
         },
         classNames: {
           toast:
-            "group toast inline-flex w-full max-w-[360px] whitespace-pre-wrap break-words rounded-xl border border-border/70 bg-card text-foreground px-3.5 py-3 shadow-[var(--shadow-card)]",
+            "group toast inline-flex w-full max-w-[520px] whitespace-pre-wrap break-words rounded-xl border border-border/70 bg-card text-foreground px-3.5 py-3 shadow-[var(--shadow-card)]",
           title: "text-sm font-semibold leading-tight text-foreground",
           description: "text-sm leading-snug text-foreground",
           actionButton:

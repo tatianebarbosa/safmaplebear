@@ -20,7 +20,10 @@ const Menubar = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Root
     ref={ref}
-    className={cn("flex h-10 items-center space-x-1 rounded-md border bg-background p-1", className)}
+    className={cn(
+      "flex h-10 items-center gap-4 border-b border-border/70 bg-transparent p-0 text-muted-foreground",
+      className,
+    )}
     {...props}
   />
 ));
@@ -33,7 +36,7 @@ const MenubarTrigger = React.forwardRef<
   <MenubarPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none data-[state=open]:bg-accent data-[state=open]:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+      "menu-underline flex cursor-default select-none items-center gap-1 rounded-none px-2.5 py-2 text-sm font-semibold outline-none transition-colors data-[state=open]:text-foreground hover:text-foreground",
       className,
     )}
     {...props}
@@ -50,7 +53,7 @@ const MenubarSubTrigger = React.forwardRef<
   <MenubarPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[state=open]:bg-accent data-[state=open]:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+      "menu-underline flex cursor-default select-none items-center rounded-none px-2 py-1.5 text-sm font-semibold outline-none transition-colors data-[state=open]:text-foreground hover:text-foreground",
       inset && "pl-8",
       className,
     )}

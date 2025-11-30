@@ -6,6 +6,7 @@ import { Bell, AlertTriangle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { useTicketStore } from "@/stores/ticketStore";
 import type { Ticket } from "@/types/tickets";
@@ -78,6 +79,8 @@ const NotificationBell = () => {
 
   const notifications = useMemo(() => buildNotifications(tickets), [tickets]);
   const unreadCount = notifications.filter((notification) => !readIds.has(notification.id)).length;
+  const hasUnread = unreadCount > 0;
+  const displayCount = unreadCount > 9 ? "9+" : `${unreadCount}`;
 
   useEffect(() => {
     // Mantem apenas IDs que ainda existem
@@ -118,75 +121,96 @@ const NotificationBell = () => {
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative rounded-full h-11 w-11"
-          aria-label="Notificacoes"
-        >
-          <Bell className="w-5 h-5" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 h-5 min-w-5 rounded-full bg-destructive px-1 text-[11px] font-semibold leading-5 text-white text-center">
-              {Math.min(unreadCount, 9)}
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent align="end" sideOffset={12} collisionPadding={16} className="w-[min(340px,calc(100vw-48px))] max-w-[calc(100vw-48px)] p-0 shadow-[0_18px_34px_-18px_rgba(30,32,36,0.45)] flex max-h-[70vh]">
-        <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
-          <div>
-            <p className="text-sm font-semibold text-foreground">Notificacoes</p>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative flex h-11 w-11 items-center justify-center rounded-full bg-transparent text-foreground shadow-none transition-transform hover:-translate-y-0.5"
+              aria-label={hasUnread ? `Notificacoes: ${displayCount} nao lidas` : "Notificacoes"}
+            >
+              <Bell className="w-5 h-5" />
+              {hasUnread && (
+                <span
+                  aria-live="polite"
+                  className="absolute top-0 right-0 inline-flex h-5 min-w-[1.35rem] -translate-y-1/3 translate-x-1/3 items-center justify-center rounded-full bg-destructive px-1 text-[10px] leading-[1.1] font-bold text-white shadow-[0_4px_10px_rgba(204,19,22,0.35)]"
+                >
+                  {displayCount}
+                </span>
+              )}
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" sideOffset={8}>
+          Notificações
+        </TooltipContent>
+      </Tooltip>
+      <PopoverContent
+        align="end"
+        side="bottom"
+        sideOffset={10}
+        collisionPadding={16}
+        className="flex flex-col w-[400px] max-w-[92vw] max-h-[65vh] overflow-hidden rounded-xl border border-border/70 bg-white p-0 shadow-[0_18px_34px_-18px_rgba(30,32,36,0.45)]"
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border/70 bg-white">
+          <div className="space-y-0.5">
+            <p className="text-sm font-semibold text-foreground">Notificações</p>
             <p className="text-xs text-muted-foreground">Tickets com SLA em risco</p>
           </div>
-          <Badge variant="secondary" className="bg-primary/10 text-primary border-none">
+          <Badge
+            variant="destructive"
+            size="xs"
+            className="border-none bg-[#c1121f] text-white px-2.5 py-[3px] text-[11px] leading-[1.1] font-semibold uppercase tracking-wide"
+          >
             {notifications.length ? `${notifications.length} ativas` : "Nenhuma"}
           </Badge>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto divide-y">
+        <div
+          className="max-h-[calc(65vh-110px)] overflow-y-auto px-3 py-3 space-y-3 pr-3"
+          style={{ scrollbarWidth: "thin" }}
+        >
           {notifications.length === 0 ? (
-            <div className="px-4 py-6 text-sm text-muted-foreground text-center">
+            <div className="px-4 py-8 text-center text-sm text-muted-foreground">
               Nenhum alerta no momento.
             </div>
           ) : (
-            notifications.map((notification) => (
-              <div key={notification.id} className="flex gap-3 px-4 py-3">
-                <div
-                  className={[
-                    "mt-0.5 h-9 w-9 rounded-full inline-flex items-center justify-center",
-                    notification.type === "overdue" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning",
-                  ].join(" ")}
+            notifications.map((notification) => {
+              const isOverdue = notification.type === "overdue";
+              const statusLabel = isOverdue ? "VENCIDO" : "CRÍTICO";
+              const statusClasses = isOverdue
+                ? "bg-red-100 text-red-700"
+                : "bg-amber-100 text-amber-700";
+
+              return (
+                <article
+                  key={notification.id}
+                  className="group relative flex gap-3 rounded-xl border border-border/60 bg-white px-3.5 py-3 shadow-[0_10px_24px_-18px_rgba(0,0,0,0.28)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-18px_rgba(0,0,0,0.32)]"
                 >
-                  {notification.type === "overdue" ? (
-                    <Clock className="w-4 h-4" />
-                  ) : (
-                    <AlertTriangle className="w-4 h-4" />
-                  )}
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-foreground">{notification.title}</p>
-                    <Badge
-                      variant={notification.type === "overdue" ? "destructive" : "warning"}
-                      size="sm"
-                      className="uppercase"
-                    >
-                      {notification.type === "overdue" ? "Vencido" : "Critico"}
-                    </Badge>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                    {isOverdue ? <Clock className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
                   </div>
-                  <p className="text-sm text-muted-foreground leading-snug">{notification.description}</p>
-                  {notification.meta && (
-                    <p className="text-xs text-muted-foreground">Responsavel: {notification.meta}</p>
-                  )}
-                </div>
-              </div>
-            ))
+                  <div className="flex-1 space-y-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-semibold leading-snug text-foreground">{notification.title}</p>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${statusClasses}`}>
+                        {statusLabel}
+                      </span>
+                    </div>
+                    <p className="text-xs leading-snug text-muted-foreground">{notification.description}</p>
+                    <p className="text-xs leading-snug text-muted-foreground">
+                      Responsável: {notification.meta ?? "—"}
+                    </p>
+                  </div>
+                </article>
+              );
+            })
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-t flex-shrink-0">
-          <Button variant="ghost" size="sm" onClick={markAllAsRead} disabled={!unreadCount}>
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-border/70 bg-white">
+          <Button variant="ghost" size="sm" onClick={markAllAsRead} disabled={!hasUnread}>
             Marcar como lidas
           </Button>
           <Button size="sm" variant="secondary" className="gap-2" onClick={() => navigate("/tickets")}>

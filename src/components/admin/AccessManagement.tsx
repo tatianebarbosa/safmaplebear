@@ -1,17 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import userService, { DevUser, AuditEntry } from "@/services/userService";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/stores/authStore";
+import { getAgentDisplayName } from "@/data/teamMembers";
 
 export default function AccessManagement() {
   const MIN_PASSWORD_LENGTH = 6;
   const [users, setUsers] = useState<DevUser[]>([]);
   const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "coord" | "user">("user");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [showAudit, setShowAudit] = useState(false);
   const { toast } = useToast();
@@ -43,10 +46,10 @@ export default function AccessManagement() {
     }
 
     try {
-      if (!username || !password) {
+      if (!username || !password || !fullName.trim()) {
         toast({
           title: "Campos obrigatorios",
-          description: "Preencha usuario e senha",
+          description: "Preencha usuario, nome completo e senha",
           variant: "destructive",
         });
         return;
@@ -59,14 +62,16 @@ export default function AccessManagement() {
         });
         return;
       }
-      userService.createUser(username, password, role);
+      userService.createUser(username, password, role, fullName.trim());
       toast({
         title: "Usuario criado",
         description: `${username} criado com sucesso`,
       });
       setUsername("");
+      setFullName("");
       setPassword("");
       setRole("user");
+      setIsCreateOpen(false);
       reload();
     } catch (e: any) {
       toast({
@@ -148,169 +153,172 @@ export default function AccessManagement() {
   };
 
   if (!canManageAccess) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Gerenciamento de Acessos</CardTitle>
-        </CardHeader>
-        <CardContent className="text-muted-foreground">
-          Apenas Coordenadores e Administradores podem gerenciar acessos.
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between gap-4">
-            <CardTitle>Gerenciamento de Acessos</CardTitle>
-            <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
-              <span className="rounded-full bg-primary/10 text-primary px-3 py-1">
-                {stats.total} usuarios
-              </span>
-              <span className="rounded-full bg-muted px-3 py-1">
-                {stats.admins} admins
-              </span>
-              <span className="rounded-full bg-muted px-3 py-1">
-                {stats.coords} coord
-              </span>
-              <span className="rounded-full bg-muted px-3 py-1">
-                {stats.standard} usuarios
-              </span>
+      <div className="flex w-full items-center justify-end gap-2 py-2 flex-wrap">
+        <Button onClick={() => setIsCreateOpen(true)}>Criar Usuario</Button>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            if (!showAudit) loadAudit();
+            setShowAudit((v) => !v);
+          }}
+        >
+          {showAudit ? "Ocultar logs" : "Ver Logs (audit)"}
+        </Button>
+      </div>
+
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Novo usuario</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5 pt-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <Input
+                placeholder="Usuario (login)"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <Input
+                placeholder="Nome completo"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+              <Input
+                type="password"
+                placeholder="Senha (min. 6 caracteres)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <select
+                className="h-10 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                value={role}
+                onChange={(e) => setRole(e.target.value as any)}
+              >
+                <option value="user">Usuario</option>
+                <option value="coord">Coordenacao</option>
+                <option value="admin">Administrador</option>
+              </select>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Dica: use o usuario (ex: joao.felipe) em vez de email e crie senhas fortes apenas para quem precisa de acesso administrativo.
+            </p>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <Input
-              placeholder="Usuario (email ou login)"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="Senha (min. 6 caracteres)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <select
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              value={role}
-              onChange={(e) => setRole(e.target.value as any)}
-            >
-              <option value="user">Usuario</option>
-              <option value="coord">Coordenacao</option>
-              <option value="admin">Administrador</option>
-            </select>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Dica: use senhas fortes e crie perfis apenas para quem precisa de acesso administrativo.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={handleCreate}>Criar Usuario</Button>
+          <DialogFooter className="gap-2 pt-2">
             <Button
               variant="outline"
               onClick={() => {
                 setUsername("");
+                setFullName("");
                 setPassword("");
                 setRole("user");
               }}
             >
               Limpar
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                if (!showAudit) loadAudit();
-                setShowAudit((v) => !v);
-              }}
-            >
-              {showAudit ? "Ocultar logs" : "Ver Logs (audit)"}
-            </Button>
-          </div>
+            <Button onClick={handleCreate}>Criar Usuario</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-          <div>
-            <h3 className="font-semibold mb-2">Usuarios</h3>
-            <div className="overflow-auto max-h-80 rounded-lg border">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="bg-muted/50">
-                    <th className="py-3 px-3 font-semibold">Usuario</th>
-                    <th className="px-3 font-semibold">Perfil</th>
-                    <th className="px-3 font-semibold">Criado</th>
-                    <th className="px-3 text-right font-semibold">Acoes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.length === 0 && (
-                    <tr>
-                      <td className="py-6 px-3 text-muted-foreground" colSpan={4}>
-                        Nenhum usuario cadastrado ainda.
-                      </td>
-                    </tr>
-                  )}
-                  {users.map((u) => (
-                    <tr key={u.id} className="border-t">
-                      <td className="py-3 px-3">{u.username}</td>
-                      <td className="px-3">
-                        <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-semibold capitalize">
-                          {u.role === "coord" ? "Coordenador" : u.role}
-                        </span>
-                      </td>
-                      <td className="px-3 whitespace-nowrap">
-                        {new Date(u.createdAt).toLocaleString()}
-                      </td>
-                      <td className="text-right px-3 space-x-2 whitespace-nowrap">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleChangePassword(u.id)}
-                        >
-                          Trocar Senha
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          disabled={u.role === "admin"}
-                          onClick={() => handleDelete(u.id)}
-                        >
-                          Apagar
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      <div>
+        <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
+          <h3 className="font-semibold">Usuarios</h3>
+          <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
+            <span className="rounded-full bg-primary/10 text-primary px-3 py-1">
+              {stats.total} usuarios
+            </span>
+            <span className="rounded-full bg-muted px-3 py-1">
+              {stats.admins} admins
+            </span>
+            <span className="rounded-full bg-muted px-3 py-1">
+              {stats.coords} coord
+            </span>
+            <span className="rounded-full bg-muted px-3 py-1">
+              {stats.standard} usuarios
+            </span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="overflow-auto max-h-[70vh] rounded-lg border">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="bg-muted/50">
+                <th className="py-3 px-3 font-semibold">Responsável (nome completo)</th>
+                <th className="px-3 font-semibold">Usuario</th>
+                <th className="px-3 font-semibold">Perfil</th>
+                <th className="px-3 font-semibold">Criado</th>
+                <th className="px-3 text-right font-semibold">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.length === 0 && (
+                <tr>
+                  <td className="py-6 px-3 text-muted-foreground" colSpan={5}>
+                    Nenhum usuario cadastrado ainda.
+                  </td>
+                </tr>
+              )}
+              {users.map((u) => {
+                const displayName = u.fullName?.trim() || getAgentDisplayName(u.username) || u.username;
+                return (
+                  <tr key={u.id} className="border-t">
+                    <td className="py-3 px-3">
+                      <span className="font-semibold">{displayName}</span>
+                    </td>
+                    <td className="px-3">{u.username}</td>
+                    <td className="px-3">
+                      <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-semibold capitalize">
+                        {u.role === "coord" ? "Coordenador" : u.role}
+                      </span>
+                    </td>
+                    <td className="px-3 whitespace-nowrap">
+                      {new Date(u.createdAt).toLocaleString()}
+                    </td>
+                    <td className="text-right px-3 space-x-2 whitespace-nowrap">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleChangePassword(u.id)}
+                      >
+                        Trocar Senha
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={u.role === "admin"}
+                        onClick={() => handleDelete(u.id)}
+                      >
+                        Apagar
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {showAudit && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Audit Log (ultimos eventos)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-80 overflow-auto">
-              {audit.length === 0 ? (
-                <p className="text-muted-foreground">Nenhum registro</p>
-              ) : (
-                audit.map((a) => (
-                  <div key={a.id} className="p-3 border rounded">
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(a.timestamp).toLocaleString()} • {a.actor}
-                    </div>
-                    <div className="font-medium">{a.action}</div>
-                    {a.detail && <div className="text-sm">{a.detail}</div>}
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-2 max-h-80 overflow-auto rounded-lg border p-3">
+          {audit.length === 0 ? (
+            <p className="text-muted-foreground">Nenhum registro</p>
+          ) : (
+            audit.map((a) => (
+              <div key={a.id} className="p-3 border rounded">
+                <div className="text-xs text-muted-foreground">
+                  {new Date(a.timestamp).toLocaleString()} • {a.actor}
+                </div>
+                <div className="font-medium">{a.action}</div>
+                {a.detail && <div className="text-sm">{a.detail}</div>}
+              </div>
+            ))
+          )}
+        </div>
       )}
     </div>
   );

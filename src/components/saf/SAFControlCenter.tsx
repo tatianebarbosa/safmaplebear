@@ -16,7 +16,7 @@ import {
   Target,
   Activity
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 
 interface Ticket {
   id: string;
@@ -327,3 +327,4 @@ const SAFControlCenter = () => {
 };
 
 export default SAFControlCenter;
+

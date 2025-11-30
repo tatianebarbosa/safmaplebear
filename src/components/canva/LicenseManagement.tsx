@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { toast } from "@/components/ui/sonner";
 import { dialogLayouts } from './dialogLayouts';
 import { SchoolCanvaData, CanvaUser } from '@/lib/canvaDataProcessor';
 import { useLicenseLimit } from '@/config/licenseLimits';

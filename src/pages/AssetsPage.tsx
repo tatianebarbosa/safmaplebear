@@ -16,6 +16,15 @@ const formatDate = (value?: string) => {
   return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
 };
 
+type AssetFormPayload = {
+  name: string;
+  description?: string;
+  requesterTeam?: AssetTeam;
+  channel?: AssetChannel;
+  assetType?: string;
+  owners?: string[];
+};
+
 const AssetsPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -42,7 +51,7 @@ const AssetsPage = () => {
     return new Date(current.contactAt) > new Date(latest) ? current.contactAt : latest;
   }, undefined);
 
-  const handleCreateAsset = (data: { name: string; description?: string; requesterTeam?: AssetTeam; channel?: AssetChannel; assetType?: string }) => {
+  const handleCreateAsset = (data: AssetFormPayload) => {
     const asset = addAsset(data);
     toast({
       title: "Ativo criado",
@@ -51,7 +60,7 @@ const AssetsPage = () => {
     navigate(`/saf/ativos/${asset.id}`);
   };
 
-  const handleUpdateAsset = (data: { name: string; description?: string; requesterTeam?: AssetTeam; channel?: AssetChannel; assetType?: string }) => {
+  const handleUpdateAsset = (data: AssetFormPayload) => {
     if (!editingAsset) return;
     updateAsset(editingAsset.id, data);
     toast({

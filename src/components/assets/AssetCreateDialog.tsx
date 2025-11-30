@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import type { SafAsset } from "@/types/assets";
 import {
@@ -14,11 +15,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ASSET_CHANNELS, ASSET_TEAMS, type AssetChannel, type AssetTeam } from "@/types/assets";
+import { X } from "lucide-react";
 
 type AssetCreateDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (data: { name: string; description?: string; requesterTeam?: AssetTeam; channel?: AssetChannel; assetType?: string }) => void;
+  onSave: (data: {
+    name: string;
+    description?: string;
+    requesterTeam?: AssetTeam;
+    channel?: AssetChannel;
+    assetType?: string;
+    owners?: string[];
+  }) => void;
   initialAsset?: SafAsset | null;
   mode?: "create" | "edit";
 };
@@ -35,6 +44,8 @@ export const AssetCreateDialog = ({
   const [requesterTeam, setRequesterTeam] = useState<AssetTeam>("SAF");
   const [channel, setChannel] = useState<AssetChannel>(ASSET_CHANNELS[0]);
   const [assetType, setAssetType] = useState("");
+  const [owners, setOwners] = useState<string[]>([]);
+  const [ownerInput, setOwnerInput] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -44,7 +55,38 @@ export const AssetCreateDialog = ({
     setRequesterTeam(initialAsset?.requesterTeam || "SAF");
     setChannel(initialAsset?.channel || ASSET_CHANNELS[0]);
     setAssetType(initialAsset?.assetType || "");
+    setOwners(initialAsset?.owners || []);
+    setOwnerInput("");
   }, [open, initialAsset]);
+
+  const addOwner = () => {
+    const newOwner = ownerInput.trim();
+    if (!newOwner) return;
+    if (owners.length >= 3) {
+      toast({
+        title: "Limite de responsáveis",
+        description: "Adicione no máximo 3 responsáveis pelo ativo.",
+        variant: "destructive",
+      });
+      return;
+    }
+    const alreadyExists = owners.some((owner) => owner.toLowerCase() === newOwner.toLowerCase());
+    if (alreadyExists) {
+      toast({
+        title: "Responsável já adicionado",
+        description: "Inclua somente nomes diferentes na lista.",
+        variant: "destructive",
+      });
+      setOwnerInput("");
+      return;
+    }
+    setOwners((prev) => [...prev, newOwner]);
+    setOwnerInput("");
+  };
+
+  const removeOwner = (name: string) => {
+    setOwners((prev) => prev.filter((owner) => owner !== name));
+  };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -64,12 +106,15 @@ export const AssetCreateDialog = ({
       requesterTeam,
       channel,
       assetType: assetType.trim() || undefined,
+      owners: owners.length ? owners : undefined,
     });
     setName("");
     setDescription("");
     setRequesterTeam("SAF");
     setChannel(ASSET_CHANNELS[0]);
     setAssetType("");
+    setOwners([]);
+    setOwnerInput("");
     onOpenChange(false);
   };
 
@@ -150,6 +195,47 @@ export const AssetCreateDialog = ({
               onChange={(event) => setAssetType(event.target.value)}
               placeholder="Ex.: alinhamento de campanha, suporte Canva, questão financeira"
             />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="asset-owners">Responsáveis pelo ativo</Label>
+              <span className="text-xs text-muted-foreground">Até 3 nomes</span>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="asset-owners"
+                value={ownerInput}
+                onChange={(event) => setOwnerInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    addOwner();
+                  }
+                }}
+                placeholder="Digite e pressione Enter para adicionar"
+              />
+              <Button type="button" variant="secondary" onClick={addOwner}>
+                Adicionar
+              </Button>
+            </div>
+            {owners.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {owners.map((owner) => (
+                  <Badge key={owner} variant="secondary" className="flex items-center gap-1">
+                    {owner}
+                    <button
+                      type="button"
+                      onClick={() => removeOwner(owner)}
+                      className="leading-none text-muted-foreground hover:text-foreground"
+                      aria-label={`Remover ${owner}`}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-2">

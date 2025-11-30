@@ -25,6 +25,7 @@ import {
   MapPin,
   Building2,
   Mail,
+  Send,
   Edit,
   RefreshCw,
   Trash2,
@@ -67,6 +68,7 @@ export const SchoolDetailsDialog = ({
     swapUser,
     transferUsersBetweenSchools,
     addUser,
+    officialData,
   } = useSchoolLicenseStore();
   const { toast } = useToast();
   const [revertDialogOpen, setRevertDialogOpen] = useState(false);
@@ -123,6 +125,16 @@ export const SchoolDetailsDialog = ({
   };
 
   if (!school) return null;
+
+  const resolvedSafManager = (() => {
+    if (school.safManager && school.safManager.trim()) return school.safManager.trim();
+    const match = officialData?.find(
+      (item) => item.school.id === school.id || item.school.name === school.name
+    );
+    const fromOfficial = match?.school.safManager?.trim();
+    if (fromOfficial) return fromOfficial;
+    return "Equipe SAF";
+  })();
 
   const history = getHistoryBySchool(school.id); // Obter o Historico
   const licenseStatus = getLicenseStatus(school);
@@ -215,15 +227,14 @@ export const SchoolDetailsDialog = ({
                         {school.status}
                       </Badge>
                       <Badge variant="muted" size="md" className="px-3 py-1 text-sm rounded-full">
-                        {school.cluster}
+                        {resolvedSafManager || school.cluster}
                       </Badge>
                     </div>
-                    {school.city && (
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{school.city}</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2 text-sm">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Responsavel do cluster:</span>
+                      <span className="text-foreground">{resolvedSafManager || 'Não informado'}</span>
+                    </div>
                   </div>
                   
                   <div className="space-y-2">
@@ -253,6 +264,39 @@ export const SchoolDetailsDialog = ({
                       </span>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between rounded-lg border border-border/60 bg-muted/30 px-3 py-2">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-foreground">Mensagem pronta para o responsável</p>
+                    <p className="text-xs text-muted-foreground">
+                      Copie e envie o texto abaixo para solicitar liberação/transferência de licença.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => {
+                      const emails = school.users.map((u) => u.email).filter(Boolean);
+                      const body = [
+                        `A Escola ${school.name} já possui ${school.usedLicenses} licenças ativas na plataforma, vinculadas aos seguintes e-mails:`,
+                        '',
+                        ...emails.map((email) => `- ${email}`),
+                        '',
+                        'Cada escola tem direito a duas licenças para uso da plataforma de marketing (Canva). Para que possamos conceder uma nova licença, é necessário transferir ou remover um dos usuários existentes. Lembramos que a remoção só pode ser realizada mediante autorização do responsável pelo e-mail vinculado à licença.'
+                      ].join('\n');
+                      navigator.clipboard?.writeText(body);
+                      toast({
+                        title: 'Mensagem copiada',
+                        description: 'Cole no e-mail ou chat com o responsável do cluster.',
+                      });
+                    }}
+                  >
+                    <Send className="h-4 w-4" />
+                    Copiar e enviar
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -299,21 +343,23 @@ export const SchoolDetailsDialog = ({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{user.name}</span>
-                    <Badge variant={user.isCompliant ? "muted" : "destructive"} size="sm">
-                      {user.role}
-                            </Badge>
-                            {!user.isCompliant && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <div className="w-2 h-2 bg-destructive rounded-full"></div>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{getNonComplianceReason(user.email)}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
+                    {user.role !== "Estudante" && (
+                      <Badge variant={user.isCompliant ? "muted" : "destructive"} size="sm">
+                        {user.role}
+                      </Badge>
+                    )}
+                    {!user.isCompliant && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="w-2 h-2 bg-destructive rounded-full"></div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{getNonComplianceReason(user.email)}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                           </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Mail className="h-3 w-3" />
@@ -330,9 +376,11 @@ export const SchoolDetailsDialog = ({
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={user.isCompliant ? "outline" : "destructive"}>
-                            {user.isCompliant ? 'Conforme' : 'Nao Conforme'}
-                          </Badge>
+                          {!user.isCompliant && (
+                            <Badge variant="destructive">
+                              Nao Conforme
+                            </Badge>
+                          )}
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -732,6 +780,7 @@ export const SchoolDetailsDialog = ({
     </>
   );
 };
+
 
 
 

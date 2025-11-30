@@ -108,7 +108,11 @@ const AssetSchoolPage = () => {
 
   const lastContact = sortedRecords[0]?.contactAt;
 
-  const defaultSafOwner = currentUser?.name || currentUser?.email || "Equipe SAF";
+  const defaultSafOwner =
+    asset?.owners?.[0] ||
+    currentUser?.name ||
+    currentUser?.email ||
+    "Equipe SAF";
 
   const handleSaveRecord = (values: {
     assetType: string;
@@ -237,12 +241,24 @@ const AssetSchoolPage = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <User className="w-4 h-4 text-primary" />
-              Responsável SAF
+              Responsáveis do ativo
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-semibold">{defaultSafOwner}</div>
-            <p className="text-xs text-muted-foreground">Alterável a cada registro</p>
+            {asset?.owners?.length ? (
+              <div className="flex flex-wrap gap-2">
+                {asset.owners.map((owner) => (
+                  <Badge key={owner} variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                    {owner}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <div className="text-lg font-semibold">{defaultSafOwner}</div>
+            )}
+            <p className="text-xs text-muted-foreground mt-2">
+              Sugerido como responsável ao criar novos registros, mas pode ser ajustado em cada contato.
+            </p>
           </CardContent>
         </Card>
       </div>

@@ -37,6 +37,7 @@ const MobileMenu = () => {
   const navItems = [
     { label: "Início", path: "/dashboard", icon: Home },
     { label: "Canva", path: "/dashboard/canva", icon: Palette },
+    { label: "Vouchers", path: "/dashboard/vouchers", icon: Ticket },
     { label: "Tickets", path: "/tickets", icon: Ticket },
     { label: "Base de Conhecimento", path: "/knowledge-base", icon: BookOpenText },
   ];
@@ -86,8 +87,15 @@ const MobileMenu = () => {
               return (
                 <Button
                   key={item.label}
-                  variant={isActive ? "secondary" : "ghost"}
-                  className="w-full justify-start h-12 text-base font-medium"
+                  variant="ghost"
+                  data-active={isActive}
+                  className={[
+                    "menu-underline w-full justify-start h-12 text-base font-semibold bg-transparent rounded-none transition-colors hover:bg-transparent",
+                    isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                  ].join(" ")}
+                  aria-current={isActive ? "page" : undefined}
                   onClick={() => handleNavigation(item.path)}
                 >
                   <Icon className="w-5 h-5 mr-3" />
@@ -149,7 +157,14 @@ const MobileMenu = () => {
             <>
               <Button
                 variant="ghost"
-                className="w-full justify-start h-12 text-base font-medium"
+                data-active={location.pathname.startsWith("/admin")}
+                className={[
+                  "menu-underline w-full justify-start h-12 text-base font-semibold bg-transparent rounded-none transition-colors hover:bg-transparent",
+                  location.pathname.startsWith("/admin")
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                ].join(" ")}
+                aria-current={location.pathname.startsWith("/admin") ? "page" : undefined}
                 onClick={() => handleNavigation("/admin")}
               >
                 <Grid className="w-5 h-5 mr-3" />
@@ -162,7 +177,7 @@ const MobileMenu = () => {
           {/* Logout */}
           <Button
             variant="ghost"
-            className="w-full justify-start h-12 text-base font-medium text-destructive hover:text-destructive hover:bg-destructive/10"
+            className="w-full justify-start h-12 text-base font-semibold text-destructive hover:text-destructive hover:bg-destructive/10"
             onClick={handleLogout}
           >
             <LogOut className="w-5 h-5 mr-3" />

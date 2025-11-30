@@ -18,7 +18,7 @@ import {
   Upload,
 } from "lucide-react";
 import { formatNumber, formatDateBR } from "@/lib/formatters";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -188,6 +188,9 @@ export const CanvaMetricsDisplay = () => {
             <p className="text-xs text-muted-foreground">
               Pessoas: {formatNumber(snapshot.totalPessoas)} • Designs:{" "}
               {formatNumber(snapshot.designsCriados)}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Por: {item.usuarioAlteracao || "Desconhecido"}{item.descricaoAlteracao ? ` - ${item.descricaoAlteracao}` : ""}
             </p>
             {isUpload && (
               <p className="text-xs text-muted-foreground">
@@ -393,15 +396,17 @@ export const CanvaMetricsDisplay = () => {
           )}
 
           {historico.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Clock className="h-5 w-5 text-muted-foreground" />
-                Histórico de coletas
-              </h3>
-              <div className="space-y-2">
-                {historico.map((item) => renderHistoricoItem(item))}
-              </div>
-            </div>
+            <Card className="border-border/70 shadow-sm">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold">Historico de coletas</h3>
+                </div>
+                <div className="space-y-2 max-h-[520px] overflow-y-auto rounded-xl border bg-muted/30 p-2 glass-scrollbar">
+                  {historico.map((item) => renderHistoricoItem(item))}
+                </div>
+              </CardContent>
+            </Card>
           )}
         </>
       )}
@@ -410,3 +415,4 @@ export const CanvaMetricsDisplay = () => {
 };
 
 export default CanvaMetricsDisplay;
+

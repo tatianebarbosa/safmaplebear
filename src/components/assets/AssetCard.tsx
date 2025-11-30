@@ -36,6 +36,16 @@ export const AssetCard = ({ asset, totalContacts, lastContactAt, onOpen, onConfi
               <CalendarClock className="w-4 h-4" />
               <span>Criado {createdAtLabel || "agora"}</span>
             </div>
+            {asset.owners?.length ? (
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-muted-foreground">Responsáveis:</span>
+                {asset.owners.map((owner) => (
+                  <Badge key={owner} variant="outline" className="border-primary/20 bg-primary/5 text-foreground">
+                    {owner}
+                  </Badge>
+                ))}
+              </div>
+            ) : null}
           </div>
           <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
             <span className="font-semibold">{totalContacts}</span> registros

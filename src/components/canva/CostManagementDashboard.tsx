@@ -32,7 +32,7 @@ import {
 import StatsCard from '@/components/dashboard/StatsCard';
 import { useInvoiceStore } from '@/stores/invoiceStore';
 import { InvoiceDialog } from './InvoiceDialog';
-import { toast } from 'sonner';
+import { toast } from "@/components/ui/sonner";
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#8dd1e1'];
 

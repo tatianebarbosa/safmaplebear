@@ -41,6 +41,18 @@ const DOMAIN_SCHOOL_OVERRIDES: Record<string, { id: string; name: string }> = {
   'mbguarulhos.com.br': { id: '90', name: 'Maple Bear Guarulhos - Centro' }
 };
 
+const fetchWithTimeout = async (input: RequestInfo | URL, init?: RequestInit & { timeout?: number }) => {
+  const controller = new AbortController();
+  const timeout = init?.timeout ?? 4000;
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
 const normalizeRole = (role?: string): OfficialUser['role'] => {
   const normalized = (role ?? '').toLowerCase();
   if (normalized.includes('professor')) return 'Professor';
@@ -88,7 +100,7 @@ const deriveLicenseStatus = (used: number, total: number): 'Disponível' | 'Comp
 export async function fetchIntegratedCanvaData(): Promise<IntegratedCanvaData | null> {
   for (const source of INTEGRATED_SOURCES) {
     try {
-      const response = await fetch(source, { cache: 'no-store' });
+      const response = await fetchWithTimeout(source, { cache: 'no-store', timeout: 4000 });
       if (!response.ok) {
         continue;
       }
@@ -116,7 +128,10 @@ export async function fetchIntegratedCanvaData(): Promise<IntegratedCanvaData | 
         }
       }
     } catch (error) {
-      console.warn(`[integratedCanvaService] Falha ao carregar ${source}`, error);
+      const reason = error instanceof Error && error.name === 'AbortError'
+        ? 'timeout excedido'
+        : (error as Error)?.message || 'erro desconhecido';
+      console.warn(`[integratedCanvaService] Falha ao carregar ${source} (${reason})`);
     }
   }
   return null;
@@ -238,6 +253,11 @@ export function buildOverviewFromIntegration(
   const compliantUsers = totalUsers - nonCompliantUsers.length;
   const complianceRate = totalUsers > 0 ? (compliantUsers / totalUsers) * 100 : 100;
   const activeSchools = officialSchools.filter((school) => school.status === 'Ativa').length;
+  const totalLicenses = processedSchools.reduce(
+    (acc, school) => acc + (school.estimatedLicenses ?? 0),
+    0
+  );
+  const availableLicenses = Math.max(totalLicenses - totalUsers, 0);
 
   return {
     totalUsers,
@@ -249,5 +269,8 @@ export function buildOverviewFromIntegration(
     topNonCompliantDomains,
     schoolsWithUsers: processedSchools.filter((school) => school.totalUsers > 0 && school.school.id !== '0').length,
     schoolsAtCapacity: Math.floor(activeSchools * 0.6),
+    totalLicenses,
+    usedLicenses: totalUsers,
+    availableLicenses,
   };
 }

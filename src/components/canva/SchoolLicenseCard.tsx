@@ -10,7 +10,7 @@ import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { getNonComplianceReason } from '@/lib/validators';
 import { UserDialog } from './UserDialog';
 import { useAuthStore } from '@/stores/authStore';
-import { toast } from 'sonner';
+import { toast } from "@/components/ui/sonner";
 import { showCanvaSyncReminder } from '@/lib/canvaReminder';
 
 interface SchoolLicenseCardProps {
@@ -78,7 +78,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
   return (
     <>
       {/* Borda igual ao container de Filtros (Card padrao = rounded-lg) */}
-      <Card className="w-full rounded-xl overflow-hidden shadow border border-border/30 h-full min-h-[360px] flex flex-col bg-white">
+      <Card className="w-full rounded-xl overflow-hidden shadow border border-border/30 h-full min-h-[400px] flex flex-col bg-white">
         <CardHeader className="px-4 pt-4 pb-2 space-y-2 border-b border-border/50 bg-gradient-to-br from-white via-white to-slate-50/80">
           <div className="flex items-start justify-between gap-3">
             <CardTitle className="text-lg font-black leading-snug text-slate-900 break-words max-w-full">
@@ -142,36 +142,18 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                 )}
               </>
             )}
-            <div className="flex items-center gap-0.5 text-[7px] text-muted-foreground max-w-full overflow-hidden">
-              <Badge
-                variant="outline"
-                size="sm"
-                className="bg-background text-slate-700 border-border !text-[6px] !px-[6px] !py-[2px] gap-0.5 leading-tight whitespace-nowrap h-auto min-h-0"
-              >
-                <Users className="h-2 w-2 shrink-0" />
-                {school.users.length} usuários
-              </Badge>
-              {nonCompliantUsers.length > 0 && (
-                <Badge
-                  variant="destructive"
-                  size="sm"
-                  className="!text-[6px] !px-[6px] !py-[2px] gap-0.5 leading-tight whitespace-nowrap h-auto min-h-0"
-                >
-                  <AlertTriangle className="h-2 w-2 shrink-0" />
-                  {nonCompliantUsers.length} fora da política
-                </Badge>
-              )}
-              {school.hasRecentJustifications && (
+            {school.hasRecentJustifications && (
+              <div className="flex items-center gap-1 text-[7px] text-muted-foreground max-w-full overflow-hidden">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background border text-primary text-[9px] leading-none">
                   <Paperclip className="h-3 w-3" />
                   Referências
                 </span>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Users List */}
-          <div className="space-y-1.5 max-h-40 overflow-y-auto rounded-lg border border-border/30 bg-slate-50/80 px-3 py-2 flex-1 shadow-inner">
+          <div className="space-y-1.5 max-h-44 overflow-y-auto rounded-lg border border-border/30 bg-slate-50/80 px-3 py-2 flex-1 shadow-inner">
             {school.users.slice(0, 3).map((user) => (
               <button
                 key={user.id}
@@ -185,15 +167,8 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                       {user.email}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge
-                      variant={user.isCompliant ? "muted" : "destructive"}
-                      size="sm"
-                      className="whitespace-nowrap"
-                    >
-                      {user.role}
-                    </Badge>
-                    {!user.isCompliant && (
+                  {!user.isCompliant && (
+                    <div className="flex items-center gap-2 shrink-0">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
@@ -204,8 +179,8 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </button>
             ))}

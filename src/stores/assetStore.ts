@@ -7,7 +7,7 @@ interface AssetStore {
   contacts: AssetContactRecord[];
 
   addAsset: (
-    data: Pick<SafAsset, "name" | "description" | "channel" | "requesterTeam" | "assetType">
+    data: Pick<SafAsset, "name" | "description" | "channel" | "requesterTeam" | "assetType" | "owners">
   ) => SafAsset;
   updateAsset: (id: string, updates: Partial<SafAsset>) => void;
 
@@ -27,11 +27,18 @@ export const useAssetStore = create<AssetStore>()(
       contacts: [],
 
       addAsset: (data) => {
+        const owners =
+          data.owners
+            ?.map((owner) => owner.trim())
+            .filter((owner) => Boolean(owner))
+            .slice(0, 3) || [];
+
         const newAsset: SafAsset = {
           id: buildId("asset"),
           name: data.name.trim(),
           description: data.description?.trim() || undefined,
           createdAt: new Date().toISOString(),
+          owners: owners.length ? owners : undefined,
           requesterTeam: data.requesterTeam,
           channel: data.channel,
           assetType: data.assetType?.trim() || undefined,

@@ -17,6 +17,7 @@ export interface School {
   name: string;
   status: SchoolStatus;
   city?: string;
+  safManager?: string;
   cluster: ClusterType;
   contactEmail?: string;
   totalLicenses: number;

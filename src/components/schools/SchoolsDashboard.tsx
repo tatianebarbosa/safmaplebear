@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Combobox } from "@/components/ui/combobox";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { School, Users, Search, Filter, FileText, Plus, Edit, MapPin, Ticket, Download, UserCheck } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import ExceptionVoucherDialog from "./ExceptionVoucherDialog";
@@ -24,6 +24,9 @@ import {
   searchVoucherByCode,
   exportVoucherReport
 } from "@/lib/voucherDataProcessor";
+
+const EXCEPTIONS_STORAGE_KEY = "voucherExceptions";
+const JUSTIFICATIONS_STORAGE_KEY = "voucherJustifications";
 
 const SchoolsDashboard = () => {
   const [schools, setSchools] = useState<VoucherSchool[]>([]);
@@ -53,6 +56,42 @@ const SchoolsDashboard = () => {
     applyFilters();
   }, [schools, searchTerm, selectedSchool, selectedCluster, selectedStatus, voucherEligible, voucherSent, selectedSafConsultant]);
 
+  const loadLocalExceptions = (): ExceptionVoucher[] => {
+    try {
+      const raw = localStorage.getItem(EXCEPTIONS_STORAGE_KEY);
+      const parsed: Partial<ExceptionVoucher>[] = raw ? JSON.parse(raw) : [];
+      return parsed.map((ex) => ({
+        id: ex.id ?? ex.code ?? `${ex.unit ?? "unit"}-${ex.cpf ?? "cpf"}-${ex.createdAt ?? Date.now()}`,
+        unit: ex.unit ?? "",
+        financialResponsible: ex.financialResponsible ?? "",
+        course: ex.course ?? "",
+        voucherPercent: Number(ex.voucherPercent ?? 0),
+        code: ex.code ?? "",
+        cpf: ex.cpf ?? "",
+        createdBy: ex.createdBy ?? "",
+        emailTitle: ex.emailTitle ?? "",
+        requestedBy: ex.requestedBy ?? "",
+        usageCount: Number(ex.usageCount ?? 0),
+        voucherCode: ex.voucherCode ?? ex.code ?? "",
+        expiryDate: ex.expiryDate ?? "",
+        requester: ex.requester ?? "",
+        requestSource: ex.requestSource ?? "email",
+        createdAt: ex.createdAt ?? new Date().toISOString(),
+      }));
+    } catch {
+      return [];
+    }
+  };
+
+  const loadLocalJustifications = (): VoucherJustification[] => {
+    try {
+      const raw = localStorage.getItem(JUSTIFICATIONS_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -60,15 +99,22 @@ const SchoolsDashboard = () => {
         loadVoucherData(),
         loadSchoolData()
       ]);
-      
+
+      const persistedExceptions = loadLocalExceptions();
+      const mergedExceptionsMap = new Map<string, ExceptionVoucher>();
+      [...voucherData.exceptions, ...persistedExceptions].forEach((ex) => {
+        mergedExceptionsMap.set(ex.id, ex);
+      });
+      const mergedExceptions = Array.from(mergedExceptionsMap.values());
+
       setSchools(voucherData.schools);
-      setExceptions(voucherData.exceptions);
-      
-      // Calcular total de usuÃ¡rios dos dados reais
+      setExceptions(mergedExceptions);
+
+      // Calcular total de usu�rios dos dados reais
       const totalUsersCount = schoolData.reduce((sum, school) => sum + school.users.length, 0);
       setTotalUsers(totalUsersCount);
-      
-      toast.success("Dados carregados com sucesso!");
+
+      toast.success(`Dados carregados: ${voucherData.schools.length} escolas, ${mergedExceptions.length} exce��es, ${totalUsersCount} usu�rios.`);
     } catch (error) {
       toast.error("Erro ao carregar dados dos vouchers");
     } finally {
@@ -79,7 +125,7 @@ const SchoolsDashboard = () => {
   const applyFilters = () => {
     let filtered = schools;
     
-    // Se uma escola especÃ­fica foi selecionada, mostrar apenas ela
+    // Se uma escola específica foi selecionada, mostrar apenas ela
     if (selectedSchool) {
       const school = schools.find(s => s.id === selectedSchool);
       filtered = school ? [school] : [];
@@ -102,7 +148,7 @@ const SchoolsDashboard = () => {
 
   const handleVoucherSearch = () => {
     if (!searchTerm.trim()) {
-      toast.error("Digite um cÃ³digo de voucher para buscar");
+      toast.error("Digite um c�digo de voucher para buscar");
       return;
     }
 
@@ -113,10 +159,12 @@ const SchoolsDashboard = () => {
         toast.success(`Voucher encontrado na escola: ${result.school.name}`);
         setFilteredSchools([result.school]);
       } else if (result.exception) {
-        toast.success(`Voucher de exceÃ§Ã£o encontrado: ${result.exception.unit}`);
+        toast.success(`Voucher de exce��o encontrado: ${result.exception.unit}`);
       }
     } else {
-      toast.error("Voucher nÃ£o encontrado");
+      toast.error("Voucher n�o encontrado");
+      setFilteredSchools([]);
+      setSelectedSchool("");
     }
   };
 
@@ -126,26 +174,40 @@ const SchoolsDashboard = () => {
   };
 
   const handleSaveException = (exception: Partial<ExceptionVoucher>) => {
-    // Salvar exceÃ§Ã£o no localStorage por enquanto
-    const existingExceptions = JSON.parse(localStorage.getItem('voucherExceptions') || '[]');
-    const newException = {
-      ...exception,
-      id: Date.now().toString(),
+    const existingExceptions = loadLocalExceptions();
+    const newException: ExceptionVoucher = {
+      id: exception.id ?? exception.code ?? Date.now().toString(),
+      unit: exception.unit ?? (currentSchool?.name ?? ""),
+      financialResponsible: exception.financialResponsible ?? "",
+      course: exception.course ?? "",
+      voucherPercent: Number(exception.voucherPercent ?? 0),
+      code: exception.code ?? "",
+      cpf: exception.cpf ?? "",
+      createdBy: exception.createdBy ?? "sistema",
+      emailTitle: exception.emailTitle ?? "",
+      requestedBy: exception.requestedBy ?? "",
+      usageCount: Number(exception.usageCount ?? 0),
+      voucherCode: exception.voucherCode ?? exception.code ?? "",
+      expiryDate: exception.expiryDate ?? "",
+      requester: exception.requester ?? "",
+      requestSource: exception.requestSource ?? "email",
+      createdAt: exception.createdAt ?? new Date().toISOString(),
     };
     
-    localStorage.setItem('voucherExceptions', JSON.stringify([...existingExceptions, newException]));
-    setExceptions([...exceptions, newException as ExceptionVoucher]);
+    const merged = [...existingExceptions, newException];
+    localStorage.setItem(EXCEPTIONS_STORAGE_KEY, JSON.stringify(merged));
+    setExceptions([...exceptions, newException]);
   };
 
   const generatePDFReport = () => {
     generateVoucherReport(filteredSchools, exceptions);
-    toast.success("RelatÃ³rio PDF gerado com sucesso!");
+    toast.success("Relatório PDF gerado com sucesso!");
   };
 
   const generateUsersPDFReport = () => {
     loadSchoolData().then(schoolData => {
       generateUserReport(totalUsers, schoolData);
-      toast.success("RelatÃ³rio de usuÃ¡rios PDF gerado com sucesso!");
+      toast.success("Relatório de usuários PDF gerado com sucesso!");
     });
   };
 
@@ -157,7 +219,7 @@ const SchoolsDashboard = () => {
 
   const submitJustification = () => {
     if (!justification.trim()) {
-      toast.error("Informe o titulo do e-mail ou numero do ticket que respalda essa alteracao.");
+      toast.error("Informe o t�tulo do e-mail ou n�mero do ticket que respalda essa altera��o.");
       return;
     }
 
@@ -173,10 +235,11 @@ const SchoolsDashboard = () => {
     };
 
     // Salvar no localStorage por enquanto
-    const existingJustifications = JSON.parse(localStorage.getItem('voucherJustifications') || '[]');
-    localStorage.setItem('voucherJustifications', JSON.stringify([...existingJustifications, newJustification]));
+    const existingJustifications = loadLocalJustifications();
+    const merged = [...existingJustifications, newJustification];
+    localStorage.setItem(JUSTIFICATIONS_STORAGE_KEY, JSON.stringify(merged));
 
-    toast.success(`${voucherAction === 'exception' ? 'ExceÃ§Ã£o adicionada' : 'Voucher editado'} com sucesso!`);
+    toast.success(`${voucherAction === 'exception' ? 'Exce��o adicionada' : 'Voucher editado'} com sucesso!`);
     setShowJustification(false);
     setJustification("");
     setCurrentSchool(null);
@@ -193,7 +256,9 @@ const SchoolsDashboard = () => {
   };
 
   const getSafConsultants = () => {
-    return ['Tatiane', 'Rafhael', 'Joao', 'Ingrid', 'Ana Paula'];
+    const consultants = [...new Set(schools.map((s) => s.safConsultant).filter(Boolean))] as string[];
+    if (consultants.length) return consultants.sort();
+    return [];
   };
 
   const getSchoolOptions = () => {
@@ -228,17 +293,17 @@ const SchoolsDashboard = () => {
         <div>
           <h1 className="text-3xl font-bold">Dashboard de Escolas</h1>
           <p className="text-muted-foreground">
-            Gerenciamento de licenÃ§as Canva e vouchers por escola
+            Gerenciamento de licenças Canva e vouchers por escola
           </p>
         </div>
         <div className="flex gap-2">
           <Button onClick={generatePDFReport}>
             <FileText className="w-4 h-4 mr-2" />
-            RelatÃ³rio PDF
+            Relatório PDF
           </Button>
           <Button variant="outline" onClick={generateUsersPDFReport}>
             <Users className="w-4 h-4 mr-2" />
-            RelatÃ³rio UsuÃ¡rios
+            Relatório Usuários
           </Button>
           <Button variant="outline" onClick={() => exportVoucherReport(filteredSchools)}>
             <Download className="w-4 h-4 mr-2" />
@@ -250,7 +315,7 @@ const SchoolsDashboard = () => {
         </div>
       </div>
 
-      {/* EstatÃ­sticas */}
+      {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Total de Escolas"
@@ -265,12 +330,12 @@ const SchoolsDashboard = () => {
           icon={<Ticket className="h-4 w-4" />}
         />
         <StatsCard
-          title="ExceÃ§Ãµes"
+          title="Exceções"
           value={stats.exceptionVouchers.toString()}
           icon={<Plus className="h-4 w-4" />}
         />
         <StatsCard
-          title="Total de UsuÃ¡rios"
+          title="Total de Usuários"
           value={totalUsers.toString()}
           trend={{ value: totalUsers > 800 ? 2.5 : -1.2, isPositive: totalUsers > 800 }}
           icon={<Users className="h-4 w-4" />}
@@ -302,7 +367,7 @@ const SchoolsDashboard = () => {
                 <Label className="text-sm font-medium">Ou buscar por texto</Label>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Nome, ID ou cÃ³digo do voucher..."
+                    placeholder="Nome, ID ou código do voucher..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -367,12 +432,12 @@ const SchoolsDashboard = () => {
               <div className="min-w-[120px]">
                 <Select value={voucherEligible} onValueChange={setVoucherEligible}>
                   <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="ElegÃ­vel" />
+                    <SelectValue placeholder="Elegível" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border shadow-md">
                     <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="true">ElegÃ­veis</SelectItem>
-                    <SelectItem value="false">NÃ£o ElegÃ­veis</SelectItem>
+                    <SelectItem value="true">Elegíveis</SelectItem>
+                    <SelectItem value="false">Não Elegíveis</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -385,7 +450,7 @@ const SchoolsDashboard = () => {
                   <SelectContent className="bg-background border shadow-md">
                     <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="true">Enviados</SelectItem>
-                    <SelectItem value="false">NÃ£o Enviados</SelectItem>
+                    <SelectItem value="false">Não Enviados</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -434,14 +499,14 @@ const SchoolsDashboard = () => {
 
               {school.voucherCode && (
                 <div>
-                  <p className="text-sm text-muted-foreground">CÃ³digo do Voucher</p>
+                  <p className="text-sm text-muted-foreground">Código do Voucher</p>
                   <code className="text-sm bg-muted px-2 py-1 rounded">{school.voucherCode}</code>
                 </div>
               )}
 
               <div className="flex flex-wrap gap-2">
                 <Badge variant={school.voucherEligible ? "default" : "secondary"}>
-                  {school.voucherEligible ? "ElegÃ­vel" : "NÃ£o ElegÃ­vel"}
+                  {school.voucherEligible ? "Elegível" : "Não Elegível"}
                 </Badge>
                 {school.voucherSent && (
                   <Badge variant="outline" className="bg-green-50 text-green-700">
@@ -478,7 +543,7 @@ const SchoolsDashboard = () => {
                   className="flex-1"
                 >
                   <Plus className="w-3 h-3 mr-1" />
-                  ExceÃ§Ã£o
+                  Exceção
                 </Button>
               </div>
             </CardContent>
@@ -502,12 +567,12 @@ const SchoolsDashboard = () => {
         onSave={handleSaveException}
       />
 
-      {/* Dialog de Justificativa (para ediÃ§Ã£o) */}
+      {/* Dialog de Justificativa (para edição) */}
       <Dialog open={showJustification} onOpenChange={setShowJustification}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {voucherAction === 'exception' ? 'Adicionar ExceÃ§Ã£o de Voucher' : 'Editar Voucher'}
+              {voucherAction === 'exception' ? 'Adicionar Exceção de Voucher' : 'Editar Voucher'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
@@ -550,3 +615,4 @@ const SchoolsDashboard = () => {
 };
 
 export default SchoolsDashboard;
+

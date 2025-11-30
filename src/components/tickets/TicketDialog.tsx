@@ -4,17 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { CalendarIcon, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useAuthStore } from "@/stores/authStore";
 import { Ticket, TicketStatus, Agente, TicketPriority } from "@/types/tickets";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
+import { getAgentDisplayName } from "@/data/teamMembers";
 
 interface TicketDialogProps {
   open: boolean;
@@ -37,7 +46,21 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
     return ["Joao", "Rafhael", "Ingrid", "Yasmin", "Tatiane", "Jaqueline", "Jessika", "Rafha", "Tati", "Jaque", "Fernanda"];
   }, [users]);
 
+  const agentOptions = useMemo(
+    () =>
+      agentes.map((agente) => ({
+        value: agente,
+        label: getAgentDisplayName(agente) || agente,
+      })),
+    [agentes]
+  );
+
   const watcherOptions = useMemo<(Agente | "Coordinator" | "Admin")[]>(() => [...agentes, "Coordinator", "Admin"], [agentes]);
+  const getWatcherLabel = (watcher: Agente | "Coordinator" | "Admin") => {
+    if (watcher === "Coordinator") return "Coordenador";
+    if (watcher === "Admin") return "Admin";
+    return getAgentDisplayName(watcher) || watcher;
+  };
 
   const defaultAgente = (ticket?.agente || currentUser?.agente || (currentUser?.name as Agente) || agentes[0]) as Agente;
   const defaultCreatedBy = ticket?.createdBy || currentUser?.name || currentUser?.agente || "Usuario logado";
@@ -59,6 +82,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
   const canEditAgent = isAdmin() || isCoordinator();
   const canEditTicket = isAdmin() || isCoordinator() || isCreator;
   const isReadOnly = isEditing && !canEditTicket;
+  const createdByDisplay = getAgentDisplayName(formData.createdBy) || formData.createdBy || "Usuario";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,10 +140,18 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
 
   const handleWatcherToggle = (watcher: Agente | "Coordinator" | "Admin", checked: boolean) => {
     if (isReadOnly) return;
-    setFormData((prev) => ({
-      ...prev,
-      watchers: checked ? [...prev.watchers, watcher] : prev.watchers.filter((w) => w !== watcher),
-    }));
+    setFormData((prev) => {
+      const updated = checked
+        ? Array.from(new Set([...(prev.watchers || []), watcher]))
+        : (prev.watchers || []).filter((w) => w !== watcher);
+
+      const ordered = watcherOptions.filter((option) => updated.includes(option));
+
+      return {
+        ...prev,
+        watchers: ordered,
+      };
+    });
   };
 
   return (
@@ -132,7 +164,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="text-sm text-muted-foreground">
             <span>
-              Criado por <span className="font-medium text-foreground">{formData.createdBy || "Usuario"}</span>
+              Criado por <span className="font-medium text-foreground">{createdByDisplay}</span>
             </span>
             <span className="mx-2">•</span>
             <span className="font-medium text-foreground">{format(creationMoment, "dd/MM/yyyy HH:mm")}</span>
@@ -146,7 +178,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="id">ID do Ticket *</Label>
+              <Label htmlFor="id">Ticket *</Label>
               <Input
                 id="id"
                 placeholder="#123456"
@@ -168,16 +200,16 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {agentes.map((agente) => (
-                      <SelectItem key={agente} value={agente}>
-                        {agente}
+                    {agentOptions.map((agente) => (
+                      <SelectItem key={agente.value} value={agente.value}>
+                        {agente.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               ) : (
                 <>
-                  <Input value={formData.agente} disabled />
+                  <Input value={getAgentDisplayName(formData.agente) || formData.agente} disabled />
                   {!canEditAgent && (
                     <p className="text-xs text-muted-foreground">Assumido automaticamente pelo usuario logado.</p>
                   )}
@@ -265,23 +297,49 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
             />
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label>Watchers (quem sera notificado)</Label>
-            <div className="grid grid-cols-3 gap-3">
-              {watcherOptions.map((watcher) => (
-                <div key={watcher} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`watcher-${watcher}`}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-between gap-2 min-h-11"
+                  disabled={isReadOnly}
+                >
+                  <div className="flex flex-1 flex-wrap gap-2 text-left">
+                    {formData.watchers.length ? (
+                      formData.watchers.map((watcher) => (
+                        <Badge
+                          key={watcher}
+                          variant="destructive"
+                          className="rounded-full font-normal px-3 py-1 text-white"
+                        >
+                          {getWatcherLabel(watcher)}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Selecione quem sera notificado</span>
+                    )}
+                  </div>
+                  <ChevronsUpDown className="h-4 w-4 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[260px]">
+                <DropdownMenuLabel>Notificar</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {watcherOptions.map((watcher) => (
+                  <DropdownMenuCheckboxItem
+                    key={watcher}
                     checked={formData.watchers.includes(watcher)}
-                    onCheckedChange={(checked) => handleWatcherToggle(watcher, checked as boolean)}
+                    onCheckedChange={(checked) => handleWatcherToggle(watcher, !!checked)}
                     disabled={isReadOnly}
-                  />
-                  <Label htmlFor={`watcher-${watcher}`} className="text-sm">
-                    {watcher}
-                  </Label>
-                </div>
-              ))}
-            </div>
+                  >
+                    {getWatcherLabel(watcher)}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
@@ -297,3 +355,4 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
     </Dialog>
   );
 };
+

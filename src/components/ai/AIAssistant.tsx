@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { DELAY_AI_SIMULATION } from "@/lib/constants";
 import { Bot, Send, Copy, RotateCcw, Heart, Smile } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import {
   loadSchoolData,
   searchSchoolByName,
@@ -363,3 +363,4 @@ Departamento de Atendimento`;
 };
 
 export default AIAssistant;
+

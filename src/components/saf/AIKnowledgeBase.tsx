@@ -16,7 +16,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +31,11 @@ import {
   Paperclip,
   FileText,
   Tag,
+  Copy,
+  BarChart3,
+  Flame,
+  Library,
+  RefreshCw,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -51,12 +55,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { KnowledgeItem, AIPrompt } from "@/types/knowledge";
+import type {
+  KnowledgeItem,
+  AIPrompt,
+  KnowledgePriority,
+  KnowledgeStatus,
+} from "@/types/knowledge";
 import {
   getStoredKnowledgeItems,
   persistKnowledgeItems,
   seedKnowledgeBase,
 } from "@/lib/knowledgeBase";
+import StatsCard from "@/components/dashboard/StatsCard";
 
 const generateKnowledgeId = () => {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -74,6 +84,9 @@ const AIKnowledgeBase = () => {
   const [editingPrompt, setEditingPrompt] = useState<AIPrompt | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState<KnowledgeStatus | "all">("all");
+  const [selectedPriority, setSelectedPriority] = useState<KnowledgePriority | "all">("all");
+  const [sortBy, setSortBy] = useState<"recent" | "usage" | "priority">("recent");
   const [initializing, setInitializing] = useState(true);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadCategory, setUploadCategory] = useState("documentos");
@@ -81,6 +94,9 @@ const AIKnowledgeBase = () => {
     "alta" | "media" | "baixa"
   >("media");
   const [isUploading, setIsUploading] = useState(false);
+  const [copyingId, setCopyingId] = useState<string | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [promptToDelete, setPromptToDelete] = useState<string | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -372,9 +388,6 @@ const AIKnowledgeBase = () => {
     setIsPromptDialogOpen(true);
   };
 
-  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
-  const [promptToDelete, setPromptToDelete] = useState<string | null>(null);
-
   const deleteItem = (id: string) => {
     const updated = knowledgeItems.filter((item) => item.id !== id);
     saveKnowledge(updated);
@@ -422,7 +435,17 @@ const AIKnowledgeBase = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  // Filtrar itens
+  const priorityWeight: Record<KnowledgePriority, number> = {
+    alta: 3,
+    media: 2,
+    baixa: 1,
+  };
+
+  const categories = [
+    "all",
+    ...Array.from(new Set(knowledgeItems.map((item) => item.category))),
+  ];
+
   const filteredItems = knowledgeItems.filter((item) => {
     const matchesSearch =
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -432,16 +455,115 @@ const AIKnowledgeBase = () => {
       );
     const matchesCategory =
       selectedCategory === "all" || item.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesStatus =
+      selectedStatus === "all" || item.status === selectedStatus;
+    const matchesPriority =
+      selectedPriority === "all" || item.priority === selectedPriority;
+    return matchesSearch && matchesCategory && matchesStatus && matchesPriority;
   });
 
-  const categories = [
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    if (sortBy === "usage") return b.usageCount - a.usageCount;
+    if (sortBy === "priority")
+      return priorityWeight[b.priority] - priorityWeight[a.priority];
+
+    const aTime =
+      Date.parse(a.updatedAt || a.createdAt) ||
+      Date.parse(a.createdAt) ||
+      0;
+    const bTime =
+      Date.parse(b.updatedAt || b.createdAt) ||
+      Date.parse(b.createdAt) ||
+      0;
+    return bTime - aTime;
+  });
+
+  const statusOptions: Array<KnowledgeStatus | "all"> = [
     "all",
-    ...Array.from(new Set(knowledgeItems.map((item) => item.category))),
+    "ativo",
+    "rascunho",
+    "arquivado",
   ];
+  const priorityOptions: Array<KnowledgePriority | "all"> = [
+    "all",
+    "alta",
+    "media",
+    "baixa",
+  ];
+  const hasFilters =
+    !!searchTerm ||
+    selectedCategory !== "all" ||
+    selectedStatus !== "all" ||
+    selectedPriority !== "all" ||
+    sortBy !== "recent";
+
+  const highPriorityCount = knowledgeItems.filter(
+    (item) => item.priority === "alta"
+  ).length;
+  const activeItems = knowledgeItems.filter(
+    (item) => item.status === "ativo"
+  ).length;
+  const uploadedCount = knowledgeItems.filter(
+    (item) => item.sourceFileName
+  ).length;
+  const mostUsedItem = knowledgeItems.reduce<KnowledgeItem | null>(
+    (current, item) => {
+      if (!current || item.usageCount > current.usageCount) {
+        return item;
+      }
+      return current;
+    },
+    null
+  );
+  const maxUsageCount =
+    knowledgeItems.length > 0
+      ? Math.max(...knowledgeItems.map((item) => item.usageCount))
+      : 1;
+
+  const formatDate = (value: string) => {
+    const parsed = Date.parse(value || "");
+    if (Number.isNaN(parsed)) return value;
+    return new Date(parsed).toLocaleDateString("pt-BR");
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("all");
+    setSelectedStatus("all");
+    setSelectedPriority("all");
+    setSortBy("recent");
+  };
+
+  const handleCopyContent = async (item: KnowledgeItem) => {
+    if (!navigator?.clipboard) {
+      toast({
+        title: "Copie manualmente",
+        description: "Navegador nao permitiu copiar automaticamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setCopyingId(item.id);
+      await navigator.clipboard.writeText(`${item.title}\n\n${item.content}`);
+      toast({
+        title: "Conteudo copiado",
+        description: "Texto pronto para colar em uma resposta.",
+      });
+    } catch {
+      toast({
+        title: "Nao foi possivel copiar",
+        description: "Tente novamente ou selecione o texto manualmente.",
+        variant: "destructive",
+      });
+    } finally {
+      setCopyingId(null);
+    }
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* AlertDialog para deletar item de conhecimento */}
       <AlertDialog
         open={!!itemToDelete}
@@ -517,136 +639,225 @@ const AIKnowledgeBase = () => {
         </TabsList>
 
         <TabsContent value="knowledge" className="space-y-6">
-          {/* Controles da Base de Conhecimento */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar na base de conhecimento..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat === "all" ? "Todas" : cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <StatsCard
+              title="Itens ativos"
+              value={activeItems}
+              description={`${knowledgeItems.length} no total`}
+              icon={<Library className="h-5 w-5" />}
+            />
+            <StatsCard
+              title="Alta prioridade"
+              value={highPriorityCount}
+              description="Conteudo critico para o atendimento"
+              icon={<Flame className="h-5 w-5" />}
+            />
+            <StatsCard
+              title="Documentos anexados"
+              value={uploadedCount}
+              description="Arquivos convertidos em artigos"
+              icon={<Paperclip className="h-5 w-5" />}
+            />
+            <StatsCard
+              title="Mais usado"
+              value={mostUsedItem?.usageCount ?? 0}
+              description={mostUsedItem ? mostUsedItem.title : "Ainda sem uso"}
+              icon={<BarChart3 className="h-5 w-5" />}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex flex-col xl:flex-row gap-3 xl:items-center">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar na base de conhecimento..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {sortedItems.length} itens filtrados
+                </Badge>
                 <Button
-                  onClick={() => {
-                    setEditingItem(null);
-                    resetForm();
-                  }}
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  disabled={!hasFilters}
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Novo Conhecimento
+                  <RefreshCw className="w-4 h-4 mr-1" />
+                  Limpar filtros
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingItem ? "Editar" : "Novo"} Conhecimento
-                  </DialogTitle>
-                  <DialogDescription>
-                    {editingItem
-                      ? "Atualize as informaÃ§Ãµes"
-                      : "Adicione novo conhecimento Ã  base da IA"}
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmitKnowledge} className="space-y-4">
-                  <div>
-                    <Label htmlFor="title">TÃ­tulo</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) =>
-                        setFormData({ ...formData, title: e.target.value })
-                      }
-                      placeholder="TÃ­tulo do conhecimento"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="category">Categoria</Label>
-                    <Select
-                      value={formData.category}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, category: value })
-                      }
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={() => {
+                        setEditingItem(null);
+                        resetForm();
+                      }}
                     >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="atendimento">Atendimento</SelectItem>
-                        <SelectItem value="canva">Canva</SelectItem>
-                        <SelectItem value="vouchers">Vouchers</SelectItem>
-                        <SelectItem value="tecnico">TÃ©cnico</SelectItem>
-                        <SelectItem value="processos">Processos</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="priority">Prioridade</Label>
-                    <Select
-                      value={formData.priority}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, priority: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="alta">Alta</SelectItem>
-                        <SelectItem value="media">MÃ©dia</SelectItem>
-                        <SelectItem value="baixa">Baixa</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="tags">Tags (separadas por vÃ­rgula)</Label>
-                    <Input
-                      id="tags"
-                      value={formData.tags}
-                      onChange={(e) =>
-                        setFormData({ ...formData, tags: e.target.value })
-                      }
-                      placeholder="tag1, tag2, tag3"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="content">ConteÃºdo</Label>
-                    <Textarea
-                      id="content"
-                      value={formData.content}
-                      onChange={(e) =>
-                        setFormData({ ...formData, content: e.target.value })
-                      }
-                      placeholder="ConteÃºdo detalhado do conhecimento..."
-                      className="min-h-32"
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full">
-                    {editingItem ? "Atualizar" : "Criar"} Conhecimento
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Novo Conhecimento
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingItem ? "Editar" : "Novo"} Conhecimento
+                      </DialogTitle>
+                      <DialogDescription>
+                        {editingItem
+                          ? "Atualize as informacoes"
+                          : "Adicione novo conhecimento a base da IA"}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmitKnowledge} className="space-y-4">
+                      <div>
+                        <Label htmlFor="title">Titulo</Label>
+                        <Input
+                          id="title"
+                          value={formData.title}
+                          onChange={(e) =>
+                            setFormData({ ...formData, title: e.target.value })
+                          }
+                          placeholder="Titulo do conhecimento"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="category">Categoria</Label>
+                        <Select
+                          value={formData.category}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, category: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="atendimento">Atendimento</SelectItem>
+                            <SelectItem value="canva">Canva</SelectItem>
+                            <SelectItem value="vouchers">Vouchers</SelectItem>
+                            <SelectItem value="tecnico">Tecnico</SelectItem>
+                            <SelectItem value="processos">Processos</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="priority">Prioridade</Label>
+                        <Select
+                          value={formData.priority}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, priority: value })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="alta">Alta</SelectItem>
+                            <SelectItem value="media">Media</SelectItem>
+                            <SelectItem value="baixa">Baixa</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="tags">Tags (separadas por virgula)</Label>
+                        <Input
+                          id="tags"
+                          value={formData.tags}
+                          onChange={(e) =>
+                            setFormData({ ...formData, tags: e.target.value })
+                          }
+                          placeholder="tag1, tag2, tag3"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="content">Conteudo</Label>
+                        <Textarea
+                          id="content"
+                          value={formData.content}
+                          onChange={(e) =>
+                            setFormData({ ...formData, content: e.target.value })
+                          }
+                          placeholder="Conteudo detalhado do conhecimento..."
+                          className="min-h-32"
+                          required
+                        />
+                      </div>
+                      <Button type="submit" className="w-full">
+                        {editingItem ? "Atualizar" : "Criar"} Conhecimento
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+
+            <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat === "all" ? "Todas" : cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={selectedPriority}
+                onValueChange={(value) =>
+                  setSelectedPriority(value as KnowledgePriority | "all")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Prioridade" />
+                </SelectTrigger>
+                <SelectContent>
+                  {priorityOptions.map((priority) => (
+                    <SelectItem key={priority} value={priority}>
+                      {priority === "all" ? "Todas prioridades" : priority}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={selectedStatus}
+                onValueChange={(value) =>
+                  setSelectedStatus(value as KnowledgeStatus | "all")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status === "all" ? "Todos status" : status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={sortBy} onValueChange={(value) => setSortBy(value as typeof sortBy)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Ordenacao" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Mais recentes</SelectItem>
+                  <SelectItem value="usage">Mais usados</SelectItem>
+                  <SelectItem value="priority">Prioridade</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <Card className="border-dashed border-primary/30 bg-muted/30">
@@ -656,15 +867,15 @@ const AIKnowledgeBase = () => {
                 Anexar documentos e textos
               </CardTitle>
               <CardDescription>
-                Converta PDFs exportados para texto e faÃ§a upload dos arquivos
-                .txt, .md, .csv ou .json. Cada arquivo Ã© transformado em um
-                artigo e fica disponÃ­vel imediatamente para a IA.
+                Converta PDFs exportados para texto e faca upload dos arquivos
+                .txt, .md, .csv ou .json. Cada arquivo e transformado em um
+                artigo e fica disponivel imediatamente para a IA.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
-                  <Label>Categoria padrÃ£o</Label>
+                  <Label>Categoria padrao</Label>
                   <Select
                     value={uploadCategory}
                     onValueChange={(value) => setUploadCategory(value)}
@@ -695,7 +906,7 @@ const AIKnowledgeBase = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="alta">Alta</SelectItem>
-                      <SelectItem value="media">MÃ©dia</SelectItem>
+                      <SelectItem value="media">Media</SelectItem>
                       <SelectItem value="baixa">Baixa</SelectItem>
                     </SelectContent>
                   </Select>
@@ -706,8 +917,8 @@ const AIKnowledgeBase = () => {
                     Dica
                   </p>
                   <p className="text-muted-foreground mt-1">
-                    Gere sumÃ¡rios curtos (atÃ© 8k caracteres). Arquivos maiores
-                    serÃ£o automaticamente truncados.
+                    Gere sumarios curtos (ate 8k caracteres). Arquivos maiores
+                    serao automaticamente truncados.
                   </p>
                 </div>
               </div>
@@ -722,80 +933,152 @@ const AIKnowledgeBase = () => {
                 />
                 <p className="text-xs text-muted-foreground">
                   Arraste e solte arquivos de texto exportados dos sistemas
-                  (limite prÃ¡tico ~8.000 caracteres por item).
+                  (limite pratico ~8.000 caracteres por item).
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Lista de Conhecimentos */}
-          <div className="grid gap-4">
-            {filteredItems.map((item) => (
-              <Card key={item.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold">{item.title}</h3>
-                        <Badge variant="outline">{item.category}</Badge>
-                        <Badge
-                          variant={
-                            item.priority === "alta" ? "default" : "secondary"
-                          }
-                        >
-                          {item.priority}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          Usado {item.usageCount} vezes
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {item.content}
-                      </p>
-                      <div className="flex items-center gap-2 mb-2">
-                        {item.tags.map((tag, index) => (
-                          <Badge
-                            key={index}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            <Tag className="w-3 h-3 mr-1" />
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Criado por {item.createdBy} em {item.createdAt}
-                      </div>
-                      {item.sourceFileName && (
-                        <div className="text-xs text-muted-foreground">
-                          Fonte: {item.sourceFileName}
+          {sortedItems.length === 0 ? (
+            <Card className="border-dashed">
+              <CardContent className="py-10 text-center space-y-2">
+                <Library className="w-8 h-8 mx-auto text-muted-foreground" />
+                <p className="font-semibold">Nenhum item encontrado</p>
+                <p className="text-sm text-muted-foreground">
+                  Ajuste a busca ou limpe os filtros para ver novamente.
+                </p>
+                <div className="flex justify-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearFilters}
+                    disabled={!hasFilters}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-1" />
+                    Limpar filtros
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4">
+              {sortedItems.map((item) => {
+                const usagePercent =
+                  maxUsageCount > 0
+                    ? Math.round((item.usageCount / maxUsageCount) * 100)
+                    : 0;
+                return (
+                  <Card key={item.id}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 space-y-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-semibold leading-tight">
+                              {item.title}
+                            </h3>
+                            <Badge variant="outline">{item.category}</Badge>
+                            <Badge
+                              variant={
+                                item.priority === "alta"
+                                  ? "default"
+                                  : item.priority === "media"
+                                  ? "secondary"
+                                  : "outline"
+                              }
+                            >
+                              {item.priority}
+                            </Badge>
+                            <Badge
+                              variant={
+                                item.status === "arquivado"
+                                  ? "secondary"
+                                  : item.status === "rascunho"
+                                  ? "outline"
+                                  : "default"
+                              }
+                              className="uppercase"
+                            >
+                              {item.status}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-1 line-clamp-3">
+                            {item.content}
+                          </p>
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <BarChart3 className="h-4 w-4" />
+                                <span>Usado {item.usageCount}x</span>
+                              </div>
+                              <span>
+                                {item.priority === "alta"
+                                  ? "Critico"
+                                  : "Contexto"}
+                              </span>
+                            </div>
+                            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                              <span
+                                className="block h-full bg-primary"
+                                style={{ width: `${Math.max(8, usagePercent)}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {item.tags.map((tag, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                <Tag className="w-3 h-3 mr-1" />
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                            <span>Criado por {item.createdBy}</span>
+                            <span>
+                              Atualizado em {formatDate(item.updatedAt || item.createdAt)}
+                            </span>
+                            {item.sourceFileName && (
+                              <span>Fonte: {item.sourceFileName}</span>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEdit(item)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setItemToDelete(item.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                        <div className="flex flex-col items-end gap-2 min-w-[120px]">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCopyContent(item)}
+                            disabled={copyingId === item.id}
+                          >
+                            <Copy className="w-4 h-4 mr-1" />
+                            {copyingId === item.id ? "Copiando..." : "Copiar"}
+                          </Button>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEdit(item)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setItemToDelete(item.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="prompts" className="space-y-6">
@@ -930,15 +1213,13 @@ const AIKnowledgeBase = () => {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setPromptToDelete(prompt.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setPromptToDelete(prompt.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

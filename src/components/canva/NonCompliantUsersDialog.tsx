@@ -305,12 +305,14 @@ export const NonCompliantUsersDialog = ({
                         <span>{user.email}</span>
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <p className="font-medium">Perfil</p>
-                      <div className="flex flex-wrap gap-1">
-                        <Badge variant="outline">{user.role}</Badge>
+                    {user.role !== "Estudante" && (
+                      <div className="space-y-1">
+                        <p className="font-medium">Perfil</p>
+                        <div className="flex flex-wrap gap-1">
+                          <Badge variant="outline">{user.role}</Badge>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="space-y-1">
                       <p className="font-medium">Escola</p>
                       <div className="flex items-center gap-1 text-muted-foreground">

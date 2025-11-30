@@ -47,7 +47,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     username: 'ana.paula',
-    fullName: 'ANA PAULA OLIVEIRA DE ANDRADE',
+    fullName: 'Ana Paula Oliveira de Andrade',
     role: 'coordenadora'
   }
 ];
@@ -92,6 +92,8 @@ const AGENT_ALIASES: Record<string, string> = {
   jaqueline: 'jaqueline.floriano',
   jessika: 'jessika.queiroz',
   fernanda: 'fernanda.louise',
+  ana: 'ana.paula',
+  anapaula: 'ana.paula',
 };
 
 export const getAgentDisplayName = (agent: string): string => {
@@ -107,4 +109,21 @@ export const getAgentDisplayName = (agent: string): string => {
 
   return member?.fullName || agent;
 };
+
+export const findTeamMemberForAgent = (agent: string): TeamMember | undefined => {
+  const normalized = normalizeKey(agent);
+  const username = AGENT_ALIASES[normalized] ?? agent;
+
+  const byUsername = TEAM_MEMBERS.find(
+    (member) => normalizeKey(member.username) === normalizeKey(username)
+  );
+  if (byUsername) return byUsername;
+
+  return TEAM_MEMBERS.find(
+    (member) => normalizeKey(member.username) === normalized || normalizeKey(member.fullName) === normalized
+  );
+};
+
+export const getCoordinatorMember = (): TeamMember | undefined =>
+  TEAM_MEMBERS.find((member) => member.role === 'coordenadora');
 

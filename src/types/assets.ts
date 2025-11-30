@@ -39,6 +39,7 @@ export interface SafAsset {
   name: string;
   description?: string;
   createdAt: string;
+  owners?: string[];
   requesterTeam?: AssetTeam;
   channel?: AssetChannel;
   assetType?: string;

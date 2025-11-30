@@ -442,7 +442,10 @@ export const buildFallbackData = async (): Promise<{
     nonMapleBearDomains: nonCompliantUsers,
     topNonCompliantDomains,
     schoolsWithUsers,
-    schoolsAtCapacity: Math.floor((schools.length || 0) * 0.6)
+    schoolsAtCapacity: Math.floor((schools.length || 0) * 0.6),
+    totalLicenses: schools.length * getMaxLicensesPerSchool(),
+    usedLicenses: licenseUsers.length,
+    availableLicenses: Math.max(schools.length * getMaxLicensesPerSchool() - licenseUsers.length, 0),
   };
 
   return { processedData, overview };

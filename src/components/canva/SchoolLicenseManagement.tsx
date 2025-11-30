@@ -13,7 +13,7 @@ import { Search, Download, X, AlertTriangle, Building2, Users } from "lucide-rea
 import { SchoolLicenseCard } from "./SchoolLicenseCard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import { School } from "@/types/schoolLicense";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { useLicenseLimit } from "@/config/licenseLimits";
 import { cn } from "@/lib/utils";
@@ -166,6 +166,7 @@ export const SchoolLicenseManagement = ({
     nonCompliantUsers,
     nonMapleBearCount,
     domainCounts,
+    unassignedUsers,
   } = useMemo(() => {
     const envTotalLicenses = Number(
       (import.meta.env as any)?.VITE_TOTAL_CANVA_LICENSES ??
@@ -210,28 +211,36 @@ export const SchoolLicenseManagement = ({
       }
     );
 
-    const estimatedTotalFromData =
-      officialData?.reduce((acc, item) => acc + (item.estimatedLicenses ?? licenseLimit), 0) ?? 0;
-    const computedTotalLicenses = hasEnvTotal
-      ? envTotalLicenses
-      : overviewTotalLicenses ??
-        (estimatedTotalFromData > 0
-          ? estimatedTotalFromData
-          : (overviewData?.totalSchools ?? totalSchoolsAll) * licenseLimit);
-    const computedUsedLicenses = overviewData?.totalUsers ?? totals.usedLicenses;
-    const safeTotalLicenses = Math.max(computedTotalLicenses || 0, computedUsedLicenses);
+    const noSchool = uniqueSchools.find(
+      (school) => school.id === "no-school" || normalizeText(school.name).includes("sem escola")
+    );
+    const unassignedUsed = noSchool?.usedLicenses ?? noSchool?.users.length ?? 0;
+    const unassignedNonCompliant =
+      noSchool?.users.filter((u) => !u.isCompliant).length ?? 0;
+    const unassignedTotalLicenses =
+      noSchool && unassignedUsed > 0
+        ? noSchool.totalLicenses || Math.max(unassignedUsed, 1)
+        : 0;
+
+    const computedUsedLicenses = overviewData?.usedLicenses ?? totals.usedLicenses + unassignedUsed;
+    const computedTotalLicenses =
+      overviewData?.totalLicenses ??
+      totalSchoolsAll * licenseLimit + unassignedTotalLicenses;
 
     return {
       totalSchools: overviewData?.totalSchools ?? totalSchoolsAll,
       activeSchools: overviewData?.schoolsWithUsers ?? activeWithLicenses,
-      totalLicenses: safeTotalLicenses,
+      totalLicenses: computedTotalLicenses,
       usedLicenses: computedUsedLicenses,
       exceedingSchools: overviewData?.schoolsAtCapacity ?? totals.exceedingSchools,
-      nonCompliantUsers: overviewData?.nonCompliantUsers ?? totals.nonCompliantUsers,
+      nonCompliantUsers: overviewData?.nonCompliantUsers ?? totals.nonCompliantUsers + unassignedNonCompliant,
       nonMapleBearCount: getNonMapleBearCount(),
       domainCounts: getDomainCounts(),
+      unassignedUsers: unassignedUsed,
     };
   }, [uniqueSchools, getLicenseStatus, getDomainCounts, getNonMapleBearCount, licenseLimit, overviewData, officialData]);
+
+  const nonCompliantUsersAll = nonCompliantUsers;
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -298,13 +307,9 @@ export const SchoolLicenseManagement = ({
     toast.success("Dados exportados com sucesso");
   };
 
-  const handleViewDetails = (school: School) => {
-    toast.info(`Visualizando detalhes: ${school.name}`);
-  };
+  const handleViewDetails = (_school: School) => {};
 
-  const handleManage = (school: School) => {
-    toast.info(`: ${school.name}`);
-  };
+  const handleManage = (_school: School) => {};
 
   return (
     <div className="space-y-4">
@@ -317,43 +322,43 @@ export const SchoolLicenseManagement = ({
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatsCard
-          title="Licenças Totais"
-          value={totalLicenses.toString()}
-          description={`${Math.max(totalLicenses - usedLicenses, 0)} disponíveis`}
-          icon={<Users className="h-4 w-4" />}
-          tooltip="Total de licenças oficiais (do overview, quando disponível). Caso contrário: escolas × limite padrão. Disponíveis = total - usadas."
-        />
-        <StatsCard
           title="Total de Escolas"
           value={totalSchools.toString()}
-          description={`${activeSchools} com licenças ativas`}
+          description={`${activeSchools} com licencas ativas`}
           icon={<Building2 className="h-4 w-4" />}
-          tooltip="Número de escolas oficiais carregadas; considera todas as escolas sincronizadas."
+          tooltip="Numero de escolas oficiais carregadas; considera todas as escolas sincronizadas."
         />
         <StatsCard
-          title="Licenças Utilizadas"
+          title="Licencas Utilizadas"
           value={`${usedLicenses}/${totalLicenses}`}
           description={
-            totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupação` : "Sem dados de licença"
+            totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupacao` : "Sem dados de licenca"
           }
           icon={<Users className="h-4 w-4" />}
-          tooltip="Soma de usuários licenciados em todas as escolas; percentual = usadas / total de licenças."
+          tooltip="Soma de usuarios licenciados em todas as escolas; percentual = usadas / total de licencas."
+        />
+        <StatsCard
+          title="Licencas fora da politica"
+          value={nonCompliantUsersAll.toString()}
+          description="Emails n?o conformes"
+          icon={<AlertTriangle className="h-4 w-4" />}
+          variant={nonCompliantUsersAll > 0 ? "destructive" : "default"}
+          tooltip="Total de usuarios com e-mail fora da politica. Emails validos: dominios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereco contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
         />
         <StatsCard
           title="Escolas em Excesso"
           value={exceedingSchools.toString()}
-          description="Licenças ultrapassadas"
+          description="Licencas ultrapassadas"
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={exceedingSchools > 0 ? "destructive" : "default"}
-          tooltip="Contagem de escolas onde usuários licenciados > limite padrão por escola."
+          tooltip="Escolas acima do limite de licencas definido. Reveja estas unidades para redistribuir ou remover acessos."
         />
         <StatsCard
-          title="Licenças fora da política"
-          value={nonCompliantUsersAll.toString()}
-          description="Emails não conformes"
-          icon={<AlertTriangle className="h-4 w-4" />}
-          variant={nonCompliantUsersAll > 0 ? "destructive" : "default"}
-          tooltip="Total de usuários com email fora da política. Emails válidos: domínios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereço contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
+          title="Usuarios sem escola"
+          value={(unassignedUsers ?? 0).toString()}
+          description="Licencas sem vinculo"
+          icon={<Users className="h-4 w-4" />}
+          tooltip="Licencas ativas sem vinculo a escola. Vincule ou remova para evitar consumo indevido."
         />
       </div>
 
@@ -366,7 +371,7 @@ export const SchoolLicenseManagement = ({
             <div className="flex-1 min-w-[320px] relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Nome da escola, cluster, usuário, email ou perfil (estudante, professor, administrador)"
+                placeholder="Nome da escola, cluster, usuário, e-mail ou perfil (estudante, professor, administrador)"
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -512,3 +517,4 @@ export const SchoolLicenseManagement = ({
     </div>
   );
 };
+

@@ -1,12 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface StatsCardProps {
   title: string;
   value: string | number;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   description?: string;
   variant?: "default" | "destructive";
+  tooltip?: string;
   trend?: {
     value: number;
     isPositive: boolean;
@@ -20,10 +22,11 @@ const StatsCard = ({
   icon,
   description,
   variant = "default",
+  tooltip,
   trend,
   className,
 }: StatsCardProps) => {
-  return (
+  const content = (
     <Card
       className={cn(
         "rounded-[var(--radius)] shadow-sm border-border/40 hover:shadow-md transition-all",
@@ -42,16 +45,12 @@ const StatsCard = ({
             <p
               className={cn(
                 "text-2xl font-semibold",
-                variant === "destructive"
-                  ? "text-destructive"
-                  : "text-foreground"
+                variant === "destructive" ? "text-destructive" : "text-foreground"
               )}
             >
               {value}
             </p>
-            {description && (
-              <p className="text-sm text-muted-foreground">{description}</p>
-            )}
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
             {trend && (
               <div className="flex items-center gap-1">
                 <span
@@ -63,32 +62,43 @@ const StatsCard = ({
                   {trend.isPositive ? "+" : ""}
                   {trend.value}%
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  vs. mês anterior
-                </span>
+                <span className="text-xs text-muted-foreground">vs. mes anterior</span>
               </div>
             )}
           </div>
-          <div
-            className={cn(
-              "p-2 rounded-full",
-              variant === "destructive" ? "bg-destructive/10" : "bg-primary/10"
-            )}
-          >
+          {icon && (
             <div
               className={cn(
-                "w-5 h-5",
-                variant === "destructive"
-                  ? "text-destructive"
-                  : "text-primary-dark"
+                "p-2 rounded-full",
+                variant === "destructive" ? "bg-destructive/10" : "bg-primary/10"
               )}
             >
-              {icon}
+              <div
+                className={cn(
+                  "w-5 h-5",
+                  variant === "destructive" ? "text-destructive" : "text-primary-dark"
+                )}
+              >
+                {icon}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </CardContent>
     </Card>
+  );
+
+  if (!tooltip) return content;
+
+  return (
+    <TooltipProvider delayDuration={120}>
+      <Tooltip>
+        <TooltipTrigger asChild>{content}</TooltipTrigger>
+        <TooltipContent side="bottom" align="start">
+          {tooltip}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

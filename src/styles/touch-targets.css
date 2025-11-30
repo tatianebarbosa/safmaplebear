@@ -122,3 +122,13 @@ a:focus-visible,
 .icon-clickable svg {
   @apply pointer-events-none;
 }
+
+/* Texto branco em botões/pílulas com fundo vermelho/primário */
+button.bg-destructive,
+button.bg-primary,
+button[class*="bg-destructive"],
+button[class*="bg-primary"],
+.bg-destructive.rounded-full,
+.bg-primary.rounded-full {
+  color: #fff !important;
+}

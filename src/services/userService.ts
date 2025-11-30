@@ -1,3 +1,5 @@
+import { TEAM_MEMBERS } from "@/data/teamMembers";
+
 // Local user management for development: stores users and audit logs in localStorage
 // simple id generator to avoid extra dependency in dev
 const uuidv4 = () =>
@@ -5,47 +7,54 @@ const uuidv4 = () =>
 
 export type Role = "admin" | "coord" | "user";
 
+type SeedUser = {
+  username: string;
+  password: string;
+  role: Role;
+  fullName?: string;
+};
+
 export interface DevUser {
   id: string;
   username: string;
   password: string; // plain for dev only
   role: Role;
   createdAt: string;
+  fullName?: string;
 }
 
-const USERS_KEY = "saf_dev_users_v1";
+const USERS_KEY = "saf_dev_users_v2";
 const AUDIT_KEY = "saf_dev_audit_v1";
 
-const defaultUsers: DevUser[] = [
-  {
-    id: uuidv4(),
-    username: "admin",
-    password: "admin2025",
-    role: "admin",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: uuidv4(),
-    username: "saf@seb.com.br",
-    password: "saf2025",
-    role: "user",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: uuidv4(),
-    username: "coordenador@sebsa.com.br",
-    password: "coord2025",
-    role: "coord",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: uuidv4(),
-    username: "tatiane.barbosa",
-    password: "tatiane.barbosa",
-    role: "user",
-    createdAt: new Date().toISOString(),
-  },
+const TEAM_SEED_USERS: SeedUser[] = TEAM_MEMBERS.map((member) => ({
+  username: member.username,
+  password: member.username,
+  role: member.role === "coordenadora" ? "coord" : "user",
+  fullName: member.fullName,
+}));
+
+const CORE_SEED_USERS: SeedUser[] = [
+  { username: "admin", password: "admin2025", role: "admin", fullName: "Administrador" },
 ];
+
+const DEV_SEED_USERS: SeedUser[] = [...CORE_SEED_USERS, ...TEAM_SEED_USERS];
+const LEGACY_EMAIL_USERS = ["saf@seb.com.br", "coordenador@sebsa.com.br", "admin@mbcentral.com.br"];
+
+const usernameFullNameMap = TEAM_MEMBERS.reduce<Record<string, string>>((acc, member) => {
+  acc[member.username.toLowerCase()] = member.fullName;
+  return acc;
+}, {});
+
+const buildUserFromSeed = (seed: SeedUser): DevUser => ({
+  id: uuidv4(),
+  username: seed.username,
+  password: seed.password,
+  role: seed.role,
+  createdAt: new Date().toISOString(),
+  fullName: seed.fullName,
+});
+
+const defaultUsers: DevUser[] = DEV_SEED_USERS.map(buildUserFromSeed);
 
 const migrateLegacyAdminPassword = (
   users: DevUser[]
@@ -65,6 +74,38 @@ const migrateLegacyAdminPassword = (
   return { users: migrated, changed };
 };
 
+const ensureSeedUsers = (users: DevUser[]): { users: DevUser[]; changed: boolean } => {
+  const existing = new Set(users.map((user) => user.username.toLowerCase()));
+  let changed = false;
+  const withSeeds = [...users];
+
+  DEV_SEED_USERS.forEach((seed) => {
+    if (!existing.has(seed.username.toLowerCase())) {
+      withSeeds.push(buildUserFromSeed(seed));
+      changed = true;
+    }
+  });
+
+  return { users: withSeeds, changed };
+};
+
+const ensureFullNames = (users: DevUser[]): { users: DevUser[]; changed: boolean } => {
+  let changed = false;
+  const hydrated = users.map((user) => {
+    if (user.fullName) return user;
+    const mapped = usernameFullNameMap[user.username.toLowerCase()];
+    if (!mapped) return user;
+    changed = true;
+    return { ...user, fullName: mapped };
+  });
+  return { users: hydrated, changed };
+};
+
+const removeLegacyEmailUsers = (users: DevUser[]): { users: DevUser[]; changed: boolean } => {
+  const filtered = users.filter((user) => !LEGACY_EMAIL_USERS.includes(user.username));
+  return { users: filtered, changed: filtered.length !== users.length };
+};
+
 function readUsers(): DevUser[] {
   try {
     const raw = localStorage.getItem(USERS_KEY);
@@ -75,10 +116,13 @@ function readUsers(): DevUser[] {
 
     const parsed = JSON.parse(raw) as DevUser[];
     const { users: migratedUsers, changed } = migrateLegacyAdminPassword(parsed);
-    if (changed) {
-      localStorage.setItem(USERS_KEY, JSON.stringify(migratedUsers));
+    const { users: cleanedUsers, changed: removedLegacy } = removeLegacyEmailUsers(migratedUsers);
+    const { users: namedUsers, changed: addedNames } = ensureFullNames(cleanedUsers);
+    const { users: hydratedUsers, changed: addedSeeds } = ensureSeedUsers(namedUsers);
+    if (changed || removedLegacy || addedNames || addedSeeds) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(hydratedUsers));
     }
-    return migratedUsers;
+    return hydratedUsers;
   } catch (e) {
     console.error("userService: failed to read users", e);
     return defaultUsers;
@@ -93,93 +137,6 @@ export function listUsers(): DevUser[] {
   return readUsers();
 }
 
-// Remote API helpers (async) - will throw if remote call fails
-export async function fetchUsersRemote(): Promise<
-  Pick<DevUser, "id" | "username" | "role">[]
-> {
-  const apiBase =
-    typeof import.meta !== "undefined"
-      ? (import.meta.env?.VITE_API_BASE_URL as string | undefined)
-      : undefined;
-  if (!apiBase) throw new Error("VITE_API_BASE_URL not configured");
-  const resp = await fetch(`${apiBase.replace(/\/$/, "")}/api/users`);
-  if (!resp.ok) throw new Error("Failed to fetch users");
-  const json = await resp.json();
-  return json.users;
-}
-
-export async function createUserRemote(
-  username: string,
-  password: string,
-  role: Role = "user"
-) {
-  const apiBase =
-    typeof import.meta !== "undefined"
-      ? (import.meta.env?.VITE_API_BASE_URL as string | undefined)
-      : undefined;
-  if (!apiBase) throw new Error("VITE_API_BASE_URL not configured");
-  const resp = await fetch(`${apiBase.replace(/\/$/, "")}/api/users`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password, role }),
-  });
-  if (!resp.ok) {
-    const body = await resp.json().catch(() => ({}));
-    throw new Error(body.message || "Failed to create user");
-  }
-  const json = await resp.json();
-  return json.user;
-}
-
-export async function deleteUserRemote(id: string) {
-  const apiBase =
-    typeof import.meta !== "undefined"
-      ? (import.meta.env?.VITE_API_BASE_URL as string | undefined)
-      : undefined;
-  if (!apiBase) throw new Error("VITE_API_BASE_URL not configured");
-  const resp = await fetch(`${apiBase.replace(/\/$/, "")}/api/users/${id}`, {
-    method: "DELETE",
-  });
-  if (!resp.ok) {
-    const body = await resp.json().catch(() => ({}));
-    throw new Error(body.message || "Failed to delete user");
-  }
-  return true;
-}
-
-export async function changePasswordRemote(id: string, newPassword: string) {
-  const apiBase =
-    typeof import.meta !== "undefined"
-      ? (import.meta.env?.VITE_API_BASE_URL as string | undefined)
-      : undefined;
-  if (!apiBase) throw new Error("VITE_API_BASE_URL not configured");
-  const resp = await fetch(
-    `${apiBase.replace(/\/$/, "")}/api/users/${id}/password`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ newPassword }),
-    }
-  );
-  if (!resp.ok) {
-    const body = await resp.json().catch(() => ({}));
-    throw new Error(body.message || "Failed to change password");
-  }
-  return true;
-}
-
-export async function fetchAuditRemote() {
-  const apiBase =
-    typeof import.meta !== "undefined"
-      ? (import.meta.env?.VITE_API_BASE_URL as string | undefined)
-      : undefined;
-  if (!apiBase) throw new Error("VITE_API_BASE_URL not configured");
-  const resp = await fetch(`${apiBase.replace(/\/$/, "")}/api/audit`);
-  if (!resp.ok) throw new Error("Failed to fetch audit");
-  const json = await resp.json();
-  return json.audit as AuditEntry[];
-}
-
 export function findUserByUsername(username: string): DevUser | undefined {
   const users = readUsers();
   return users.find((u) => u.username.toLowerCase() === username.toLowerCase());
@@ -188,7 +145,8 @@ export function findUserByUsername(username: string): DevUser | undefined {
 export function createUser(
   username: string,
   password: string,
-  role: Role = "user"
+  role: Role = "user",
+  fullName?: string
 ) {
   const users = readUsers();
   if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
@@ -200,6 +158,7 @@ export function createUser(
     password,
     role,
     createdAt: new Date().toISOString(),
+    fullName: fullName?.trim() || usernameFullNameMap[username.toLowerCase()],
   };
   users.push(user);
   writeUsers(users);

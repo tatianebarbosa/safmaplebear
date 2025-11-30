@@ -316,15 +316,18 @@ export const EnhancedSchoolManagement = ({
                                   <span className="font-medium text-sm">
                                     {user.name || user.email.split('@')[0]}
                                   </span>
-                                  <Badge 
-                                    variant={user.isCompliant ? "success" : "destructive"}
-                                    size="sm"
-                                  >
-                                    {user.isCompliant ? 'Conforme' : 'Fora da política'}
-                                  </Badge>
+                                  {!user.isCompliant && (
+                                    <Badge 
+                                      variant="destructive"
+                                      size="sm"
+                                    >
+                                      Fora da política
+                                    </Badge>
+                                  )}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                  {user.email} • {user.role}
+                                  {user.email}
+                                  {user.role !== "Estudante" && ` • ${user.role}`}
                                 </div>
                                 {user.complianceIssue && (
                                   <div className="text-xs text-destructive mt-1">

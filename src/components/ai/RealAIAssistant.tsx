@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Bot, Send, Copy, RotateCcw, Heart, Smile, Key, AlertCircle } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   loadSchoolData, 
@@ -588,3 +588,4 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
 };
 
 export default RealAIAssistant;
+

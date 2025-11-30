@@ -30,9 +30,9 @@ import {
 import {
   buildProcessedSchoolsFromIntegration,
   fetchIntegratedCanvaData,
+  buildOverviewFromIntegration,
 } from "@/lib/integratedCanvaService";
 import { saveLicenseAction, type LicenseAction } from "@/lib/canvaDataProcessor";
-import { fetchCanvaOverview } from "@/lib/canvaOverviewApi";
 
 const calculateLicenseStatus = (
   usedLicenses: number,
@@ -152,6 +152,7 @@ const centralSchool: School = {
   name: "Central",
   status: "Ativa",
   city: "Escritorio Central",
+  safManager: "Equipe SAF",
   cluster: "Alerta" as any,
   contactEmail: "saf@mbcentral.com.br",
   totalLicenses: 20,
@@ -223,10 +224,16 @@ const ensureCentralSchool = (schools: School[]): School[] => {
       }
     });
 
+    const nextTotal =
+      school.id === "no-school"
+        ? remainingUsers.length
+        : school.totalLicenses;
+
     return {
       ...school,
       users: remainingUsers,
       usedLicenses: remainingUsers.length,
+      totalLicenses: Math.max(nextTotal ?? 0, remainingUsers.length),
     };
   });
 
@@ -248,6 +255,7 @@ const ensureCentralSchool = (schools: School[]): School[] => {
     name: centralSchool.name,
     users: mergedCentralUsers,
     usedLicenses: mergedCentralUsers.length,
+    totalLicenses: Math.max(central.totalLicenses ?? mergedCentralUsers.length, mergedCentralUsers.length),
   };
 
   return cleanedSchools;
@@ -287,93 +295,6 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       loadOfficialData: async () => {
         set({ loading: true });
         try {
-          // 1) Tenta buscar overview diretamente da API do backend
-          try {
-            const api = await fetchCanvaOverview();
-            const ov = api.overview;
-            const toNumber = (value: unknown) => {
-              const parsed = Number(value);
-              return Number.isFinite(parsed) ? parsed : 0;
-            };
-
-            const totalUsers = toNumber(ov.licencasUtilizadas);
-            const nonCompliant = toNumber(ov.usuariosNaoConformes);
-            const compliant = Math.max(0, totalUsers - nonCompliant);
-
-            const overview: CanvaOverviewData = {
-              totalUsers,
-              totalSchools: toNumber(ov.totalEscolas),
-              compliantUsers: compliant,
-              nonCompliantUsers: nonCompliant,
-              complianceRate:
-                totalUsers > 0 ? (compliant / totalUsers) * 100 : 0,
-              nonMapleBearDomains: toNumber(ov.dominiosNaoMapleBear),
-              topNonCompliantDomains: ov.dominiosNaoMapleBearTop ?? [],
-              schoolsWithUsers: toNumber(ov.escolasComLicenca),
-              schoolsAtCapacity: toNumber(ov.escolasEmExcesso),
-            };
-
-            const mapStatus = (
-              used: number,
-              limit: number
-            ): "Disponível" | "Completo" | "Excedido" => {
-              if (used > limit) return "Excedido";
-              if (used === limit) return "Completo";
-              return "Disponível";
-            };
-
-            const convertedSchools: School[] = api.schools.map((item, index) => {
-              const limit = toNumber(item.limit) || getMaxLicensesPerSchool();
-              const used = toNumber(item.usedLicenses);
-              return {
-                id: String(item.schoolId ?? index),
-                name: item.name,
-                status: "Ativa",
-                city: "",
-                cluster: "Outros/Implantação" as any,
-                contactEmail: undefined,
-                totalLicenses: limit,
-                usedLicenses: used,
-                users: [],
-                hasRecentJustifications: false,
-              };
-            });
-
-            const processedData: ProcessedSchoolData[] = api.schools.map(
-              (item, index) => {
-                const limit = toNumber(item.limit) || getMaxLicensesPerSchool();
-                const used = toNumber(item.usedLicenses);
-                return {
-                  school: {
-                    id: String(item.schoolId ?? index),
-                    name: item.name,
-                    status: "Ativa",
-                    cluster: "Outros",
-                    city: "",
-                    state: "",
-                    region: "",
-                  },
-                  users: [],
-                  totalUsers: used,
-                  compliantUsers: used,
-                  nonCompliantUsers: 0,
-                  estimatedLicenses: limit,
-                  licenseStatus: mapStatus(used, limit),
-                };
-              }
-            );
-
-            set({
-              officialData: processedData,
-              overviewData: overview,
-              schools: ensureCentralSchool(convertedSchools),
-              loading: false,
-            });
-            return;
-          } catch (apiError) {
-            console.warn("[schoolLicenseStore] API overview falhou, usando fallback de CSV", apiError);
-          }
-
           const finalizeData = (
             processedData: ProcessedSchoolData[],
             overview: CanvaOverviewData
@@ -384,6 +305,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
               name: data.school.name,
               status: data.school.status,
               city: data.school.city,
+              safManager: data.school.safManager,
               cluster: data.school.cluster as any,
               contactEmail: data.school.email?.toLowerCase(),
               totalLicenses:
@@ -410,7 +332,24 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             });
           };
 
-          // Fallback data - usar sempre em desenvolvimento
+          // 1) Tentar carregar dados integrados do backend (/api/canva/dados-recentes)
+          const integratedData = await fetchIntegratedCanvaData();
+          if (integratedData) {
+            const officialSchools = await parseOfficialSchoolsCSV();
+            const processedFromIntegration = buildProcessedSchoolsFromIntegration(
+              integratedData,
+              officialSchools
+            );
+            const overviewFromIntegration = buildOverviewFromIntegration(
+              integratedData,
+              officialSchools,
+              processedFromIntegration
+            );
+            finalizeData(processedFromIntegration, overviewFromIntegration);
+            return;
+          }
+
+          // 2) Fallback local (CSVs públicos)
           const fallbackData = await buildFallbackData();
           if (fallbackData) {
             finalizeData(fallbackData.processedData, fallbackData.overview);
@@ -420,19 +359,20 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           set({ loading: false });
         } catch (error) {
           console.error("Failed to load official data:", error);
-          // Tentar fallback em caso de erro
+          // Tentar fallback em caso de erro inesperado
           try {
-            const licenseLimit = getMaxLicensesPerSchool();
             const fallbackData = await buildFallbackData();
             if (fallbackData) {
+              const licenseLimit = getMaxLicensesPerSchool();
               const convertedSchools: School[] = fallbackData.processedData.map(
                 (data) => ({
                   id: data.school.id,
-                  name: data.school.name,
-                  status: data.school.status,
-                  city: data.school.city,
-                  cluster: data.school.cluster as any,
-                  contactEmail: data.school.email?.toLowerCase(),
+              name: data.school.name,
+              status: data.school.status,
+              city: data.school.city,
+              safManager: data.school.safManager,
+              cluster: data.school.cluster as any,
+              contactEmail: data.school.email?.toLowerCase(),
                   totalLicenses:
                     data.school.id === "no-school"
                       ? Math.max(data.estimatedLicenses, 1)

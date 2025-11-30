@@ -3,13 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Header from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -17,7 +11,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
-// Lazy load page components for better performance
+// Carregamento preguiçoso das páginas para deixar a navegação mais leve
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -41,6 +35,8 @@ const KnowledgeBasePage = lazy(() => import("@/pages/KnowledgeBasePage"));
 const AssetsPage = lazy(() => import("@/pages/AssetsPage"));
 const AssetDetailPage = lazy(() => import("@/pages/AssetDetailPage"));
 const AssetSchoolPage = lazy(() => import("@/pages/AssetSchoolPage"));
+import ProfilePage from "@/pages/Profile";
+import AgentMonitoringPage from "@/pages/AgentMonitoringPage";
 
 const ProtectedShell = () => (
   <ProtectedRoute>
@@ -77,6 +73,8 @@ const App = () => (
               <Route path="/monitoring" element={<MonitoringPortal />} />
               <Route path="/tickets" element={<TicketsPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/monitoria-agentes" element={<AgentMonitoringPage />} />
               <Route
                 path="/knowledge-base"
                 element={<KnowledgeBasePage />}
@@ -90,7 +88,7 @@ const App = () => (
               <Route path="/access-control" element={<AccessControl />} />
             </Route>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Sempre deixe as rotas novas acima do catch-all "*" */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

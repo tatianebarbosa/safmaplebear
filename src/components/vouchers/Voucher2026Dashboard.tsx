@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { Calendar, School, TrendingUp, Download, FileText, Search, Gift } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { 
@@ -38,8 +38,9 @@ const Voucher2026Dashboard = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const data = await loadVoucher2026Data();
-      setVouchers(data);
+      const { vouchers: loadedVouchers } = await loadVoucher2026Data();
+      setVouchers(loadedVouchers);
+      setFilteredVouchers(loadedVouchers);
       toast.success("Dados dos vouchers 2026 carregados!");
     } catch (error) {
       toast.error("Erro ao carregar dados dos vouchers 2026");
@@ -317,3 +318,4 @@ const Voucher2026Dashboard = () => {
 };
 
 export default Voucher2026Dashboard;
+

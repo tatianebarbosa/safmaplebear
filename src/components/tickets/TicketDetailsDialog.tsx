@@ -191,7 +191,6 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
                       onChange={(e) => setForm((prev) => ({ ...prev, agente: e.target.value as any }))}
                       disabled={!canEdit}
                     />
-                    <p className="text-[11px] text-muted-foreground">Nome completo: {agentDisplay}</p>
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs text-muted-foreground">Vencimento</Label>

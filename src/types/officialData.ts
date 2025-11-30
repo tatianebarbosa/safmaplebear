@@ -48,4 +48,8 @@ export interface CanvaOverviewData {
   }>;
   schoolsWithUsers: number;
   schoolsAtCapacity: number;
+  // Campos adicionais para alinhar cards do front
+  totalLicenses?: number;
+  usedLicenses?: number;
+  availableLicenses?: number;
 }

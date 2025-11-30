@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useInvoiceStore } from '@/stores/invoiceStore';
-import { toast } from 'sonner';
+import { toast } from "@/components/ui/sonner";
 import { dialogLayouts } from './dialogLayouts';
 
 interface InvoiceDialogProps {
