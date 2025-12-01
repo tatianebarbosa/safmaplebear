@@ -29,7 +29,7 @@ import { Edit, Trash2, KeyRound, UserPlus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { User, Role } from '@/types/tickets';
 
-// Função auxiliar para fazer requisições autenticadas
+// Funo auxiliar para fazer requisies autenticadas
 const fetchAuthenticated = async (url: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('saf_auth_token');
   const headers = {
@@ -41,9 +41,9 @@ const fetchAuthenticated = async (url: string, options: RequestInit = {}) => {
   const response = await fetch(url, { ...options, headers });
   
   if (response.status === 401 || response.status === 403) {
-    // Redirecionar para login se o token for inválido/expirado
+    // Redirecionar para login se o token for invlido/expirado
     window.location.href = '/login';
-    throw new Error('Não autorizado');
+    throw new Error('No autorizado');
   }
 
   return response;
@@ -54,7 +54,7 @@ const api = {
     const response = await fetchAuthenticated('/api/admin/users');
     const data = await response.json();
     if (!data.success) {
-      throw new Error(data.message || 'Erro ao buscar usuários');
+      throw new Error(data.message || 'Erro ao buscar usu?rios');
     }
     // O backend retorna username, name, role. O frontend espera id, name, email, role.
     // Usaremos username como email e id.
@@ -145,8 +145,8 @@ const UserManagementTable = () => {
       setUsers(fetchedUsers);
     } catch (error) {
       toast({
-        title: 'Erro ao carregar usuários',
-        description: 'Não foi possível buscar a lista de usuários do servidor.',
+        title: 'Erro ao carregar usu?rios',
+        description: 'No foi possvel buscar a lista de usu?rios do servidor.',
         variant: 'destructive',
       });
     } finally {
@@ -183,7 +183,7 @@ const UserManagementTable = () => {
         toast({ title: 'Erro', description: result.message, variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Erro de Conexão', description: error.message || 'Não foi possível criar o usuário.', variant: 'destructive' });
+      toast({ title: 'Erro de Conexo', description: error.message || 'No foi possvel criar o usu?rio.', variant: 'destructive' });
     }
   };
 
@@ -204,7 +204,7 @@ const UserManagementTable = () => {
         toast({ title: 'Erro', description: result.message, variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Erro de Conexão', description: error.message || 'Não foi possível atualizar a senha.', variant: 'destructive' });
+      toast({ title: 'Erro de Conexo', description: error.message || 'No foi possvel atualizar a senha.', variant: 'destructive' });
     }
   };
 
@@ -226,12 +226,12 @@ const UserManagementTable = () => {
         toast({ title: 'Erro', description: result.message, variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Erro de Conexão', description: error.message || 'Não foi possível atualizar o perfil.', variant: 'destructive' });
+      toast({ title: 'Erro de Conexo', description: error.message || 'No foi possvel atualizar o perfil.', variant: 'destructive' });
     }
   };
 
   const handleDeleteUser = async (user: User) => {
-    if (!window.confirm(`Tem certeza que deseja deletar o usuário ${user.name} (${user.email})?`)) {
+    if (!window.confirm(`Tem certeza que deseja deletar o usu?rio ${user.name} (${user.email})?`)) {
       return;
     }
 
@@ -239,19 +239,19 @@ const UserManagementTable = () => {
       const result = await api.deleteUser(user.email);
 
       if (!result.success) {
-        toast({ title: 'Erro', description: result.message || 'Não foi possível remover o usuário.', variant: 'destructive' });
+        toast({ title: 'Erro', description: result.message || 'No foi possvel remover o usu?rio.', variant: 'destructive' });
         return;
       }
 
       setUsers((current) => current.filter((u) => u.id !== user.id));
-      toast({ title: 'Usuário removido', description: result.message || 'Acesso revogado com sucesso.' });
+      toast({ title: 'Usurio removido', description: result.message || 'Acesso revogado com sucesso.' });
     } catch (error: any) {
-      toast({ title: 'Erro de Conexão', description: error.message || 'Não foi possível deletar o usuário.', variant: 'destructive' });
+      toast({ title: 'Erro de Conexo', description: error.message || 'No foi possvel deletar o usu?rio.', variant: 'destructive' });
     }
   };
 
   if (isLoading) {
-    return <p>Carregando usuários...</p>;
+    return <p>Carregando usu?rios...</p>;
   }
 
   return (
@@ -259,7 +259,7 @@ const UserManagementTable = () => {
       <div className="flex justify-end">
         <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
           <UserPlus className="h-4 w-4" />
-          Novo Usuário
+          Novo Usurio
         </Button>
       </div>
 
@@ -269,7 +269,7 @@ const UserManagementTable = () => {
             <TableHead>Nome</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Perfil</TableHead>
-            <TableHead className="text-right">Ações</TableHead>
+            <TableHead className="text-right">Aes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -315,11 +315,11 @@ const UserManagementTable = () => {
         </TableBody>
       </Table>
 
-      {/* Dialog de Criação de Usuário */}
+      {/* Dialog de Criao de Usurio */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Criar Novo Usuário</DialogTitle>
+            <DialogTitle>Criar Novo Usurio</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateUser} className="space-y-4">
             <div className="space-y-2">
@@ -368,13 +368,13 @@ const UserManagementTable = () => {
               </Select>
             </div>
             <DialogFooter>
-              <Button type="submit">Criar Usuário</Button>
+              <Button type="submit">Criar Usurio</Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Dialog de Alteração de Senha */}
+      {/* Dialog de Alterao de Senha */}
       <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -398,7 +398,7 @@ const UserManagementTable = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog de Alteração de Perfil */}
+      {/* Dialog de Alterao de Perfil */}
       <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

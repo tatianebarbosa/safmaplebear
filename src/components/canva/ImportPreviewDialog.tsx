@@ -43,7 +43,7 @@ export const ImportPreviewDialog = ({
     return {
       ...item,
       schoolFound: !!school,
-      schoolName: school?.name || 'Escola não encontrada',
+      schoolName: school?.name || 'Escola no encontrada',
       isCompliant: compliant,
       validRole,
       valid: !!school && compliant && validRole && item.name && item.email,
@@ -65,10 +65,10 @@ export const ImportPreviewDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Prévia da Importação
+            Prvia da Importao
           </DialogTitle>
           <DialogDescription>
-            Verifique os dados antes de confirmar a importação
+            Verifique os dados antes de confirmar a importao
           </DialogDescription>
         </DialogHeader>
         
@@ -87,21 +87,21 @@ export const ImportPreviewDialog = ({
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-green-600">Válidos</CardTitle>
+                <CardTitle className="text-sm text-green-600">Vlidos</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">{validItems.length}</div>
-                <div className="text-xs text-muted-foreground">serão importados</div>
+                <div className="text-xs text-muted-foreground">sero importados</div>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-destructive">Inválidos</CardTitle>
+                <CardTitle className="text-sm text-destructive">Invlidos</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-destructive">{invalidItems.length}</div>
-                <div className="text-xs text-muted-foreground">serão ignorados</div>
+                <div className="text-xs text-muted-foreground">sero ignorados</div>
               </CardContent>
             </Card>
           </div>
@@ -110,14 +110,14 @@ export const ImportPreviewDialog = ({
           {Object.keys(schoolCounts).length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">Distribuição por Escola</CardTitle>
+                <CardTitle className="text-sm">Distribuio por Escola</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   {Object.entries(schoolCounts).map(([schoolName, count]) => (
                     <div key={schoolName} className="flex justify-between items-center">
                       <span className="text-sm">{schoolName}</span>
-                      <Badge variant="outline">{count} usuários</Badge>
+                      <Badge variant="outline">{count} usu?rios</Badge>
                     </div>
                   ))}
                 </div>
@@ -128,7 +128,7 @@ export const ImportPreviewDialog = ({
           {/* Preview Data */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm">Prévia dos Dados</CardTitle>
+              <CardTitle className="text-sm">Prvia dos Dados</CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px]">
@@ -166,17 +166,17 @@ export const ImportPreviewDialog = ({
                         <div className="flex flex-col gap-1">
                           {!item.schoolFound && (
                             <Badge variant="destructive" className="text-xs">
-                              Escola não encontrada
+                              Escola no encontrada
                             </Badge>
                           )}
                           {!item.isCompliant && (
                             <Badge variant="destructive" className="text-xs">
-                              E-mail fora da política
+                              E-mail fora da pol?tica
                             </Badge>
                           )}
                           {!item.validRole && (
                             <Badge variant="destructive" className="text-xs">
-                              Função inválida
+                              Funo invlida
                             </Badge>
                           )}
                           {(!item.name || !item.email) && (
@@ -199,13 +199,13 @@ export const ImportPreviewDialog = ({
               <CardHeader>
                 <CardTitle className="text-sm text-warning-foreground flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4" />
-                  Atenção
+                  Ateno
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-warning-foreground">
-                  {invalidItems.length} registro(s) contém(têm) erros e não será(ão) importado(s). 
-                  Apenas {validItems.length} registro(s) válido(s) será(ão) processado(s).
+                  {invalidItems.length} registro(s) contm(tm) erros e no ser(o) importado(s). 
+                  Apenas {validItems.length} registro(s) vlido(s) ser(o) processado(s).
                 </p>
               </CardContent>
             </Card>
@@ -220,7 +220,7 @@ export const ImportPreviewDialog = ({
             onClick={() => onConfirm(validItems)}
             disabled={validItems.length === 0}
           >
-            Confirmar Importação ({validItems.length} registros)
+            Confirmar Importao ({validItems.length} registros)
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -260,7 +260,7 @@ export const SchoolLicenseManagement = ({
   }, [externalSearchTerm, onExternalSearchConsumed]);
 
   const handleExport = () => {
-    // Exporta sempre a visão filtrada mais recente
+    // Exporta sempre a viso filtrada mais recente
     const formatCell = (value: unknown) => {
       const raw = value ?? "";
       const str = typeof raw === "string" ? raw : String(raw);
@@ -276,11 +276,11 @@ export const SchoolLicenseManagement = ({
         "Status",
         "Cluster",
         "Cidade",
-        "Licencas Totais",
-        "Licencas Usadas",
-        "Status Licencas",
-        "Total Usuarios",
-        "Usuarios Nao Conformes",
+        "LicenÃ§as Totais",
+        "LicenÃ§as Usadas",
+        "Status LicenÃ§as",
+        "Total UsuÃ¡rios",
+        "UsuÃ¡rios NÃ£o Conformes",
       ],
       ...filteredSchools.map((school) => [
         formatCell(school.name),
@@ -301,7 +301,7 @@ export const SchoolLicenseManagement = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "escolas-licencas.csv";
+    link.download = "escolas-licenças.csv";
     link.click();
     URL.revokeObjectURL(url);
     toast.success("Dados exportados com sucesso");
@@ -324,41 +324,41 @@ export const SchoolLicenseManagement = ({
         <StatsCard
           title="Total de Escolas"
           value={totalSchools.toString()}
-          description={`${activeSchools} com licencas ativas`}
+          description={`${activeSchools} com licenças ativas`}
           icon={<Building2 className="h-4 w-4" />}
-          tooltip="Numero de escolas oficiais carregadas; considera todas as escolas sincronizadas."
+          tooltip="Número de escolas oficiais carregadas; considera todas as escolas sincronizadas."
         />
         <StatsCard
-          title="Licencas Utilizadas"
+          title="licenças Utilizadas"
           value={`${usedLicenses}/${totalLicenses}`}
           description={
-            totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupacao` : "Sem dados de licenca"
+            totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupação` : "Sem dados de licença"
           }
           icon={<Users className="h-4 w-4" />}
-          tooltip="Soma de usuarios licenciados em todas as escolas; percentual = usadas / total de licencas."
+          tooltip="Soma de usuários licenciados em todas as escolas; percentual = usadas / total de licenças."
         />
         <StatsCard
-          title="Licencas fora da politica"
+          title="Licenças fora da política"
           value={nonCompliantUsersAll.toString()}
-          description="Emails n?o conformes"
+          description="Emails não conformes"
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={nonCompliantUsersAll > 0 ? "destructive" : "default"}
-          tooltip="Total de usuarios com e-mail fora da politica. Emails validos: dominios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereco contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
+          tooltip="Total de usuários com e-mail fora da politica. Emails validos: dominios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereco contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
         />
         <StatsCard
           title="Escolas em Excesso"
           value={exceedingSchools.toString()}
-          description="Licencas ultrapassadas"
+          description="licenças ultrapassadas"
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={exceedingSchools > 0 ? "destructive" : "default"}
-          tooltip="Escolas acima do limite de licencas definido. Reveja estas unidades para redistribuir ou remover acessos."
+          tooltip="Escolas acima do limite de licenças definido. Reveja estas unidades para redistribuir ou remover acessos."
         />
         <StatsCard
-          title="Usuarios sem escola"
+          title="usuários sem escola"
           value={(unassignedUsers ?? 0).toString()}
-          description="Licencas sem vinculo"
+          description="Licenças sem vínculo"
           icon={<Users className="h-4 w-4" />}
-          tooltip="Licencas ativas sem vinculo a escola. Vincule ou remova para evitar consumo indevido."
+          tooltip="Licenças ativas sem vínculo à escola. Vincule ou remova para evitar consumo indevido."
         />
       </div>
 
@@ -394,11 +394,11 @@ export const SchoolLicenseManagement = ({
                   "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
                 )}
               >
-                <SelectValue placeholder="Cluster/Região" />
+                <SelectValue placeholder="Cluster/Regio" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Implantação">Implantação</SelectItem>
+                <SelectItem value="Implantao">Implantao</SelectItem>
                 <SelectItem value="Alta Performance">Alta Performance</SelectItem>
                 <SelectItem value="Potente">Potente</SelectItem>
                 <SelectItem value="Desenvolvimento">Desenvolvimento</SelectItem>
@@ -419,11 +419,11 @@ export const SchoolLicenseManagement = ({
                   "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
                 )}
               >
-                <SelectValue placeholder="Status das Licenças" />
+                <SelectValue placeholder="Status das licenças" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Disponível">Disponível</SelectItem>
+                <SelectItem value="Disponvel">Disponvel</SelectItem>
                 <SelectItem value="Completo">Completa</SelectItem>
                 <SelectItem value="Excedido">Excedida</SelectItem>
               </SelectContent>
@@ -442,7 +442,7 @@ export const SchoolLicenseManagement = ({
                   "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
                 )}
               >
-                <SelectValue placeholder="Perfil do Usuário" />
+                <SelectValue placeholder="Perfil do Usurio" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os perfis</SelectItem>
@@ -509,7 +509,7 @@ export const SchoolLicenseManagement = ({
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             className="rounded-full px-4"
           >
-            Próxima
+            Prxima
           </Button>
         </div>
       </div>

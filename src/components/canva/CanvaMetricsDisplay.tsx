@@ -23,6 +23,7 @@ import StatsCard from "@/components/dashboard/StatsCard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import { useAuthStore } from "@/stores/authStore";
 import { uploadMemberReport, uploadModelReport, getUploadInfo, clearUploadOverrides } from "@/lib/canvaUsageService";
+import { getAgentDisplayName } from "@/data/teamMembers";
 
 export const CanvaMetricsDisplay = () => {
   const { overviewData } = useSchoolLicenseStore();
@@ -160,6 +161,19 @@ export const CanvaMetricsDisplay = () => {
     }
   };
 
+  const formatActor = (actor?: string) => {
+    if (!actor) return { label: "Desconhecido" };
+    const trimmed = actor.trim();
+    const email = /\S+@\S+\.\S+/.test(trimmed) ? trimmed : undefined;
+    const base = trimmed.split("@")[0] || trimmed;
+    const baseToken = base.split(/[.\s]/)[0] || base;
+    const friendly =
+      getAgentDisplayName(base) ||
+      getAgentDisplayName(baseToken) ||
+      (base ? base.charAt(0).toUpperCase() + base.slice(1) : undefined);
+    return { label: friendly || trimmed, email };
+  };
+
   const renderHistoricoItem = (item: CanvaHistorico) => {
     const isUpload = item.usuarioAlteracao?.toLowerCase().includes("upload") || item.descricaoAlteracao?.toLowerCase().includes("upload");
     const uploadLabel = item.descricaoAlteracao?.replace("Upload CSV:", "").trim();
@@ -190,7 +204,12 @@ export const CanvaMetricsDisplay = () => {
               {formatNumber(snapshot.designsCriados)}
             </p>
             <p className="text-xs text-muted-foreground">
-              Por: {item.usuarioAlteracao || "Desconhecido"}{item.descricaoAlteracao ? ` - ${item.descricaoAlteracao}` : ""}
+              {(() => {
+                const actor = formatActor(item.usuarioAlteracao);
+                return `Por: ${actor.label}${actor.email ? ` (${actor.email})` : ""}${
+                  item.descricaoAlteracao ? ` - ${item.descricaoAlteracao}` : ""
+                }`;
+              })()}
             </p>
             {isUpload && (
               <p className="text-xs text-muted-foreground">
@@ -250,7 +269,7 @@ export const CanvaMetricsDisplay = () => {
               <div className="space-y-1 text-sm">
                 <p className="font-semibold text-amber-800">Uploads do Canva estao vencidos</p>
                 <p className="text-muted-foreground">
-                  Faltam arquivos de {pendingUploadsLabel || "membros e modelos"}; atualize os CSVs (30 dias). Ultimo membros: {lastMemberUpload ?? "nao encontrado"} | Ultimo modelos: {lastModelUpload ?? "nao encontrado"}.
+                  Faltam arquivos de {pendingUploadsLabel || "membros e modelos"}; atualize os CSVs (30 dias). Último membros: {lastMemberUpload ?? "não encontrado"} | Último modelos: {lastModelUpload ?? "não encontrado"}.
                 </p>
               </div>
             </div>

@@ -61,13 +61,13 @@ export const seedKnowledgeBase = async (): Promise<KnowledgeItem[]> => {
   try {
     const response = await fetch(DEFAULT_KNOWLEDGE_URL);
     if (!response.ok) {
-      throw new Error(`Falha ao carregar conhecimento padrão (${response.status})`);
+      throw new Error(`Falha ao carregar conhecimento padro (${response.status})`);
     }
     const defaultKnowledge = (await response.json()) as KnowledgeItem[];
     persistKnowledgeItems(defaultKnowledge);
     return defaultKnowledge;
   } catch (error) {
-    console.warn('Não foi possível carregar base de conhecimento padrão:', error);
+    console.warn('No foi possvel carregar base de conhecimento padro:', error);
     return [];
   }
 };

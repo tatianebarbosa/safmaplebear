@@ -60,10 +60,10 @@ const RealAIAssistant = () => {
     }
   }, []);
 
-  // Função para consultar dados de escolas
+  // Funo para consultar dados de escolas
   const querySchoolData = async (message: string) => {
     if (!schoolDataLoaded) {
-      toast.error("Dados das escolas ainda estão sendo carregados");
+      toast.error("Dados das escolas ainda esto sendo carregados");
       return;
     }
 
@@ -85,7 +85,7 @@ const RealAIAssistant = () => {
           lowerMessage.includes('carteira saf') ||
           lowerMessage.includes('consultor') ||
           lowerMessage.includes('responsavel') ||
-          lowerMessage.includes('responsável')) &&
+          lowerMessage.includes('respons?vel')) &&
         (lowerMessage.includes('quant') ||
           lowerMessage.includes('lista') ||
           lowerMessage.includes('listar') ||
@@ -98,7 +98,7 @@ const RealAIAssistant = () => {
         schoolInfo = await summarizeSchoolsBySafAgent({ includeSchools });
       } else if (lowerMessage.includes('qual') && lowerMessage.includes('escola')) {
         // Busca por nome de escola
-        const schoolName = message.replace(/qual|escola|é|o|da|de|/gi, '').trim();
+        const schoolName = message.replace(/qual|escola||o|da|de|/gi, '').trim();
         const school = await searchSchoolByName(schoolName);
         if (school) {
           schoolInfo = formatSchoolData(school);
@@ -122,7 +122,7 @@ const RealAIAssistant = () => {
         }
       } else if (lowerMessage.includes('cluster')) {
         // Busca por cluster
-        const clusters = ['Potente', 'Desenvolvimento', 'Alta Performance', 'Alerta', 'Implantação'];
+        const clusters = ['Potente', 'Desenvolvimento', 'Alta Performance', 'Alerta', 'Implantao'];
         let foundCluster = '';
         for (const cluster of clusters) {
           if (lowerMessage.toLowerCase().includes(cluster.toLowerCase())) {
@@ -157,7 +157,7 @@ const RealAIAssistant = () => {
       }
 
       if (!schoolInfo) {
-        // Se não encontrou dados específicos, usa a IA para responder
+        // Se no encontrou dados especficos, usa a IA para responder
         await chatWithAI(message);
         return;
       }
@@ -182,7 +182,7 @@ const RealAIAssistant = () => {
     }
   };
 
-  // Função para melhorar texto usando ChatGPT real
+  // Funo para melhorar texto usando ChatGPT real
   const improveTextWithAI = async (text: string, type: 'polite' | 'welcoming' | 'professional') => {
     if (!apiKey.trim()) {
       toast.error("Por favor, insira sua chave da API do OpenAI");
@@ -194,23 +194,23 @@ const RealAIAssistant = () => {
     
     try {
       const prompts = {
-        polite: `Reescreva o seguinte texto para soar mais educado e formal, mantendo o significado original. Use tratamento respeitoso e linguagem cortês apropriada para atendimento ao cliente empresarial:
+        polite: `Reescreva o seguinte texto para soar mais educado e formal, mantendo o significado original. Use tratamento respeitoso e linguagem corts apropriada para atendimento ao cliente empresarial:
 
 "${text}"
 
-Responda apenas com o texto melhorado, sem explicações adicionais.`,
+Responda apenas com o texto melhorado, sem explicaes adicionais.`,
         
-        welcoming: `Reescreva o seguinte texto para soar mais acolhedor e caloroso, mantendo o significado original. Use linguagem amigável e próxima, apropriada para criar conexão com o cliente:
+        welcoming: `Reescreva o seguinte texto para soar mais acolhedor e caloroso, mantendo o significado original. Use linguagem amigvel e prxima, apropriada para criar conexo com o cliente:
 
 "${text}"
 
-Responda apenas com o texto melhorado, sem explicações adicionais.`,
+Responda apenas com o texto melhorado, sem explicaes adicionais.`,
         
-        professional: `Reescreva o seguinte texto para soar mais profissional e corporativo, mantendo o significado original. Use linguagem técnica e formal apropriada para contextos empresariais:
+        professional: `Reescreva o seguinte texto para soar mais profissional e corporativo, mantendo o significado original. Use linguagem tcnica e formal apropriada para contextos empresariais:
 
 "${text}"
 
-Responda apenas com o texto melhorado, sem explicações adicionais.`
+Responda apenas com o texto melhorado, sem explicaes adicionais.`
       };
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -224,7 +224,7 @@ Responda apenas com o texto melhorado, sem explicações adicionais.`
           messages: [
             {
               role: 'system',
-              content: 'Você é um assistente especializado em melhorar textos de atendimento ao cliente para o Maple Bear. Sempre mantenha o contexto educacional e o tom apropriado da marca.'
+              content: 'Voc  um assistente especializado em melhorar textos de atendimento ao cliente para o Maple Bear. Sempre mantenha o contexto educacional e o tom apropriado da marca.'
             },
             {
               role: 'user',
@@ -258,7 +258,7 @@ Responda apenas com o texto melhorado, sem explicações adicionais.`
       
     } catch (error: any) {
       console.error('Erro na API do OpenAI:', error);
-      toast.error(`Erro: ${error.message || 'Falha na comunicação com a IA'}`);
+      toast.error(`Erro: ${error.message || 'Falha na comunicao com a IA'}`);
     } finally {
       setLoading(false);
     }
@@ -281,19 +281,19 @@ Responda apenas com o texto melhorado, sem explicações adicionais.`
         schoolContext = await generateSchoolContext();
       }
 
-      const systemPrompt = `Você é um assistente inteligente do Maple Bear SAF (Sistema de Atendimento às Franquias). Você ajuda com:
+      const systemPrompt = `Voc  um assistente inteligente do Maple Bear SAF (Sistema de Atendimento s Franquias). Voc ajuda com:
 
-- Informações sobre escolas e franquias (você tem acesso a uma base de dados atualizada)
+- Informaes sobre escolas e franquias (voc tem acesso a uma base de dados atualizada)
 - Dados de tickets de atendimento
-- Melhorar textos de comunicação
-- Explicar relatórios e métricas
+- Melhorar textos de comunicao
+- Explicar relatrios e mtricas
 - Agendar atividades do SAF
-- Questões sobre vouchers e campanhas
+- Questes sobre vouchers e campanhas
 - Suporte a coordenadores e franqueados
 
-Seja sempre útil, profissional e focado no contexto educacional do Maple Bear. Responda em português brasileiro.
+Seja sempre til, profissional e focado no contexto educacional do Maple Bear. Responda em portugus brasileiro.
 
-${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoolContext}` : ''}`;
+${schoolContext ? `\n\nVoc tem acesso aos seguintes dados de escolas:\n${schoolContext}` : ''}`;
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -324,7 +324,7 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
       }
 
       const data = await response.json();
-      const aiReply = data.choices[0]?.message?.content?.trim() || "Desculpe, não consegui processar sua pergunta.";
+      const aiReply = data.choices[0]?.message?.content?.trim() || "Desculpe, no consegui processar sua pergunta.";
       
       const aiResponse: AIResponse = {
         id: Date.now().toString(),
@@ -340,7 +340,7 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
       
     } catch (error: any) {
       console.error('Erro na API do OpenAI:', error);
-      toast.error(`Erro: ${error.message || 'Falha na comunicação com a IA'}`);
+      toast.error(`Erro: ${error.message || 'Falha na comunicao com a IA'}`);
     } finally {
       setLoading(false);
     }
@@ -348,19 +348,19 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Texto copiado para a área de transferência!");
+    toast.success("Texto copiado para a rea de transferncia!");
   };
 
   const clearHistory = () => {
     setResponses([]);
-    toast.success("Histórico limpo!");
+    toast.success("Histrico limpo!");
   };
 
   const saveApiKey = () => {
     if (apiKey.trim()) {
       localStorage.setItem('openai_api_key', apiKey);
       setShowApiKeyInput(false);
-      toast.success("Chave da API salva com segurança!");
+      toast.success("Chave da API salva com segurana!");
     }
   };
 
@@ -370,7 +370,7 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Bot className="h-8 w-8 text-primary" />
-            Assistente de IA Avançado
+            Assistente de IA Avanado
           </h1>
           <p className="text-muted-foreground">
             IA real powered by ChatGPT + Dados das Escolas Maple Bear
@@ -387,7 +387,7 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
           {responses.length > 0 && (
             <Button variant="outline" onClick={clearHistory}>
               <RotateCcw className="mr-2 h-4 w-4" />
-              Limpar Histórico
+              Limpar Histrico
             </Button>
           )}
         </div>
@@ -407,12 +407,12 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
         <Alert className="bg-green-50 border-green-200">
           <AlertCircle className="h-4 w-4 text-green-600" />
           <AlertDescription className="text-green-800">
-            Dados das escolas carregados com sucesso! Você pode fazer perguntas sobre as escolas.
+            Dados das escolas carregados com sucesso! Voc pode fazer perguntas sobre as escolas.
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Configuração da API Key */}
+      {/* Configurao da API Key */}
       {showApiKeyInput && (
         <Alert>
           <Key className="h-4 w-4" />
@@ -432,7 +432,7 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Sua chave é armazenada localmente e usada apenas para as chamadas da IA.
+                Sua chave  armazenada localmente e usada apenas para as chamadas da IA.
                 <br />
                 Obtenha sua chave em: <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-primary underline">OpenAI Platform</a>
               </p>
@@ -455,12 +455,12 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
         <CardHeader>
           <CardTitle>Interaja com a IA</CardTitle>
           <CardDescription>
-            Faça perguntas sobre escolas, melhore textos ou converse com a IA
+            Faa perguntas sobre escolas, melhore textos ou converse com a IA
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
-            placeholder="Digite uma pergunta sobre escolas (ex: 'Quais escolas estão em SP?') ou faça outra pergunta..."
+            placeholder="Digite uma pergunta sobre escolas (ex: 'Quais escolas esto em SP?') ou faa outra pergunta..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             rows={4}
@@ -510,7 +510,7 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
               variant="default"
             >
               <Bot className="mr-2 h-4 w-4" />
-              Perguntar à IA
+              Perguntar  IA
             </Button>
           </div>
           
@@ -523,10 +523,10 @@ ${schoolContext ? `\n\nVocê tem acesso aos seguintes dados de escolas:\n${schoo
         </CardContent>
       </Card>
 
-      {/* Histórico de Respostas */}
+      {/* Histrico de Respostas */}
       {responses.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Histórico de Interações</h2>
+          <h2 className="text-2xl font-semibold">Histrico de Interaes</h2>
           
           {responses.map((response) => (
             <Card key={response.id}>

@@ -41,7 +41,7 @@ export const SchoolLicenseOverview = ({ schoolsData, onSchoolClick }: SchoolLice
   const getPerformanceBadge = (performance: string) => {
     switch (performance) {
       case 'high': return <Badge variant="default">Alta Performance</Badge>;
-      case 'medium': return <Badge variant="secondary">Média Performance</Badge>;
+      case 'medium': return <Badge variant="secondary">Mdia Performance</Badge>;
       default: return <Badge variant="outline">Baixa Performance</Badge>;
     }
   };
@@ -99,7 +99,7 @@ export const SchoolLicenseOverview = ({ schoolsData, onSchoolClick }: SchoolLice
                           <div className="text-xs text-muted-foreground">
                             {school.nonCompliantUsers.length > 0 && (
                               <Badge variant="outline" className="text-xs">
-                                {school.nonCompliantUsers.length} não conforme(s)
+                                {school.nonCompliantUsers.length} no conforme(s)
                               </Badge>
                             )}
                           </div>
@@ -123,7 +123,7 @@ export const SchoolLicenseOverview = ({ schoolsData, onSchoolClick }: SchoolLice
                         <div className="space-y-1">
                           <div className="flex items-center gap-1">
                             <Users className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-muted-foreground">Usuários:</span>
+                            <span className="text-muted-foreground">Usurios:</span>
                             <span className="font-medium">{school.users.length}</span>
                           </div>
                         </div>

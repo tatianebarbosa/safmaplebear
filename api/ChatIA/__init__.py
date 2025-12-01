@@ -24,7 +24,7 @@ def _json_response(payload: Dict[str, Any], status_code: int) -> func.HttpRespon
   """Retorna uma resposta JSON padronizada."""
   return func.HttpResponse(
     json.dumps(payload, ensure_ascii=False),
-    mimetype="application/json",
+    mimetype="application/json; charset=utf-8",
     status_code=status_code,
   )
 

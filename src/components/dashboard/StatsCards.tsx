@@ -67,21 +67,21 @@ export const DashboardStats = ({
       />
       <StatsCard
         icon={<Users className="w-6 h-6" />}
-        label="Usuários Totais"
+        label="Usu?rios Totais"
         value={totalUsers}
         trend="+18 novos"
         trendColor="positive"
       />
       <StatsCard
         icon={<CheckCircle2 className="w-6 h-6" />}
-        label="Licenças Ativas"
+        label="LicenÃ§as Ativas"
         value={activeLicenses}
-        trend="73% de ocupação"
+        trend="73% de ocupa??o"
         trendColor="neutral"
       />
       <StatsCard
         icon={<AlertCircle className="w-6 h-6" />}
-        label="Não Conformes"
+        label="N?o Conformes"
         value={nonCompliantUsers}
         trend="-3 desde ontem"
         trendColor="positive"

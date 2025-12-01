@@ -37,11 +37,11 @@ export const CanvaRankings = ({ rankings }: CanvaRankingsProps) => {
 
   const getRankingDescription = (category: UserRanking['category']) => {
     switch (category) {
-      case 'most_active': return 'Usuários com maior atividade geral';
-      case 'most_creative': return 'Usuários que mais criaram designs';
-      case 'most_shared': return 'Usuários que mais compartilharam';
-      case 'most_viewed': return 'Usuários com designs mais visualizados';
-      default: return 'Ranking de usuários';
+      case 'most_active': return 'Usurios com maior atividade geral';
+      case 'most_creative': return 'Usurios que mais criaram designs';
+      case 'most_shared': return 'Usurios que mais compartilharam';
+      case 'most_viewed': return 'Usurios com designs mais visualizados';
+      default: return 'Ranking de usu?rios';
     }
   };
 
@@ -53,10 +53,10 @@ export const CanvaRankings = ({ rankings }: CanvaRankingsProps) => {
   };
 
   const getRankingBadge = (rank: number) => {
-    if (rank === 1) return <Badge variant="warning">🏆 1º</Badge>;
-    if (rank === 2) return <Badge variant="secondary">🥈 2º</Badge>;
-    if (rank === 3) return <Badge variant="outline">🥉 3º</Badge>;
-    return <Badge variant="outline">{rank}º</Badge>;
+    if (rank === 1) return <Badge variant="warning"> 1</Badge>;
+    if (rank === 2) return <Badge variant="secondary"> 2</Badge>;
+    if (rank === 3) return <Badge variant="outline"> 3</Badge>;
+    return <Badge variant="outline">{rank}</Badge>;
   };
 
   const RankingList = ({ rankingData, category }: { rankingData: UserRanking[], category: UserRanking['category'] }) => {
@@ -95,11 +95,11 @@ export const CanvaRankings = ({ rankings }: CanvaRankingsProps) => {
                     <div className="text-xs text-muted-foreground">
                       {category === 'most_active' ? 'pontos' :
                        category === 'most_creative' ? 'designs' :
-                       category === 'most_shared' ? 'shares' : 'visualizações'}
+                       category === 'most_shared' ? 'shares' : 'visualizaes'}
                     </div>
                     {!ranking.user.isCompliant && (
                       <Badge variant="destructive" className="text-xs">
-                        Fora da política
+                        Fora da pol?tica
                       </Badge>
                     )}
                   </div>
@@ -117,10 +117,10 @@ export const CanvaRankings = ({ rankings }: CanvaRankingsProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Trophy className="h-5 w-5" />
-          Rankings de Usuários
+          Rankings de Usurios
         </CardTitle>
         <CardDescription>
-          Veja os usuários mais ativos e performáticos do Canva
+          Veja os usu?rios mais ativos e performticos do Canva
         </CardDescription>
       </CardHeader>
       <CardContent>

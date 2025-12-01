@@ -253,11 +253,11 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
   const periodFieldCandidates = ['ultima atividade', 'ltima atividade', 'last activity', 'periodo', 'period'];
   const schoolNameFieldCandidates = ['escola', 'school', 'organizacao', 'organization', 'instituicao', 'institution', 'campus', 'org name', 'organizational unit'];
   const schoolIdFieldCandidates = ['escola id', 'escolaid', 'school id', 'id escola', 'school'];
-  const emailFieldCandidates = ['e-mail', 'email', 'usuario', 'user email', 'user'];
+  const emailFieldCandidates = ['e-mail', 'email', 'usu?rio', 'user email', 'user'];
   const designsCreatedFields = ['designs criados', 'designs created', 'created designs', 'total designs'];
   const designsPublishedFields = ['designs publicados', 'designs published', 'publicado', 'publicados', 'published designs'];
   const linksSharedFields = ['links compartilhados', 'compartilhados', 'links shared', 'shared links', 'links compartilhado', 'shared'];
-  const viewsFields = ['designs visualizados', 'visualizacoes', 'views', 'visualizações'];
+  const viewsFields = ['designs visualizados', 'visualizacoes', 'views', 'visualizaes'];
 
   members.forEach((row) => {
     let email = findField(row, emailFieldCandidates);
@@ -309,7 +309,7 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
     entry.stats.designsShared += shared;
     entry.stats.designsViewed += views;
     entry.creators.push({
-      name: findField(row, ['membro', 'member', 'nome', 'name', 'usuario']),
+      name: findField(row, ['membro', 'member', 'nome', 'name', 'usu?rio']),
       email,
       designs: designsCreated,
       published: designsPublished,

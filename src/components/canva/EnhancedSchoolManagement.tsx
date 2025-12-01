@@ -82,12 +82,12 @@ export const EnhancedSchoolManagement = ({
       case 'needs_attention':
         return (
           <Badge variant="outline" className="text-destructive border-destructive">
-            {school.nonCompliantUsers.length} fora da política
+            {school.nonCompliantUsers.length} fora da pol?tica
           </Badge>
         );
       default:
         return school.usedLicenses === school.maxLicenses ? (
-          <Badge variant="secondary">Capacidade máxima</Badge>
+          <Badge variant="secondary">Capacidade mxima</Badge>
         ) : null;
     }
   };
@@ -125,7 +125,7 @@ export const EnhancedSchoolManagement = ({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Cluster/Região</label>
+              <label className="text-sm font-medium">Cluster/Regio</label>
               <Select value={selectedCluster} onValueChange={setSelectedCluster}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos os clusters" />
@@ -151,7 +151,7 @@ export const EnhancedSchoolManagement = ({
                   <SelectItem value="all">Todos os status</SelectItem>
                   <SelectItem value="has_issues">Com problemas</SelectItem>
                   <SelectItem value="over_limit">Acima do limite</SelectItem>
-                  <SelectItem value="needs_attention">Requer atenção</SelectItem>
+                  <SelectItem value="needs_attention">Requer ateno</SelectItem>
                   <SelectItem value="normal">Normal</SelectItem>
                 </SelectContent>
               </Select>
@@ -215,13 +215,13 @@ export const EnhancedSchoolManagement = ({
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Users className="h-3 w-3" />
-                          {school.usedLicenses}/{school.maxLicenses} licenças
+                          {school.usedLicenses}/{school.maxLicenses} licen?as
                         </span>
-                        <span>{school.users.length} usuários totais</span>
+                        <span>{school.users.length} usu?rios totais</span>
                         {school.nonCompliantUsers.length > 0 && (
                           <span className="text-destructive flex items-center gap-1">
                             <AlertTriangle className="h-3 w-3" />
-                            {school.nonCompliantUsers.length} fora da política
+                            {school.nonCompliantUsers.length} fora da pol?tica
                           </span>
                         )}
                       </div>
@@ -236,7 +236,7 @@ export const EnhancedSchoolManagement = ({
                           toggleSchoolExpansion(school.schoolId);
                         }}
                       >
-                        {expandedSchool === school.schoolId ? 'Ocultar' : 'Ver'} Usuários
+                        {expandedSchool === school.schoolId ? 'Ocultar' : 'Ver'} Usurios
                       </Button>
                       <Button
                         size="sm"
@@ -291,7 +291,7 @@ export const EnhancedSchoolManagement = ({
                       <div className="text-2xl font-bold text-primary">
                         {school.totalActivity.designsViewed}
                       </div>
-                      <div className="text-xs text-muted-foreground">Visualizações</div>
+                      <div className="text-xs text-muted-foreground">Visualizaes</div>
                     </div>
                   </div>
 
@@ -301,7 +301,7 @@ export const EnhancedSchoolManagement = ({
                       <Separator />
                       <div className="space-y-3">
                         <h4 className="font-medium text-sm">
-                          Usuários da Escola ({school.users.length})
+                          Usurios da Escola ({school.users.length})
                         </h4>
                         <div className="grid gap-2 max-h-64 overflow-y-auto">
                           {school.users.map((user, index) => (
@@ -321,13 +321,13 @@ export const EnhancedSchoolManagement = ({
                                       variant="destructive"
                                       size="sm"
                                     >
-                                      Fora da política
+                                      Fora da pol?tica
                                     </Badge>
                                   )}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
                                   {user.email}
-                                  {user.role !== "Estudante" && ` • ${user.role}`}
+                                  {user.role !== "Estudante" && `  ${user.role}`}
                                 </div>
                                 {user.complianceIssue && (
                                   <div className="text-xs text-destructive mt-1">

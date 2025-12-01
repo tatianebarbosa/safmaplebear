@@ -36,7 +36,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "message": "O ID do registro de alteração é obrigatório."
                 }, ensure_ascii=False),
                  status_code=400,
-                 mimetype="application/json"
+                 mimetype="application/json; charset=utf-8"
             )
         
         try:
@@ -48,7 +48,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "message": "O ID do registro deve ser um número inteiro."
                 }, ensure_ascii=False),
                  status_code=400,
-                 mimetype="application/json"
+                 mimetype="application/json; charset=utf-8"
             )
 
         # Caminho para o arquivo de histórico
@@ -61,7 +61,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "message": "O arquivo de histórico não existe."
                 }, ensure_ascii=False),
                  status_code=404,
-                 mimetype="application/json"
+                 mimetype="application/json; charset=utf-8"
             )
         
         # Lê o histórico existente
@@ -86,7 +86,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "message": f"Nenhum registro de alteração encontrado com o ID: {record_id}."
                 }, ensure_ascii=False),
                  status_code=404,
-                 mimetype="application/json"
+                 mimetype="application/json; charset=utf-8"
             )
         
         # Salva o histórico atualizado
@@ -98,7 +98,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps(updated_record, ensure_ascii=False, indent=2),
             status_code=200,
-            mimetype="application/json",
+            mimetype="application/json; charset=utf-8",
             headers={
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -114,5 +114,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "message": str(e)
             }, ensure_ascii=False),
             status_code=500,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )

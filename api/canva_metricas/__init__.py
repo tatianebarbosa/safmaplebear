@@ -36,7 +36,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "message": "Especifique o tipo de métrica: pessoas, designs, membros, kits ou escolas"
                 }, ensure_ascii=False),
                 status_code=400,
-                mimetype="application/json"
+                mimetype="application/json; charset=utf-8"
             )
         
         # Caminho para o arquivo de dados integrados
@@ -53,7 +53,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "message": "Os dados do Canva ainda não foram coletados."
                 }, ensure_ascii=False),
                 status_code=404,
-                mimetype="application/json"
+                mimetype="application/json; charset=utf-8"
             )
         
         # Lê o arquivo de dados
@@ -139,7 +139,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "message": f"Tipo '{tipo}' não reconhecido. Use: pessoas, designs, membros, kits ou escolas"
                 }, ensure_ascii=False),
                 status_code=400,
-                mimetype="application/json"
+                mimetype="application/json; charset=utf-8"
             )
         
         logging.info(f'Métricas do tipo "{tipo}" retornadas com sucesso')
@@ -147,7 +147,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps(metrics, ensure_ascii=False, indent=2),
             status_code=200,
-            mimetype="application/json",
+            mimetype="application/json; charset=utf-8",
             headers={
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -163,5 +163,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "message": str(e)
             }, ensure_ascii=False),
             status_code=500,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )

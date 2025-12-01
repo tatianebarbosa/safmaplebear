@@ -60,7 +60,7 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
     if (!over) return;
 
     const ticket = tickets.find(t => t.id === active.id);
-    if (!ticket || !canManageTicket(ticket.agente)) return;
+    if (!ticket) return;
 
     const overId = over.id as string;
     const overContainer = over.data?.current?.sortable?.containerId as TicketStatus | undefined;
@@ -78,10 +78,10 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
 
   const getSLABadge = (diasAberto: number) => {
     if (diasAberto >= 15) {
-      return <Badge variant="destructive" className="text-xs">Crítico {diasAberto}d</Badge>;
+      return <Badge variant="destructive" className="text-xs">Crtico {diasAberto}d</Badge>;
     }
     if (diasAberto >= 8) {
-      return <Badge variant="warning" className="text-xs">Atenção {diasAberto}d</Badge>;
+      return <Badge variant="warning" className="text-xs">Ateno {diasAberto}d</Badge>;
     }
     return <Badge variant="outline" className="text-xs">{diasAberto}d</Badge>;
   };
@@ -125,7 +125,7 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Icon className="h-4 w-4" />
                   {column.title}
-                  <Badge variant="secondary" className="ml-auto">
+                  <Badge variant="secondary" className="ml-auto bg-destructive text-white border border-destructive/70 rounded-full px-2 py-0.5">
                     {columnTickets.length}
                   </Badge>
                 </CardTitle>
@@ -140,7 +140,7 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
                     <TicketCard 
                       key={ticket.id} 
                       ticket={ticket}
-                      canManage={canManageTicket(ticket.agente)}
+                      canManage={true}
                       onOpenDetails={onOpenDetails}
                       onResolve={(t) => requestStatusChange(t, 'Resolvido')}
                     />

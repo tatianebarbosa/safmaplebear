@@ -66,11 +66,11 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
     });
 
     if (!newUserId) {
-      toast.error('Não foi possível adicionar a licença. Tente novamente.');
+      toast.error('Nao foi possivel adicionar a licenca. Tente novamente.');
       return;
     }
 
-    toast.success(`${payload.user.name} adicionado(a) com licença desta escola.`);
+    toast.success(`${payload.user.name} adicionado(a) com licenca desta escola.`);
     showCanvaSyncReminder();
     setShowAddUserDialog(false);
   };
@@ -146,7 +146,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
               <div className="flex items-center gap-1 text-[7px] text-muted-foreground max-w-full overflow-hidden">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background border text-primary text-[9px] leading-none">
                   <Paperclip className="h-3 w-3" />
-                  Referências
+                  Referencias
                 </span>
               </div>
             )}
@@ -205,7 +205,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                   className="w-full justify-center rounded-full border-border/60 shadow-sm font-semibold text-foreground bg-muted hover:bg-muted/80"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Adicionar licen?a
+                  Adicionar Licença
                 </Button>
               )}
               <Button
@@ -232,8 +232,12 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
         open={showAddUserDialog}
         onOpenChange={setShowAddUserDialog}
         onSave={handleAddNewUser}
-        title="Adicionar licen?a"
+        title="Adicionar Licença"
       />
     </>
   );
 };
+
+
+
+

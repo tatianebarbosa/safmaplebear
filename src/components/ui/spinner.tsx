@@ -8,7 +8,7 @@ interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * Componente de Spinner para indicar estado de carregamento.
- * Ideal para ser usado dentro de botões.
+ * Ideal para ser usado dentro de botes.
  */
 export const Spinner: React.FC<SpinnerProps> = ({
   size = "md",
@@ -52,8 +52,8 @@ interface ButtonSpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Wrapper para botões que exibe um spinner e desabilita o botão
- * quando isLoading é true.
+ * Wrapper para botes que exibe um spinner e desabilita o boto
+ * quando isLoading  true.
  */
 export const ButtonSpinner: React.FC<ButtonSpinnerProps> = ({
   isLoading,
@@ -63,9 +63,9 @@ export const ButtonSpinner: React.FC<ButtonSpinnerProps> = ({
 }) => {
   const spinnerSize = size === "sm" ? "sm" : size === "lg" ? "lg" : "md";
   
-  // Determina a cor do spinner baseado no contexto do botão (simplificado)
-  // Em botões de cor, o spinner deve ser branco/foreground
-  const spinnerColor = "current"; // Usar 'current' para herdar a cor do texto do botão
+  // Determina a cor do spinner baseado no contexto do boto (simplificado)
+  // Em botes de cor, o spinner deve ser branco/foreground
+  const spinnerColor = "current"; // Usar 'current' para herdar a cor do texto do boto
 
   return (
     <div className="inline-flex items-center justify-center" {...props}>

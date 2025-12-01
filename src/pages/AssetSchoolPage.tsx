@@ -63,7 +63,7 @@ const AssetSchoolPage = () => {
       } catch (error) {
         toast({
           title: "Erro ao carregar escola",
-          description: "Confirme se o CSV de escolas está disponível em public/data.",
+          description: "Confirme se o CSV de escolas est dispon?vel em public/data.",
           variant: "destructive",
         });
       } finally {
@@ -134,7 +134,7 @@ const AssetSchoolPage = () => {
         assetName: asset.name,
         requesterTeam,
       });
-      toast({ title: "Registro atualizado", description: "As informações do contato foram salvas." });
+      toast({ title: "Registro atualizado", description: "As informaes do contato foram salvas." });
     } else {
       addContact({
         ...values,
@@ -169,7 +169,7 @@ const AssetSchoolPage = () => {
       <div className="layout-wide w-full py-8">
         <Card>
           <CardContent className="py-10 text-center space-y-3">
-            <p className="text-lg font-semibold">Ativo não encontrado</p>
+            <p className="text-lg font-semibold">Ativo no encontrado</p>
             <Button variant="outline" onClick={() => navigate("/saf/ativos")} className="gap-2">
               <ArrowLeft className="w-4 h-4" />
               Voltar para Ativos
@@ -194,7 +194,7 @@ const AssetSchoolPage = () => {
               <ArrowLeft className="w-4 h-4" />
               Voltar para escolas
             </Button>
-            <span>•</span>
+            <span></span>
             <span>{asset.name}</span>
           </div>
           <h1 className="text-3xl font-bold">{school?.name || "Carregando escola..."}</h1>
@@ -227,7 +227,7 @@ const AssetSchoolPage = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Clock3 className="w-4 h-4 text-primary" />
-              Último contato
+              ltimo contato
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -241,7 +241,7 @@ const AssetSchoolPage = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <User className="w-4 h-4 text-primary" />
-              Responsáveis do ativo
+              Responsveis do ativo
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -257,7 +257,7 @@ const AssetSchoolPage = () => {
               <div className="text-lg font-semibold">{defaultSafOwner}</div>
             )}
             <p className="text-xs text-muted-foreground mt-2">
-              Sugerido como responsável ao criar novos registros, mas pode ser ajustado em cada contato.
+              Sugerido como respons?vel ao criar novos registros, mas pode ser ajustado em cada contato.
             </p>
           </CardContent>
         </Card>
@@ -309,7 +309,7 @@ const AssetSchoolPage = () => {
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por texto / observação"
+                placeholder="Buscar por texto / observao"
                 value={filters.search}
                 onChange={(event) => setFilters((prev) => ({ ...prev, search: event.target.value }))}
                 className="pl-10"
@@ -324,7 +324,7 @@ const AssetSchoolPage = () => {
                 value={filters.startDate || ""}
                 onChange={(event) => setFilters((prev) => ({ ...prev, startDate: event.target.value }))}
               />
-              <span className="text-muted-foreground text-sm">até</span>
+              <span className="text-muted-foreground text-sm">at</span>
               <Input
                 type="date"
                 value={filters.endDate || ""}
@@ -349,7 +349,7 @@ const AssetSchoolPage = () => {
             <div className="text-center py-10 space-y-3">
               <p className="text-lg font-semibold">Nenhum registro ainda</p>
               <p className="text-muted-foreground">
-                Clique em &quot;Novo registro de contato&quot; para registrar a primeira interação deste ativo com a escola.
+                Clique em &quot;Novo registro de contato&quot; para registrar a primeira interao deste ativo com a escola.
               </p>
               <Button onClick={() => { setShowDialog(true); setEditingId(null); }} className="gap-2">
                 <Plus className="w-4 h-4" />
@@ -361,12 +361,12 @@ const AssetSchoolPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Data e horário</TableHead>
+                    <TableHead>Data e horrio</TableHead>
                     <TableHead>Canal</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Resultado</TableHead>
-                    <TableHead>Responsável SAF</TableHead>
-                    <TableHead>Ações</TableHead>
+                    <TableHead>Responsvel SAF</TableHead>
+                    <TableHead>Aes</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

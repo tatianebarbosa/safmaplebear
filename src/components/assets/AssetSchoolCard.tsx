@@ -66,7 +66,7 @@ export const AssetSchoolCard = ({
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="w-4 h-4 text-primary" />
-          <span>Último contato: {lastContactLabel}</span>
+          <span>ltimo contato: {lastContactLabel}</span>
         </div>
         <div className="pt-2">
           <Button onClick={onManage} className="w-full gap-2" size="sm">

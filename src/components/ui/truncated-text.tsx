@@ -16,7 +16,7 @@ interface TruncatedTextProps {
 }
 
 /**
- * Componente de texto truncado com tooltip automático
+ * Componente de texto truncado com tooltip automtico
  * Resolve problemas de overflow em cards e componentes
  */
 export const TruncatedText: React.FC<TruncatedTextProps> = ({
@@ -67,7 +67,7 @@ interface TruncatedEmailProps {
 
 /**
  * Componente especializado para emails
- * Trunca mantendo visível o domínio
+ * Trunca mantendo visvel o dom?nio
  */
 export const TruncatedEmail: React.FC<TruncatedEmailProps> = ({
   email,

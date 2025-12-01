@@ -1,16 +1,16 @@
 /**
- * Utilitários para manipulação de strings
- * Funções auxiliares para formatação, limpeza e transformação de texto
+ * Utilitrios para manipulao de strings
+ * Funes auxiliares para formatao, limpeza e transformao de texto
  */
 
 // ============================================================================
-// GERAÇÃO DE IDs
+// GERAO DE IDs
 // ============================================================================
 
 /**
- * Gera um ID único limpo (sem caracteres especiais)
+ * Gera um ID nico limpo (sem caracteres especiais)
  * @param prefix - Prefixo opcional para o ID
- * @returns ID único limpo
+ * @returns ID nico limpo
  * @example generateCleanId('user') // "user-abc123def456"
  */
 export function generateCleanId(prefix?: string): string {
@@ -47,14 +47,14 @@ export function generateUUID(): string {
 }
 
 // ============================================================================
-// FORMATAÇÃO DE TEXTO
+// FORMATAO DE TEXTO
 // ============================================================================
 
 /**
- * Converte texto para Title Case (primeira letra de cada palavra maiúscula)
+ * Converte texto para Title Case (primeira letra de cada palavra maiscula)
  * @param text - Texto a ser convertido
  * @returns Texto em Title Case
- * @example toTitleCase("olá mundo") // "Olá Mundo"
+ * @example toTitleCase("ol mundo") // "Ol Mundo"
  */
 export function toTitleCase(text: string): string {
   if (!text || typeof text !== 'string') {
@@ -72,7 +72,7 @@ export function toTitleCase(text: string): string {
  * Converte texto para camelCase
  * @param text - Texto a ser convertido
  * @returns Texto em camelCase
- * @example toCamelCase("olá mundo") // "oláMundo"
+ * @example toCamelCase("ol mundo") // "olMundo"
  */
 export function toCamelCase(text: string): string {
   if (!text || typeof text !== 'string') {
@@ -88,7 +88,7 @@ export function toCamelCase(text: string): string {
  * Converte texto para kebab-case
  * @param text - Texto a ser convertido
  * @returns Texto em kebab-case
- * @example toKebabCase("Olá Mundo") // "olá-mundo"
+ * @example toKebabCase("Ol Mundo") // "ol-mundo"
  */
 export function toKebabCase(text: string): string {
   if (!text || typeof text !== 'string') {
@@ -105,7 +105,7 @@ export function toKebabCase(text: string): string {
  * Converte texto para snake_case
  * @param text - Texto a ser convertido
  * @returns Texto em snake_case
- * @example toSnakeCase("Olá Mundo") // "olá_mundo"
+ * @example toSnakeCase("Ol Mundo") // "ol_mundo"
  */
 export function toSnakeCase(text: string): string {
   if (!text || typeof text !== 'string') {
@@ -119,14 +119,14 @@ export function toSnakeCase(text: string): string {
 }
 
 // ============================================================================
-// LIMPEZA E SANITIZAÇÃO
+// LIMPEZA E SANITIZAO
 // ============================================================================
 
 /**
  * Remove acentos de uma string
  * @param text - Texto a ser processado
  * @returns Texto sem acentos
- * @example removeAccents("São Paulo") // "Sao Paulo"
+ * @example removeAccents("So Paulo") // "Sao Paulo"
  */
 export function removeAccents(text: string): string {
   if (!text || typeof text !== 'string') {
@@ -137,10 +137,10 @@ export function removeAccents(text: string): string {
 }
 
 /**
- * Remove espaços extras de uma string
+ * Remove espaos extras de uma string
  * @param text - Texto a ser processado
- * @returns Texto sem espaços extras
- * @example removeExtraSpaces("Olá    mundo  ") // "Olá mundo"
+ * @returns Texto sem espaos extras
+ * @example removeExtraSpaces("Ol    mundo  ") // "Ol mundo"
  */
 export function removeExtraSpaces(text: string): string {
   if (!text || typeof text !== 'string') {
@@ -153,9 +153,9 @@ export function removeExtraSpaces(text: string): string {
 /**
  * Remove caracteres especiais de uma string
  * @param text - Texto a ser processado
- * @param keepSpaces - Se true, mantém espaços
+ * @param keepSpaces - Se true, mantm espaos
  * @returns Texto sem caracteres especiais
- * @example removeSpecialChars("Olá, mundo!") // "Olamundo"
+ * @example removeSpecialChars("Ol, mundo!") // "Olamundo"
  */
 export function removeSpecialChars(text: string, keepSpaces: boolean = false): string {
   if (!text || typeof text !== 'string') {
@@ -170,7 +170,7 @@ export function removeSpecialChars(text: string, keepSpaces: boolean = false): s
  * Limpa e normaliza uma string
  * @param text - Texto a ser limpo
  * @returns Texto limpo e normalizado
- * @example cleanString("  Olá,   Mundo!  ") // "Olá, Mundo!"
+ * @example cleanString("  Ol,   Mundo!  ") // "Ol, Mundo!"
  */
 export function cleanString(text: string): string {
   if (!text || typeof text !== 'string') {
@@ -181,14 +181,14 @@ export function cleanString(text: string): string {
 }
 
 // ============================================================================
-// TRUNCAMENTO E LIMITAÇÃO
+// TRUNCAMENTO E LIMITAO
 // ============================================================================
 
 /**
- * Trunca uma string adicionando reticências
+ * Trunca uma string adicionando reticncias
  * @param text - Texto a ser truncado
- * @param maxLength - Comprimento máximo
- * @param ellipsis - String de reticências (padrão: "...")
+ * @param maxLength - Comprimento mximo
+ * @param ellipsis - String de reticncias (padro: "...")
  * @returns Texto truncado
  * @example truncate("Texto muito longo", 10) // "Texto m..."
  */
@@ -207,8 +207,8 @@ export function truncate(text: string, maxLength: number, ellipsis: string = '..
 /**
  * Trunca uma string em uma palavra completa
  * @param text - Texto a ser truncado
- * @param maxLength - Comprimento máximo
- * @param ellipsis - String de reticências (padrão: "...")
+ * @param maxLength - Comprimento mximo
+ * @param ellipsis - String de reticncias (padro: "...")
  * @returns Texto truncado em palavra completa
  * @example truncateWords("Texto muito longo aqui", 15) // "Texto muito..."
  */
@@ -232,11 +232,11 @@ export function truncateWords(text: string, maxLength: number, ellipsis: string 
 }
 
 // ============================================================================
-// VALIDAÇÃO E VERIFICAÇÃO
+// VALIDAO E VERIFICAO
 // ============================================================================
 
 /**
- * Verifica se uma string está vazia ou contém apenas espaços
+ * Verifica se uma string est vazia ou contm apenas espaos
  * @param text - Texto a ser verificado
  * @returns true se vazio
  * @example isEmpty("   ") // true
@@ -246,9 +246,9 @@ export function isEmpty(text: string | null | undefined): boolean {
 }
 
 /**
- * Verifica se uma string contém apenas números
+ * Verifica se uma string contm apenas nmeros
  * @param text - Texto a ser verificado
- * @returns true se contém apenas números
+ * @returns true se contm apenas nmeros
  * @example isNumeric("12345") // true
  */
 export function isNumeric(text: string): boolean {
@@ -260,9 +260,9 @@ export function isNumeric(text: string): boolean {
 }
 
 /**
- * Verifica se uma string contém apenas letras
+ * Verifica se uma string contm apenas letras
  * @param text - Texto a ser verificado
- * @returns true se contém apenas letras
+ * @returns true se contm apenas letras
  * @example isAlpha("Texto") // true
  */
 export function isAlpha(text: string): boolean {
@@ -274,9 +274,9 @@ export function isAlpha(text: string): boolean {
 }
 
 /**
- * Verifica se uma string contém apenas letras e números
+ * Verifica se uma string contm apenas letras e nmeros
  * @param text - Texto a ser verificado
- * @returns true se contém apenas letras e números
+ * @returns true se contm apenas letras e nmeros
  * @example isAlphanumeric("Texto123") // true
  */
 export function isAlphanumeric(text: string): boolean {
@@ -288,13 +288,13 @@ export function isAlphanumeric(text: string): boolean {
 }
 
 // ============================================================================
-// EXTRAÇÃO E PARSING
+// EXTRAO E PARSING
 // ============================================================================
 
 /**
- * Extrai números de uma string
- * @param text - Texto do qual extrair números
- * @returns Array de números encontrados
+ * Extrai nmeros de uma string
+ * @param text - Texto do qual extrair nmeros
+ * @returns Array de nmeros encontrados
  * @example extractNumbers("Tenho 2 gatos e 3 cachorros") // [2, 3]
  */
 export function extractNumbers(text: string): number[] {
@@ -339,14 +339,14 @@ export function extractEmails(text: string): string[] {
 }
 
 // ============================================================================
-// COMPARAÇÃO E SIMILARIDADE
+// COMPARAO E SIMILARIDADE
 // ============================================================================
 
 /**
- * Calcula a distância de Levenshtein entre duas strings
+ * Calcula a distncia de Levenshtein entre duas strings
  * @param str1 - Primeira string
  * @param str2 - Segunda string
- * @returns Distância de Levenshtein
+ * @returns Distncia de Levenshtein
  * @example levenshteinDistance("kitten", "sitting") // 3
  */
 export function levenshteinDistance(str1: string, str2: string): number {
@@ -393,13 +393,13 @@ export function stringSimilarity(str1: string, str2: string): number {
 }
 
 // ============================================================================
-// MÁSCARAS E FORMATAÇÃO ESPECIAL
+// MSCARAS E FORMATAO ESPECIAL
 // ============================================================================
 
 /**
- * Aplica máscara a uma string
+ * Aplica mscara a uma string
  * @param value - Valor a ser mascarado
- * @param mask - Máscara a ser aplicada (# = número, A = letra, * = qualquer)
+ * @param mask - Mscara a ser aplicada (# = nmero, A = letra, * = qualquer)
  * @returns Valor mascarado
  * @example applyMask("12345678900", "###.###.###-##") // "123.456.789-00"
  */
@@ -444,7 +444,7 @@ export function applyMask(value: string, mask: string): string {
  * Pluraliza uma palavra baseado em quantidade
  * @param count - Quantidade
  * @param singular - Forma singular
- * @param plural - Forma plural (opcional, adiciona 's' por padrão)
+ * @param plural - Forma plural (opcional, adiciona 's' por padro)
  * @returns Palavra pluralizada
  * @example pluralize(1, "item") // "item"
  * @example pluralize(2, "item") // "itens"

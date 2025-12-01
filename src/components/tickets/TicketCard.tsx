@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { Ticket } from '@/types/tickets';
 import { format, differenceInDays } from 'date-fns';
 import { MoreVertical, Edit, CheckCircle } from 'lucide-react';
 import { getAgentDisplayName } from '@/data/teamMembers';
+import { useTicketStore } from '@/stores/ticketStore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +24,9 @@ interface TicketCardProps {
 }
 
 export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: TicketCardProps) => {
+  const { updateTicket } = useTicketStore();
+  const [isEditingDesc, setIsEditingDesc] = useState(false);
+  const [descDraft, setDescDraft] = useState(ticket.observacao || "");
   const {
     attributes,
     listeners,
@@ -37,13 +42,7 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: Tick
   };
 
   const getSLABadge = () => {
-    if (ticket.diasAberto >= 15) {
-      return <Badge variant="destructive" className="text-xs">Crítico {ticket.diasAberto}d</Badge>;
-    }
-    if (ticket.diasAberto >= 8) {
-      return <Badge variant="warning" className="text-xs">Atenção {ticket.diasAberto}d</Badge>;
-    }
-    return <Badge variant="outline" className="text-xs">{ticket.diasAberto}d</Badge>;
+    return null; // manter apenas o alerta vermelho de atraso
   };
 
   const getDueDateBadge = () => {
@@ -56,14 +55,7 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: Tick
     if (diffDays < 0) {
       return <Badge variant="destructive" className="text-xs">Atraso {Math.abs(diffDays)}d</Badge>;
     }
-    if (diffDays === 0) {
-      return <Badge variant="warning" className="text-xs">Vence hoje</Badge>;
-    }
-    if (diffDays <= 3) {
-      return <Badge variant="info" className="text-xs">Vence em {diffDays}d</Badge>;
-    }
-    
-    return null;
+    return null; // somente badge vermelha de atraso
   };
 
   const handleResolve = () => {
@@ -72,18 +64,48 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: Tick
 
   const agentLabel = getAgentDisplayName(ticket.agente);
 
+  useEffect(() => {
+    setDescDraft(ticket.observacao || "");
+    setIsEditingDesc(false);
+  }, [ticket.id, ticket.observacao]);
+
+  const startEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDescDraft(ticket.observacao || "");
+    setIsEditingDesc(true);
+  };
+
+  const saveDesc = () => {
+    const trimmed = descDraft.trim();
+    if (trimmed && trimmed !== ticket.observacao) {
+      updateTicket(ticket.id, { observacao: trimmed });
+    }
+    setIsEditingDesc(false);
+  };
+
+  const cancelEdit = () => {
+    setDescDraft(ticket.observacao || "");
+    setIsEditingDesc(false);
+  };
+
   return (
     <Card 
       ref={setNodeRef} 
       style={style} 
       className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
         isDragging ? 'opacity-50' : ''
-      } ${canManage ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
-      {...(canManage ? { ...attributes, ...listeners } : {})}
-      onClick={() => onOpenDetails?.(ticket)}
+      } cursor-grab active:cursor-grabbing`}
+      {...attributes}
+      {...listeners}
+      onClick={() => {
+        if (isEditingDesc) return;
+        onOpenDetails?.(ticket);
+      }}
     >
       <div className="flex items-start justify-between mb-2">
-        <span className="font-mono text-sm font-bold">{ticket.id}</span>
+        <span className="font-mono text-base font-bold px-3 py-1 rounded-full bg-muted text-foreground">
+          {ticket.id}
+        </span>
         <div className="flex items-center gap-1">
           {getSLABadge()}
           {getDueDateBadge()}
@@ -111,8 +133,30 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: Tick
         </div>
       </div>
       
-      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-        {ticket.observacao}
+      <p className="text-sm text-muted-foreground mb-3">
+        {isEditingDesc ? (
+          <textarea
+            className="w-full rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+            autoFocus
+            value={descDraft}
+            onChange={(e) => setDescDraft(e.target.value)}
+            onBlur={saveDesc}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveDesc();
+              }
+              if (e.key === 'Escape') {
+                e.preventDefault();
+                cancelEdit();
+              }
+            }}
+          />
+        ) : (
+          <span onDoubleClick={startEdit} className="block">
+            {ticket.observacao}
+          </span>
+        )}
       </p>
       
       <div className="flex items-center justify-between text-xs text-muted-foreground">

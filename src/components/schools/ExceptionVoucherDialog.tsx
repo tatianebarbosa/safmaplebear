@@ -27,29 +27,29 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
   });
 
   const handleSubmit = () => {
-    // Validações
+    // Validaes
     if (!formData.voucherCode.trim()) {
-      toast.error("Código do voucher é obrigatório");
+      toast.error("Cdigo do voucher  obrigatrio");
       return;
     }
     
     if (!formData.expiryDate) {
-      toast.error("Data de validade é obrigatória");
+      toast.error("Data de validade  obrigatria");
       return;
     }
     
     if (!formData.requester.trim()) {
-      toast.error("Solicitante é obrigatório");
+      toast.error("Solicitante  obrigatrio");
       return;
     }
     
     if (formData.requestSource === 'email' && !formData.emailTitle.trim()) {
-      toast.error("Título do email é obrigatório");
+      toast.error("Ttulo do email  obrigatrio");
       return;
     }
     
     if (formData.requestSource === 'ticket' && !formData.ticketNumber.trim()) {
-      toast.error("Número do ticket é obrigatório");
+      toast.error("Nmero do ticket  obrigatrio");
       return;
     }
     
@@ -93,7 +93,7 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
     });
     
     onClose();
-    toast.success("Exceção de voucher criada com sucesso!");
+    toast.success("Exceo de voucher criada com sucesso!");
   };
 
   const handleClose = () => {
@@ -113,7 +113,7 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Adicionar Exceção de Voucher</DialogTitle>
+          <DialogTitle>Adicionar Exceo de Voucher</DialogTitle>
         </DialogHeader>
         
         {school && (
@@ -126,7 +126,7 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="voucherCode">Código do Voucher *</Label>
+              <Label htmlFor="voucherCode">Cdigo do Voucher *</Label>
               <Input
                 id="voucherCode"
                 placeholder="Ex: MBSP2026001"
@@ -177,7 +177,7 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
           
           {formData.requestSource === 'email' && (
             <div>
-              <Label htmlFor="emailTitle">Título do Email *</Label>
+              <Label htmlFor="emailTitle">Ttulo do Email *</Label>
               <Input
                 id="emailTitle"
                 placeholder="Assunto do email"
@@ -189,7 +189,7 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
           
           {formData.requestSource === 'ticket' && (
             <div>
-              <Label htmlFor="ticketNumber">Número do Ticket *</Label>
+              <Label htmlFor="ticketNumber">Nmero do Ticket *</Label>
               <Input
                 id="ticketNumber"
                 placeholder="Ex: #12345"
@@ -220,7 +220,7 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
               Cancelar
             </Button>
             <Button onClick={handleSubmit}>
-              Criar Exceção
+              Criar Exceo
             </Button>
           </div>
         </div>

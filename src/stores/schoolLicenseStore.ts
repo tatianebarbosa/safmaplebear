@@ -15,6 +15,7 @@ import type { OfficialSchool, OfficialUser } from "@/types/officialData";
 import {
   getLicenseLimitForSchool,
   getMaxLicensesPerSchool,
+  subscribeToLicenseLimit,
 } from "@/config/licenseLimits";
 import {
   processSchoolsWithUsers,
@@ -53,13 +54,15 @@ const resolveUserCreatedAt = (user: OfficialUser): string => {
 };
 
 type AddUserMeta = {
-  origemSolicitacao: "Ticket SAF" | "E-mail";
+  origemSolicitacao: "Ticket SAF" | "E-mail" | "Ativo";
   solicitadoPorNome: string;
   solicitadoPorEmail: string;
   observacao: string;
   performedBy?: string;
   ticketNumber?: string;
   emailTitle?: string;
+  assetId?: string;
+  assetName?: string;
 };
 
 type ActionMeta = {
@@ -283,7 +286,33 @@ const recordLicenseAction = (
 
 export const useSchoolLicenseStore = create<SchoolLicenseState>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      const syncLicenseLimit = (limit: number) => {
+        const safeLimit = Math.max(1, Math.floor(limit));
+        set((state) => {
+          const currentSchools = state?.schools?.length ? state.schools : seedSchools;
+          let changed = false;
+          const updated = currentSchools.map((school) => {
+            if (school.id === centralSchool.id) return school;
+            if (school.id === "no-school") {
+              const newTotal = Math.max(safeLimit, school.users.length);
+              if (school.totalLicenses === newTotal) return school;
+              changed = true;
+              return { ...school, totalLicenses: newTotal };
+            }
+            if (school.totalLicenses === safeLimit) return school;
+            changed = true;
+            return { ...school, totalLicenses: safeLimit };
+          });
+          return changed ? { schools: updated } : state;
+        });
+      };
+
+      // Reage a mudanças externas no limite (localStorage/env) e aplica ao iniciar
+      subscribeToLicenseLimit(() => syncLicenseLimit(getMaxLicensesPerSchool()));
+      syncLicenseLimit(getMaxLicensesPerSchool());
+
+      return {
       schools: seedSchools,
       justifications: [],
       history: [], // InicializaÃ§Ã£o do novo estado
@@ -330,6 +359,8 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
               schools: ensureCentralSchool(convertedSchools),
               loading: false,
             });
+            // Garante que o limite global seja aplicado aos dados carregados
+            syncLicenseLimit(licenseLimit);
           };
 
           // 1) Tentar carregar dados integrados do backend (/api/canva/dados-recentes)
@@ -436,11 +467,30 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           isCompliant: isEmailCompliantSaf(user.email),
         };
 
+        const originDetails =
+          meta.origemSolicitacao === "Ativo"
+            ? `Origem: ${meta.origemSolicitacao}${meta.assetName ? ` (${meta.assetName})` : ""}.`
+            : `Origem: ${meta.origemSolicitacao}.`;
+
+        const justificationParts: string[] = [];
+        if (meta.origemSolicitacao === "Ticket SAF" && meta.ticketNumber?.trim()) {
+          justificationParts.push(`Ticket: ${meta.ticketNumber}`);
+        }
+        if (meta.origemSolicitacao === "E-mail" && meta.emailTitle?.trim()) {
+          justificationParts.push(`Email: ${meta.emailTitle}`);
+        }
+        if (meta.origemSolicitacao === "Ativo" && (meta.assetName || meta.assetId)) {
+          justificationParts.push(`Ativo: ${meta.assetName || meta.assetId}`);
+        }
+        if (meta.observacao?.trim()) {
+          justificationParts.push(`Obs: ${meta.observacao.trim()}`);
+        }
+
         state.addHistoryEntry({
           schoolId: school.id,
           schoolName: school.name,
           action: "ADD_USER",
-          details: `Novo usuario adicionado: ${user.name} (${user.email}). Origem: ${meta.origemSolicitacao}. Solicitado por: ${meta.solicitadoPorNome} (${meta.solicitadoPorEmail}). Motivo: ${meta.observacao}.`,
+          details: `Novo usuario adicionado: ${user.name} (${user.email}). ${originDetails} Solicitado por: ${meta.solicitadoPorNome} (${meta.solicitadoPorEmail}). Motivo: ${meta.observacao}.`,
           performedBy: meta.performedBy || "Sistema/Usuario",
           changeSet: {
             type: "ADD_USER",
@@ -449,13 +499,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         });
 
         const justificationText =
-          meta.ticketNumber?.trim()
-            ? `Ticket: ${meta.ticketNumber}`
-            : meta.emailTitle?.trim()
-            ? `Email: ${meta.emailTitle}`
-            : meta.observacao?.trim()
-            ? meta.observacao.trim()
-            : "Justificativa nao informada";
+          justificationParts.join(" | ") || "Justificativa nao informada";
 
         recordLicenseAction({
           schoolId: school.id,
@@ -918,14 +962,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
 
       setUsageData: (data) => set({ usageData: data }),
       applyLicenseLimit: (limit) => {
-        const safeLimit = Math.max(1, Math.floor(limit));
-        set((state) => ({
-          schools: state.schools.map((school) =>
-            school.id === centralSchool.id
-              ? school
-              : { ...school, totalLicenses: safeLimit }
-          ),
-        }));
+        syncLicenseLimit(limit);
       },
 
       // Helpers
@@ -983,10 +1020,18 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           .sort((a, b) => b.count - a.count);
       },
       isEmailValid: (email: string) => isEmailCompliantSaf(email),
-    }),
+      };
+    },
     {
-      name: "school-license-storage",
-      version: 1,
+      name: "school-license-storage-v2",
+      version: 2,
+      onRehydrateStorage: () => (state) => {
+        // Reaplica o limite salvo ao hidratar para atualizar totais das escolas persistidas
+        if (state?.applyLicenseLimit) {
+          const limit = getMaxLicensesPerSchool();
+          state.applyLicenseLimit(limit);
+        }
+      },
     }
   )
 );

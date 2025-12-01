@@ -68,7 +68,7 @@ const VoucherManagement = () => {
     localStorage.setItem('saf_vouchers', JSON.stringify(newVouchers));
   };
 
-  // Registrar histórico de edição
+  // Registrar histrico de edio
   const addEditHistory = (voucherId: string, field: string, oldValue: any, newValue: any, reason: string = '') => {
     const historyRecord: EditHistoryRecord = {
       id: `edit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -102,7 +102,7 @@ const VoucherManagement = () => {
       // Editar voucher existente
       const updatedVouchers = vouchers.map(voucher => {
         if (voucher.id === editingVoucher.id) {
-          // Registrar mudanças no histórico
+          // Registrar mudanas no histrico
           Object.keys(formData).forEach(key => {
             const fieldKey = key as keyof typeof formData;
             if (formData[fieldKey] !== (voucher as any)[fieldKey]) {
@@ -181,7 +181,7 @@ const VoucherManagement = () => {
   const updateStatus = (id: string, status: VoucherRecord['status']) => {
     const updatedVouchers = vouchers.map(voucher => {
       if (voucher.id === id) {
-        addEditHistory(id, 'status', voucher.status, status, 'Atualização de status');
+        addEditHistory(id, 'status', voucher.status, status, 'Atualizao de status');
         return {
           ...voucher,
           status,
@@ -219,7 +219,7 @@ const VoucherManagement = () => {
 
   const exportVouchers = () => {
     const csvData = [
-      ['Escola', 'Tipo', 'Valor', 'Status', 'Solicitante', 'Data', 'Código', 'Descrição'],
+      ['Escola', 'Tipo', 'Valor', 'Status', 'Solicitante', 'Data', 'Cdigo', 'Descrio'],
       ...vouchers.map(v => [
         v.school,
         v.type,
@@ -263,7 +263,7 @@ const VoucherManagement = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza que deseja remover este voucher?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação é irreversível. O voucher será permanentemente removido do sistema.
+              Esta ao  irreversvel. O voucher ser permanentemente removido do sistema.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -277,7 +277,7 @@ const VoucherManagement = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Gerenciamento de Vouchers</h1>
-          <p className="text-muted-foreground">Controle e histórico de vouchers para escolas</p>
+          <p className="text-muted-foreground">Controle e histrico de vouchers para escolas</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={exportVouchers} variant="outline">
@@ -305,7 +305,7 @@ const VoucherManagement = () => {
               <DialogHeader>
                 <DialogTitle>{editingVoucher ? 'Editar' : 'Novo'} Voucher</DialogTitle>
                 <DialogDescription>
-                  {editingVoucher ? 'Edite as informações do voucher' : 'Crie um novo voucher para uma escola'}
+                  {editingVoucher ? 'Edite as informaes do voucher' : 'Crie um novo voucher para uma escola'}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -354,22 +354,22 @@ const VoucherManagement = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="description">Descrição</Label>
+                  <Label htmlFor="description">Descrio</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Detalhes da solicitação..."
+                    placeholder="Detalhes da solicitao..."
                   />
                 </div>
                 {editingVoucher && (
                   <div>
-                    <Label htmlFor="reason">Motivo da Alteração</Label>
+                    <Label htmlFor="reason">Motivo da Alterao</Label>
                     <Input
                       id="reason"
                       value={formData.reason}
                       onChange={(e) => setFormData({...formData, reason: e.target.value})}
-                      placeholder="Por que está fazendo esta alteração?"
+                      placeholder="Por que est fazendo esta alterao?"
                       required
                     />
                   </div>
@@ -383,7 +383,7 @@ const VoucherManagement = () => {
         </div>
       </div>
 
-      {/* Estatísticas */}
+      {/* Estatsticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">
@@ -451,7 +451,7 @@ const VoucherManagement = () => {
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span>Solicitado por: {voucher.requestedBy}</span>
                     <span>Criado: {voucher.createdAt}</span>
-                    {voucher.voucherCode && <span>Código: {voucher.voucherCode}</span>}
+                    {voucher.voucherCode && <span>Cdigo: {voucher.voucherCode}</span>}
                     {voucher.editHistory.length > 0 && (
                       <Button
                         variant="link"
@@ -459,7 +459,7 @@ const VoucherManagement = () => {
                         className="h-auto p-0 text-xs"
                         onClick={() => setViewHistory(voucher.id)}
                       >
-                        Ver histórico ({voucher.editHistory.length})
+                        Ver histrico ({voucher.editHistory.length})
                       </Button>
                     )}
                   </div>
@@ -512,14 +512,14 @@ const VoucherManagement = () => {
         ))}
       </div>
 
-      {/* Dialog do Histórico */}
+      {/* Dialog do Histrico */}
       {viewHistory && (
         <Dialog open={!!viewHistory} onOpenChange={() => setViewHistory(null)}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Histórico de Edições</DialogTitle>
+              <DialogTitle>Histrico de Edies</DialogTitle>
               <DialogDescription>
-                Todas as alterações realizadas neste voucher
+                Todas as alteraes realizadas neste voucher
               </DialogDescription>
             </DialogHeader>
             <div className="max-h-96 overflow-y-auto space-y-3">

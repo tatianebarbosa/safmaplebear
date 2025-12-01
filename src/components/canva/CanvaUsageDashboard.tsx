@@ -106,12 +106,12 @@ export const CanvaUsageDashboard = ({
   };
 
   const clusterOptions = [
-    { value: "Implantação", label: "Implantação" },
+    { value: "Implantao", label: "Implantao" },
     { value: "Alta Performance", label: "Alta Performance" },
     { value: "Potente", label: "Potente" },
     { value: "Desenvolvimento", label: "Desenvolvimento" },
     { value: "Alerta", label: "Alerta" },
-    { value: "Outros/Implantação", label: "Outros/Implantação" },
+    { value: "Outros/Implantao", label: "Outros/Implantao" },
   ];
 
   const loadDashboardData = useCallback(async () => {
@@ -180,7 +180,7 @@ export const CanvaUsageDashboard = ({
       period: point.period,
       designs: Math.max(0, point.designs ?? 0),
     }));
-    // Limita para os pontos mais recentes para evitar gráfico muito longo
+    // Limita para os pontos mais recentes para evitar grfico muito longo
     return sanitized.slice(-24);
   }, [timeData]);
 
@@ -298,7 +298,7 @@ export const CanvaUsageDashboard = ({
     navigator.clipboard
       ?.writeText(email)
       .then(() => toast.success("Email copiado para comunicar o destaque."))
-      .catch(() => toast.error("Nao foi possivel copiar o email agora."));
+      .catch(() => toast.error("N?o foi possivel copiar o email agora."));
   };
 
   const rankStyle = (position: number) => {
@@ -677,7 +677,7 @@ export const CanvaUsageDashboard = ({
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">—</div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground"></div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">Aguardando dado</div>
                     </div>
                   );

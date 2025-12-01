@@ -1,20 +1,20 @@
 /**
- * Utilitários para geração e download de arquivos (CSV, JSON, etc)
- * Centraliza lógica duplicada encontrada em múltiplos componentes
+ * Utilitrios para gerao e download de arquivos (CSV, JSON, etc)
+ * Centraliza lgica duplicada encontrada em mltiplos componentes
  */
 
 // ============================================================================
-// CONVERSÃO DE DADOS
+// CONVERSO DE DADOS
 // ============================================================================
 
 /**
  * Converte array bidimensional em string CSV
  * @param data - Array de arrays representando linhas e colunas
- * @param delimiter - Delimitador a ser usado (padrão: ponto-e-vírgula)
+ * @param delimiter - Delimitador a ser usado (padro: ponto-e-vrgula)
  * @returns String no formato CSV
  * @example 
- * arrayToCSV([['Nome', 'Idade'], ['João', '30'], ['Maria', '25']])
- * // "Nome;Idade\nJoão;30\nMaria;25"
+ * arrayToCSV([['Nome', 'Idade'], ['Joo', '30'], ['Maria', '25']])
+ * // "Nome;Idade\nJoo;30\nMaria;25"
  */
 export function arrayToCSV(data: string[][], delimiter: string = ';'): string {
   if (!data || !Array.isArray(data) || data.length === 0) {
@@ -27,10 +27,10 @@ export function arrayToCSV(data: string[][], delimiter: string = ';'): string {
 }
 
 /**
- * Sanitiza uma célula para uso em CSV
- * @param cell - Conteúdo da célula
- * @returns Célula sanitizada e escapada
- * @example sanitizeCSVCell('Texto, com vírgula') // '"Texto, com vírgula"'
+ * Sanitiza uma clula para uso em CSV
+ * @param cell - Contedo da clula
+ * @returns Clula sanitizada e escapada
+ * @example sanitizeCSVCell('Texto, com vrgula') // '"Texto, com vrgula"'
  */
 export function sanitizeCSVCell(cell: string | number | boolean): string {
   if (cell === null || cell === undefined) {
@@ -39,7 +39,7 @@ export function sanitizeCSVCell(cell: string | number | boolean): string {
   
   const cellStr = String(cell);
   
-  // Se contém vírgula, ponto-e-vírgula, aspas ou quebra de linha, envolve em aspas
+  // Se contm vrgula, ponto-e-vrgula, aspas ou quebra de linha, envolve em aspas
   if (cellStr.includes(',') || cellStr.includes(';') || cellStr.includes('"') || cellStr.includes('\n')) {
     // Escapa aspas duplicando-as
     return `"${cellStr.replace(/"/g, '""')}"`;
@@ -49,10 +49,10 @@ export function sanitizeCSVCell(cell: string | number | boolean): string {
 }
 
 /**
- * Sanitiza texto para uso seguro em CSV (substitui vírgulas)
+ * Sanitiza texto para uso seguro em CSV (substitui vrgulas)
  * @param text - Texto a ser sanitizado
- * @returns Texto com vírgulas substituídas por ponto-e-vírgula
- * @example sanitizeForCSV("Texto, com vírgula") // "Texto; com vírgula"
+ * @returns Texto com vrgulas substitudas por ponto-e-vrgula
+ * @example sanitizeForCSV("Texto, com vrgula") // "Texto; com vrgula"
  */
 export function sanitizeForCSV(text: string): string {
   if (!text || typeof text !== 'string') {
@@ -69,10 +69,10 @@ export function sanitizeForCSV(text: string): string {
 /**
  * Faz download de um arquivo CSV
  * @param data - Array bidimensional com os dados
- * @param filename - Nome do arquivo (sem extensão)
- * @param delimiter - Delimitador do CSV (padrão: ponto-e-vírgula)
+ * @param filename - Nome do arquivo (sem extenso)
+ * @param delimiter - Delimitador do CSV (padro: ponto-e-vrgula)
  * @example 
- * downloadCSV([['Nome', 'Email'], ['João', 'joao@email.com']], 'usuarios')
+ * downloadCSV([['Nome', 'Email'], ['Joo', 'joao@email.com']], 'usu?rios')
  */
 export function downloadCSV(
   data: string[][], 
@@ -87,10 +87,10 @@ export function downloadCSV(
 /**
  * Faz download de um arquivo JSON
  * @param data - Objeto ou array a ser exportado
- * @param filename - Nome do arquivo (sem extensão)
- * @param pretty - Se true, formata o JSON com indentação
+ * @param filename - Nome do arquivo (sem extenso)
+ * @param pretty - Se true, formata o JSON com indentao
  * @example 
- * downloadJSON({ name: 'João', age: 30 }, 'usuario')
+ * downloadJSON({ name: 'Joo', age: 30 }, 'usu?rio')
  */
 export function downloadJSON(
   data: any, 
@@ -107,11 +107,11 @@ export function downloadJSON(
 
 /**
  * Faz download de um arquivo de texto
- * @param content - Conteúdo do arquivo
- * @param filename - Nome do arquivo com extensão
- * @param mimeType - Tipo MIME do arquivo (padrão: text/plain)
+ * @param content - Contedo do arquivo
+ * @param filename - Nome do arquivo com extenso
+ * @param mimeType - Tipo MIME do arquivo (padro: text/plain)
  * @example 
- * downloadTextFile('Conteúdo do arquivo', 'documento.txt')
+ * downloadTextFile('Contedo do arquivo', 'documento.txt')
  */
 export function downloadTextFile(
   content: string, 
@@ -125,9 +125,9 @@ export function downloadTextFile(
 /**
  * Faz download de um Blob
  * @param blob - Blob a ser baixado
- * @param filename - Nome do arquivo com extensão
+ * @param filename - Nome do arquivo com extenso
  * @example 
- * downloadBlob(new Blob(['conteúdo']), 'arquivo.txt')
+ * downloadBlob(new Blob(['contedo']), 'arquivo.txt')
  */
 export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
@@ -141,7 +141,7 @@ export function downloadBlob(blob: Blob, filename: string): void {
   link.click();
   document.body.removeChild(link);
   
-  // Limpa o URL temporário após um pequeno delay
+  // Limpa o URL temporrio aps um pequeno delay
   setTimeout(() => {
     URL.revokeObjectURL(url);
   }, 100);
@@ -150,7 +150,7 @@ export function downloadBlob(blob: Blob, filename: string): void {
 /**
  * Faz download de um arquivo a partir de uma URL de dados (data URL)
  * @param dataUrl - URL de dados (data:...)
- * @param filename - Nome do arquivo com extensão
+ * @param filename - Nome do arquivo com extenso
  * @example 
  * downloadFromDataURL('data:text/plain;base64,SGVsbG8=', 'arquivo.txt')
  */
@@ -167,13 +167,13 @@ export function downloadFromDataURL(dataUrl: string, filename: string): void {
 }
 
 // ============================================================================
-// UTILITÁRIOS DE NOME DE ARQUIVO
+// UTILITRIOS DE NOME DE ARQUIVO
 // ============================================================================
 
 /**
  * Gera nome de arquivo com timestamp
  * @param prefix - Prefixo do nome do arquivo
- * @param extension - Extensão do arquivo (com ou sem ponto)
+ * @param extension - Extenso do arquivo (com ou sem ponto)
  * @returns Nome de arquivo com data
  * @example 
  * generateFilenameWithDate('relatorio', 'csv') 
@@ -188,7 +188,7 @@ export function generateFilenameWithDate(prefix: string, extension: string): str
 /**
  * Gera nome de arquivo com timestamp completo
  * @param prefix - Prefixo do nome do arquivo
- * @param extension - Extensão do arquivo (com ou sem ponto)
+ * @param extension - Extenso do arquivo (com ou sem ponto)
  * @returns Nome de arquivo com data e hora
  * @example 
  * generateFilenameWithTimestamp('backup', 'json') 
@@ -203,11 +203,11 @@ export function generateFilenameWithTimestamp(prefix: string, extension: string)
 }
 
 /**
- * Sanitiza nome de arquivo removendo caracteres inválidos
+ * Sanitiza nome de arquivo removendo caracteres invlidos
  * @param filename - Nome do arquivo a ser sanitizado
- * @returns Nome de arquivo válido
+ * @returns Nome de arquivo vlido
  * @example 
- * sanitizeFilename('Relatório: 2025/11') 
+ * sanitizeFilename('Relatrio: 2025/11') 
  * // "Relatorio-2025-11"
  */
 export function sanitizeFilename(filename: string): string {
@@ -218,9 +218,9 @@ export function sanitizeFilename(filename: string): string {
   return filename
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-    .replace(/[^a-zA-Z0-9-_\.]/g, '-') // Substitui caracteres inválidos por hífen
-    .replace(/-+/g, '-') // Remove hífens duplicados
-    .replace(/^-|-$/g, ''); // Remove hífens no início e fim
+    .replace(/[^a-zA-Z0-9-_\.]/g, '-') // Substitui caracteres invlidos por hfen
+    .replace(/-+/g, '-') // Remove hfens duplicados
+    .replace(/^-|-$/g, ''); // Remove hfens no incio e fim
 }
 
 // ============================================================================
@@ -228,9 +228,9 @@ export function sanitizeFilename(filename: string): string {
 // ============================================================================
 
 /**
- * Lê arquivo como texto
+ * L arquivo como texto
  * @param file - Arquivo a ser lido
- * @returns Promise com o conteúdo do arquivo
+ * @returns Promise com o contedo do arquivo
  * @example 
  * const content = await readFileAsText(file);
  */
@@ -251,7 +251,7 @@ export function readFileAsText(file: File): Promise<string> {
 }
 
 /**
- * Lê arquivo como Data URL (base64)
+ * L arquivo como Data URL (base64)
  * @param file - Arquivo a ser lido
  * @returns Promise com a Data URL
  * @example 
@@ -274,9 +274,9 @@ export function readFileAsDataURL(file: File): Promise<string> {
 }
 
 /**
- * Lê arquivo CSV e converte para array bidimensional
+ * L arquivo CSV e converte para array bidimensional
  * @param file - Arquivo CSV a ser lido
- * @param delimiter - Delimitador usado no CSV (padrão: ponto-e-vírgula)
+ * @param delimiter - Delimitador usado no CSV (padro: ponto-e-vrgula)
  * @returns Promise com array bidimensional
  * @example 
  * const data = await parseCSVFile(file);
@@ -294,14 +294,14 @@ export async function parseCSVFile(
 }
 
 // ============================================================================
-// VALIDAÇÃO DE ARQUIVOS
+// VALIDAO DE ARQUIVOS
 // ============================================================================
 
 /**
  * Valida tipo de arquivo
  * @param file - Arquivo a ser validado
  * @param allowedTypes - Array de tipos MIME permitidos
- * @returns true se o tipo é permitido
+ * @returns true se o tipo  permitido
  * @example 
  * validateFileType(file, ['text/csv', 'application/csv'])
  */
@@ -312,10 +312,10 @@ export function validateFileType(file: File, allowedTypes: string[]): boolean {
 /**
  * Valida tamanho de arquivo
  * @param file - Arquivo a ser validado
- * @param maxSizeInMB - Tamanho máximo em MB
- * @returns true se o tamanho é permitido
+ * @param maxSizeInMB - Tamanho mximo em MB
+ * @returns true se o tamanho  permitido
  * @example 
- * validateFileSize(file, 5) // Máximo 5MB
+ * validateFileSize(file, 5) // Mximo 5MB
  */
 export function validateFileSize(file: File, maxSizeInMB: number): boolean {
   const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
@@ -325,7 +325,7 @@ export function validateFileSize(file: File, maxSizeInMB: number): boolean {
 /**
  * Valida arquivo CSV
  * @param file - Arquivo a ser validado
- * @returns true se é um CSV válido
+ * @returns true se  um CSV vlido
  * @example 
  * validateCSVFile(file)
  */
@@ -337,7 +337,7 @@ export function validateCSVFile(file: File): boolean {
 /**
  * Valida arquivo JSON
  * @param file - Arquivo a ser validado
- * @returns true se é um JSON válido
+ * @returns true se  um JSON vlido
  * @example 
  * validateJSONFile(file)
  */

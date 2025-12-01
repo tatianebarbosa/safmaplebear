@@ -27,7 +27,7 @@ const seedInvoices: CanvaInvoice[] = [
     amount: 289.90,
     currency: 'BRL',
     description: 'Canva Pro',
-    team: 'Maple Bear | Comunicação',
+    team: 'Maple Bear | Comunicao',
     email: 'comunicacao@maplebear.com.br',
     status: 'paid',
     period: {
@@ -57,7 +57,7 @@ const seedInvoices: CanvaInvoice[] = [
     date: '2024-03-10',
     amount: 525.10,
     currency: 'BRL',
-    description: 'Canva for Teams - Expansão',
+    description: 'Canva for Teams - Expanso',
     team: 'Educacional',
     email: 'educacional@maplebear.com.br',
     status: 'paid',
@@ -72,7 +72,7 @@ export const useInvoiceStore = create<InvoiceState>()(
   persist(
     (set, get) => ({
       invoices: seedInvoices,
-      annualBudget: 10000, // R$ 10.000 de orçamento anual
+      annualBudget: 10000, // R$ 10.000 de oramento anual
 
       addInvoice: (invoice) => set(state => ({
         invoices: [...state.invoices, { ...invoice, id: Date.now().toString() }]
@@ -100,11 +100,11 @@ export const useInvoiceStore = create<InvoiceState>()(
         const averageMonthly = totalYearCost / 12;
         const totalInvoices = yearInvoices.length;
         
-        // Calcular custo por licença (assumindo dados do sistema de licenças)
-        const estimatedLicenses = 50; // Seria obtido do store de licenças
+        // Calcular custo por licen?a (assumindo dados do sistema de licen?as)
+        const estimatedLicenses = 50; // Seria obtido do store de licen?as
         const costPerLicense = totalYearCost / estimatedLicenses;
 
-        // Tendência mensal
+        // Tendncia mensal
         const monthlyData: { [key: string]: number } = {};
         yearInvoices.forEach(inv => {
           const month = new Date(inv.date).toLocaleDateString('pt-BR', { 
@@ -151,23 +151,23 @@ export const useInvoiceStore = create<InvoiceState>()(
 
         const alerts: BudgetAlert[] = [];
 
-        // Alerta de orçamento ultrapassado
+        // Alerta de oramento ultrapassado
         if (yearSpending > annualBudget) {
           alerts.push({
             id: 'over_budget',
             type: 'over_budget',
-            message: `Orçamento anual ultrapassado em R$ ${(yearSpending - annualBudget).toFixed(2)}`,
+            message: `Oramento anual ultrapassado em R$ ${(yearSpending - annualBudget).toFixed(2)}`,
             severity: 'high',
             amount: yearSpending,
             threshold: annualBudget
           });
         }
-        // Alerta de aproximação do limite
+        // Alerta de aproximao do limite
         else if (yearSpending > annualBudget * 0.8) {
           alerts.push({
             id: 'approaching_limit',
             type: 'approaching_limit',
-            message: `Usando ${((yearSpending / annualBudget) * 100).toFixed(1)}% do orçamento anual`,
+            message: `Usando ${((yearSpending / annualBudget) * 100).toFixed(1)}% do oramento anual`,
             severity: 'medium',
             amount: yearSpending,
             threshold: annualBudget

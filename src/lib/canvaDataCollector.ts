@@ -272,9 +272,33 @@ export class CanvaDataCollector {
   }
 
   private async fetchHistory(): Promise<RawHistoryEntry[]> {
-    const response = await fetch('/data/canva_history.json');
+    // Primeiro tenta um endpoint dinâmico (se existir) e depois faz fallback para o arquivo estático.
+    try {
+      const apiResponse = await fetch(`/api/canva/history?ts=${Date.now()}`, { cache: 'no-store' });
+      if (apiResponse.ok) {
+        return apiResponse.json();
+      }
+    } catch (error) {
+      console.warn('Falha ao buscar histórico dinâmico, usando fallback estático.', error);
+    }
+
+    const cacheBuster = Date.now();
+    const response = await fetch(`/data/canva_history.json?t=${cacheBuster}`, {
+      cache: 'no-store',
+    });
     if (!response.ok) return [];
     return response.json();
+  }
+
+  private async fetchRemoteUploadHistory(): Promise<UploadHistoryEntry[]> {
+    try {
+      const response = await fetch(`/api/canva/upload-history?ts=${Date.now()}`, { cache: 'no-store' });
+      if (!response.ok) return [];
+      return response.json();
+    } catch (error) {
+      console.warn('Falha ao buscar histórico de uploads compartilhado; usando apenas local.', error);
+      return [];
+    }
   }
 
   async coletarDadosCanva(periodoFiltro?: string): Promise<CanvaData | null> {
@@ -332,7 +356,17 @@ export class CanvaDataCollector {
 
   async obterHistorico(): Promise<CanvaHistorico[]> {
     const raw = await this.fetchHistory();
-    const uploadHistory = this.loadUploadHistory();
+    const remoteUploadHistory = await this.fetchRemoteUploadHistory();
+    const localUploadHistory = this.loadUploadHistory();
+    // Mescla remoto + local e remove duplicados por id (remoto prevalece)
+    const mergedUploadHistoryMap = new Map<string, UploadHistoryEntry>();
+    [...remoteUploadHistory, ...localUploadHistory].forEach((item) => {
+      if (!mergedUploadHistoryMap.has(item.id)) {
+        mergedUploadHistoryMap.set(item.id, item);
+      }
+    });
+    const uploadHistory = Array.from(mergedUploadHistoryMap.values());
+
     const uploadEntries: CanvaHistorico[] = uploadHistory.map((upload) => {
       const date = new Date(upload.uploadedAt);
       const admins = Math.floor(upload.totalPessoas * 0.05);

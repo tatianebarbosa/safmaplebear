@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useToast } from "@/hooks/use-toast";
 import { useTicketStore } from "@/stores/ticketStore";
 import type { Ticket } from "@/types/tickets";
+import { fetchTicketsFromApi } from "@/lib/ticketService";
 
 type NotificationType = "overdue" | "critical";
 
@@ -37,6 +38,7 @@ const buildNotifications = (tickets: Ticket[]): NotificationItem[] => {
   const items: NotificationItem[] = [];
 
   overdue.slice(0, 5).forEach((ticket) => {
+    const responsavel = ticket.responsavel || ticket.agente;
     const distance = ticket.dueDate
       ? formatDistanceToNow(new Date(ticket.dueDate), { addSuffix: true, locale: ptBR }).replace("cerca de ", "")
       : "SLA expirado";
@@ -47,13 +49,14 @@ const buildNotifications = (tickets: Ticket[]): NotificationItem[] => {
       title: `Ticket ${ticket.id} vencido`,
       description: `SLA expirou ${distance}`,
       type: "overdue",
-      meta: ticket.agente,
+      meta: responsavel,
     });
   });
 
   critical.forEach((ticket) => {
     // Evita duplicar notificacao quando o ticket ja esta vencido
     if (items.some((item) => item.ticketId === ticket.id)) return;
+    const responsavel = ticket.responsavel || ticket.agente;
 
     items.push({
       id: `critical-${ticket.id}`,
@@ -61,6 +64,7 @@ const buildNotifications = (tickets: Ticket[]): NotificationItem[] => {
       title: `Ticket ${ticket.id} critico`,
       description: `${ticket.diasAberto} dias em aberto com ${ticket.agente}.`,
       type: "critical",
+      meta: `${responsavel}  Coorden?o`,
     });
   });
 
@@ -70,6 +74,7 @@ const buildNotifications = (tickets: Ticket[]): NotificationItem[] => {
 const NotificationBell = () => {
   const navigate = useNavigate();
   const tickets = useTicketStore((state) => state.tickets);
+  const setTickets = useTicketStore((state) => state.setTickets);
   const logDueNotification = useTicketStore((state) => state.logDueNotification);
   const shouldNotify = useTicketStore((state) => state.shouldNotify);
   const { toast } = useToast();
@@ -94,6 +99,20 @@ const NotificationBell = () => {
       return next;
     });
   }, [notifications]);
+
+  useEffect(() => {
+    const loadTickets = async () => {
+      try {
+        const remoteTickets = await fetchTicketsFromApi();
+        if (remoteTickets.length) {
+          setTickets(remoteTickets);
+        }
+      } catch (error) {
+        console.error("No foi possvel carregar tickets reais:", error);
+      }
+    };
+    loadTickets();
+  }, [setTickets]);
 
   useEffect(() => {
     notifications.forEach((notification) => {
@@ -128,7 +147,7 @@ const NotificationBell = () => {
               variant="ghost"
               size="icon"
               className="relative flex h-11 w-11 items-center justify-center rounded-full bg-transparent text-foreground shadow-none transition-transform hover:-translate-y-0.5"
-              aria-label={hasUnread ? `Notificacoes: ${displayCount} nao lidas` : "Notificacoes"}
+              aria-label={hasUnread ? `Notificacoes: ${displayCount} n?o lidas` : "Notificacoes"}
             >
               <Bell className="w-5 h-5" />
               {hasUnread && (
@@ -143,21 +162,19 @@ const NotificationBell = () => {
           </PopoverTrigger>
         </TooltipTrigger>
         <TooltipContent side="bottom" sideOffset={8}>
-          Notificações
+          Notificaes
         </TooltipContent>
       </Tooltip>
       <PopoverContent
         align="end"
         side="bottom"
-        sideOffset={10}
+        sideOffset={2}
         collisionPadding={16}
-        className="flex flex-col w-[400px] max-w-[92vw] max-h-[65vh] overflow-hidden rounded-xl border border-border/70 bg-white p-0 shadow-[0_18px_34px_-18px_rgba(30,32,36,0.45)]"
+        style={{ maxHeight: "70vh" }}
+        className="flex flex-col w-[400px] max-w-[92vw] overflow-hidden rounded-xl border border-border/70 bg-white p-0 shadow-[0_18px_34px_-18px_rgba(30,32,36,0.45)]"
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/70 bg-white">
-          <div className="space-y-0.5">
-            <p className="text-sm font-semibold text-foreground">Notificações</p>
-            <p className="text-xs text-muted-foreground">Tickets com SLA em risco</p>
-          </div>
+          <p className="text-sm font-semibold text-foreground">Notificaes</p>
           <Badge
             variant="destructive"
             size="xs"
@@ -168,8 +185,8 @@ const NotificationBell = () => {
         </div>
 
         <div
-          className="max-h-[calc(65vh-110px)] overflow-y-auto px-3 py-3 space-y-3 pr-3"
-          style={{ scrollbarWidth: "thin" }}
+          className="flex-1 overflow-y-auto px-3 py-3 space-y-3 pr-3"
+          style={{ scrollbarWidth: "thin", maxHeight: "calc(70vh - 110px)" }}
         >
           {notifications.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
@@ -178,7 +195,7 @@ const NotificationBell = () => {
           ) : (
             notifications.map((notification) => {
               const isOverdue = notification.type === "overdue";
-              const statusLabel = isOverdue ? "VENCIDO" : "CRÍTICO";
+              const statusLabel = isOverdue ? "VENCIDO" : "CRTICO";
               const statusClasses = isOverdue
                 ? "bg-red-100 text-red-700"
                 : "bg-amber-100 text-amber-700";
@@ -194,13 +211,13 @@ const NotificationBell = () => {
                   <div className="flex-1 space-y-1.5">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-semibold leading-snug text-foreground">{notification.title}</p>
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${statusClasses}`}>
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${statusClasses}`}>
                         {statusLabel}
                       </span>
                     </div>
                     <p className="text-xs leading-snug text-muted-foreground">{notification.description}</p>
                     <p className="text-xs leading-snug text-muted-foreground">
-                      Responsável: {notification.meta ?? "—"}
+                      Responsvel: {notification.meta ?? ""}
                     </p>
                   </div>
                 </article>
@@ -209,14 +226,6 @@ const NotificationBell = () => {
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-border/70 bg-white">
-          <Button variant="ghost" size="sm" onClick={markAllAsRead} disabled={!hasUnread}>
-            Marcar como lidas
-          </Button>
-          <Button size="sm" variant="secondary" className="gap-2" onClick={() => navigate("/tickets")}>
-            Abrir tickets
-          </Button>
-        </div>
       </PopoverContent>
     </Popover>
   );

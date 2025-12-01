@@ -10,7 +10,7 @@ def handle_get_users(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(
         json.dumps({"success": True, "users": users}, ensure_ascii=False),
         status_code=200,
-        mimetype="application/json"
+        mimetype="application/json; charset=utf-8"
     )
 
 def handle_create_user(req: func.HttpRequest) -> func.HttpResponse:
@@ -21,7 +21,7 @@ def handle_create_user(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Invalid JSON"}),
             status_code=400,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
     
     username = body.get('username', '').strip().lower()
@@ -33,14 +33,14 @@ def handle_create_user(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Username, nome e senha são obrigatórios"}),
             status_code=400,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
 
     if not secure_auth.validate_email_domain(username):
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Domínio de email inválido"}),
             status_code=400,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
 
     result = secure_auth.create_user(username, name, password, role)
@@ -48,7 +48,7 @@ def handle_create_user(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(
         json.dumps(result, ensure_ascii=False),
         status_code=200 if result['success'] else 409, # 409 Conflict se usuário já existe
-        mimetype="application/json"
+        mimetype="application/json; charset=utf-8"
     )
 
 def handle_update_password(req: func.HttpRequest) -> func.HttpResponse:
@@ -59,7 +59,7 @@ def handle_update_password(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Invalid JSON"}),
             status_code=400,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
     
     username = body.get('username', '').strip().lower()
@@ -69,7 +69,7 @@ def handle_update_password(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Username e nova senha são obrigatórios"}),
             status_code=400,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
         
     result = secure_auth.update_user_password(username, new_password)
@@ -77,7 +77,7 @@ def handle_update_password(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(
         json.dumps(result, ensure_ascii=False),
         status_code=200 if result['success'] else 404,
-        mimetype="application/json"
+        mimetype="application/json; charset=utf-8"
     )
 
 def handle_update_role(req: func.HttpRequest) -> func.HttpResponse:
@@ -88,7 +88,7 @@ def handle_update_role(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Invalid JSON"}),
             status_code=400,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
     
     username = body.get('username', '').strip().lower()
@@ -98,7 +98,7 @@ def handle_update_role(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Username e novo perfil são obrigatórios"}),
             status_code=400,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
         
     result = secure_auth.update_user_role(username, new_role)
@@ -106,7 +106,7 @@ def handle_update_role(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(
         json.dumps(result, ensure_ascii=False),
         status_code=200 if result['success'] else 400,
-        mimetype="application/json"
+        mimetype="application/json; charset=utf-8"
     )
 
 def handle_delete_user(req: func.HttpRequest, route_username: str = None) -> func.HttpResponse:
@@ -127,7 +127,7 @@ def handle_delete_user(req: func.HttpRequest, route_username: str = None) -> fun
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Username é obrigatório"}),
             status_code=400,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
 
     result = secure_auth.delete_user(username)
@@ -135,7 +135,7 @@ def handle_delete_user(req: func.HttpRequest, route_username: str = None) -> fun
     return func.HttpResponse(
         json.dumps(result, ensure_ascii=False),
         status_code=200 if result['success'] else 404,
-        mimetype="application/json"
+        mimetype="application/json; charset=utf-8"
     )
 
 @auth_middleware(required_role='admin')
@@ -159,7 +159,7 @@ def main(req: func.HttpRequest, user_info: dict) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Ação de PUT inválida"}),
                 status_code=400,
-                mimetype="application/json"
+                mimetype="application/json; charset=utf-8"
             )
     elif req.method == 'DELETE':
         return handle_delete_user(req, action)
@@ -167,5 +167,5 @@ def main(req: func.HttpRequest, user_info: dict) -> func.HttpResponse:
     return func.HttpResponse(
         json.dumps({"success": False, "message": "Método não permitido"}),
         status_code=405,
-        mimetype="application/json"
+        mimetype="application/json; charset=utf-8"
     )

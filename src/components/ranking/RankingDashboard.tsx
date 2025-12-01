@@ -71,7 +71,7 @@ const RankingDashboard = () => {
         error instanceof Error ? error.message : "Erro desconhecido";
       toast({
         title: "Erro ao carregar dados",
-        description: `Verifique se os arquivos CSV estão disponíveis. Detalhe: ${errorMessage}`,
+        description: `Verifique se os arquivos CSV esto dispon?veis. Detalhe: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {
@@ -99,7 +99,7 @@ const RankingDashboard = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type === "text/csv") {
-      // Aqui implementaríamos o upload de novos CSVs
+      // Aqui implementaramos o upload de novos CSVs
       toast({
         title: "Upload de arquivo",
         description:
@@ -128,7 +128,7 @@ const RankingDashboard = () => {
           Ranking de Atividade Canva
         </h1>
         <p className="text-muted-foreground">
-          Acompanhe o desempenho e evolução dos usuários nas atividades do Canva
+          Acompanhe o desempenho e evoluo dos usu?rios nas atividades do Canva
         </p>
       </div>
 
@@ -137,13 +137,13 @@ const RankingDashboard = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5" />
-            Configurações de Período
+            Configuraes de Perodo
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Período Atual</label>
+              <label className="text-sm font-medium">Perodo Atual</label>
               <Select
                 value={currentPeriod}
                 onValueChange={(value: any) => setCurrentPeriod(value)}
@@ -152,10 +152,10 @@ const RankingDashboard = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="30_dias">Últimos 30 Dias</SelectItem>
-                  <SelectItem value="3_meses">Últimos 3 Meses</SelectItem>
-                  <SelectItem value="6_meses">Últimos 6 Meses</SelectItem>
-                  <SelectItem value="12_meses">Últimos 12 Meses</SelectItem>
+                  <SelectItem value="30_dias">ltimos 30 Dias</SelectItem>
+                  <SelectItem value="3_meses">ltimos 3 Meses</SelectItem>
+                  <SelectItem value="6_meses">ltimos 6 Meses</SelectItem>
+                  <SelectItem value="12_meses">ltimos 12 Meses</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -201,12 +201,12 @@ const RankingDashboard = () => {
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
-            title="Total de Usuários"
+            title="Total de Usurios"
             value={stats.totalUsers}
             icon={<Users className="h-4 w-4" />}
           />
           <StatsCard
-            title="Usuários Ativos"
+            title="Usurios Ativos"
             value={stats.activeUsers}
             icon={<TrendingUp className="h-4 w-4" />}
           />
@@ -217,7 +217,7 @@ const RankingDashboard = () => {
             className="priority-low"
           />
           <StatsCard
-            title="Novos Usuários"
+            title="Novos Usurios"
             value={stats.newUsers}
             icon={<Star className="h-4 w-4" />}
             className="priority-medium"
@@ -239,12 +239,12 @@ const RankingDashboard = () => {
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-2">
-                Atualizações Automáticas
+                Atualizaes Automticas
               </h3>
               <p className="text-sm text-muted-foreground mb-3">
                 Para manter os rankings sempre atualizados e armazenar o
-                histórico de dados, conecte seu projeto ao Supabase. Isso
-                permitirá uploads automáticos e comparações históricas mais
+                histrico de dados, conecte seu projeto ao Supabase. Isso
+                permitir uploads automticos e comparaes histricas mais
                 precisas.
               </p>
               <Button size="sm" className="btn-maple">

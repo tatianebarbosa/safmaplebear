@@ -1,16 +1,16 @@
 /**
- * Utilitários de formatação para datas, moedas e números
- * Centraliza lógica duplicada encontrada em múltiplos componentes
+ * Utilitrios de formatao para datas, moedas e nmeros
+ * Centraliza lgica duplicada encontrada em mltiplos componentes
  */
 
 // ============================================================================
-// FORMATAÇÃO DE DATAS
+// FORMATAO DE DATAS
 // ============================================================================
 
 /**
- * Formata uma data para o padrão brasileiro (dd/MM/yyyy)
+ * Formata uma data para o padro brasileiro (dd/MM/yyyy)
  * @param date - Data a ser formatada (Date, string ou timestamp)
- * @returns String formatada no padrão brasileiro
+ * @returns String formatada no padro brasileiro
  * @example formatDateBR(new Date()) // "14/11/2025"
  */
 export function formatDateBR(date: Date | string | number): string {
@@ -19,14 +19,14 @@ export function formatDateBR(date: Date | string | number): string {
     : date;
   
   if (isNaN(dateObj.getTime())) {
-    return 'Data inválida';
+    return 'Data invlida';
   }
   
   return dateObj.toLocaleDateString('pt-BR');
 }
 
 /**
- * Formata uma data e hora para o padrão brasileiro (dd/MM/yyyy HH:mm:ss)
+ * Formata uma data e hora para o padro brasileiro (dd/MM/yyyy HH:mm:ss)
  * @param date - Data a ser formatada (Date, string ou timestamp)
  * @returns String formatada com data e hora
  * @example formatDateTimeBR(new Date()) // "14/11/2025 15:30:45"
@@ -37,16 +37,16 @@ export function formatDateTimeBR(date: Date | string | number): string {
     : date;
   
   if (isNaN(dateObj.getTime())) {
-    return 'Data inválida';
+    return 'Data invlida';
   }
   
   return dateObj.toLocaleString('pt-BR');
 }
 
 /**
- * Formata uma data para o padrão ISO (YYYY-MM-DD)
+ * Formata uma data para o padro ISO (YYYY-MM-DD)
  * @param date - Data a ser formatada (Date, string ou timestamp)
- * @returns String formatada no padrão ISO
+ * @returns String formatada no padro ISO
  * @example formatDateISO(new Date()) // "2025-11-14"
  */
 export function formatDateISO(date: Date | string | number = new Date()): string {
@@ -64,7 +64,7 @@ export function formatDateISO(date: Date | string | number = new Date()): string
 /**
  * Formata uma data completa para ISO com timezone
  * @param date - Data a ser formatada (Date, string ou timestamp)
- * @returns String formatada no padrão ISO completo
+ * @returns String formatada no padro ISO completo
  * @example formatDateTimeISO(new Date()) // "2025-11-14T15:30:45.123Z"
  */
 export function formatDateTimeISO(date: Date | string | number = new Date()): string {
@@ -101,7 +101,7 @@ export function formatDateShort(date: Date | string | number): string {
     : date;
   
   if (isNaN(dateObj.getTime())) {
-    return 'Data inválida';
+    return 'Data invlida';
   }
   
   return dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
@@ -119,7 +119,7 @@ export function formatDateTimeShort(date: Date | string | number): string {
     : date;
   
   if (isNaN(dateObj.getTime())) {
-    return 'Data inválida';
+    return 'Data invlida';
   }
   
   return dateObj.toLocaleString('pt-BR', {
@@ -132,9 +132,9 @@ export function formatDateTimeShort(date: Date | string | number): string {
 }
 
 /**
- * Cria uma data de expiração adicionando dias à data atual
- * @param days - Número de dias a adicionar
- * @returns String ISO da data de expiração
+ * Cria uma data de expirao adicionando dias  data atual
+ * @param days - Nmero de dias a adicionar
+ * @returns String ISO da data de expirao
  * @example getExpiryDate(7) // Data daqui a 7 dias em formato ISO
  */
 export function getExpiryDate(days: number): string {
@@ -144,13 +144,13 @@ export function getExpiryDate(days: number): string {
 }
 
 // ============================================================================
-// FORMATAÇÃO DE MOEDA
+// FORMATAO DE MOEDA
 // ============================================================================
 
 /**
- * Formata um valor numérico para moeda brasileira (R$)
- * @param value - Valor numérico a ser formatado
- * @param decimals - Número de casas decimais (padrão: 2)
+ * Formata um valor numrico para moeda brasileira (R$)
+ * @param value - Valor numrico a ser formatado
+ * @param decimals - Nmero de casas decimais (padro: 2)
  * @returns String formatada como moeda
  * @example formatCurrency(1234.56) // "R$ 1.234,56"
  */
@@ -166,9 +166,9 @@ export function formatCurrency(value: number, decimals: number = 2): string {
 }
 
 /**
- * Formata um valor numérico simples com casas decimais
- * @param value - Valor numérico a ser formatado
- * @param decimals - Número de casas decimais (padrão: 2)
+ * Formata um valor numrico simples com casas decimais
+ * @param value - Valor numrico a ser formatado
+ * @param decimals - Nmero de casas decimais (padro: 2)
  * @returns String formatada com decimais
  * @example formatDecimal(1234.567, 2) // "1234.57"
  */
@@ -182,8 +182,8 @@ export function formatDecimal(value: number, decimals: number = 2): string {
 
 /**
  * Formata um valor como percentual
- * @param value - Valor numérico (0-100)
- * @param decimals - Número de casas decimais (padrão: 1)
+ * @param value - Valor numrico (0-100)
+ * @param decimals - Nmero de casas decimais (padro: 1)
  * @returns String formatada como percentual
  * @example formatPercentage(75.5) // "75,5%"
  */
@@ -199,12 +199,12 @@ export function formatPercentage(value: number, decimals: number = 1): string {
 }
 
 // ============================================================================
-// FORMATAÇÃO DE NÚMEROS
+// FORMATAO DE NMEROS
 // ============================================================================
 
 /**
- * Formata um número com separadores de milhares
- * @param value - Valor numérico a ser formatado
+ * Formata um nmero com separadores de milhares
+ * @param value - Valor numrico a ser formatado
  * @returns String formatada com separadores
  * @example formatNumber(1234567) // "1.234.567"
  */
@@ -217,15 +217,15 @@ export function formatNumber(value: number): string {
 }
 
 /**
- * Formata tamanho de arquivo em bytes para formato legível
+ * Formata tamanho de arquivo em bytes para formato legvel
  * @param bytes - Tamanho em bytes
- * @param decimals - Número de casas decimais (padrão: 2)
+ * @param decimals - Nmero de casas decimais (padro: 2)
  * @returns String formatada com unidade apropriada
  * @example formatFileSize(1536000) // "1.46 MB"
  */
 export function formatFileSize(bytes: number, decimals: number = 2): string {
   if (bytes === 0) return '0 Bytes';
-  if (isNaN(bytes)) return 'Tamanho inválido';
+  if (isNaN(bytes)) return 'Tamanho invlido';
   
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -235,13 +235,13 @@ export function formatFileSize(bytes: number, decimals: number = 2): string {
 }
 
 // ============================================================================
-// UTILITÁRIOS DE CONVERSÃO
+// UTILITRIOS DE CONVERSO
 // ============================================================================
 
 /**
- * Converte string de moeda para número
+ * Converte string de moeda para nmero
  * @param currencyString - String de moeda (ex: "R$ 1.234,56")
- * @returns Valor numérico
+ * @returns Valor numrico
  * @example parseCurrency("R$ 1.234,56") // 1234.56
  */
 export function parseCurrency(currencyString: string): number {
@@ -254,9 +254,9 @@ export function parseCurrency(currencyString: string): number {
 }
 
 /**
- * Converte string de percentual para número
+ * Converte string de percentual para nmero
  * @param percentString - String de percentual (ex: "75,5%")
- * @returns Valor numérico
+ * @returns Valor numrico
  * @example parsePercentage("75,5%") // 75.5
  */
 export function parsePercentage(percentString: string): number {

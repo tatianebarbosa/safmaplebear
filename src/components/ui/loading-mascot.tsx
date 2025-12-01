@@ -12,7 +12,7 @@ interface LoadingMascotProps {
 /**
  * Componente LoadingMascot
  *
- * Exibe o mascote da Maple Bear com animação de loading.
+ * Exibe o mascote da Maple Bear com animao de loading.
  * Ideal para telas de carregamento e processamento.
  *
  * @example

@@ -84,9 +84,9 @@ const UserManagement = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Gerenciamento de Usuários</h1>
+          <h1 className="text-3xl font-bold">Gerenciamento de Usurios</h1>
           <p className="text-muted-foreground">
-            Gerencie licenças de usuários do Canva
+            Gerencie licen?as de usu?rios do Canva
           </p>
         </div>
         
@@ -97,7 +97,7 @@ const UserManagement = () => {
           </Button>
           <Button onClick={() => setIsAddDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Adicionar Usuário
+            Adicionar Usurio
           </Button>
         </div>
       </div>
@@ -123,14 +123,14 @@ const UserManagement = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status da Licença</label>
+              <label className="text-sm font-medium">Status da Licen?a</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="available">Disponível</SelectItem>
+                  <SelectItem value="available">Disponvel</SelectItem>
                   <SelectItem value="active">Ativa</SelectItem>
                   <SelectItem value="inactive">Inativa</SelectItem>
                   <SelectItem value="excess">Excesso</SelectItem>
@@ -166,7 +166,7 @@ const UserManagement = () => {
 
       <Tabs defaultValue="users" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="users">Usuários ({filteredUsers.length})</TabsTrigger>
+          <TabsTrigger value="users">Usurios ({filteredUsers.length})</TabsTrigger>
           <TabsTrigger value="schools">Por Escola</TabsTrigger>
         </TabsList>
 
@@ -181,15 +181,15 @@ const UserManagement = () => {
                       <th className="p-4 text-left font-medium">Email</th>
                       <th className="p-4 text-left font-medium">Escola</th>
                       <th className="p-4 text-left font-medium">Status</th>
-                      <th className="p-4 text-left font-medium">Função</th>
-                      <th className="p-4 text-right font-medium">Ações</th>
+                      <th className="p-4 text-left font-medium">Funo</th>
+                      <th className="p-4 text-right font-medium">Aes</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredUsers.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                          Nenhum usuário encontrado
+                          Nenhum usu?rio encontrado
                         </td>
                       </tr>
                     ) : (
@@ -202,7 +202,7 @@ const UserManagement = () => {
                             <div className="text-sm text-muted-foreground">{user.email}</div>
                           </td>
                           <td className="p-4">
-                            <div className="text-sm">{user.school || "Não definida"}</div>
+                            <div className="text-sm">{user.school || "No definida"}</div>
                           </td>
                           <td className="p-4">
                             {getStatusBadge(user.licenseStatus)}
@@ -251,7 +251,7 @@ const UserManagement = () => {
                     <div>
                       <h3 className="font-medium">{school.school}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {school.total} usuários total
+                        {school.total} usu?rios total
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -272,13 +272,13 @@ const UserManagement = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Dialog Adicionar Usuário */}
+      {/* Dialog Adicionar Usurio */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Adicionar Usuário</DialogTitle>
+            <DialogTitle>Adicionar Usurio</DialogTitle>
             <DialogDescription>
-              Cadastre um novo usuário no sistema
+              Cadastre um novo usu?rio no sistema
             </DialogDescription>
           </DialogHeader>
           
@@ -306,7 +306,7 @@ const UserManagement = () => {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Função</label>
+                <label className="text-sm font-medium">Funo</label>
                 <Select 
                   value={formData.role} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
@@ -324,7 +324,7 @@ const UserManagement = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Status da Licença</label>
+                <label className="text-sm font-medium">Status da Licen?a</label>
                 <Select 
                   value={formData.licenseStatus} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, licenseStatus: value }))}
@@ -333,7 +333,7 @@ const UserManagement = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Disponível">Disponível</SelectItem>
+                    <SelectItem value="Disponvel">Disponvel</SelectItem>
                     <SelectItem value="Ativa">Ativa</SelectItem>
                     <SelectItem value="Inativa">Inativa</SelectItem>
                     <SelectItem value="Excesso">Excesso</SelectItem>
@@ -357,19 +357,19 @@ const UserManagement = () => {
               Cancelar
             </Button>
             <Button onClick={handleAddUser}>
-              Adicionar Usuário
+              Adicionar Usurio
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Editar Usuário */}
+      {/* Dialog Editar Usurio */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Editar Usuário</DialogTitle>
+            <DialogTitle>Editar Usurio</DialogTitle>
             <DialogDescription>
-              Altere as informações do usuário
+              Altere as informaes do usu?rio
             </DialogDescription>
           </DialogHeader>
           
@@ -398,7 +398,7 @@ const UserManagement = () => {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Função</label>
+                <label className="text-sm font-medium">Funo</label>
                 <Select 
                   value={formData.role} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
@@ -416,7 +416,7 @@ const UserManagement = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Status da Licença</label>
+                <label className="text-sm font-medium">Status da Licen?a</label>
                 <Select 
                   value={formData.licenseStatus} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, licenseStatus: value }))}
@@ -425,7 +425,7 @@ const UserManagement = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Disponível">Disponível</SelectItem>
+                    <SelectItem value="Disponvel">Disponvel</SelectItem>
                     <SelectItem value="Ativa">Ativa</SelectItem>
                     <SelectItem value="Inativa">Inativa</SelectItem>
                     <SelectItem value="Excesso">Excesso</SelectItem>
@@ -449,19 +449,19 @@ const UserManagement = () => {
               Cancelar
             </Button>
             <Button onClick={handleEditUser}>
-              Salvar Alterações
+              Salvar Alteraes
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Excluir Usuário */}
+      {/* Dialog Excluir Usurio */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Excluir Usuário</DialogTitle>
+            <DialogTitle>Excluir Usurio</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir este usu?rio? Esta ao no pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           
@@ -478,7 +478,7 @@ const UserManagement = () => {
               Cancelar
             </Button>
             <Button variant="destructive" onClick={handleDeleteUser}>
-              Excluir Usuário
+              Excluir Usurio
             </Button>
           </DialogFooter>
         </DialogContent>

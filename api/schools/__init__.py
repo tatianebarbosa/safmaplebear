@@ -10,7 +10,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Method not allowed"}),
             status_code=405,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json; charset=utf-8"}
         )
     
     try:
@@ -20,7 +20,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Token de autorização necessário"}),
                 status_code=401,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         token = auth_header[7:]  # Remove 'Bearer '
@@ -29,7 +29,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Token inválido ou expirado"}),
                 status_code=401,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         # Check permissions
@@ -38,7 +38,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Permissão insuficiente"}),
                 status_code=403,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         # Get schools overview
@@ -62,5 +62,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": f"Erro interno: {str(e)}"}),
             status_code=500,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json; charset=utf-8"}
         )

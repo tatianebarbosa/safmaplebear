@@ -65,7 +65,7 @@ const AssetsPage = () => {
     updateAsset(editingAsset.id, data);
     toast({
       title: "Ativo atualizado",
-      description: "Nome e descrição configurados.",
+      description: "Nome e descrio configurados.",
     });
     setEditingAsset(null);
   };
@@ -93,7 +93,7 @@ const AssetsPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{assets.length}</div>
-            <p className="text-xs text-muted-foreground">Menus ativos disponíveis</p>
+            <p className="text-xs text-muted-foreground">Menus ativos dispon?veis</p>
           </CardContent>
         </Card>
         <Card>
@@ -103,16 +103,16 @@ const AssetsPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalContacts}</div>
-            <p className="text-xs text-muted-foreground">Ligações, e-mails e acompanhamentos</p>
+            <p className="text-xs text-muted-foreground">Ligaes, e-mails e acompanhamentos</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Último contato registrado</CardTitle>
+            <CardTitle className="text-sm font-medium">ltimo contato registrado</CardTitle>
             <FileClock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-semibold">{formatDate(lastContact) || "Ainda não registrado"}</div>
+            <div className="text-lg font-semibold">{formatDate(lastContact) || "Ainda no registrado"}</div>
             <p className="text-xs text-muted-foreground">Atualize sempre ao falar com a escola</p>
           </CardContent>
         </Card>

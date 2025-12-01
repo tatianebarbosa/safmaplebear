@@ -1,8 +1,8 @@
 /**
- * Extensão para FloatingAIChat.tsx
+ * Extenso para FloatingAIChat.tsx
  * 
- * Adiciona funcionalidade de consulta sobre métricas do Canva à IA
- * Cole este código no seu FloatingAIChat.tsx existente
+ * Adiciona funcionalidade de consulta sobre mtricas do Canva  IA
+ * Cole este cdigo no seu FloatingAIChat.tsx existente
  */
 
 // Adicione este objeto ao seu sistema de consulta de dados:
@@ -10,49 +10,49 @@
 export const canvaMetricsContext = {
   // Contexto para a IA sobre dados do Canva
   systemPrompt: `
-    Você é um assistente especializado em gestão de licenças Canva e métricas de uso.
+    Voc  um assistente especializado em gest?o de licen?as Canva e mtricas de uso.
     
-    Você tem acesso aos seguintes dados do Canva:
-    - Total de pessoas (usuários ativos)
+    Voc tem acesso aos seguintes dados do Canva:
+    - Total de pessoas (usu?rios ativos)
     - Designs criados
     - Membros ativos
     - Total publicado
     - Total compartilhado
     - Administradores, Alunos, Professores
     - Kits de marca
-    - Histórico de alterações
+    - Histrico de alteraes
     
-    Quando o usuário perguntar sobre:
-    1. "Quantas licenças Canva temos?" - Responda com o total de pessoas
+    Quando o usu?rio perguntar sobre:
+    1. "Quantas licen?as Canva temos?" - Responda com o total de pessoas
     2. "Quantos designs foram criados?" - Responda com o total de designs criados
-    3. "Qual é a atividade do Canva?" - Forneça um resumo de todas as métricas
-    4. "Quem está usando o Canva?" - Forneça a distribuição por função
-    5. "Quais são os kits de marca?" - Liste os kits de marca disponíveis
+    3. "Qual  a atividade do Canva?" - Fornea um resumo de todas as mtricas
+    4. "Quem est usando o Canva?" - Fornea a distribuio por funo
+    5. "Quais so os kits de marca?" - Liste os kits de marca dispon?veis
     
-    Sempre forneça contexto e análise dos dados, não apenas números.
+    Sempre fornea contexto e anlise dos dados, no apenas nmeros.
   `,
 
-  // Função para processar perguntas sobre Canva
+  // Funo para processar perguntas sobre Canva
   processarPerguntaCanva: (pergunta: string, dados: any) => {
     const perguntaLower = pergunta.toLowerCase();
     
-    if (perguntaLower.includes('licença') || perguntaLower.includes('pessoas')) {
+    if (perguntaLower.includes('licen?a') || perguntaLower.includes('pessoas')) {
       return `
-        📊 **Licenças Canva Ativas:**
+         **Licen?as Canva Ativas:**
         - Total de Pessoas: ${dados.totalPessoas}
         - Administradores: ${dados.administradores}
         - Alunos: ${dados.alunos}
         - Professores: ${dados.professores}
         
-        ${dados.mudancas?.totalPessoas ? `Mudança: ${dados.mudancas.totalPessoas > 0 ? '+' : ''}${dados.mudancas.totalPessoas}` : ''}
+        ${dados.mudancas?.totalPessoas ? `Mudana: ${dados.mudancas.totalPessoas > 0 ? '+' : ''}${dados.mudancas.totalPessoas}` : ''}
       `;
     }
     
     if (perguntaLower.includes('design')) {
       return `
-        🎨 **Atividade de Designs:**
+         **Atividade de Designs:**
         - Designs Criados: ${dados.designsCriados}
-        - Crescimento: ${dados.designsCriadosCrescimento}% (últimos 30 dias)
+        - Crescimento: ${dados.designsCriadosCrescimento}% (ltimos 30 dias)
         - Total Publicado: ${dados.totalPublicado}
         - Total Compartilhado: ${dados.totalCompartilhado}
       `;
@@ -60,7 +60,7 @@ export const canvaMetricsContext = {
     
     if (perguntaLower.includes('atividade') || perguntaLower.includes('engajamento')) {
       return `
-        📈 **Resumo de Atividade do Canva:**
+         **Resumo de Atividade do Canva:**
         
         **Pessoas:**
         - Total: ${dados.totalPessoas}
@@ -71,7 +71,7 @@ export const canvaMetricsContext = {
         - Publicados: ${dados.totalPublicado}
         - Compartilhados: ${dados.totalCompartilhado}
         
-        **Funções:**
+        **Funes:**
         - Administradores: ${dados.administradores}
         - Alunos: ${dados.alunos}
         - Professores: ${dados.professores}
@@ -88,7 +88,7 @@ export const canvaMetricsContext = {
         ).join('\n');
         
         return `
-          🎯 **Kits de Marca Disponíveis:**
+           **Kits de Marca Disponveis:**
           ${kitsFormatados}
           
           Total: ${dados.totalKits} kits
@@ -99,7 +99,7 @@ export const canvaMetricsContext = {
     
     if (perguntaLower.includes('quem') || perguntaLower.includes('usando')) {
       return `
-        👥 **Distribuição de Usuários:**
+         **Distribuio de Usurios:**
         - Administradores: ${dados.administradores}
         - Alunos: ${dados.alunos}
         - Professores: ${dados.professores}
@@ -116,12 +116,12 @@ export const canvaMetricsContext = {
   },
 };
 
-// Adicione esta função ao seu componente FloatingAIChat:
+// Adicione esta funo ao seu componente FloatingAIChat:
 
 export const consultarCanvaComIA = async (pergunta: string, dadosCanva: any, openaiClient: any) => {
-  // Detecta se a pergunta é sobre Canva
+  // Detecta se a pergunta  sobre Canva
   const ehSobreCanva = pergunta.toLowerCase().includes('canva') || 
-                       pergunta.toLowerCase().includes('licença') ||
+                       pergunta.toLowerCase().includes('licen?a') ||
                        pergunta.toLowerCase().includes('design') ||
                        pergunta.toLowerCase().includes('kit') ||
                        pergunta.toLowerCase().includes('marca');
@@ -137,14 +137,14 @@ export const consultarCanvaComIA = async (pergunta: string, dadosCanva: any, ope
     return respostaContexto;
   }
   
-  // Se não conseguiu processar com contexto, usa a IA com os dados
+  // Se no conseguiu processar com contexto, usa a IA com os dados
   const prompt = `
     ${canvaMetricsContext.systemPrompt}
     
     Dados Atuais do Canva:
     ${JSON.stringify(dadosCanva, null, 2)}
     
-    Pergunta do usuário: ${pergunta}
+    Pergunta do usu?rio: ${pergunta}
     
     Responda de forma clara e concisa, usando os dados fornecidos.
   `;
@@ -169,6 +169,6 @@ export const consultarCanvaComIA = async (pergunta: string, dadosCanva: any, ope
     return response.choices[0].message.content;
   } catch (error) {
     console.error('Erro ao consultar IA sobre Canva:', error);
-    return 'Desculpe, não consegui processar sua pergunta sobre Canva.';
+    return 'Desculpe, no consegui processar sua pergunta sobre Canva.';
   }
 };

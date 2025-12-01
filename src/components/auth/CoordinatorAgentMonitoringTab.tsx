@@ -114,6 +114,7 @@ const CoordinatorAgentMonitoringTab = () => {
   const tickets = useTicketStore((state) => state.tickets);
   const updateTicket = useTicketStore((state) => state.updateTicket);
   const moveTicket = useTicketStore((state) => state.moveTicket);
+  const addNoteToTicket = useTicketStore((state) => state.addNoteToTicket);
   const { assets, contacts } = useAssetStore();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -135,6 +136,8 @@ const CoordinatorAgentMonitoringTab = () => {
   });
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [showTicketDetails, setShowTicketDetails] = useState(false);
+  const [pendingMove, setPendingMove] = useState<{ ticket: Ticket; status: TicketStatus } | null>(null);
+  const [moveJustification, setMoveJustification] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem(ALERT_PREFS_KEY);
@@ -143,7 +146,7 @@ const CoordinatorAgentMonitoringTab = () => {
         const parsed = JSON.parse(stored);
         setAlertPrefs((prev) => ({ ...prev, ...parsed }));
       } catch {
-        // se o JSON estiver quebrado, só ignora para não travar a tela
+        // se o JSON estiver quebrado, s ignora para no travar a tela
       }
     }
   }, []);
@@ -409,8 +412,28 @@ const CoordinatorAgentMonitoringTab = () => {
   };
 
   const handleMove = (ticket: Ticket, status: TicketStatus) => {
-    moveTicket(ticket.id, status);
-    toast({ title: "Status atualizado", description: `${ticket.id} agora ${status}` });
+    setPendingMove({ ticket, status });
+    setMoveJustification("");
+  };
+
+  const handleConfirmMove = () => {
+    if (!pendingMove) return;
+    const justification = moveJustification.trim();
+    if (!justification) {
+      toast({ title: "Justificativa obrigatria", description: "Informe o motivo da mudana de status.", variant: "destructive" });
+      return;
+    }
+
+    moveTicket(pendingMove.ticket.id, pendingMove.status);
+    addNoteToTicket(pendingMove.ticket.id, {
+      id: `move-${Date.now()}`,
+      author: coordinator?.fullName || "Coorden?o",
+      content: `Mudana para ${pendingMove.status}: ${justification}`,
+      createdAt: new Date().toISOString(),
+    });
+    toast({ title: "Status atualizado", description: `${pendingMove.ticket.id} agora ${pendingMove.status}` });
+    setPendingMove(null);
+    setMoveJustification("");
   };
 
   const agentHistory = useMemo(() => {
@@ -903,7 +926,7 @@ const CoordinatorAgentMonitoringTab = () => {
             <KanbanSquare className="h-5 w-5 text-primary" />
             Monitoramento de Ativos
           </CardTitle>
-          <CardDescription>Visão rápida de ativos SAF e registros de contato</CardDescription>
+          <CardDescription>Viso rpida de ativos SAF e registros de contato</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -916,7 +939,7 @@ const CoordinatorAgentMonitoringTab = () => {
               <p className="text-2xl font-semibold">{assetSummaries.totalContacts}</p>
             </div>
             <div className="rounded-lg border p-3 bg-muted/40">
-              <p className="text-sm text-muted-foreground">Último contato</p>
+              <p className="text-sm text-muted-foreground">ltimo contato</p>
               <p className="text-lg font-semibold">
                 {assetSummaries.lastContactOverall
                   ? format(new Date(assetSummaries.lastContactOverall), "dd/MM/yyyy HH:mm")
@@ -932,8 +955,8 @@ const CoordinatorAgentMonitoringTab = () => {
                   <TableHead>Tipo</TableHead>
                   <TableHead>Time</TableHead>
                   <TableHead>Contatos</TableHead>
-                  <TableHead>Último contato</TableHead>
-                  <TableHead className="w-32">Ações</TableHead>
+                  <TableHead>ltimo contato</TableHead>
+                  <TableHead className="w-32">Aes</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1023,6 +1046,39 @@ const CoordinatorAgentMonitoringTab = () => {
                 </div>
               ))
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!pendingMove} onOpenChange={(open) => !open && setPendingMove(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar mudana de status</DialogTitle>
+            <DialogDescription>
+              Informe a justificativa para alterar o status do ticket.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            {pendingMove && (
+              <div className="text-sm text-muted-foreground">
+                Ticket <span className="font-semibold">{pendingMove.ticket.id}</span> {" "}
+                <span className="font-semibold">{pendingMove.status}</span>
+              </div>
+            )}
+            <Textarea
+              placeholder="Descreva o motivo ou referncia (e-mail, ticket, etc.)"
+              value={moveJustification}
+              onChange={(e) => setMoveJustification(e.target.value)}
+              rows={4}
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setPendingMove(null)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleConfirmMove}>
+                Confirmar
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

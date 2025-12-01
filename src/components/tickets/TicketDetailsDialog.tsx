@@ -28,7 +28,7 @@ interface TicketDetailsDialogProps {
 }
 
 export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetailsDialogProps) => {
-  const { addNoteToTicket, updateTicket } = useTicketStore();
+  const { addNoteToTicket, updateTicket, addHistoryEntry, revertHistoryEntry } = useTicketStore();
   const { currentUser, canManageTicket } = useAuthStore();
   const { requestStatusChange, justificationDialog } = useTicketStatusJustification();
   const [note, setNote] = useState("");
@@ -42,7 +42,9 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
   });
 
   const notes = useMemo(() => ticket?.notes || [], [ticket]);
-  const canEdit = ticket ? canManageTicket(ticket.agente) : false;
+  const historyEntries = useMemo(() => ticket?.history || [], [ticket]);
+  // Permitir que qualquer usuário mova/edite; se necessário, ajuste aqui para futuras restrições
+  const canEdit = !!ticket && !!currentUser;
 
   useEffect(() => {
     if (!ticket) return;
@@ -78,16 +80,56 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       dueDate: form.dueDate || undefined,
       slaDias: form.slaDias ? Number(form.slaDias) : undefined,
       observacao: form.observacao,
+      status: form.status as TicketStatus,
     };
 
     const changes: string[] = [];
-    if ((form.priority || "Media") !== (ticket.priority || "Media"))
+    const before: Partial<Ticket> = {};
+    const after: Partial<Ticket> = {};
+    if ((form.priority || "Media") !== (ticket.priority || "Media")) {
       changes.push(`Prioridade: ${ticket.priority || "N/A"} -> ${form.priority}`);
-    if (form.agente !== ticket.agente) changes.push(`Responsavel: ${ticket.agente} -> ${form.agente}`);
-    if ((form.dueDate || "") !== (ticket.dueDate || "")) changes.push(`Vencimento: ${ticket.dueDate || "Sem"} -> ${form.dueDate || "Sem"}`);
-    if ((form.slaDias || "") !== (ticket.slaDias?.toString() || ""))
+      before.priority = ticket.priority;
+      after.priority = form.priority as any;
+    }
+    if (form.agente !== ticket.agente) {
+      changes.push(`Responsavel: ${ticket.agente} -> ${form.agente}`);
+      before.agente = ticket.agente;
+      after.agente = form.agente as any;
+    }
+    if ((form.dueDate || "") !== (ticket.dueDate || "")) {
+      changes.push(`Vencimento: ${ticket.dueDate || "Sem"} -> ${form.dueDate || "Sem"}`);
+      before.dueDate = ticket.dueDate;
+      after.dueDate = form.dueDate || undefined;
+    }
+    if ((form.slaDias || "") !== (ticket.slaDias?.toString() || "")) {
       changes.push(`SLA: ${ticket.slaDias ?? "-"} -> ${form.slaDias || "-"}`);
-    if (form.observacao !== ticket.observacao) changes.push("Descricao editada");
+      before.slaDias = ticket.slaDias;
+      after.slaDias = form.slaDias ? Number(form.slaDias) : undefined;
+    }
+    if (form.observacao !== ticket.observacao) {
+      changes.push("Descricao editada");
+      before.observacao = ticket.observacao;
+      after.observacao = form.observacao;
+    }
+    if (form.status !== ticket.status) {
+      changes.push(`Status: ${ticket.status} -> ${form.status}`);
+      before.status = ticket.status;
+      after.status = form.status as TicketStatus;
+    }
+
+    const historyAction = changes.join(" | ") || "Atualizacao no ticket";
+    const registerHistory = () => {
+      if (!changes.length) return;
+      const timestamp = new Date().toISOString();
+      addHistoryEntry(ticket.id, {
+        id: `${ticket.id}-hist-${Date.now()}`,
+        author: currentUser?.name || currentUser?.agente || "Usuario",
+        action: historyAction,
+        timestamp,
+        before,
+        after,
+      });
+    };
 
     const applyFieldUpdates = () => {
       if (!changes.length) return;
@@ -95,14 +137,24 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       updateTicket(ticket.id, updates);
       addNoteToTicket(ticket.id, {
         id: `${ticket.id}-change-${Date.now()}`,
-        author: currentUser?.name || currentUser?.agente || "Usuario",
+        author: currentUser?.name || currentUser?.agente || "Usu?rio",
         content: `Atualizacoes: ${changes.join(" | ")}`,
         createdAt: new Date().toISOString(),
       });
+      registerHistory();
     };
 
     if (form.status !== ticket.status) {
-      requestStatusChange(ticket, form.status as TicketStatus, applyFieldUpdates);
+      requestStatusChange(ticket, form.status as TicketStatus, () => {
+        applyFieldUpdates();
+        registerHistory();
+        addNoteToTicket(ticket.id, {
+          id: `${ticket.id}-status-${Date.now()}`,
+          author: currentUser?.name || currentUser?.agente || "Usu?rio",
+          content: `Status alterado para ${form.status} por ${currentUser?.name || currentUser?.agente || "Usu?rio"}. Dono do ticket: ${ticket.agente}`,
+          createdAt: new Date().toISOString(),
+        });
+      });
       return;
     }
 
@@ -113,11 +165,16 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
     if (!ticket || !note.trim()) return;
     addNoteToTicket(ticket.id, {
       id: `${ticket.id}-${Date.now()}`,
-      author: currentUser?.name || currentUser?.agente || "Usuario",
+      author: currentUser?.name || currentUser?.agente || "Usu?rio",
       content: note.trim(),
       createdAt: new Date().toISOString(),
     });
     setNote("");
+  };
+
+  const handleRevert = (entryId: string) => {
+    if (!ticket) return;
+    revertHistoryEntry(ticket.id, entryId, currentUser?.name || currentUser?.agente || "Usuario");
   };
 
   if (!ticket) return null;
@@ -132,7 +189,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       <DialogContent className="max-w-4xl w-[96vw] max-h-[85vh] p-0 overflow-hidden border border-border/70 shadow-2xl flex flex-col">
         <DialogHeader className="border-b border-border/60 bg-muted/40 px-6 py-4">
           <DialogTitle className="flex items-center gap-3 text-xl sm:text-2xl">
-            <Badge variant="secondary" className="font-mono">
+            <Badge variant="secondary" className="font-mono text-base sm:text-lg px-3 py-2 rounded-full bg-muted text-foreground">
               {ticket.id}
             </Badge>
             <span className="leading-tight text-base sm:text-lg">
@@ -222,16 +279,16 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
                 </div>
                 <div className="flex justify-end">
                   <Button onClick={handleSave} disabled={!canEdit || !hasChanges} className="min-w-[180px]">
-                    Salvar alterações
+                    Salvar alteraes
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
-                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <Tag className="h-4 w-4" />
-                  Descrição
-                </div>
+            <div className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Tag className="h-4 w-4" />
+                Descrio
+              </div>
                 <Textarea
                   className="min-h-[120px]"
                   value={form.observacao}
@@ -278,6 +335,36 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
                 <Button onClick={handleAddNote} disabled={!note.trim()}>
                   Adicionar comentario
                 </Button>
+              </div>
+            </div>
+
+            <div className="space-y-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <Clock3 className="h-4 w-4" />
+                  Historico de alteracoes
+                </div>
+                <Badge variant="outline">{historyEntries.length} registros</Badge>
+              </div>
+              <Separator />
+              <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+                {historyEntries.length === 0 && (
+                  <p className="text-sm text-muted-foreground">Nenhuma alteracao registrada.</p>
+                )}
+                {historyEntries.map((h) => (
+                  <div key={h.id} className="rounded-md border border-border/60 bg-background p-2">
+                    <div className="flex items-center justify-between text-[12px] text-muted-foreground mb-1">
+                      <span className="font-medium text-foreground">{h.author}</span>
+                      <span>{format(new Date(h.timestamp), "dd/MM HH:mm")}</span>
+                    </div>
+                    <p className="text-sm mb-2">{h.action}</p>
+                    <div className="flex items-center justify-end">
+                      <Button variant="outline" size="sm" className="h-7 px-2 text-xs" onClick={() => handleRevert(h.id)}>
+                        Reverter
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

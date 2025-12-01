@@ -18,7 +18,7 @@ def auth_middleware(required_role: str = None):
                 return func.HttpResponse(
                     json.dumps({"success": False, "message": "Token de autenticação ausente ou inválido"}),
                     status_code=401,
-                    mimetype="application/json"
+                    mimetype="application/json; charset=utf-8"
                 )
 
             token = auth_header.split(' ')[1]
@@ -32,7 +32,7 @@ def auth_middleware(required_role: str = None):
                 return func.HttpResponse(
                     json.dumps({"success": False, "message": message}),
                     status_code=status_code,
-                    mimetype="application/json"
+                    mimetype="application/json; charset=utf-8"
                 )
 
             user_role = payload.get('role')
@@ -42,7 +42,7 @@ def auth_middleware(required_role: str = None):
                 return func.HttpResponse(
                     json.dumps({"success": False, "message": "Acesso negado. Permissão insuficiente."}),
                     status_code=403,
-                    mimetype="application/json"
+                    mimetype="application/json; charset=utf-8"
                 )
             
             # 4. Adicionar informações do usuário ao contexto da função

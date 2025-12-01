@@ -15,9 +15,9 @@ export function generateVoucherReport(
 ) {
   const doc = new jsPDF();
   
-  // Cabeçalho
+  // Cabealho
   doc.setFontSize(16);
-  doc.text('Relatório de Vouchers Canva', 20, 20);
+  doc.text('Relatrio de Vouchers Canva', 20, 20);
   
   doc.setFontSize(10);
   doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 30);
@@ -35,7 +35,7 @@ export function generateVoucherReport(
   doc.text(`Total de Escolas: ${totalSchools}`, 20, 55);
   doc.text(`Vouchers Criados: ${totalVouchers}`, 20, 62);
   doc.text(`Vouchers Enviados: ${sentVouchers}`, 20, 69);
-  doc.text(`Exceções Criadas: ${totalExceptions}`, 20, 76);
+  doc.text(`Excees Criadas: ${totalExceptions}`, 20, 76);
   
   // Tabela de Vouchers por Escola
   const schoolData = schools
@@ -45,13 +45,13 @@ export function generateVoucherReport(
       school.cluster,
       school.voucherQuantity.toString(),
       school.voucherCode,
-      school.voucherSent ? 'Sim' : 'Não',
+      school.voucherSent ? 'Sim' : 'No',
       school.slmSales.toString()
     ]);
   
   doc.autoTable({
     startY: 90,
-    head: [['Escola', 'Cluster', 'Qtd Vouchers', 'Código', 'Enviado', 'Vendas SLM']],
+    head: [['Escola', 'Cluster', 'Qtd Vouchers', 'Cdigo', 'Enviado', 'Vendas SLM']],
     body: schoolData,
     styles: { fontSize: 7 },
     headStyles: { fillColor: [41, 128, 185] },
@@ -65,12 +65,12 @@ export function generateVoucherReport(
     }
   });
   
-  // Nova página para exceções se houver
+  // Nova pgina para excees se houver
   if (exceptions.length > 0) {
     doc.addPage();
     
     doc.setFontSize(14);
-    doc.text('Vouchers de Exceção', 20, 20);
+    doc.text('Vouchers de Exceo', 20, 20);
     
     const exceptionData = exceptions.map(exc => [
       exc.unit || 'N/A',
@@ -84,7 +84,7 @@ export function generateVoucherReport(
     
     doc.autoTable({
       startY: 35,
-      head: [['Unidade', 'Código Voucher', 'Solicitado Por', 'Origem', 'Validade', 'Criado Em']],
+      head: [['Unidade', 'Cdigo Voucher', 'Solicitado Por', 'Origem', 'Validade', 'Criado Em']],
       body: exceptionData,
       styles: { fontSize: 8 },
       headStyles: { fillColor: [231, 76, 60] },
@@ -99,10 +99,10 @@ export function generateVoucherReport(
     });
   }
   
-  // Estatísticas por Cluster
+  // Estatsticas por Cluster
   doc.addPage();
   doc.setFontSize(14);
-  doc.text('Estatísticas por Cluster', 20, 20);
+  doc.text('Estatsticas por Cluster', 20, 20);
   
   const clusterStats = schools.reduce((acc, school) => {
     if (!acc[school.cluster]) {
@@ -131,7 +131,7 @@ export function generateVoucherReport(
   
   doc.autoTable({
     startY: 35,
-    head: [['Cluster', 'Total Escolas', 'Elegíveis', 'Vouchers', 'Enviados', '% Entrega']],
+    head: [['Cluster', 'Total Escolas', 'Elegveis', 'Vouchers', 'Enviados', '% Entrega']],
     body: clusterData,
     styles: { fontSize: 9 },
     headStyles: { fillColor: [46, 204, 113] }
@@ -145,11 +145,11 @@ export function generateUserReport(totalUsers: number, schoolData: any[]) {
   const doc = new jsPDF();
   
   doc.setFontSize(16);
-  doc.text('Relatório de Usuários Canva', 20, 20);
+  doc.text('Relatrio de Usurios Canva', 20, 20);
   
   doc.setFontSize(10);
   doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 30);
-  doc.text(`Total de Usuários: ${totalUsers}`, 20, 37);
+  doc.text(`Total de Usurios: ${totalUsers}`, 20, 37);
   
   const schoolUserData = schoolData
     .filter(school => school.users && school.users.length > 0)
@@ -170,5 +170,5 @@ export function generateUserReport(totalUsers: number, schoolData: any[]) {
     headStyles: { fillColor: [155, 89, 182] }
   });
   
-  doc.save(`relatorio_usuarios_${new Date().toISOString().split('T')[0]}.pdf`);
+  doc.save(`relatorio_usu?rios_${new Date().toISOString().split('T')[0]}.pdf`);
 }

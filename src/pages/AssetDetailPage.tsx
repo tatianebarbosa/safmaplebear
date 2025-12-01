@@ -32,7 +32,7 @@ const AssetDetailPage = () => {
       } catch (error) {
         toast({
           title: "Erro ao carregar escolas",
-          description: "Confirme os CSVs em public/data (escolas.csv e usuarios_updated.csv).",
+          description: "Confirme os CSVs em public/data (escolas.csv e usu?rios_updated.csv).",
           variant: "destructive",
         });
       } finally {
@@ -80,8 +80,8 @@ const AssetDetailPage = () => {
       <div className="layout-wide w-full py-8">
         <Card>
           <CardContent className="py-10 text-center space-y-3">
-            <p className="text-lg font-semibold">Ativo não encontrado</p>
-            <p className="text-muted-foreground">Volte para a lista de ativos para selecionar um menu válido.</p>
+            <p className="text-lg font-semibold">Ativo no encontrado</p>
+            <p className="text-muted-foreground">Volte para a lista de ativos para selecionar um menu vlido.</p>
             <Button variant="outline" onClick={() => navigate("/saf/ativos")} className="gap-2">
               <ArrowLeft className="w-4 h-4" />
               Voltar para Ativos
@@ -106,14 +106,14 @@ const AssetDetailPage = () => {
               <ArrowLeft className="w-4 h-4" />
               Voltar para ativos
             </Button>
-            <span>•</span>
+            <span></span>
             <span>Criado em {new Date(asset.createdAt).toLocaleDateString("pt-BR")}</span>
           </div>
           <h1 className="text-3xl font-bold">{asset.name}</h1>
           {asset.description && <p className="text-muted-foreground max-w-3xl">{asset.description}</p>}
           {asset.owners?.length ? (
             <div className="flex flex-wrap items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Responsáveis:</span>
+              <span className="text-muted-foreground">Responsveis:</span>
               {asset.owners.map((owner) => (
                 <Badge key={owner} variant="outline" className="border-primary/20 bg-primary/5">
                   {owner}
@@ -121,7 +121,7 @@ const AssetDetailPage = () => {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Defina responsáveis para organizar os contatos deste ativo.</p>
+            <p className="text-sm text-muted-foreground">Defina respons?veis para organizar os contatos deste ativo.</p>
           )}
         </div>
         <div className="flex items-center gap-3">

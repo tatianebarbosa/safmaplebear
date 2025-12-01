@@ -48,7 +48,7 @@ export async function saveLicenseLimit(
   motivo: string
 ): Promise<number> {
   if (!apiPrefix) {
-    throw new Error("API base URL não configurada");
+    throw new Error("API base URL no configurada");
   }
 
   const res = await fetch(buildUrl(), {

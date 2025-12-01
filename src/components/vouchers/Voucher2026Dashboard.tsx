@@ -114,7 +114,7 @@ const Voucher2026Dashboard = () => {
         <div className="flex gap-2">
           <Button variant="outline">
             <FileText className="w-4 h-4 mr-2" />
-            Relatório PDF
+            Relatrio PDF
           </Button>
           <Button variant="outline" onClick={() => exportVoucher2026Report(filteredVouchers)}>
             <Download className="w-4 h-4 mr-2" />
@@ -126,7 +126,7 @@ const Voucher2026Dashboard = () => {
         </div>
       </div>
 
-      {/* Estatísticas */}
+      {/* Estatsticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Total de Escolas"
@@ -135,7 +135,7 @@ const Voucher2026Dashboard = () => {
           icon={<School className="h-4 w-4" />}
         />
         <StatsCard
-          title="Escolas Elegíveis"
+          title="Escolas Elegveis"
           value={stats.eligibleSchools.toString()}
           trend={{ value: stats.deliveryRate, isPositive: stats.deliveryRate > 80 }}
           icon={<Gift className="h-4 w-4" />}
@@ -161,7 +161,7 @@ const Voucher2026Dashboard = () => {
               <Label className="text-sm font-medium mb-2 block">Buscar</Label>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Nome, ID ou código do voucher..."
+                  placeholder="Nome, ID ou cdigo do voucher..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="flex-1"
@@ -172,7 +172,7 @@ const Voucher2026Dashboard = () => {
               </div>
             </div>
 
-            {/* Filtros em linha única */}
+            {/* Filtros em linha nica */}
             <div className="flex flex-wrap gap-3">
               <Select value={selectedCluster} onValueChange={setSelectedCluster}>
                 <SelectTrigger className="w-40">
@@ -200,12 +200,12 @@ const Voucher2026Dashboard = () => {
 
               <Select value={voucherEligible} onValueChange={setVoucherEligible}>
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Elegível" />
+                  <SelectValue placeholder="Elegvel" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="true">Elegíveis</SelectItem>
-                  <SelectItem value="false">Não Elegíveis</SelectItem>
+                  <SelectItem value="true">Elegveis</SelectItem>
+                  <SelectItem value="false">No Elegveis</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -216,7 +216,7 @@ const Voucher2026Dashboard = () => {
                 <SelectContent>
                   <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="true">Enviados</SelectItem>
-                  <SelectItem value="false">Não Enviados</SelectItem>
+                  <SelectItem value="false">No Enviados</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -274,14 +274,14 @@ const Voucher2026Dashboard = () => {
 
               {voucher.voucherCode && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Código do Voucher</p>
+                  <p className="text-sm text-muted-foreground">Cdigo do Voucher</p>
                   <code className="text-sm bg-muted px-2 py-1 rounded">{voucher.voucherCode}</code>
                 </div>
               )}
 
               <div className="flex flex-wrap gap-2">
                 <Badge variant={voucher.voucherEligible ? "default" : "secondary"}>
-                  {voucher.voucherEligible ? "Elegível" : "Não Elegível"}
+                  {voucher.voucherEligible ? "Elegvel" : "No Elegvel"}
                 </Badge>
                 {voucher.voucherSent && (
                   <Badge variant="outline" className="bg-green-50 text-green-700">

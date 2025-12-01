@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { ASSET_CHANNELS, ASSET_TEAMS, type AssetChannel, type AssetTeam } from "@/types/assets";
 import { X } from "lucide-react";
+import { useAuthStore } from "@/stores/authStore";
 
 type AssetCreateDialogProps = {
   open: boolean;
@@ -46,7 +47,34 @@ export const AssetCreateDialog = ({
   const [assetType, setAssetType] = useState("");
   const [owners, setOwners] = useState<string[]>([]);
   const [ownerInput, setOwnerInput] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const { toast } = useToast();
+  const authUsers = useAuthStore((state) => state.users);
+
+  const ownerSuggestions = useMemo(
+    () =>
+      authUsers
+        ?.filter((user) => (user.role || "").toLowerCase() !== "admin")
+        .map((user) => ({
+          name: user.name,
+          email: user.email,
+          searchText: `${user.name || ""} ${user.email || ""}`.trim(),
+        }))
+        .filter((user) => Boolean(user.name)) || [],
+    [authUsers]
+  );
+
+  const filteredSuggestions = useMemo(() => {
+    const query = ownerInput.trim().toLowerCase();
+    if (query.length < 2) return [];
+    return ownerSuggestions
+      .filter(
+        (user) =>
+          !owners.some((owner) => owner.toLowerCase() === (user.name || "").toLowerCase()) &&
+          user.searchText.toLowerCase().includes(query)
+      )
+      .slice(0, 8);
+  }, [ownerInput, ownerSuggestions, owners]);
 
   useEffect(() => {
     if (!open) return;
@@ -59,13 +87,13 @@ export const AssetCreateDialog = ({
     setOwnerInput("");
   }, [open, initialAsset]);
 
-  const addOwner = () => {
-    const newOwner = ownerInput.trim();
+  const addOwnerValue = (value: string) => {
+    const newOwner = value.trim();
     if (!newOwner) return;
     if (owners.length >= 3) {
       toast({
-        title: "Limite de responsáveis",
-        description: "Adicione no máximo 3 responsáveis pelo ativo.",
+        title: "Limite de respons?veis",
+        description: "Adicione no mximo 3 respons?veis pelo ativo.",
         variant: "destructive",
       });
       return;
@@ -73,7 +101,7 @@ export const AssetCreateDialog = ({
     const alreadyExists = owners.some((owner) => owner.toLowerCase() === newOwner.toLowerCase());
     if (alreadyExists) {
       toast({
-        title: "Responsável já adicionado",
+        title: "Responsvel j adicionado",
         description: "Inclua somente nomes diferentes na lista.",
         variant: "destructive",
       });
@@ -83,6 +111,8 @@ export const AssetCreateDialog = ({
     setOwners((prev) => [...prev, newOwner]);
     setOwnerInput("");
   };
+
+  const addOwner = () => addOwnerValue(ownerInput);
 
   const removeOwner = (name: string) => {
     setOwners((prev) => prev.filter((owner) => owner !== name));
@@ -125,7 +155,7 @@ export const AssetCreateDialog = ({
           <DialogTitle>{mode === "edit" ? "Configurar ativo" : "Criar ativo"}</DialogTitle>
           <DialogDescription>
             {mode === "edit"
-              ? "Atualize o nome e a descrição deste ativo."
+              ? "Atualize o nome e a descrio deste ativo."
               : "Monte um menu interno para acompanhar escolas e contatos desse ativo."}
           </DialogDescription>
         </DialogHeader>
@@ -143,7 +173,7 @@ export const AssetCreateDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="asset-description">Descrição (opcional)</Label>
+            <Label htmlFor="asset-description">Descrio (opcional)</Label>
             <Textarea
               id="asset-description"
               value={description}
@@ -193,20 +223,22 @@ export const AssetCreateDialog = ({
               id="asset-type"
               value={assetType}
               onChange={(event) => setAssetType(event.target.value)}
-              placeholder="Ex.: alinhamento de campanha, suporte Canva, questão financeira"
+              placeholder="Ex.: alinhamento de campanha, suporte Canva, questo financeira"
             />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="asset-owners">Responsáveis pelo ativo</Label>
-              <span className="text-xs text-muted-foreground">Até 3 nomes</span>
+              <Label htmlFor="asset-owners">Responsveis pelo ativo</Label>
+              <span className="text-xs text-muted-foreground">At 3 nomes</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 relative">
               <Input
                 id="asset-owners"
                 value={ownerInput}
                 onChange={(event) => setOwnerInput(event.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 120)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
@@ -218,6 +250,20 @@ export const AssetCreateDialog = ({
               <Button type="button" variant="secondary" onClick={addOwner}>
                 Adicionar
               </Button>
+              {showSuggestions && filteredSuggestions.length > 0 && ownerInput.trim().length >= 2 && (
+                <div className="absolute top-full mt-1 left-0 w-full max-h-60 overflow-auto rounded-xl border border-border/70 bg-popover shadow-lg z-50">
+                  {filteredSuggestions.map((user) => (
+                    <button
+                      key={`${user.name}-${user.email || "no-email"}`}
+                      type="button"
+                      className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-sm"
+                      onClick={() => addOwnerValue(user.name)}
+                    >
+                      <div className="font-medium text-foreground">{user.name}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             {owners.length > 0 && (
               <div className="flex flex-wrap gap-2">
@@ -242,7 +288,7 @@ export const AssetCreateDialog = ({
             <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit">{mode === "edit" ? "Salvar alterações" : "Salvar ativo"}</Button>
+            <Button type="submit">{mode === "edit" ? "Salvar alteraes" : "Salvar ativo"}</Button>
           </div>
         </form>
       </DialogContent>

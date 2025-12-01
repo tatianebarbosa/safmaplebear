@@ -26,7 +26,7 @@ function setCorsHeaders(res) {
     "GET, POST, OPTIONS, PUT, DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
 }
 
 // In-memory data for users and audit

@@ -1,5 +1,5 @@
 /**
- * Exemplo de uso do apiClient para requisições HTTP
+ * Exemplo de uso do apiClient para requisies HTTP
  *
  * Este arquivo demonstra como usar o novo cliente HTTP centralizado
  * em vez de fazer chamadas fetch diretas.
@@ -8,14 +8,14 @@
 import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/apiClient";
 
 // ========================================
-// EXEMPLO 1: Fazer uma requisição GET
+// EXEMPLO 1: Fazer uma requisio GET
 // ========================================
 
 async function fetchUserData(userId: string) {
   const response = await apiGet(`/api/users/${userId}`);
 
   if (!response.ok) {
-    console.error("Erro ao buscar usuário:", response.error);
+    console.error("Erro ao buscar usu?rio:", response.error);
     return null;
   }
 
@@ -23,7 +23,7 @@ async function fetchUserData(userId: string) {
 }
 
 // ========================================
-// EXEMPLO 2: Fazer uma requisição POST com retries automáticos
+// EXEMPLO 2: Fazer uma requisio POST com retries automticos
 // ========================================
 
 interface LoginRequest {
@@ -71,32 +71,32 @@ async function deleteUser(userId: string) {
   const response = await apiDelete(`/api/users/${userId}`);
 
   if (!response.ok) {
-    throw new Error(`Falha ao deletar usuário: ${response.error}`);
+    throw new Error(`Falha ao deletar usu?rio: ${response.error}`);
   }
 
   return true;
 }
 
 // ========================================
-// BOAS PRÁTICAS
+// BOAS PRTICAS
 // ========================================
 
 /**
- * ✅ FAÇA:
+ *  FAA:
  *
  * 1. Use o apiClient em vez de fetch direto
- * 2. Trate erros com tipos específicos (não use `any`)
+ * 2. Trate erros com tipos especficos (no use `any`)
  * 3. Use constantes para delays (DELAY_* do @/lib/constants)
- * 4. Remova console.log/error do código de produção
+ * 4. Remova console.log/error do cdigo de produo
  * 5. Use type safety com Zod ou interfaces TypeScript
  *
- * ❌ NÃO FAÇA:
+ *  NO FAA:
  *
- * 1. Não faça fetch direto sem tratamento
- * 2. Não use `any` para types de erro
- * 3. Não use números mágicos para delays
- * 4. Não deixe console.log no código produção
- * 5. Não misture diferentes estilos de requisição
+ * 1. No faa fetch direto sem tratamento
+ * 2. No use `any` para types de erro
+ * 3. No use nmeros mgicos para delays
+ * 4. No deixe console.log no cdigo produo
+ * 5. No misture diferentes estilos de requisio
  */
 
 export { fetchUserData, loginUser, updateSchool, deleteUser };

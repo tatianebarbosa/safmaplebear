@@ -1,5 +1,5 @@
 /**
- * Cliente HTTP centralizado para todas as requisições da aplicação
+ * Cliente HTTP centralizado para todas as requisies da aplicao
  * Fornece tratamento consistente de erros, headers e retry logic
  */
 
@@ -19,7 +19,7 @@ const DEFAULT_TIMEOUT = 10000; // 10 segundos
 const DEFAULT_RETRIES = 2;
 
 /**
- * Realiza requisição HTTP com tratamento de erro e retry automático
+ * Realiza requisio HTTP com tratamento de erro e retry automtico
  */
 export async function apiCall<T = unknown>(
   url: string,
@@ -63,7 +63,7 @@ export async function apiCall<T = unknown>(
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
 
-      // Não faz retry em erros de rede de cliente ou últimas tentativas
+      // No faz retry em erros de rede de cliente ou ltimas tentativas
       if (attempt === retries || error instanceof TypeError) {
         break;
       }
@@ -77,7 +77,7 @@ export async function apiCall<T = unknown>(
   return {
     ok: false,
     status: 0,
-    error: lastError?.message || "Erro desconhecido na requisição",
+    error: lastError?.message || "Erro desconhecido na requisio",
   };
 }
 

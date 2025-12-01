@@ -68,7 +68,7 @@ const TicketsPage = () => {
   }, [hasRole]);
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
+    <div className="layout-wide w-full py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Tickets SAF</h1>
@@ -219,7 +219,7 @@ const TicketsPage = () => {
       </div>
 
       <div className="text-xs text-muted-foreground">
-        <span className="font-medium">Atalhos:</span> N (novo) • K (kanban) • T (tabela)
+        <span className="font-medium">Atalhos:</span> N (novo)  K (kanban)  T (tabela)
       </div>
 
       <TicketDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />

@@ -27,10 +27,10 @@ const RankingTable = ({ changes, showComparison = true }: RankingTableProps) => 
   };
 
   const getPositionBadge = (position: number) => {
-    if (position === 1) return <Badge variant="warning">🥇 1º</Badge>;
-    if (position === 2) return <Badge variant="secondary">🥈 2º</Badge>;
-    if (position === 3) return <Badge variant="outline">🥉 3º</Badge>;
-    return <Badge variant="outline">{position}º</Badge>;
+    if (position === 1) return <Badge variant="warning"> 1</Badge>;
+    if (position === 2) return <Badge variant="secondary"> 2</Badge>;
+    if (position === 3) return <Badge variant="outline"> 3</Badge>;
+    return <Badge variant="outline">{position}</Badge>;
   };
 
   const getChangeText = (change: RankingChange) => {
@@ -52,14 +52,14 @@ const RankingTable = ({ changes, showComparison = true }: RankingTableProps) => 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-20">Posição</TableHead>
-              <TableHead>Usuário</TableHead>
+              <TableHead className="w-20">Posio</TableHead>
+              <TableHead>Usurio</TableHead>
               <TableHead>Escola</TableHead>
               <TableHead className="text-right">Score</TableHead>
               <TableHead className="text-center">Designs</TableHead>
               <TableHead className="text-center">Publicados</TableHead>
-              <TableHead className="text-center">Visualizações</TableHead>
-              {showComparison && <TableHead className="text-center">Evolução</TableHead>}
+              <TableHead className="text-center">Visualizaes</TableHead>
+              {showComparison && <TableHead className="text-center">Evoluo</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -89,7 +89,7 @@ const RankingTable = ({ changes, showComparison = true }: RankingTableProps) => 
                 
                 <TableCell>
                   <Badge variant="outline" className="text-xs">
-                    {change.escola || 'Não identificada'}
+                    {change.escola || 'No identificada'}
                   </Badge>
                 </TableCell>
                 

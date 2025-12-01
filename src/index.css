@@ -117,7 +117,7 @@
     --shadow-elevated: 0 8px 24px hsl(220 9% 13% / 0.12);
 
     /* Border Radius */
-    --radius: 0.9rem;
+    --radius: 0.45rem;
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;

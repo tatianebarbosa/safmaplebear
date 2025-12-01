@@ -49,10 +49,10 @@ const UserAnalytics = () => {
       const responsibles = getClusterSAFResponsibles(userData);
       setSafResponsibles(responsibles);
 
-      toast.success("Dados dos usuários carregados com sucesso!");
+      toast.success("Dados dos usu?rios carregados com sucesso!");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Erro desconhecido";
-      toast.error(`Erro ao carregar dados dos usuários: ${message}`);
+      toast.error(`Erro ao carregar dados dos usu?rios: ${message}`);
     } finally {
       setLoading(false);
     }
@@ -70,26 +70,26 @@ const UserAnalytics = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Análise de Usuários</h1>
+          <h1 className="text-3xl font-bold">Anlise de Usurios</h1>
           <p className="text-muted-foreground">
-            Análise completa dos usuários, emails e responsáveis SAF
+            Anlise completa dos usu?rios, emails e respons?veis SAF
           </p>
         </div>
       </div>
 
-      {/* Cards de Estatísticas Gerais */}
+      {/* Cards de Estatsticas Gerais */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total de Usuários
+              Total de Usurios
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{users.length}</div>
             <p className="text-xs text-muted-foreground">
-              Usuários cadastrados no sistema
+              Usurios cadastrados no sistema
             </p>
           </CardContent>
         </Card>
@@ -106,7 +106,7 @@ const UserAnalytics = () => {
               {emailAnalysis?.totalMaplebearUsers || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              Usuários com email @maplebear ou @mbcentral
+              Usurios com email @maplebear ou @mbcentral
             </p>
           </CardContent>
         </Card>
@@ -123,7 +123,7 @@ const UserAnalytics = () => {
               {emailAnalysis?.totalExternalUsers || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              Usuários com email externo
+              Usurios com email externo
             </p>
           </CardContent>
         </Card>
@@ -131,14 +131,14 @@ const UserAnalytics = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Responsáveis SAF
+              Responsveis SAF
             </CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{safResponsibles.length}</div>
             <p className="text-xs text-muted-foreground">
-              Possíveis responsáveis SAF
+              Possveis respons?veis SAF
             </p>
           </CardContent>
         </Card>
@@ -146,9 +146,9 @@ const UserAnalytics = () => {
 
       <Tabs defaultValue="emails" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="emails">Análise de Emails</TabsTrigger>
-          <TabsTrigger value="schools">Usuários por Escola</TabsTrigger>
-          <TabsTrigger value="saf">Responsáveis SAF</TabsTrigger>
+          <TabsTrigger value="emails">Anlise de Emails</TabsTrigger>
+          <TabsTrigger value="schools">Usurios por Escola</TabsTrigger>
+          <TabsTrigger value="saf">Responsveis SAF</TabsTrigger>
         </TabsList>
 
         <TabsContent value="emails" className="space-y-4">
@@ -160,7 +160,7 @@ const UserAnalytics = () => {
                   Emails Autorizados
                 </CardTitle>
                 <CardDescription>
-                  Usuários com emails @maplebear, @mbcentral, @seb, @sebsa
+                  Usurios com emails @maplebear, @mbcentral, @seb, @sebsa
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -194,7 +194,7 @@ const UserAnalytics = () => {
                   Emails Externos
                 </CardTitle>
                 <CardDescription>
-                  Usuários sem autorização de licença
+                  Usurios sem autorizao de licen?a
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -202,7 +202,7 @@ const UserAnalytics = () => {
                   {emailAnalysis?.totalExternalUsers || 0}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Usuários que não deveriam ter acesso às licenças Canva
+                  Usurios que no deveriam ter acesso s licen?as Canva
                 </p>
               </CardContent>
             </Card>
@@ -214,7 +214,7 @@ const UserAnalytics = () => {
                 <CardHeader>
                   <CardTitle>Lista de Emails Externos</CardTitle>
                   <CardDescription>
-                    Usuários que precisam de revisão
+                    Usurios que precisam de reviso
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -242,7 +242,7 @@ const UserAnalytics = () => {
                     {emailAnalysis.externalEmails.length > 20 && (
                       <p className="text-sm text-muted-foreground text-center">
                         E mais {emailAnalysis.externalEmails.length - 20}{" "}
-                        usuários...
+                        usu?rios...
                       </p>
                     )}
                   </div>
@@ -256,10 +256,10 @@ const UserAnalytics = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building className="h-5 w-5" />
-                Usuários por Escola
+                Usurios por Escola
               </CardTitle>
               <CardDescription>
-                Distribuição de usuários nas unidades
+                Distribuio de usu?rios nas unidades
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -275,7 +275,7 @@ const UserAnalytics = () => {
                     >
                       <span className="font-medium">{school}</span>
                       <Badge variant="outline">
-                        {schoolUsers.length} usuários
+                        {schoolUsers.length} usu?rios
                       </Badge>
                     </div>
                   ))}
@@ -289,7 +289,7 @@ const UserAnalytics = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Responsáveis SAF
+                Responsveis SAF
               </CardTitle>
               <CardDescription>
                 Consultores de cluster SAF por unidade
@@ -327,7 +327,7 @@ const UserAnalytics = () => {
                 ))}
                 {safResponsibles.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">
-                    Nenhum responsável SAF identificado
+                    Nenhum respons?vel SAF identificado
                   </p>
                 )}
               </div>

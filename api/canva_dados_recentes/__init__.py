@@ -36,7 +36,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     ensure_ascii=False,
                 ),
                 status_code=404,
-                mimetype="application/json",
+                mimetype="application/json; charset=utf-8",
             )
 
         with open(data_file, "r", encoding="utf-8") as f:
@@ -47,7 +47,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps(data, ensure_ascii=False, indent=2),
             status_code=200,
-            mimetype="application/json",
+            mimetype="application/json; charset=utf-8",
             headers={
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -66,7 +66,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 ensure_ascii=False,
             ),
             status_code=500,
-            mimetype="application/json",
+            mimetype="application/json; charset=utf-8",
         )
 
     except Exception as e:  # pragma: no cover
@@ -80,5 +80,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 ensure_ascii=False,
             ),
             status_code=500,
-            mimetype="application/json",
+            mimetype="application/json; charset=utf-8",
         )

@@ -75,7 +75,7 @@ const ProfileManagement = () => {
     confirmPassword: "",
   });
 
-  // Carregar dados do usuário atual e listas
+  // Carregar dados do usu?rio atual e listas
   useEffect(() => {
     loadUserData();
     loadPendingUsers();
@@ -110,7 +110,7 @@ const ProfileManagement = () => {
     }
   };
 
-  // Verificar se domínio é permitido
+  // Verificar se dom?nio  permitido
   const isAllowedDomain = (email: string): boolean => {
     const allowedDomains = [
       "@maplebear.com.br",
@@ -132,7 +132,7 @@ const ProfileManagement = () => {
 
     if (!isAllowedDomain(formData.email)) {
       toast({
-        title: "Email nao permitido",
+        title: "Email n?o permitido",
         description: "Use emails corporativos @maplebear, @mbcentral, @seb ou @sebsa",
         variant: "destructive",
       });
@@ -168,8 +168,8 @@ const ProfileManagement = () => {
   const changePassword = async () => {
     if (formData.newPassword !== formData.confirmPassword) {
       toast({
-        title: "Senhas não conferem",
-        description: "A nova senha e confirmação devem ser iguais",
+        title: "Senhas no conferem",
+        description: "A nova senha e confirmao devem ser iguais",
         variant: "destructive",
       });
       return;
@@ -184,7 +184,7 @@ const ProfileManagement = () => {
       return;
     }
 
-    // Simular alteração de senha
+    // Simular alterao de senha
     toast({
       title: "Senha alterada",
       description: "Sua senha foi alterada com sucesso",
@@ -200,7 +200,7 @@ const ProfileManagement = () => {
     setIsPasswordOpen(false);
   };
 
-  // Aprovar usuário pendente
+  // Aprovar usu?rio pendente
   const approveUser = (userId: string) => {
     const user = pendingUsers.find((u) => u.id === userId);
     if (!user) return;
@@ -230,12 +230,12 @@ const ProfileManagement = () => {
     localStorage.setItem("saf_all_users", JSON.stringify(updatedAllUsers));
 
     toast({
-      title: "Usuário aprovado",
+      title: "Usurio aprovado",
       description: `${user.name} foi aprovado e pode acessar o sistema`,
     });
   };
 
-  // Negar usuário pendente
+  // Negar usu?rio pendente
   const [denyUserId, setDenyUserId] = useState<string | null>(null);
 
   const handleDenyUser = () => {
@@ -245,21 +245,21 @@ const ProfileManagement = () => {
   };
 
   const denyUser = (userId: string) => {
-    // Ação real de negação (simulada)
+    // Ao real de negao (simulada)
     const updatedPending = pendingUsers.filter((u) => u.id !== userId);
     setPendingUsers(updatedPending);
     localStorage.setItem("saf_pending_users", JSON.stringify(updatedPending));
 
     toast({
       title: "Acesso negado",
-      description: "Usuário foi removido da lista de pendentes",
+      description: "Usurio foi removido da lista de pendentes",
       variant: "destructive",
     });
   };
   const createUser = () => {
     if (!isAllowedDomain(formData.email)) {
       toast({
-        title: "Email não permitido",
+        title: "Email no permitido",
         description: "Use emails corporativos @maplebear, @mbcentral, @seb ou @sebsa",
         variant: "destructive",
       });
@@ -286,7 +286,7 @@ const ProfileManagement = () => {
     localStorage.setItem("saf_all_users", JSON.stringify(updatedUsers));
 
     toast({
-      title: "Usuário criado",
+      title: "Usurio criado",
       description: `${formData.name} foi adicionado ao sistema`,
     });
 
@@ -322,7 +322,7 @@ const ProfileManagement = () => {
         <div>
           <h1 className="text-3xl font-bold">Gerenciamento de Perfil</h1>
           <p className="text-muted-foreground">
-            Configure seu perfil e gerencie usuários
+            Configure seu perfil e gerencie usu?rios
           </p>
         </div>
       </div>
@@ -333,22 +333,22 @@ const ProfileManagement = () => {
           {currentUser.role === "admin" && (
             <>
               <TabsTrigger value="pending">
-                Aprovações ({pendingUsers.length})
+                Aprovaes ({pendingUsers.length})
               </TabsTrigger>
               <TabsTrigger value="users">
-                Usuários ({allUsers.length})
+                Usurios ({allUsers.length})
               </TabsTrigger>
             </>
           )}
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
-          {/* Perfil do usuário atual */}
+          {/* Perfil do usu?rio atual */}
           <Card>
             <CardHeader>
-              <CardTitle>Informações do Perfil</CardTitle>
+              <CardTitle>Informaes do Perfil</CardTitle>
               <CardDescription>
-                Gerencie suas informações pessoais e segurança
+                Gerencie suas informaes pessoais e segurana
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -373,13 +373,13 @@ const ProfileManagement = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Último Login</Label>
+                  <Label className="text-sm font-medium">ltimo Login</Label>
                   <p className="text-sm text-muted-foreground">
                     {new Date(currentUser.lastLogin).toLocaleString("pt-BR")}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Sessão Expira</Label>
+                  <Label className="text-sm font-medium">Sesso Expira</Label>
                   <p className="text-sm text-muted-foreground">
                     {new Date(currentUser.sessionExpiry).toLocaleString(
                       "pt-BR"
@@ -400,7 +400,7 @@ const ProfileManagement = () => {
                     <DialogHeader>
                       <DialogTitle>Editar Perfil</DialogTitle>
                       <DialogDescription>
-                        Atualize suas informações pessoais
+                        Atualize suas informaes pessoais
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
@@ -425,7 +425,7 @@ const ProfileManagement = () => {
                           }
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          Apenas emails @maplebear, @mbcentral, @seb ou @sebsa são
+                          Apenas emails @maplebear, @mbcentral, @seb ou @sebsa so
                           permitidos
                         </p>
                       </div>
@@ -434,7 +434,7 @@ const ProfileManagement = () => {
                         className="w-full"
                         isLoading={isLoading}
                       >
-                        Salvar Alterações
+                        Salvar Alteraes
                       </Button>
                     </div>
                   </DialogContent>
@@ -510,21 +510,21 @@ const ProfileManagement = () => {
           </Card>
         </TabsContent>
 
-        {/* Aprovações - apenas para admin */}
+        {/* Aprovaes - apenas para admin */}
         {currentUser.role === "admin" && (
           <TabsContent value="pending" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Usuários Pendentes de Aprovação</CardTitle>
+                <CardTitle>Usurios Pendentes de Aprovao</CardTitle>
                 <CardDescription>
-                  Analise e aprove novos usuários que solicitaram acesso
+                  Analise e aprove novos usu?rios que solicitaram acesso
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {pendingUsers.length === 0 ? (
                     <p className="text-center text-muted-foreground py-8">
-                      Nenhum usuário pendente de aprovação
+                      Nenhum usu?rio pendente de aprovao
                     </p>
                   ) : (
                     pendingUsers.map((user) => (
@@ -577,9 +577,9 @@ const ProfileManagement = () => {
                                   Tem certeza que deseja negar o acesso?
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Esta ação removerá o usuário da lista de
-                                  pendentes. Ele precisará refazer a
-                                  solicitação.
+                                  Esta ao remover o usu?rio da lista de
+                                  pendentes. Ele precisar refazer a
+                                  solicitao.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -603,30 +603,30 @@ const ProfileManagement = () => {
           </TabsContent>
         )}
 
-        {/* Usuários - apenas para admin */}
+        {/* Usurios - apenas para admin */}
         {currentUser.role === "admin" && (
           <TabsContent value="users" className="space-y-6">
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>Usuários do Sistema</CardTitle>
+                    <CardTitle>Usurios do Sistema</CardTitle>
                     <CardDescription>
-                      Gerencie todos os usuários ativos
+                      Gerencie todos os usu?rios ativos
                     </CardDescription>
                   </div>
                   <Dialog open={newUserOpen} onOpenChange={setNewUserOpen}>
                     <DialogTrigger asChild>
                       <Button>
                         <Users className="w-4 h-4 mr-2" />
-                        Criar Usuário
+                        Criar Usurio
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Criar Novo Usuário</DialogTitle>
+                        <DialogTitle>Criar Novo Usurio</DialogTitle>
                         <DialogDescription>
-                          Adicione um novo usuário ao sistema
+                          Adicione um novo usu?rio ao sistema
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
@@ -657,7 +657,7 @@ const ProfileManagement = () => {
                           />
                         </div>
                         <Button onClick={createUser} className="w-full">
-                          Criar Usuário
+                          Criar Usurio
                         </Button>
                       </div>
                     </DialogContent>

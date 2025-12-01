@@ -77,7 +77,7 @@ const VoucherDashboard = () => {
     switch (status.toLowerCase()) {
       case 'ativa': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'inativa': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'implantando': return 'bg-primary-light/10 text-primary-dark border border-primary-light/20'; // Substituído amarelo por vermelho light
+      case 'implantando': return 'bg-primary-light/10 text-primary-dark border border-primary-light/20'; // Substitudo amarelo por vermelho light
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   };
@@ -93,18 +93,18 @@ const VoucherDashboard = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="layout-wide w-full py-8 space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dashboard de Vouchers</h1>
           <p className="text-muted-foreground">
-            Gerenciamento e distribuição de vouchers Canva
+            Gerenciamento e distribuio de vouchers Canva
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
             <FileText className="w-4 h-4 mr-2" />
-            Relatório PDF
+            Relatrio PDF
           </Button>
           <Button variant="outline" onClick={() => exportVoucherReport(filteredSchools)}>
             <Download className="w-4 h-4 mr-2" />
@@ -116,7 +116,7 @@ const VoucherDashboard = () => {
         </div>
       </div>
 
-      {/* Estatísticas */}
+      {/* Estatsticas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total de Escolas"
@@ -136,7 +136,7 @@ const VoucherDashboard = () => {
           icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatsCard
-          title="Exceções"
+          title="Excees"
           value={stats.exceptionVouchers.toString()}
           icon={<FileText className="h-4 w-4" />}
         />
@@ -150,7 +150,7 @@ const VoucherDashboard = () => {
               <Label className="text-sm font-medium">Buscar escola</Label>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Nome, ID ou código do voucher..."
+                  placeholder="Nome, ID ou cdigo do voucher..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="max-w-sm"
@@ -193,12 +193,12 @@ const VoucherDashboard = () => {
               <div className="min-w-[120px]">
                 <Select value={voucherEligible} onValueChange={setVoucherEligible}>
                   <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Elegível" />
+                    <SelectValue placeholder="Elegvel" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="true">Elegíveis</SelectItem>
-                    <SelectItem value="false">Não Elegíveis</SelectItem>
+                    <SelectItem value="true">Elegveis</SelectItem>
+                    <SelectItem value="false">No Elegveis</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -211,7 +211,7 @@ const VoucherDashboard = () => {
                   <SelectContent>
                     <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="true">Enviados</SelectItem>
-                    <SelectItem value="false">Não Enviados</SelectItem>
+                    <SelectItem value="false">No Enviados</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -250,14 +250,14 @@ const VoucherDashboard = () => {
 
               {school.voucherCode && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Código do Voucher</p>
+                  <p className="text-sm text-muted-foreground">Cdigo do Voucher</p>
                   <code className="text-sm bg-muted px-2 py-1 rounded">{school.voucherCode}</code>
                 </div>
               )}
 
               <div className="flex flex-wrap gap-2">
                 <Badge variant={school.voucherEligible ? "default" : "destructive"}>
-                  {school.voucherEligible ? "Elegível" : "Não Elegível"}
+                  {school.voucherEligible ? "Elegvel" : "No Elegvel"}
                 </Badge>
                 {school.voucherSent && (
                   <Badge variant="outline" className="bg-success-bg text-success">

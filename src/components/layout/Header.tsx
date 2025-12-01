@@ -31,7 +31,7 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { currentUser } = useAuthStore();
+  const { currentUser, hasRole } = useAuthStore();
 
   const userEmail = localStorage.getItem("userEmail") || "admin@maplebear.com.br";
   const displayName = currentUser?.name || currentUser?.email || userEmail;
@@ -40,10 +40,10 @@ const Header = () => {
     () => userEmail.split("@")[0].slice(0, 2).toUpperCase(),
     [userEmail]
   );
-  const showManagement = currentUser?.role === "Admin";
+  const showManagement = hasRole("Admin") || hasRole("Coordinator");
 
   const navItems = [
-    { label: "Início", path: "/dashboard" },
+    { label: "Inicio", path: "/dashboard" },
     { label: "Canva", path: "/dashboard/canva" },
     { label: "Vouchers", path: "/dashboard/vouchers" },
     { label: "Ativos", path: "/saf/ativos" },
@@ -181,7 +181,7 @@ const Header = () => {
                   variant="ghost"
                   size="icon"
                   className="rounded-full h-11 w-11 bg-primary text-white"
-                  aria-label="Menu do usuário"
+                  aria-label="Menu do usuario"
                 >
                   <Avatar className="w-10 h-10">
                     <AvatarFallback className="bg-primary text-white text-sm font-semibold">
@@ -191,11 +191,11 @@ const Header = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                align="center"
+                align="end"
                 side="bottom"
-                sideOffset={10}
-                avoidCollisions={false}
-                className="w-52 rounded-xl shadow-[0_18px_34px_-18px_rgba(30,32,36,0.4)]"
+                sideOffset={8}
+                collisionPadding={12}
+                className="w-52 rounded-xl shadow-[0_18px_34px_-18px_rgba(30,32,36,0.4)] right-0 translate-x-0"
               >
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 <User className="w-4 h-4 mr-2" />

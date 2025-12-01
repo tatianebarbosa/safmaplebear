@@ -29,13 +29,13 @@ const MobileMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { currentUser } = useAuthStore();
+  const { currentUser, hasRole } = useAuthStore();
   const [open, setOpen] = useState(false);
 
-  const showManagement = currentUser?.role === "Admin";
+  const showManagement = hasRole("Admin") || hasRole("Coordinator");
 
   const navItems = [
-    { label: "Início", path: "/dashboard", icon: Home },
+    { label: "Incio", path: "/dashboard", icon: Home },
     { label: "Canva", path: "/dashboard/canva", icon: Palette },
     { label: "Vouchers", path: "/dashboard/vouchers", icon: Ticket },
     { label: "Tickets", path: "/tickets", icon: Ticket },
@@ -48,7 +48,7 @@ const MobileMenu = () => {
 
     toast({
       title: "Logout realizado",
-      description: "Você foi desconectado com sucesso",
+      description: "Voc foi desconectado com sucesso",
     });
 
     navigate("/login");
@@ -66,7 +66,7 @@ const MobileMenu = () => {
           variant="ghost"
           size="icon"
           className="md:hidden rounded-full h-11 w-11"
-          aria-label="Abrir menu de navegação"
+          aria-label="Abrir menu de navegao"
         >
           <Menu className="w-6 h-6" />
         </Button>
@@ -79,7 +79,7 @@ const MobileMenu = () => {
         </SheetHeader>
 
         <div className="mt-6 flex flex-col gap-2">
-          {/* Navegação Principal */}
+          {/* Navegao Principal */}
           <div className="space-y-1">
             {navItems.map((item) => {
               const isActive = location.pathname.startsWith(item.path);
@@ -110,7 +110,7 @@ const MobileMenu = () => {
           {/* Links Externos */}
           <div className="space-y-1">
             <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              Links Rápidos
+              Links Rpidos
             </p>
             {SPREADSHEET_LINKS.map((item) => (
               <Button

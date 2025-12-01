@@ -3,8 +3,8 @@ const CANVA_DASHBOARD_PATH = "/dashboard/canva";
 const MODAL_ID = "canva-sync-reminder-modal";
 
 /**
- * Exibe um aviso modal centralizado lembrando de replicar a alteração no Canva.
- * Abre imediatamente a página oficial em uma nova guia e exibe botões de ação.
+ * Exibe um aviso modal centralizado lembrando de replicar a alterao no Canva.
+ * Abre imediatamente a pgina oficial em uma nova guia e exibe botes de ao.
  */
 export const showCanvaSyncReminder = () => {
   if (typeof document === "undefined") return;
@@ -58,10 +58,10 @@ export const showCanvaSyncReminder = () => {
         ">!</div>
         <div style="flex: 1; min-width: 0;">
           <div style="font-size: 18px; font-weight: 800; margin-bottom: 6px; line-height: 1.2;">
-            Replique esta alteração no Canva agora
+            Replique esta alterao no Canva agora
           </div>
           <div style="font-size: 15px; color: #475569; line-height: 1.4;">
-            Finalize esta mesma ação diretamente no Canva para manter licenças e usuários alinhados.
+            Finalize esta mesma ao diretamente no Canva para manter licen?as e usu?rios alinhados.
           </div>
         </div>
       </div>
@@ -113,7 +113,7 @@ export const showCanvaSyncReminder = () => {
   const closeButton = wrapper.querySelector<HTMLButtonElement>("[data-canva-close]");
   closeButton?.addEventListener("click", () => {
     closeModal();
-    // Volta para o painel de escolas/licenças após o usuário confirmar que vai ajustar.
+    // Volta para o painel de escolas/licen?as aps o usu?rio confirmar que vai ajustar.
     window.location.href = CANVA_DASHBOARD_PATH;
   });
 
@@ -126,6 +126,6 @@ export const showCanvaSyncReminder = () => {
   document.addEventListener("keydown", onEsc);
   document.body.appendChild(wrapper);
 
-  // Abre a nova guia imediatamente após a ação do usuário
+  // Abre a nova guia imediatamente aps a ao do usu?rio
   window.open(CANVA_PEOPLE_URL, "_blank", "noopener,noreferrer");
 };

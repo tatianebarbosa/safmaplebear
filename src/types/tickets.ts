@@ -21,13 +21,23 @@ export interface TicketNote {
   createdAt: string;
 }
 
+export interface TicketHistoryEntry {
+  id: string;
+  author: string;
+  action: string;
+  timestamp: string;
+  before: Partial<Ticket>;
+  after: Partial<Ticket>;
+}
+
 export interface Ticket {
   id: string; // "#258209"
   agente: Agente; // responsavel atual
+  responsavel?: string; // nome exibido do responsavel (pode vir do backend)
   diasAberto: number; // p/ badge de SLA
   status: TicketStatus;
   observacao: string;
-  createdBy?: string; // nome do usuario logado que criou
+  createdBy?: string; // nome do usu?rio logado que criou
   createdAt: string; // ISO
   updatedAt: string; // ISO
   resolvedAt?: string | null; // ISO quando resolvido, null se aberto
@@ -38,6 +48,7 @@ export interface Ticket {
   slaDias?: number;
   assigneeEmail?: string;
   notes?: TicketNote[];
+  history?: TicketHistoryEntry[];
 }
 
 export interface User {

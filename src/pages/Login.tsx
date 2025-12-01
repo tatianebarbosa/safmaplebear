@@ -23,7 +23,7 @@ const mapRole = (role?: string): Role => {
   if (normalized === "coord" || normalized === "coordinator") return "Coordinator";
   if (normalized === "agent") return "Agent";
 
-  console.warn(`[auth] Papel desconhecido recebido: "${role}". Usando "Agent" como padrão.`);
+  console.warn(`[auth] Papel desconhecido recebido: "${role}". Usando "Agent" como padro.`);
   return "Agent";
 };
 

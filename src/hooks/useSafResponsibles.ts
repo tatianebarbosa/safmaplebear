@@ -8,7 +8,7 @@ import type { User } from "@/types/tickets";
 const FALLBACK_RESPONSIBLES = [
   "Rafael",
   "Joao",
-  "João",
+  "Joo",
   "Ingrid",
   "Rafha",
   "Rafhael",
@@ -41,7 +41,7 @@ export const useSafResponsibles = (opts: UseSafResponsiblesOptions = {}): Option
       .trim();
 
   const hydrateUsers = useCallback(async () => {
-    // 0) Tenta carregar direto do estado persistido (atualizado pela página de Admin)
+    // 0) Tenta carregar direto do estado persistido (atualizado pela pgina de Admin)
     try {
       const persisted = typeof window !== "undefined" ? localStorage.getItem("saf-auth-storage") : null;
       if (persisted) {
@@ -49,7 +49,7 @@ export const useSafResponsibles = (opts: UseSafResponsiblesOptions = {}): Option
         const storedUsers = parsed?.state?.users;
         if (Array.isArray(storedUsers) && storedUsers.length > 0) {
           setUsers(storedUsers as User[]);
-          // Não faz return para permitir refresh da API, mas já garante dados locais atualizados
+          // No faz return para permitir refresh da API, mas j garante dados locais atualizados
         }
       }
     } catch {

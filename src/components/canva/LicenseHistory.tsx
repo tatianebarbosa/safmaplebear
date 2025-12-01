@@ -63,11 +63,11 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
 
   const getActionLabel = (action: string) => {
     const labels = {
-      add: 'Licença Adicionada',
-      remove: 'Licença Removida',
-      transfer: 'Usuário Transferido',
-      delete: 'Usuário Excluído',
-      update: 'Usuário Atualizado',
+      add: 'Licen?a Adicionada',
+      remove: 'Licen?a Removida',
+      transfer: 'Usurio Transferido',
+      delete: 'Usurio Excludo',
+      update: 'Usurio Atualizado',
     };
     return labels[action as keyof typeof labels] || action;
   };
@@ -85,7 +85,7 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
 
   const exportHistory = () => {
     const csvData = [
-      ['Data/Hora', 'Escola', 'Ação', 'Usuário', 'Email', 'Escola Destino', 'Referencia (Email/Ticket)', 'Executado por'],
+      ['Data/Hora', 'Escola', 'Ao', 'Usurio', 'Email', 'Escola Destino', 'Referencia (Email/Ticket)', 'Executado por'],
       ...filteredHistory.map(action => [
         formatDateTimeBR(action.timestamp),
         action.schoolName,
@@ -98,7 +98,7 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
       ])
     ];
 
-    downloadCSV(csvData, `historico-licencas-canva-${formatDateForFilename()}`);
+    downloadCSV(csvData, `historico-licen?as-canva-${formatDateForFilename()}`);
   };
 
   return (
@@ -131,24 +131,24 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">Ação</label>
+              <label className="text-sm font-medium mb-2 block">Ao</label>
               <Select value={actionFilter} onValueChange={setActionFilter}>
                 <SelectTrigger>
-              <SelectValue placeholder="Todas as ações" />
+              <SelectValue placeholder="Todas as aes" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas as ações</SelectItem>
-              <SelectItem value="add">Licença Adicionada</SelectItem>
-              <SelectItem value="remove">Licença Removida</SelectItem>
-              <SelectItem value="transfer">Usuário Transferido</SelectItem>
-              <SelectItem value="delete">Usuário Excluído</SelectItem>
-              <SelectItem value="update">Usuário Atualizado</SelectItem>
+              <SelectItem value="all">Todas as aes</SelectItem>
+              <SelectItem value="add">Licen?a Adicionada</SelectItem>
+              <SelectItem value="remove">Licen?a Removida</SelectItem>
+              <SelectItem value="transfer">Usurio Transferido</SelectItem>
+              <SelectItem value="delete">Usurio Excludo</SelectItem>
+              <SelectItem value="update">Usurio Atualizado</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">Data Início</label>
+              <label className="text-sm font-medium mb-2 block">Data Incio</label>
               <Input
                 type="date"
                 value={dateRange.start}
@@ -187,17 +187,17 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Histórico de Ações ({filteredHistory.length})
+            Histrico de Aes ({filteredHistory.length})
           </CardTitle>
           <CardDescription>
-            Registro de todas as alterações realizadas no sistema de licenças Canva
+            Registro de todas as alteraes realizadas no sistema de licen?as Canva
           </CardDescription>
         </CardHeader>
         <CardContent>
           {filteredHistory.length === 0 ? (
             <div className="text-center py-8">
               <History className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Nenhum histórico encontrado com os filtros aplicados.</p>
+              <p className="text-muted-foreground">Nenhum histrico encontrado com os filtros aplicados.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -206,8 +206,8 @@ export const LicenseHistory = ({ schoolsData }: LicenseHistoryProps) => {
                   <TableRow>
                     <TableHead>Data/Hora</TableHead>
                     <TableHead>Escola</TableHead>
-                    <TableHead>Ação</TableHead>
-                    <TableHead>Usuário</TableHead>
+                    <TableHead>Ao</TableHead>
+                    <TableHead>Usurio</TableHead>
                     <TableHead>Destino</TableHead>
                     <TableHead>Referencia (Email/Ticket)</TableHead>
                     <TableHead>Executado por</TableHead>

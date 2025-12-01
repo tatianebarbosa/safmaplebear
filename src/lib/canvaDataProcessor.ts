@@ -1,4 +1,4 @@
-﻿import { getMaxLicensesPerSchool } from '@/config/licenseLimits';
+import { getMaxLicensesPerSchool } from '@/config/licenseLimits';
 import { isEmailCompliant } from '@/lib/safDataService';
 
 export interface CanvaUser {
@@ -13,7 +13,7 @@ export interface CanvaUser {
   designsViewed: number;
   school?: string;
   schoolId?: string;
-  isCompliant: boolean; // Se est? dentro da pol?tica de dom?nio
+  isCompliant: boolean; // Se esta dentro da politica de dominio
   complianceIssue?: string;
   period: '30d' | '3m' | '6m' | '12m';
 }
@@ -86,7 +86,7 @@ export interface LicenseAction {
   performedBy: string;
 }
 
-// Dom?nios permitidos pela pol?tica
+// Dominios permitidos pela politica
 const parseCanvaReportCSV = (csvContent: string, period: '30d' | '3m' | '6m' | '12m'): CanvaUser[] => {
   const lines = csvContent.split('\n');
   const users: CanvaUser[] = [];
@@ -113,7 +113,7 @@ const parseCanvaReportCSV = (csvContent: string, period: '30d' | '3m' | '6m' | '
     if (!name || !email) continue;
 
     const isCompliant = isEmailCompliant(email);
-    const complianceIssue = !isCompliant ? 'Dom?nio fora da pol?tica corporativa' : undefined;
+    const complianceIssue = !isCompliant ? 'Dominio fora da politica corporativa' : undefined;
 
     users.push({
       id: `${email}-${period}`,
@@ -166,16 +166,16 @@ const extractClusterFromSchool = (schoolName: string): string => {
   if (!schoolName) return 'Indefinido';
   
   // Extract cluster from school name patterns
-  if (schoolName.includes('S?o Paulo') || schoolName.includes('SP')) return 'S?o Paulo';
+  if (schoolName.includes('Sao Paulo') || schoolName.includes('SP')) return 'Sao Paulo';
   if (schoolName.includes('Rio de Janeiro') || schoolName.includes('RJ')) return 'Rio de Janeiro';
   if (schoolName.includes('Belo Horizonte') || schoolName.includes('BH')) return 'Minas Gerais';
   if (schoolName.includes('Salvador') || schoolName.includes('Bahia')) return 'Bahia';
   if (schoolName.includes('Recife') || schoolName.includes('Caruaru')) return 'Pernambuco';
-  if (schoolName.includes('Bras?lia') || schoolName.includes('DF')) return 'Distrito Federal';
+  if (schoolName.includes('Brasilia') || schoolName.includes('DF')) return 'Distrito Federal';
   if (schoolName.includes('Porto Alegre') || schoolName.includes('RS')) return 'Rio Grande do Sul';
-  if (schoolName.includes('Curitiba') || schoolName.includes('PR')) return 'Paran?';
-  if (schoolName.includes('Fortaleza') || schoolName.includes('CE')) return 'Cear?';
-  if (schoolName.includes('Goi?nia') || schoolName.includes('GO')) return 'Goi?s';
+  if (schoolName.includes('Curitiba') || schoolName.includes('PR')) return 'Parana';
+  if (schoolName.includes('Fortaleza') || schoolName.includes('CE')) return 'Ceara';
+  if (schoolName.includes('Goiania') || schoolName.includes('GO')) return 'Goias';
   
   return 'Outros Estados';
 };
@@ -183,7 +183,7 @@ const extractClusterFromSchool = (schoolName: string): string => {
 export const loadCanvaData = async (period: '30d' | '3m' | '6m' | '12m' = '30d'): Promise<CanvaUser[]> => {
   try {
     // Load users mapping from CSV (updated file)
-    const usersResponse = await fetch('/data/usuarios_canva_atualizados.csv');
+    const usersResponse = await fetch('/data/usu?rios_canva_atualizados.csv');
     const usersText = await usersResponse.text();
     const usersMapping = parseUsersCSV(usersText);
 
@@ -295,7 +295,7 @@ export const generateCanvaAnalytics = (users: CanvaUser[]): CanvaAnalytics => {
     topPerformingSchools,
     complianceRate,
     totalActivity,
-    periodComparison: [] // Implementar compara??o de per?odos
+    periodComparison: [] // Implementar comparacao de periodos
   };
 };
 
@@ -375,7 +375,7 @@ export const filterCanvaUsers = (
 
 export const exportCanvaData = (users: CanvaUser[]): string => {
   const headers = [
-    'Nome', 'Email', 'Fun??o', 'Escola', 'Status Pol?tica', 
+    'Nome', 'Email', 'Fun??o', 'Escola', 'Status Politica', 
     'Designs Criados', 'Designs Publicados', 'Links Compartilhados', 
     'Designs Visualizados', '?ltima Atividade'
   ];
@@ -385,7 +385,7 @@ export const exportCanvaData = (users: CanvaUser[]): string => {
     user.email,
     user.role,
     user.school || 'A preencher',
-    user.isCompliant ? 'Conforme' : 'Fora da pol?tica',
+    user.isCompliant ? 'Conforme' : 'Fora da politica',
     user.designsCreated.toString(),
     user.designsPublished.toString(),
     user.sharedLinks.toString(),

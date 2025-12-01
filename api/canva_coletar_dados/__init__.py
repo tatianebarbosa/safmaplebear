@@ -44,7 +44,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     "message": "Credenciais do Canva não configuradas. Configure CANVA_EMAIL e CANVA_PASSWORD."
                 }, ensure_ascii=False),
                 status_code=500,
-                mimetype="application/json"
+                mimetype="application/json; charset=utf-8"
             )
         
         # Obtém o período do filtro (opcional)
@@ -99,7 +99,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps(response_data, ensure_ascii=False, indent=2),
             status_code=200,
-            mimetype="application/json",
+            mimetype="application/json; charset=utf-8",
             headers={
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -115,7 +115,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "message": f"Módulos necessários não encontrados: {str(e)}"
             }, ensure_ascii=False),
             status_code=500,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )
     
     except Exception as e:
@@ -126,5 +126,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "message": str(e)
             }, ensure_ascii=False),
             status_code=500,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )

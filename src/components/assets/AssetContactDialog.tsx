@@ -99,7 +99,7 @@ export const AssetContactDialog = ({
     if (!assetType.trim()) {
       toast({
         title: "Informe o tipo de ativo / motivo do contato",
-        description: "Ex.: alinhamento de campanha, suporte Canva, questão financeira",
+        description: "Ex.: alinhamento de campanha, suporte Canva, questo financeira",
         variant: "destructive",
       });
       return;
@@ -151,7 +151,7 @@ export const AssetContactDialog = ({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Responsável SAF</Label>
+            <Label>Responsvel SAF</Label>
             <Input
               value={safOwner}
               onChange={(event) => setSafOwner(event.target.value)}
@@ -211,17 +211,17 @@ export const AssetContactDialog = ({
         </div>
 
         <div className="space-y-2">
-          <Label>Observações</Label>
+          <Label>Observaes</Label>
           <Textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
-            placeholder="Anote decisões, pendências, próximos passos ou links."
+            placeholder="Anote decises, pendncias, prximos passos ou links."
             rows={3}
           />
         </div>
 
         <div className="space-y-2">
-          <Label>Data e horário do contato</Label>
+          <Label>Data e horrio do contato</Label>
           <Input
             type="datetime-local"
             value={contactAt}
@@ -233,7 +233,7 @@ export const AssetContactDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
             Cancelar
           </Button>
-          <Button onClick={handleSave}>{mode === "edit" ? "Salvar alterações" : "Salvar registro"}</Button>
+          <Button onClick={handleSave}>{mode === "edit" ? "Salvar alteraes" : "Salvar registro"}</Button>
         </div>
       </DialogContent>
     </Dialog>

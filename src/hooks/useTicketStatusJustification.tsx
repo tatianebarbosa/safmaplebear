@@ -4,7 +4,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { useTicketStore } from "@/stores/ticketStore";
 import { Ticket, TicketStatus } from "@/types/tickets";
 
-const statusesRequiringJustification: TicketStatus[] = ["Pendente", "Em andamento", "Resolvido"];
+// Exigir justificativa apenas quando for marcar como resolvido
+const statusesRequiringJustification: TicketStatus[] = ["Resolvido"];
 
 export const requiresTicketJustification = (status: TicketStatus) =>
   statusesRequiringJustification.includes(status);

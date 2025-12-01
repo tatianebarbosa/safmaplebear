@@ -2,7 +2,7 @@
 import { z } from "zod";
 import userService from "@/services/userService";
 
-// Credenciais válidas para modo desenvolvimento
+// Credenciais vlidas para modo desenvolvimento
 const VALID_CREDENTIALS = [
   { username: "admin", password: "admin2025", role: "admin" },
   { username: "saf@seb.com.br", password: "saf2025", role: "user" },
@@ -10,10 +10,10 @@ const VALID_CREDENTIALS = [
   { username: "tatiane.barbosa", password: "tatiane.barbosa", role: "user" },
 ];
 
-// Esquema de validação para o login
+// Esquema de validao para o login
 const loginSchema = z.object({
-  username: z.string().min(1, "O nome de usuário é obrigatório"),
-  password: z.string().min(1, "A senha é obrigatória"),
+  username: z.string().min(1, "O nome de usu?rio  obrigatrio"),
+  password: z.string().min(1, "A senha  obrigatria"),
 });
 
 // Tipagem para os dados de login
@@ -30,8 +30,8 @@ interface LoginResponse {
 }
 
 /**
- * Autentica o usuário (modo desenvolvimento - autenticação local)
- * @param data - Credenciais de login (usuário e senha).
+ * Autentica o usu?rio (modo desenvolvimento - autenticao local)
+ * @param data - Credenciais de login (usu?rio e senha).
  * @returns A resposta da API de login.
  */
 export const login = async (data: LoginData): Promise<LoginResponse> => {
@@ -41,7 +41,7 @@ export const login = async (data: LoginData): Promise<LoginResponse> => {
   // Simula delay de rede
   await new Promise((resolve) => setTimeout(resolve, 500));
 
-  // Normaliza o username removendo espaços
+  // Normaliza o username removendo espaos
   const normalizedUsername = data.username.trim().toLowerCase();
 
   // If an API base url is configured (Vite env var `VITE_API_BASE_URL`), try remote login (useful for mock server)
@@ -75,7 +75,7 @@ export const login = async (data: LoginData): Promise<LoginResponse> => {
           role: "user",
         };
 
-      if (!token) throw new Error("Token não recebido do servidor");
+      if (!token) throw new Error("Token no recebido do servidor");
 
       return {
         token,
@@ -133,31 +133,31 @@ export const login = async (data: LoginData): Promise<LoginResponse> => {
 };
 
 /**
- * Salva o token de autenticação no localStorage.
- * @param token - O token de autenticação.
+ * Salva o token de autenticao no localStorage.
+ * @param token - O token de autenticao.
  */
 export const saveAuthToken = (token: string) => {
   localStorage.setItem("authToken", token);
 };
 
 /**
- * Obtém o token de autenticação do localStorage.
- * @returns O token de autenticação ou null se não existir.
+ * Obtm o token de autenticao do localStorage.
+ * @returns O token de autenticao ou null se no existir.
  */
 export const getAuthToken = (): string | null => {
   return localStorage.getItem("authToken");
 };
 
 /**
- * Remove o token de autenticação do localStorage.
+ * Remove o token de autenticao do localStorage.
  */
 export const removeAuthToken = () => {
   localStorage.removeItem("authToken");
 };
 
 /**
- * Verifica se o usuário está autenticado.
- * @returns True se o usuário estiver autenticado, false caso contrário.
+ * Verifica se o usu?rio est autenticado.
+ * @returns True se o usu?rio estiver autenticado, false caso contrrio.
  */
 export const isAuthenticated = (): boolean => {
   return getAuthToken() !== null;

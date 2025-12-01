@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -141,7 +141,7 @@ const AIKnowledgeBase = () => {
             id: "1",
             name: "Tom Educado",
             prompt:
-              "Reescreva o texto a seguir mantendo o mesmo conteÃºdo, mas com um tom mais educado e profissional, adequado para o atendimento ao cliente Maple Bear:",
+              "Reescreva o texto a seguir mantendo o mesmo conteúdo, mas com um tom mais educado e profissional, adequado para o atendimento ao cliente Maple Bear:",
             category: "atendimento",
             isActive: true,
             usageCount: 50,
@@ -149,9 +149,9 @@ const AIKnowledgeBase = () => {
           },
           {
             id: "2",
-            name: "Resposta TÃ©cnica Canva",
+            name: "Resposta Técnica Canva",
             prompt:
-              "Com base no conhecimento sobre licenÃ§as Canva da Maple Bear, responda a seguinte dÃºvida de forma clara e tÃ©cnica:",
+              "Com base no conhecimento sobre licenças Canva da Maple Bear, responda a seguinte dúvida de forma clara e técnica:",
             category: "canva",
             isActive: true,
             usageCount: 30,
@@ -263,9 +263,9 @@ const AIKnowledgeBase = () => {
 
       if (!uploads.length) {
         toast({
-          title: "Nenhum conteÃºdo encontrado",
+          title: "Nenhum conteúdo encontrado",
           description:
-            "Os arquivos enviados estÃ£o vazios ou nÃ£o puderam ser lidos.",
+            "Os arquivos enviados estão vazios ou não puderam ser lidos.",
           variant: "destructive",
         });
         return;
@@ -538,7 +538,7 @@ const AIKnowledgeBase = () => {
     if (!navigator?.clipboard) {
       toast({
         title: "Copie manualmente",
-        description: "Navegador nao permitiu copiar automaticamente.",
+        description: "Navegador n?o permitiu copiar automaticamente.",
         variant: "destructive",
       });
       return;
@@ -553,7 +553,7 @@ const AIKnowledgeBase = () => {
       });
     } catch {
       toast({
-        title: "Nao foi possivel copiar",
+        title: "N?o foi possivel copiar",
         description: "Tente novamente ou selecione o texto manualmente.",
         variant: "destructive",
       });
@@ -575,7 +575,7 @@ const AIKnowledgeBase = () => {
               Tem certeza que deseja remover este item?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Esta aÃ§Ã£o Ã© irreversÃ­vel. O item de conhecimento serÃ¡
+              Esta ação é irreversível. O item de conhecimento será
               permanentemente removido da base.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -602,7 +602,7 @@ const AIKnowledgeBase = () => {
               Tem certeza que deseja remover este prompt?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Esta aÃ§Ã£o Ã© irreversÃ­vel. O prompt serÃ¡ permanentemente
+              Esta ação é irreversível. O prompt será permanentemente
               removido do sistema.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -1139,7 +1139,7 @@ const AIKnowledgeBase = () => {
                         <SelectItem value="atendimento">Atendimento</SelectItem>
                         <SelectItem value="canva">Canva</SelectItem>
                         <SelectItem value="vouchers">Vouchers</SelectItem>
-                        <SelectItem value="tecnico">TÃ©cnico</SelectItem>
+                        <SelectItem value="tecnico">Técnico</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

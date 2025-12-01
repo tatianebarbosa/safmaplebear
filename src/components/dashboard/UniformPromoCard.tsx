@@ -76,7 +76,7 @@ const UniformPromoCard = () => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(promoImage));
     } catch (err) {
-      console.warn("[home-card] nao foi possivel salvar a imagem", err);
+      console.warn("[home-card] n?o foi possivel salvar a imagem", err);
     }
   }, [promoImage]);
 
@@ -91,7 +91,7 @@ const UniformPromoCard = () => {
     });
     toast({
       title: "Banner oficial aplicado",
-      description: "Imagem padrão da SAF foi restaurada.",
+      description: "Imagem padro da SAF foi restaurada.",
     });
   };
 

@@ -33,7 +33,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
 
   const handleAction = () => {
     if (!selectedSchool || !justification.trim()) {
-      toast.error('Selecione a escola e informe o t?tulo do e-mail ou numero do ticket correspondente');
+      toast.error('Selecione a escola e informe o titulo do e-mail ou numero do ticket correspondente');
       return;
     }
 
@@ -69,8 +69,8 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
     switch (action) {
       case 'add': return 'Adicionar Licença';
       case 'remove': return 'Remover Licença';
-      case 'transfer': return 'Transferir Usuário';
-      case 'delete': return 'Excluir Usuário';
+      case 'transfer': return 'Transferir Usurio';
+      case 'delete': return 'Excluir Usurio';
     }
   };
 
@@ -121,7 +121,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
               <Plus className="h-4 w-4 text-success" />
               <div>
                 <div className="text-2xl font-bold text-success">{availableLicenses}</div>
-                <div className="text-sm text-muted-foreground">Disponíveis</div>
+                <div className="text-sm text-muted-foreground">Disponveis</div>
               </div>
             </div>
           </CardContent>
@@ -157,9 +157,9 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
               {nonCompliantUsers.map((user, index) => (
                 <div key={index} className="flex items-center justify-between text-sm p-2 bg-background rounded border">
                   <div>
-                    <span className="font-medium">{user.name || 'Nome não informado'}</span>
+                    <span className="font-medium">{user.name || 'Nome no informado'}</span>
                     <span className="text-muted-foreground ml-2">{user.email}</span>
-                    <Badge variant="outline" className="ml-2">{user.schoolName || 'Escola não definida'}</Badge>
+                    <Badge variant="outline" className="ml-2">{user.schoolName || 'Escola no definida'}</Badge>
                   </div>
                   <Button 
                     size="sm" 
@@ -212,7 +212,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                     <div className="flex items-center justify-between">
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-medium">{school.schoolName || 'Escola não identificada'}</h3>
+                          <h3 className="font-medium">{school.schoolName || 'Escola no identificada'}</h3>
                           {school.usedLicenses > school.maxLicenses && (
                             <Badge variant="destructive">
                               {school.usedLicenses - school.maxLicenses} em excesso
@@ -220,12 +220,12 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                           )}
                           {school.nonCompliantUsers.length > 0 && (
                             <Badge variant="outline" className="text-destructive">
-                              {school.nonCompliantUsers.length} não conforme(s)
+                              {school.nonCompliantUsers.length} no conforme(s)
                             </Badge>
                           )}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {school.usedLicenses}/{school.maxLicenses} licenças utilizadas • {school.users.length} usuários totais
+                          {school.usedLicenses}/{school.maxLicenses} licenças utilizadas  {school.users.length} usuários totais
                         </div>
                         <div className="flex gap-1">
                           {school.users.slice(0, 3).map((user, index) => (
@@ -261,7 +261,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                             
                             <div className="space-y-4">
                               <div>
-                                <Label htmlFor="action">Ação</Label>
+                                <Label htmlFor="action">Ao</Label>
                                 <Select value={action} onValueChange={(value: any) => setAction(value)}>
                                   <SelectTrigger>
                                     <SelectValue />
@@ -269,15 +269,15 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                                   <SelectContent>
                                     <SelectItem value="add">Adicionar Licença</SelectItem>
                                     <SelectItem value="remove">Remover Licença</SelectItem>
-                                    <SelectItem value="transfer">Transferir Usuário</SelectItem>
-                                    <SelectItem value="delete">Excluir Usuário</SelectItem>
+                                    <SelectItem value="transfer">Transferir Usurio</SelectItem>
+                                    <SelectItem value="delete">Excluir Usurio</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
 
                               {(action === 'remove' || action === 'delete' || action === 'transfer') && selectedSchool && (
                                 <div>
-                                  <Label htmlFor="user">Usuário</Label>
+                                  <Label htmlFor="user">Usurio</Label>
                                   <Select value={selectedUser?.id || ''} onValueChange={(value) => {
                                     const user = selectedSchool.users.find(u => u.id === value);
                                     setSelectedUser(user || null);
@@ -288,7 +288,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                                     <SelectContent>
                                       {selectedSchool.users.map((user) => (
                                         <SelectItem key={user.id} value={user.id}>
-                                          {user.name || user.email} {!user.isCompliant && '⚠️'}
+                                          {user.name || user.email} {!user.isCompliant && ''}
                                         </SelectItem>
                                       ))}
                                     </SelectContent>

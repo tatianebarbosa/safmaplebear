@@ -66,7 +66,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps(history_data, ensure_ascii=False, indent=2),
             status_code=200,
-            mimetype="application/json",
+            mimetype="application/json; charset=utf-8",
             headers={
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -82,5 +82,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "message": str(e)
             }, ensure_ascii=False),
             status_code=500,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )

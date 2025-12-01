@@ -32,9 +32,9 @@ export interface UserStats {
   recentChanges: number;
 }
 
-// Simula dados dos usuários Canva processados
+// Simula dados dos usu?rios Canva processados
 export const loadCanvaUsers = async (): Promise<CanvaUser[]> => {
-  // Em produção, isso viria do arquivo Excel ou API
+  // Em produo, isso viria do arquivo Excel ou API
   const mockUsers: CanvaUser[] = [
     {
       id: '1',
@@ -64,14 +64,14 @@ export const loadCanvaUsers = async (): Promise<CanvaUser[]> => {
       email: 'rafhael.santos@maplebear.com.br', 
       role: 'Consultor SAF',
       status: 'Ativo',
-      unit: 'Maple Bear São Paulo',
+      unit: 'Maple Bear So Paulo',
       unitCode: 'SP01',
       isActive: true,
       addedDate: '2024-03-05'
     },
     {
       id: '4',
-      name: 'João Oliveira',
+      name: 'Joo Oliveira',
       email: 'joao.oliveira@maplebear.com.br',
       role: 'Consultor SAF', 
       status: 'Ativo',
@@ -97,7 +97,7 @@ export const getUserStats = (users: CanvaUser[]): UserStats => {
     activeUsers: activeUsers.length,
     inactiveUsers: users.length - activeUsers.length,
     usersByUnit,
-    recentChanges: 0 // Implementar contagem de mudanças recentes
+    recentChanges: 0 // Implementar contagem de mudanas recentes
   };
 };
 

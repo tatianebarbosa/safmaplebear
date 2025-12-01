@@ -73,7 +73,7 @@ const FloatingAIChat = () => {
     {
       id: "1",
       content:
-        "Pronto para ajudar com dados do SAF (licenças, escolas, usuários, métricas, agenda) ou melhorar um texto. O que precisa?",
+        "Pronto para ajudar com dados do SAF (licen?as, escolas, usu�rios, mtricas, agenda) ou melhorar um texto. O que precisa?",
       role: "assistant",
       timestamp: new Date(),
       origin: "offline",
@@ -114,7 +114,7 @@ const FloatingAIChat = () => {
       const parsed = JSON.parse(raw) as Array<Omit<ChatMessage, "timestamp"> & { timestamp: string }>;
       return parsed.map((m) => ({ ...m, timestamp: new Date(m.timestamp) }));
     } catch (error) {
-      console.warn("Erro ao ler histórico do chat:", error);
+      console.warn("Erro ao ler histrico do chat:", error);
       return null;
     }
   };
@@ -128,7 +128,7 @@ const FloatingAIChat = () => {
       }));
       localStorage.setItem(key, JSON.stringify(serializable));
     } catch (error) {
-      console.warn("Erro ao salvar histórico do chat:", error);
+      console.warn("Erro ao salvar histrico do chat:", error);
     }
   };
 
@@ -151,7 +151,7 @@ const FloatingAIChat = () => {
       .map((t) => `${t.id} (${t.agente}) - ${t.diasAberto}d${t.observacao ? ` | ${truncateObservation(t.observacao, 60)}` : ""}`)
       .join("; ");
 
-    return `${matches.length} ticket(s) vinculados à escola (match na observação): ${list}`;
+    return `${matches.length} ticket(s) vinculados  escola (match na observao): ${list}`;
   };
 
   const userDisplayName =
@@ -191,7 +191,7 @@ const FloatingAIChat = () => {
     );
 
     if (!ticket) {
-      return `Nao encontrei o ticket ${ticketId} na fila atual. Confirme o ID ou cadastre o chamado.`;
+      return `N?o encontrei o ticket ${ticketId} na fila atual. Confirme o ID ou cadastre o chamado.`;
     }
 
     const createdAt = new Date(ticket.createdAt);
@@ -310,8 +310,8 @@ const FloatingAIChat = () => {
     setMessages((prev) => {
       if (!prev.length || prev[0].role !== "assistant") return prev;
       const personalizedGreeting = userDisplayName
-        ? `Oi, ${userDisplayName}. Dados do SAF (licenças, escolas, usuários, métricas, agenda) ou melhorar um texto?`
-        : `Pronto para ajudar com dados do SAF (licenças, escolas, usuários, métricas, agenda) ou melhorar um texto.`;
+        ? `Oi, ${userDisplayName}. Dados do SAF (licen?as, escolas, usu�rios, mtricas, agenda) ou melhorar um texto?`
+        : `Pronto para ajudar com dados do SAF (licen?as, escolas, usu�rios, mtricas, agenda) ou melhorar um texto.`;
       if (prev[0].content === personalizedGreeting) return prev;
       const updated = [...prev];
       updated[0] = { ...updated[0], content: personalizedGreeting };
@@ -319,7 +319,7 @@ const FloatingAIChat = () => {
     });
   }, [userDisplayName]);
 
-  // Carregar histórico do usuário
+  // Carregar histrico do usu?rio
   useEffect(() => {
     const persisted = loadPersistedMessages();
     if (persisted && persisted.length) {
@@ -327,7 +327,7 @@ const FloatingAIChat = () => {
     }
   }, [currentUser?.email, currentUser?.id, currentUser?.name]);
 
-  // Persistir histórico do usuário
+  // Persistir histrico do usu?rio
   useEffect(() => {
     if (!messages.length) return;
     persistMessages(messages);
@@ -360,7 +360,7 @@ const FloatingAIChat = () => {
       {
         id: "1",
         content:
-          "Pronto para ajudar com dados do SAF (licenças, escolas, usuários, métricas, agenda) ou melhorar um texto. O que precisa?",
+          "Pronto para ajudar com dados do SAF (licen?as, escolas, usu�rios, mtricas, agenda) ou melhorar um texto. O que precisa?",
         role: "assistant",
         timestamp: new Date(),
         origin: "offline",
@@ -435,7 +435,7 @@ const FloatingAIChat = () => {
           if (biAnswer) {
             response = biAnswer;
             origin = "bi";
-            sourceLabel = "Fontes (Painel de escolas/licenças SAF)";
+            sourceLabel = "Fontes (Painel de escolas/licen?as SAF)";
 
             const schoolPanelSource = resolveSchoolPanelSource(
               messageText,
@@ -484,12 +484,12 @@ const FloatingAIChat = () => {
       }
       if (dataSourcesUsed.length) {
         sources.push(...dataSourcesUsed);
-        sourceLabel = sourceLabel || "Fontes (Painel de escolas/licenças SAF)";
+        sourceLabel = sourceLabel || "Fontes (Painel de escolas/licen?as SAF)";
       }
 
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: response ?? "Não consegui processar sua pergunta neste momento.",
+        content: response ?? "No consegui processar sua pergunta neste momento.",
         role: "assistant",
         timestamp: new Date(),
         sources: sources.length ? sources : undefined,
@@ -525,7 +525,7 @@ const FloatingAIChat = () => {
 
     const wantsResponsible =
       lowerMessage.includes("responsavel") ||
-      lowerMessage.includes("responsável") ||
+      lowerMessage.includes("respons?vel") ||
       lowerMessage.includes("carteira saf") ||
       lowerMessage.includes("consultor") ||
       lowerMessage.includes("time saf") ||
@@ -539,14 +539,14 @@ const FloatingAIChat = () => {
       lowerMessage.includes("email") ||
       lowerMessage.includes("e-mail") ||
       lowerMessage.includes("ticket medio") ||
-      lowerMessage.includes("ticket médio") ||
+      lowerMessage.includes("ticket mdio") ||
       lowerMessage.includes("ticket") ||
       lowerMessage.includes("pendencia") ||
       lowerMessage.includes("cluster") ||
       lowerMessage.includes("status") ||
       lowerMessage.includes("telefone") ||
       lowerMessage.includes("razao") ||
-      lowerMessage.includes("razão") ||
+      lowerMessage.includes("razo") ||
       lowerMessage.includes("fantasia") ||
       lowerMessage.includes("cidade") ||
       lowerMessage.includes("estado") ||
@@ -573,7 +573,7 @@ const FloatingAIChat = () => {
         lowerMessage.includes("carteira saf") ||
         lowerMessage.includes("consultor") ||
         lowerMessage.includes("responsavel") ||
-        lowerMessage.includes("responsável")) &&
+        lowerMessage.includes("respons?vel")) &&
       (lowerMessage.includes("quant") ||
         lowerMessage.includes("lista") ||
         lowerMessage.includes("listar") ||
@@ -587,8 +587,8 @@ const FloatingAIChat = () => {
       return summarizeSchoolsBySafAgent({ includeSchools });
     }
 
-    // Última atualização sem escola específica
-    if (lowerMessage.includes("ultima atualizacao") || lowerMessage.includes("última atualizacao")) {
+    // ltima atualizao sem escola especfica
+    if (lowerMessage.includes("ultima atualizacao") || lowerMessage.includes("ltima atualizacao")) {
       const lastUpdated = getSchoolDataLastUpdated();
       if (lastUpdated) {
         return `Dados das escolas atualizados em ${lastUpdated}.`;
@@ -636,7 +636,7 @@ const FloatingAIChat = () => {
             : "";
         const ticketSummary = mentionsTickets
           ? summarizeTicketsForSchool(school as SchoolData) ||
-            "Tickets: nenhum ticket vinculado à escola no dataset local."
+            "Tickets: nenhum ticket vinculado  escola no dataset local."
           : null;
         return ticketSummary ? `${result}${link} | ${ticketSummary}` : `${result}${link}`;
       }
@@ -650,14 +650,14 @@ const FloatingAIChat = () => {
       const highlight = formatSchoolHighlights(school as SchoolData);
       const ticketSummary = mentionsTickets
         ? summarizeTicketsForSchool(school as SchoolData) ||
-          "Tickets: nenhum ticket vinculado à escola no dataset local."
+          "Tickets: nenhum ticket vinculado  escola no dataset local."
         : null;
       return ticketSummary
         ? `${highlight}${freshness}${link}\n${ticketSummary}`
         : `${highlight}${freshness}${link}`;
     }
 
-    // Sugestões se não encontrar
+    // Sugestes se no encontrar
     const data = await loadSchoolData();
     const normalizedQuery = normalize(message);
     const suggestions = data
@@ -675,10 +675,10 @@ const FloatingAIChat = () => {
       .map((s) => s.name);
 
     const suggestionText = suggestions.length
-      ? `Sugestões: ${suggestions.join("; ")}.`
-      : "Nenhuma sugestão de nome semelhante.";
+      ? `Sugestes: ${suggestions.join("; ")}.`
+      : "Nenhuma sugest?o de nome semelhante.";
 
-    return `Nao localizei essa escola agora. Me envie o nome completo, cidade ou cluster para tentar de novo. ${suggestionText}`;
+    return `N?o localizei essa escola agora. Me envie o nome completo, cidade ou cluster para tentar de novo. ${suggestionText}`;
   };
 
   const callOpenAI = async (
@@ -709,7 +709,7 @@ const FloatingAIChat = () => {
     }
 
     const data = await response.json();
-    return data.response || "Não consegui processar sua pergunta.";
+    return data.response || "No consegui processar sua pergunta.";
   };
 
   const simulateAIResponse = async (input: string): Promise<string> => {
@@ -729,7 +729,7 @@ const FloatingAIChat = () => {
     const lowerInput = input.toLowerCase();
 
     if (lowerInput.includes("ticket") || lowerInput.includes("chamado")) {
-      return "Posso listar tickets pendentes e priorizar os críticos (ex.: acima de 15 dias). Quer ver os mais urgentes ou todos os abertos?";
+      return "Posso listar tickets pendentes e priorizar os crticos (ex.: acima de 15 dias). Quer ver os mais urgentes ou todos os abertos?";
     }
 
     if (lowerInput.includes("escola") || lowerInput.includes("unidade")) {
@@ -744,15 +744,15 @@ const FloatingAIChat = () => {
       return offlineRewrite(input);
     }
 
-    if (lowerInput.includes("relatório") || lowerInput.includes("dashboard")) {
-      return "Diga a métrica (licenças Canva, escolas, usuários, agenda) e eu mostro onde ver no SAF e como interpretar.";
+    if (lowerInput.includes("relatrio") || lowerInput.includes("dashboard")) {
+      return "Diga a mtrica (licen?as Canva, escolas, usu�rios, agenda) e eu mostro onde ver no SAF e como interpretar.";
     }
 
-    if (lowerInput.includes("licença") || lowerInput.includes("licencas") || lowerInput.includes("canva")) {
-      return "Consigo trazer totais, usadas, disponíveis, excesso e não conformes por escola, além de domínios autorizados e usuários vinculados. Qual dado você quer?";
+    if (lowerInput.includes("licen?a") || lowerInput.includes("licen?as") || lowerInput.includes("canva")) {
+      return "Consigo trazer totais, usadas, dispon�veis, excesso e no conformes por escola, alm de dom�nios autorizados e usu�rios vinculados. Qual dado voc quer?";
     }
 
-    return "Atendo apenas com dados do SAF: licenças Canva, escolas, usuários, métricas/dashboards, agenda ou revisão de textos. Se não houver dado no sistema, aviso que não encontrei. O que você precisa?";
+    return "Atendo apenas com dados do SAF: licen?as Canva, escolas, usu�rios, mtricas/dashboards, agenda ou reviso de textos. Se no houver dado no sistema, aviso que no encontrei. O que voc precisa?";
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -808,13 +808,13 @@ const FloatingAIChat = () => {
             <Badge variant="default" className="text-[8px] px-1 py-0.5 leading-none">
               ChatGPT 4.1
             </Badge>
-            {/* badge removido a pedido do usuário */}
+            {/* badge removido a pedido do usu?rio */}
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
-              aria-label="Limpar histórico"
+              aria-label="Limpar histrico"
               onClick={clearHistory}
               className="text-xs"
             >

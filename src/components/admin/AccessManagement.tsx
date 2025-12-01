@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import userService, { DevUser, AuditEntry } from "@/services/userService";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/stores/authStore";
@@ -10,18 +11,39 @@ import { getAgentDisplayName } from "@/data/teamMembers";
 export default function AccessManagement() {
   const MIN_PASSWORD_LENGTH = 6;
   const [users, setUsers] = useState<DevUser[]>([]);
+  const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "coord" | "user">("user");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [audit, setAudit] = useState<AuditEntry[]>([]);
-  const [showAudit, setShowAudit] = useState(false);
   const { toast } = useToast();
-  const { hasRole } = useAuthStore();
+  const { hasRole, currentUser } = useAuthStore();
   const canManageAccess = hasRole("Admin") || hasRole("Coordinator");
 
-  const reload = () => setUsers(userService.listUsers());
+  const actorName =
+    currentUser?.name?.trim() ||
+    currentUser?.email ||
+    localStorage.getItem("userEmail") ||
+    "Portal SAF";
+
+  const actorFullName =
+    currentUser?.name?.trim() ||
+    getAgentDisplayName(currentUser?.agente as any) ||
+    actorName;
+
+  const actorRole =
+    (currentUser?.role || "")
+      .toLowerCase()
+      .replace("coordinator", "coord")
+      .replace("admin", "admin") || "user";
+
+  const looksLikeEmail = (value?: string) => !!value && /\S+@\S+\.\S+/.test(value);
+
+  const reload = () => {
+    setUsers(userService.listUsers());
+    setAuditEntries(userService.getAuditEntries());
+  };
 
   useEffect(() => {
     reload();
@@ -62,7 +84,14 @@ export default function AccessManagement() {
         });
         return;
       }
-      userService.createUser(username, password, role, fullName.trim());
+      userService.createUser(
+        username,
+        password,
+        role,
+        fullName.trim(),
+        actorFullName,
+        actorRole
+      );
       toast({
         title: "Usuario criado",
         description: `${username} criado com sucesso`,
@@ -76,7 +105,7 @@ export default function AccessManagement() {
     } catch (e: any) {
       toast({
         title: "Erro",
-        description: e?.message || "Erro ao criar usuario",
+        description: e?.message || "Erro ao criar usu?rio",
         variant: "destructive",
       });
     }
@@ -102,7 +131,7 @@ export default function AccessManagement() {
         });
         return;
       }
-      userService.deleteUser(id);
+      userService.deleteUser(id, actorFullName, actorRole);
       toast({ title: "Usuario excluido" });
       reload();
     } catch (e: any) {
@@ -135,7 +164,7 @@ export default function AccessManagement() {
       return;
     }
     try {
-      userService.changePassword(id, cleanPass);
+      userService.changePassword(id, cleanPass, actorFullName, actorRole);
       toast({ title: "Senha alterada" });
       reload();
     } catch (e: any) {
@@ -147,28 +176,14 @@ export default function AccessManagement() {
     }
   };
 
-  const loadAudit = () => {
-    setAudit(userService.getAuditEntries(200));
-    setShowAudit(true);
-  };
-
   if (!canManageAccess) {
     return null;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex w-full items-center justify-end gap-2 py-2 flex-wrap">
-        <Button onClick={() => setIsCreateOpen(true)}>Criar Usuario</Button>
-        <Button
-          variant="ghost"
-          onClick={() => {
-            if (!showAudit) loadAudit();
-            setShowAudit((v) => !v);
-          }}
-        >
-          {showAudit ? "Ocultar logs" : "Ver Logs (audit)"}
-        </Button>
+      <div className="flex w-full items-center justify-end gap-3 py-2">
+        <Button onClick={() => setIsCreateOpen(true)}>Criar usuario</Button>
       </div>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -199,13 +214,13 @@ export default function AccessManagement() {
                 value={role}
                 onChange={(e) => setRole(e.target.value as any)}
               >
-                <option value="user">Usuario</option>
+                <option value="user">Usu?rio</option>
                 <option value="coord">Coordenacao</option>
                 <option value="admin">Administrador</option>
               </select>
             </div>
             <p className="text-xs text-muted-foreground">
-              Dica: use o usuario (ex: joao.felipe) em vez de email e crie senhas fortes apenas para quem precisa de acesso administrativo.
+              Dica: use o usu?rio (ex: joao.felipe) em vez de email e crie senhas fortes apenas para quem precisa de acesso administrativo.
             </p>
           </div>
           <DialogFooter className="gap-2 pt-2">
@@ -220,17 +235,17 @@ export default function AccessManagement() {
             >
               Limpar
             </Button>
-            <Button onClick={handleCreate}>Criar Usuario</Button>
+            <Button onClick={handleCreate}>Criar Usu?rio</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <div>
         <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
-          <h3 className="font-semibold">Usuarios</h3>
+          <h3 className="font-semibold">Usu?rios</h3>
           <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
             <span className="rounded-full bg-primary/10 text-primary px-3 py-1">
-              {stats.total} usuarios
+              {stats.total} usu?rios
             </span>
             <span className="rounded-full bg-muted px-3 py-1">
               {stats.admins} admins
@@ -239,7 +254,7 @@ export default function AccessManagement() {
               {stats.coords} coord
             </span>
             <span className="rounded-full bg-muted px-3 py-1">
-              {stats.standard} usuarios
+              {stats.standard} usu?rios
             </span>
           </div>
         </div>
@@ -247,18 +262,18 @@ export default function AccessManagement() {
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="bg-muted/50">
-                <th className="py-3 px-3 font-semibold">Responsável (nome completo)</th>
-                <th className="px-3 font-semibold">Usuario</th>
+                <th className="py-3 px-3 font-semibold">Responsvel (nome completo)</th>
+                <th className="px-3 font-semibold">Usu?rio</th>
                 <th className="px-3 font-semibold">Perfil</th>
                 <th className="px-3 font-semibold">Criado</th>
-                <th className="px-3 text-right font-semibold">Ações</th>
+                <th className="px-3 text-right font-semibold">Aes</th>
               </tr>
             </thead>
             <tbody>
               {users.length === 0 && (
                 <tr>
                   <td className="py-6 px-3 text-muted-foreground" colSpan={5}>
-                    Nenhum usuario cadastrado ainda.
+                    Nenhum usu?rio cadastrado ainda.
                   </td>
                 </tr>
               )}
@@ -303,23 +318,48 @@ export default function AccessManagement() {
         </div>
       </div>
 
-      {showAudit && (
-        <div className="space-y-2 max-h-80 overflow-auto rounded-lg border p-3">
-          {audit.length === 0 ? (
-            <p className="text-muted-foreground">Nenhum registro</p>
+      <Card className="border">
+        <CardHeader>
+          <CardTitle>Historico de alteracoes</CardTitle>
+          <CardDescription />
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {auditEntries.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nenhuma alteracao registrada.</p>
           ) : (
-            audit.map((a) => (
-              <div key={a.id} className="p-3 border rounded">
-                <div className="text-xs text-muted-foreground">
-                  {new Date(a.timestamp).toLocaleString()} • {a.actor}
+            auditEntries.slice(0, 40).map((entry) => (
+              <div
+                key={entry.id}
+                className="flex items-start justify-between gap-3 rounded-md border px-3 py-2 text-sm"
+              >
+                <div className="space-y-1">
+                  <div className="font-semibold uppercase text-xs tracking-wide text-muted-foreground">
+                    {entry.action.replace(/_/g, " ")}
+                  </div>
+                  {entry.detail && (
+                    <div className="text-muted-foreground">{entry.detail}</div>
+                  )}
+                  <div className="text-xs text-muted-foreground">
+                    {(() => {
+                      const display =
+                        getAgentDisplayName(entry.actor?.split("@")[0] || "") ||
+                        entry.actor ||
+                        "Desconhecido";
+                      const email = looksLikeEmail(entry.actor) ? entry.actor : "";
+                      return `Por ${display}${email ? ` (${email})` : ""}${
+                        entry.actorRole ? ` • ${entry.actorRole}` : ""
+                      }`;
+                    })()}
+                  </div>
                 </div>
-                <div className="font-medium">{a.action}</div>
-                {a.detail && <div className="text-sm">{a.detail}</div>}
+                <div className="text-xs text-muted-foreground whitespace-nowrap">
+                  {new Date(entry.timestamp).toLocaleString("pt-BR")}
+                </div>
               </div>
             ))
           )}
-        </div>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -84,7 +84,7 @@ const SchoolManagement = () => {
       });
     } catch (err) {
       setError(
-        "Não encontramos os arquivos CSV dentro de public/data. Confirme se escolas.csv e usuarios_updated.csv estão disponíveis e compartilham o mesmo separador ';'."
+        "Não encontramos os arquivos CSV dentro de public/data. Confirme se escolas.csv e usuários_updated.csv estão disponíveis e compartilham o mesmo separador ';'."
       );
       toast({
         title: "Erro ao carregar dados",
@@ -216,7 +216,7 @@ const SchoolManagement = () => {
               <AlertTriangle className="w-10 h-10 text-destructive" />
               <div>
                 <h2 className="text-2xl font-semibold text-foreground">
-                  Não foi possível carregar as escolas
+                  No foi possvel carregar as escolas
                 </h2>
                 <p className="text-muted-foreground mt-2">{error}</p>
               </div>
@@ -228,7 +228,7 @@ const SchoolManagement = () => {
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Confirme se os arquivos foram exportados com separador ';' e
-                  se estão na pasta <code>public/data</code>.
+                  se esto na pasta <code>public/data</code>.
                 </p>
               </div>
               <div className="rounded-lg border border-border/60 bg-background/80 p-4">
@@ -237,7 +237,7 @@ const SchoolManagement = () => {
                 </p>
                 <p className="text-sm text-muted-foreground">
                   As colunas de ID devem estar iguais entre escolas.csv e
-                  usuarios_updated.csv para combinar os dados.
+                  usuários_updated.csv para combinar os dados.
                 </p>
               </div>
             </div>
@@ -276,7 +276,7 @@ const SchoolManagement = () => {
               <AlertTriangle className="w-5 h-5 text-destructive mt-0.5" />
               <div>
                 <p className="font-semibold text-foreground">
-                  Não foi possível atualizar os CSVs
+                  No foi possvel atualizar os CSVs
                 </p>
                 <p className="text-sm text-muted-foreground">{error}</p>
               </div>
@@ -307,7 +307,7 @@ const SchoolManagement = () => {
           trend={{ value: 5.2, isPositive: true }}
         />
         <StatsCard
-          title="Licencas Utilizadas"
+          title="Licenças Utilizadas"
           value={`${stats.usedLicenses}/${stats.totalLicenses}`}
           description={`${stats.availableLicenses} disponiveis`}
           icon={<Users className="h-4 w-4" />}
@@ -317,7 +317,7 @@ const SchoolManagement = () => {
           }}
         />
         <StatsCard
-          title="Licencas fora da politica"
+          title="Licenças fora da política"
           value={stats.nonCompliantLicenses}
           icon={<AlertTriangle className="h-4 w-4" />}
           className={stats.nonCompliantLicenses > 0 ? "border-destructive/20 bg-destructive/5" : ""}
@@ -333,7 +333,7 @@ const SchoolManagement = () => {
           }
         />
         <StatsCard
-          title="Licencas Totais"
+          title="Licenças Totais"
           value={stats.totalLicenses}
           description={`${stats.availableLicenses} disponiveis`}
           icon={<Users className="h-4 w-4" />}
@@ -378,8 +378,8 @@ const SchoolManagement = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="available">Dispon?vel</SelectItem>
-                <SelectItem value="warning">Atenção</SelectItem>
+                <SelectItem value="available">Disponivel</SelectItem>
+                <SelectItem value="warning">Ateno</SelectItem>
                 <SelectItem value="full">Completo</SelectItem>
                 <SelectItem value="excess">Excesso</SelectItem>
               </SelectContent>
@@ -390,7 +390,7 @@ const SchoolManagement = () => {
                 <SelectValue placeholder="Ordenar por" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="usage-desc">Maior utilização</SelectItem>
+                <SelectItem value="usage-desc">Maior utilizao</SelectItem>
                 <SelectItem value="name-asc">Nome (A-Z)</SelectItem>
                 <SelectItem value="licenses-remaining">
                   Menos licenças livres
@@ -437,7 +437,7 @@ const SchoolManagement = () => {
 
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground hidden md:inline">
-                Visualização
+                Visualizao
               </span>
               <div className="inline-flex overflow-hidden rounded-md border border-border">
                 <Button
@@ -522,13 +522,13 @@ const SchoolManagement = () => {
                     : "border-primary/30 text-primary bg-primary/5"
                 )}
               >
-                {hasFiltersApplied ? "Filtros ativos" : "Nenhum dado"}
+                        {hasFiltersApplied ? "Filtros ativos" : "Nenhum dado"}
               </Badge>
               <School className="w-12 h-12 text-muted-foreground" />
               <h3 className="text-lg font-semibold text-foreground">
                 {hasFiltersApplied
                   ? "Nenhuma escola corresponde aos filtros"
-                  : "Ainda n?o existem escolas carregadas"}
+                  : "Ainda não existem escolas carregadas"}
               </h3>
               <p className="text-muted-foreground max-w-xl">
                 {hasFiltersApplied
@@ -558,12 +558,12 @@ const SchoolManagement = () => {
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">
-                Escolas em atenção
+                Escolas em ateno
               </p>
               <p className="text-xs text-muted-foreground">
                 {atRiskSchools.length}{" "}
                 {atRiskSchools.length === 1 ? "escola" : "escolas"} com licenças
-                próximas do limite.
+                prximas do limite.
               </p>
             </div>
           </div>
@@ -586,8 +586,8 @@ const SchoolManagement = () => {
               })
             ) : (
               <div className="col-span-3 text-sm text-muted-foreground">
-                Nenhuma escola est? em alerta agora. Continue observando o uso
-                médio nas próximas atualiza??es.
+                Nenhuma escola está em alerta agora. Continue observando o uso
+                médio nas próximas atualizações.
               </div>
             )}
           </div>
@@ -619,7 +619,7 @@ const SchoolManagement = () => {
                 Gerenciamento Completo de Licenças
               </h3>
               <p className="text-sm text-muted-foreground mb-3">
-                Para funcionalidades avançadas como edição de limites de
+                Para funcionalidades avanadas como edio de limites de
                 licenças, histórico de alterações e notificações automáticas,
                 conecte seu projeto ao Supabase.
               </p>

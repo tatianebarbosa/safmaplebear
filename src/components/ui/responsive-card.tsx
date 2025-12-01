@@ -17,11 +17,11 @@ interface ResponsiveCardProps {
 }
 
 /**
- * Card responsivo com melhores práticas de UX
+ * Card responsivo com melhores prticas de UX
  * - Padding responsivo
- * - Botões com tamanho adequado para toque
+ * - Botes com tamanho adequado para toque
  * - Truncamento de texto com tooltip
- * - Layout flexível
+ * - Layout flexvel
  */
 export const ResponsiveCard = ({
   title,
@@ -76,8 +76,8 @@ interface StatCardProps {
 }
 
 /**
- * Card de estatística responsivo
- * Ideal para dashboards e métricas
+ * Card de estatstica responsivo
+ * Ideal para dashboards e mtricas
  */
 export const StatCard = ({
   label,
@@ -103,7 +103,7 @@ export const StatCard = ({
                 trend.isPositive ? "text-success" : "text-destructive"
               )}
             >
-              {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value)}%
+              {trend.isPositive ? "" : ""} {Math.abs(trend.value)}%
             </p>
           )}
         </div>
@@ -127,7 +127,7 @@ interface ActionCardProps {
 }
 
 /**
- * Card de ação com call-to-action proeminente
+ * Card de ao com call-to-action proeminente
  * Ideal para onboarding e features destacadas
  */
 export const ActionCard = ({
@@ -178,7 +178,7 @@ interface ListCardProps {
 
 /**
  * Card com lista de itens
- * Ideal para listas de ações ou informações
+ * Ideal para listas de aes ou informaes
  */
 export const ListCard = ({ title, items, className }: ListCardProps) => {
   return (

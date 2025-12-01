@@ -38,11 +38,11 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
   const getTendenciaIcon = () => {
     switch (dados?.tendencia) {
       case 'aumento':
-        return '📈';
+        return '';
       case 'reducao':
-        return '📉';
+        return '';
       default:
-        return '→';
+        return '';
     }
   };
 
@@ -67,7 +67,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
       <div className="dashboard-header">
         <div className="header-content">
           <div className="header-title">
-            <div className="logo-canva">🎨</div>
+            <div className="logo-canva"></div>
             <div>
               <h1>Gestão de Licenças Canva</h1>
               <p>Monitoramento centralizado de usuários e licenças</p>
@@ -79,7 +79,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
             disabled={loading}
             title="Atualizar dados do Canva"
           >
-            {loading ? '⟳ Atualizando...' : '🔄 Atualizar Agora'}
+            {loading ? ' Atualizando...' : ' Atualizar Agora'}
           </button>
         </div>
       </div>
@@ -90,7 +90,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
         <div className="card card-primary">
           <div className="card-header">
             <h3>Total de Usuários</h3>
-            <span className="card-icon">👥</span>
+            <span className="card-icon"></span>
           </div>
           <div className={`card-value ${animateCount ? 'animate' : ''}`}>
             {loading ? (
@@ -113,7 +113,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
         <div className="card card-success">
           <div className="card-header">
             <h3>Pessoas Ativas</h3>
-            <span className="card-icon">✅</span>
+            <span className="card-icon"></span>
           </div>
           <div className="card-value">
             {loading ? (
@@ -139,7 +139,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
         <div className="card card-warning">
           <div className="card-header">
             <h3>Pessoas Inativas</h3>
-            <span className="card-icon">⏸️</span>
+            <span className="card-icon"></span>
           </div>
           <div className="card-value">
             {loading ? (
@@ -165,7 +165,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
         <div className="card card-info">
           <div className="card-header">
             <h3>Última Atualização</h3>
-            <span className="card-icon">⏰</span>
+            <span className="card-icon"></span>
           </div>
           <div className="card-value">
             {loading ? (
@@ -180,7 +180,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
             )}
           </div>
           <div className="card-footer">
-            <span className="status-badge active">● Sincronizado</span>
+            <span className="status-badge active"> Sincronizado</span>
           </div>
         </div>
       </div>
@@ -189,8 +189,8 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
       {dados?.historico && dados.historico.length > 0 && (
         <div className="card card-chart">
           <div className="card-header">
-            <h3>Histórico de Usuários (Últimos 7 dias)</h3>
-            <span className="card-icon">📊</span>
+            <h3>Histórico de Usuários (últimos 7 dias)</h3>
+            <span className="card-icon"></span>
           </div>
           <div className="chart-container">
             <div className="chart-bars">
@@ -216,19 +216,19 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
       {/* Quick Actions */}
       <div className="quick-actions">
         <button className="action-btn action-btn-primary">
-          📥 Exportar Relatório
+          Exportar Relatório
         </button>
         <button className="action-btn action-btn-secondary">
-          ⚙️ Configurações
+          Configurações
         </button>
         <button className="action-btn action-btn-tertiary">
-          📞 Suporte Canva
+          Suporte Canva
         </button>
       </div>
 
       {/* Info Box */}
       <div className="info-box">
-        <div className="info-icon">ℹ️</div>
+        <div className="info-icon"></div>
         <div className="info-content">
           <h4>Dica Profissional</h4>
           <p>

@@ -146,11 +146,13 @@ export function createUser(
   username: string,
   password: string,
   role: Role = "user",
-  fullName?: string
+  fullName?: string,
+  actor?: string,
+  actorRole?: Role | string
 ) {
   const users = readUsers();
   if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
-    throw new Error("Usuário já existe");
+    throw new Error("Usurio j existe");
   }
   const user: DevUser = {
     id: uuidv4(),
@@ -163,28 +165,39 @@ export function createUser(
   users.push(user);
   writeUsers(users);
   logAction({
-    actor: "system",
+    actor: actor || "system",
+    actorRole,
     action: `create_user`,
-    detail: `created ${username}`,
+    detail: `created ${username} (${role})`,
   });
   return user;
 }
 
-export function deleteUser(id: string) {
+export function deleteUser(
+  id: string,
+  actor?: string,
+  actorRole?: Role | string
+) {
   let users = readUsers();
   const user = users.find((u) => u.id === id);
-  if (!user) throw new Error("Usuário não encontrado");
+  if (!user) throw new Error("Usurio no encontrado");
   users = users.filter((u) => u.id !== id);
   writeUsers(users);
   logAction({
-    actor: "system",
+    actor: actor || "system",
+    actorRole,
     action: "delete_user",
     detail: `deleted ${user.username}`,
   });
   return true;
 }
 
-export function changePassword(id: string, newPassword: string) {
+export function changePassword(
+  id: string,
+  newPassword: string,
+  actor?: string,
+  actorRole?: Role | string
+) {
   const trimmed = newPassword.trim();
   if (trimmed.length < 6) {
     throw new Error("A nova senha deve ter ao menos 6 caracteres.");
@@ -192,11 +205,12 @@ export function changePassword(id: string, newPassword: string) {
 
   const users = readUsers();
   const user = users.find((u) => u.id === id);
-  if (!user) throw new Error("Usuario nao encontrado");
+  if (!user) throw new Error("Usu?rio n?o encontrado");
   user.password = trimmed;
   writeUsers(users);
   logAction({
-    actor: "system",
+    actor: actor || "system",
+    actorRole,
     action: "change_password",
     detail: `changed password for ${user.username}`,
   });
@@ -209,6 +223,7 @@ export interface AuditEntry {
   actor: string;
   action: string;
   detail?: string;
+  actorRole?: Role | string;
 }
 
 function readAudit(): AuditEntry[] {
@@ -233,6 +248,7 @@ export function logAction(entry: {
   actor: string;
   action: string;
   detail?: string;
+  actorRole?: Role | string;
 }) {
   const audit = readAudit();
   const e: AuditEntry = {
@@ -241,6 +257,7 @@ export function logAction(entry: {
     actor: entry.actor,
     action: entry.action,
     detail: entry.detail,
+    actorRole: entry.actorRole,
   };
   audit.unshift(e);
   writeAudit(audit);

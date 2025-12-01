@@ -75,7 +75,7 @@ const buildOfficialUser = (
   const email = (user.email ?? '').trim().toLowerCase();
   if (!email || !email.includes('@')) return null;
   const nameCandidate = user.nome?.trim() || '';
-  const name = nameCandidate || email.split('@')[0] || 'Usuário';
+  const name = nameCandidate || email.split('@')[0] || 'Usuario';
 
   return {
     id: `${schoolId ?? 0}-${email}`,
@@ -90,11 +90,11 @@ const buildOfficialUser = (
   };
 };
 
-const deriveLicenseStatus = (used: number, total: number): 'Disponível' | 'Completo' | 'Excedido' => {
-  if (total === 0) return 'Disponível';
+const deriveLicenseStatus = (used: number, total: number): 'Disponvel' | 'Completo' | 'Excedido' => {
+  if (total === 0) return 'Disponvel';
   if (used > total) return 'Excedido';
   if (used === total) return 'Completo';
-  return 'Disponível';
+  return 'Disponvel';
 };
 
 export async function fetchIntegratedCanvaData(): Promise<IntegratedCanvaData | null> {
@@ -113,7 +113,7 @@ export async function fetchIntegratedCanvaData(): Promise<IntegratedCanvaData | 
             return parsed;
           }
         } catch {
-          console.warn(`[integratedCanvaService] Conteúdo inválido em ${source}`);
+          console.warn(`[integratedCanvaService] Contedo invlido em ${source}`);
           continue;
         }
       } else {
@@ -186,7 +186,7 @@ export function buildProcessedSchoolsFromIntegration(
   if (!allocations.some((allocation) => allocation.school_id === 0) && data.unallocated_users_list?.length) {
     allocations.push({
       school_id: 0,
-      school_name: 'Usuários Sem Escola Definida',
+      school_name: 'Usuarios Sem Escola Definida',
       users: data.unallocated_users_list,
       total_users: data.unallocated_users_list.length,
       total_licenses: data.unallocated_users_list.length,

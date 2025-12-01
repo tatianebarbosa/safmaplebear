@@ -32,9 +32,9 @@ export function Combobox({
   options,
   value,
   onValueChange,
-  placeholder = "Selecione uma opção...",
+  placeholder = "Selecione uma opo...",
   searchPlaceholder = "Pesquisar...",
-  emptyMessage = "Nenhuma opção encontrada.",
+  emptyMessage = "Nenhuma opo encontrada.",
   className
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)

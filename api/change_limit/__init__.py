@@ -10,7 +10,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Method not allowed"}),
             status_code=405,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json; charset=utf-8"}
         )
     
     try:
@@ -20,7 +20,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Token de autorização necessário"}),
                 status_code=401,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         token = auth_header[7:]  # Remove 'Bearer '
@@ -29,7 +29,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Token inválido ou expirado"}),
                 status_code=401,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         # Check permissions - only coordenadora can change limits
@@ -38,7 +38,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Apenas coordenadoras podem alterar limites"}),
                 status_code=403,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         # Get school ID from route params
@@ -47,7 +47,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "ID da escola é obrigatório"}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         # Parse request body
@@ -57,7 +57,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Invalid JSON"}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         # Validate required fields
@@ -68,7 +68,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Novo limite e motivo são obrigatórios"}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         try:
@@ -77,7 +77,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Novo limite deve ser um número inteiro"}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         # Perform action
@@ -100,5 +100,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": f"Erro interno: {str(e)}"}),
             status_code=500,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json; charset=utf-8"}
         )

@@ -52,7 +52,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   }
 ];
 
-// Função para buscar membros da equipe por nome
+// Funo para buscar membros da equipe por nome
 export const searchTeamMembers = (query: string): TeamMember[] => {
   if (!query.trim()) return TEAM_MEMBERS;
   
@@ -63,12 +63,12 @@ export const searchTeamMembers = (query: string): TeamMember[] => {
   );
 };
 
-// Função para obter membro por username
+// Funo para obter membro por username
 export const getTeamMemberByUsername = (username: string): TeamMember | undefined => {
   return TEAM_MEMBERS.find(member => member.username === username);
 };
 
-// Função para obter membro por nome completo
+// Funo para obter membro por nome completo
 export const getTeamMemberByFullName = (fullName: string): TeamMember | undefined => {
   return TEAM_MEMBERS.find(member => member.fullName === fullName);
 };

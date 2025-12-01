@@ -38,20 +38,20 @@ interface Alert {
 
 const SAFControlCenter = () => {
   const [tickets] = useState<Ticket[]>([
-    { id: '#258209', quem: 'João', quando: '22 dias', dias: 22, status: 'Pendente', observacao: 'aguardando dados, para Douglas colocar no dominio o PC do CRM' },
-    { id: '#258809', quem: 'João', quando: '17 dias', dias: 17, status: 'Pendente', observacao: 'esse caso quem está verificando é Fernanda Inacio de Edtech' },
+    { id: '#258209', quem: 'Joo', quando: '22 dias', dias: 22, status: 'Pendente', observacao: 'aguardando dados, para Douglas colocar no dominio o PC do CRM' },
+    { id: '#258809', quem: 'Joo', quando: '17 dias', dias: 17, status: 'Pendente', observacao: 'esse caso quem est verificando  Fernanda Inacio de Edtech' },
     { id: '#259134', quem: 'Tati', quando: '25 dias', dias: 25, status: 'Pendente', observacao: 'Ainda sendo tratado deste caso com o Iago' },
-    { id: '#258993', quem: 'Ingrid', quando: '20 dias', dias: 20, status: 'Pendente', observacao: 'aguardando retorno do eduardo, há 20 dias pendente' },
-    { id: '#261211', quem: 'João', quando: '1 dia', dias: 1, status: 'Pendente', observacao: 'recebemos evidencias hoje, enviado clickup toddle 261211' },
-    { id: '#262226', quem: 'João', quando: '4 dias', dias: 4, status: 'Resolvido', observacao: 'enviado resposta, aguardando dados' },
+    { id: '#258993', quem: 'Ingrid', quando: '20 dias', dias: 20, status: 'Pendente', observacao: 'aguardando retorno do eduardo, h 20 dias pendente' },
+    { id: '#261211', quem: 'Joo', quando: '1 dia', dias: 1, status: 'Pendente', observacao: 'recebemos evidencias hoje, enviado clickup toddle 261211' },
+    { id: '#262226', quem: 'Joo', quando: '4 dias', dias: 4, status: 'Resolvido', observacao: 'enviado resposta, aguardando dados' },
   ]);
 
   const [alerts, setAlerts] = useState<Alert[]>([
     {
       id: '1',
       type: 'warning',
-      title: 'Cobrança da Coordenadora',
-      message: 'Verificar status do ticket #258993 - Ingrid está aguardando há 20 dias',
+      title: 'Cobrana da Coordenadora',
+      message: 'Verificar status do ticket #258993 - Ingrid est aguardando h 20 dias',
       timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
       escola: 'Escola Valinhos'
     },
@@ -59,15 +59,15 @@ const SAFControlCenter = () => {
       id: '2',
       type: 'info',
       title: 'Visita Agendada',
-      message: 'Rafael visitará a escola de São Paulo na segunda-feira',
+      message: 'Rafael visitar a escola de So Paulo na segunda-feira',
       timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-      escola: 'São Paulo'
+      escola: 'So Paulo'
     },
     {
       id: '3',
       type: 'warning',
-      title: 'Tickets Críticos',
-      message: '5 tickets pendentes há mais de 15 dias necessitam atenção urgente',
+      title: 'Tickets Crticos',
+      message: '5 tickets pendentes h mais de 15 dias necessitam ateno urgente',
       timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000)
     }
   ]);
@@ -95,10 +95,10 @@ const SAFControlCenter = () => {
   const formatTimeAgo = (timestamp: Date) => {
     const hours = Math.floor((Date.now() - timestamp.getTime()) / (1000 * 60 * 60));
     if (hours < 1) return 'agora mesmo';
-    if (hours === 1) return 'há 1 hora';
-    if (hours < 24) return `há ${hours} horas`;
+    if (hours === 1) return 'h 1 hora';
+    if (hours < 24) return `h ${hours} horas`;
     const days = Math.floor(hours / 24);
-    return `há ${days} ${days === 1 ? 'dia' : 'dias'}`;
+    return `h ${days} ${days === 1 ? 'dia' : 'dias'}`;
   };
 
   const clearAlert = (alertId: string) => {
@@ -114,11 +114,11 @@ const SAFControlCenter = () => {
           Centro de Controle SAF
         </h1>
         <p className="text-muted-foreground">
-          Visão geral dos seus atendimentos, monitorias e alertas importantes
+          Viso geral dos seus atendimentos, monitorias e alertas importantes
         </p>
       </div>
 
-      {/* Métricas Principais */}
+      {/* Mtricas Principais */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -128,7 +128,7 @@ const SAFControlCenter = () => {
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">{pendingTickets.length}</div>
             <p className="text-xs text-muted-foreground">
-              {criticalTickets.length} críticos ({'>'}15 dias)
+              {criticalTickets.length} crticos ({'>'}15 dias)
             </p>
           </CardContent>
         </Card>
@@ -141,7 +141,7 @@ const SAFControlCenter = () => {
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{todayTasks.length}</div>
             <p className="text-xs text-muted-foreground">
-              Precisam atenção imediata
+              Precisam ateno imediata
             </p>
           </CardContent>
         </Card>
@@ -154,14 +154,14 @@ const SAFControlCenter = () => {
           <CardContent>
             <div className="text-2xl font-bold text-red-600">{alerts.length}</div>
             <p className="text-xs text-muted-foreground">
-              Requerem sua atenção
+              Requerem sua ateno
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Taxa de Resolução</CardTitle>
+            <CardTitle className="text-sm font-medium">Taxa de Resoluo</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -173,16 +173,16 @@ const SAFControlCenter = () => {
         </Card>
       </div>
 
-      {/* Alertas Críticos */}
+      {/* Alertas Crticos */}
       {alerts.length > 0 && (
         <Card className="border-orange-200 bg-orange-50/50">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-orange-500" />
-              Alertas e Cobranças
+              Alertas e Cobranas
             </CardTitle>
             <CardDescription>
-              Situações que precisam da sua atenção imediata
+              Situaes que precisam da sua ateno imediata
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -210,7 +210,7 @@ const SAFControlCenter = () => {
                   size="sm"
                   onClick={() => clearAlert(alert.id)}
                 >
-                  ×
+                  
                 </Button>
               </div>
             ))}
@@ -218,16 +218,16 @@ const SAFControlCenter = () => {
         </Card>
       )}
 
-      {/* Tickets Críticos */}
+      {/* Tickets Crticos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-red-500" />
-            Tickets Críticos ({'>'}15 dias)
+            Tickets Crticos ({'>'}15 dias)
           </CardTitle>
             <CardDescription>
-              Tickets que precisam atenção urgente
+              Tickets que precisam ateno urgente
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -239,7 +239,7 @@ const SAFControlCenter = () => {
                     <Badge variant={getStatusColor(ticket.status) as any}>
                       {ticket.status}
                     </Badge>
-                    <span className="text-sm text-muted-foreground">• {ticket.quem}</span>
+                    <span className="text-sm text-muted-foreground"> {ticket.quem}</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">{ticket.observacao}</p>
                 </div>
@@ -250,7 +250,7 @@ const SAFControlCenter = () => {
             ))}
             {criticalTickets.length === 0 && (
               <p className="text-center text-muted-foreground py-4">
-                🎉 Nenhum ticket crítico no momento!
+                 Nenhum ticket crtico no momento!
               </p>
             )}
           </CardContent>
@@ -260,7 +260,7 @@ const SAFControlCenter = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-blue-500" />
-              Ações de Hoje
+              Aes de Hoje
             </CardTitle>
             <CardDescription>
               Tickets que precisam ser trabalhados hoje
@@ -275,7 +275,7 @@ const SAFControlCenter = () => {
                     <Badge variant={getStatusColor(ticket.status) as any}>
                       {ticket.status}
                     </Badge>
-                    <span className="text-sm text-muted-foreground">• {ticket.quem}</span>
+                    <span className="text-sm text-muted-foreground"> {ticket.quem}</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">{ticket.observacao}</p>
                 </div>
@@ -286,19 +286,19 @@ const SAFControlCenter = () => {
             ))}
             {todayTasks.length === 0 && (
               <p className="text-center text-muted-foreground py-4">
-                ✅ Nenhuma tarefa urgente para hoje!
+                 Nenhuma tarefa urgente para hoje!
               </p>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Ações Rápidas */}
+      {/* Aes Rpidas */}
       <Card>
         <CardHeader>
-          <CardTitle>Ações Rápidas</CardTitle>
+          <CardTitle>Aes Rpidas</CardTitle>
           <CardDescription>
-            Acesso rápido às principais funcionalidades do SAF
+            Acesso rpido s principais funcionalidades do SAF
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -317,7 +317,7 @@ const SAFControlCenter = () => {
             </Button>
             <Button variant="outline" className="flex flex-col items-center gap-2 h-auto p-4">
               <FileText className="h-6 w-6" />
-              <span className="text-sm">Relatórios</span>
+              <span className="text-sm">Relatrios</span>
             </Button>
           </div>
         </CardContent>

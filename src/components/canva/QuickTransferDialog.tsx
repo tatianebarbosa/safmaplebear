@@ -59,6 +59,21 @@ export const QuickTransferDialog = ({
   const sourceUsers = sourceSchool?.users ?? [];
   const targetUsers = targetSchool?.users ?? [];
 
+  const userOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    schools.forEach((school) => {
+      (school.users || []).forEach((user) => {
+        const key = user.email || user.id || user.name;
+        if (!key) return;
+        if (!map.has(key)) {
+          const label = user.email ? `${user.name} - ${user.email}` : user.name;
+          map.set(key, label);
+        }
+      });
+    });
+    return Array.from(map.entries()).map(([value, label]) => ({ value, label }));
+  }, [schools]);
+
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({
       ...prev,
@@ -74,9 +89,9 @@ export const QuickTransferDialog = ({
   const validate = () => {
     const nextErrors: Record<string, string> = {};
     if (!form.sourceSchoolId) nextErrors.sourceSchoolId = "Escolha a escola de origem";
-    if (!form.sourceUserId) nextErrors.sourceUserId = "Escolha quem vai ceder a licenca";
+    if (!form.sourceUserId) nextErrors.sourceUserId = "Escolha quem vai ceder a licen?a";
     if (!form.targetSchoolId) nextErrors.targetSchoolId = "Escolha a escola destino";
-    if (!form.targetUserId) nextErrors.targetUserId = "Escolha quem recebera a licenca";
+    if (!form.targetUserId) nextErrors.targetUserId = "Escolha quem recebera a licen?a";
     if (form.sourceSchoolId && form.sourceSchoolId === form.targetSchoolId) {
       nextErrors.targetSchoolId = "Origem e destino precisam ser diferentes";
     }
@@ -122,9 +137,9 @@ export const QuickTransferDialog = ({
     >
       <DialogContent className={`${dialogLayouts.md} flex flex-col`}>
         <DialogHeader>
-          <DialogTitle>Transferencia rapida de licenca</DialogTitle>
+          <DialogTitle>Transferencia rapida de licen?a</DialogTitle>
           <DialogDescription>
-            Troque a licenca entre escolas em um unico passo. Registramos o motivo e quem realizou.
+            Troque a licen?a entre escolas em um unico passo. Registramos o motivo e quem realizou.
           </DialogDescription>
         </DialogHeader>
 
@@ -153,14 +168,14 @@ export const QuickTransferDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label>Usuario que vai ceder</Label>
+              <Label>Usu?rio que vai ceder</Label>
               <Select
                 value={form.sourceUserId}
                 onValueChange={(value) => handleChange("sourceUserId", value)}
                 disabled={!sourceUsers.length}
               >
                 <SelectTrigger className={errors.sourceUserId ? "border-destructive" : ""}>
-                  <SelectValue placeholder="Selecione o usuario" />
+                  <SelectValue placeholder="Selecione o usu?rio" />
                 </SelectTrigger>
                 <SelectContent>
                   {sourceUsers.map((user) => (
@@ -202,14 +217,14 @@ export const QuickTransferDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label>Usuario que vai receber</Label>
+              <Label>Usu?rio que vai receber</Label>
               <Select
                 value={form.targetUserId}
                 onValueChange={(value) => handleChange("targetUserId", value)}
                 disabled={!targetUsers.length}
               >
                 <SelectTrigger className={errors.targetUserId ? "border-destructive" : ""}>
-                  <SelectValue placeholder="Selecione o usuario" />
+                  <SelectValue placeholder="Selecione o usu?rio" />
                 </SelectTrigger>
                 <SelectContent>
                   {targetUsers.map((user) => (
@@ -241,11 +256,22 @@ export const QuickTransferDialog = ({
             </div>
             <div className="space-y-2">
               <Label>Responsavel</Label>
-              <Input
+              <Select
                 value={form.performedBy}
-                onChange={(e) => handleChange("performedBy", e.target.value)}
-                placeholder="Seu nome ou email"
-              />
+                onValueChange={(value) => handleChange("performedBy", value)}
+                disabled={!userOptions.length}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um usuário do site" />
+                </SelectTrigger>
+                <SelectContent>
+                  {userOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

@@ -67,10 +67,10 @@ const InsightsAnalytics = () => {
           totalSchools: 156,
           activeSchools: 142,
           byCluster: {
-            'São Paulo': 45,
+            'So Paulo': 45,
             'Rio de Janeiro': 28,
             'Minas Gerais': 32,
-            'Paraná': 22,
+            'Paran': 22,
             'Santa Catarina': 18,
             'Outros': 11
           }
@@ -84,16 +84,16 @@ const InsightsAnalytics = () => {
       };
 
       setAnalyticsData(mockData);
-      toast.success("Dados de análise carregados!");
+      toast.success("Dados de anlise carregados!");
     } catch (error) {
-      toast.error("Erro ao carregar dados de análise");
+      toast.error("Erro ao carregar dados de anlise");
     } finally {
       setLoading(false);
     }
   };
 
   const generateReport = () => {
-    toast.success("Relatório de insights gerado!");
+    toast.success("Relatrio de insights gerado!");
   };
 
   if (loading || !analyticsData) {
@@ -108,9 +108,9 @@ const InsightsAnalytics = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Insights e Análises</h1>
+          <h1 className="text-3xl font-bold">Insights e Anlises</h1>
           <p className="text-muted-foreground">
-            Análise detalhada de performance e tendências
+            Anlise detalhada de performance e tendncias
           </p>
         </div>
         <div className="flex gap-2">
@@ -127,12 +127,12 @@ const InsightsAnalytics = () => {
           </Select>
           <Button onClick={generateReport}>
             <Download className="w-4 h-4 mr-2" />
-            Gerar Relatório
+            Gerar Relatrio
           </Button>
         </div>
       </div>
 
-      {/* Estatísticas Principais */}
+      {/* Estatsticas Principais */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Taxa de Uso Vouchers"
@@ -141,7 +141,7 @@ const InsightsAnalytics = () => {
           icon={<Target className="h-4 w-4" />}
         />
         <StatsCard
-          title="Usuários Ativos"
+          title="Usurios Ativos"
           value={analyticsData.canvaUsers.active.toString()}
           trend={{ value: analyticsData.trends.userGrowth, isPositive: true }}
           icon={<Users className="h-4 w-4" />}
@@ -166,7 +166,7 @@ const InsightsAnalytics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5" />
-              Análise de Vouchers
+              Anlise de Vouchers
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -187,7 +187,7 @@ const InsightsAnalytics = () => {
             
             <div className="pt-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Taxa de Utilização</span>
+                <span className="text-sm font-medium">Taxa de Utilizao</span>
                 <span className="text-sm text-muted-foreground">{analyticsData.voucherUsage.rate}%</span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -200,12 +200,12 @@ const InsightsAnalytics = () => {
           </CardContent>
         </Card>
 
-        {/* Distribuição por Função */}
+        {/* Distribuio por Funo */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
-              Usuários por Função
+              Usurios por Funo
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -256,12 +256,12 @@ const InsightsAnalytics = () => {
           </CardContent>
         </Card>
 
-        {/* Tendências */}
+        {/* Tendncias */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              Tendências - {selectedPeriod === '7d' ? '7 dias' : selectedPeriod === '30d' ? '30 dias' : selectedPeriod === '90d' ? '90 dias' : '1 ano'}
+              Tendncias - {selectedPeriod === '7d' ? '7 dias' : selectedPeriod === '30d' ? '30 dias' : selectedPeriod === '90d' ? '90 dias' : '1 ano'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -273,7 +273,7 @@ const InsightsAnalytics = () => {
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Crescimento Usuários</span>
+                <span className="text-sm text-muted-foreground">Crescimento Usurios</span>
                 <Badge variant={analyticsData.trends.userGrowth > 0 ? "default" : "destructive"}>
                   {analyticsData.trends.userGrowth > 0 ? '+' : ''}{analyticsData.trends.userGrowth}%
                 </Badge>
@@ -299,22 +299,22 @@ const InsightsAnalytics = () => {
             <div className="space-y-2">
               <h4 className="font-semibold text-primary">Vouchers</h4>
               <p className="text-sm text-muted-foreground">
-                Taxa de utilização de {analyticsData.voucherUsage.rate}% demonstra boa adesão. 
+                Taxa de utilizao de {analyticsData.voucherUsage.rate}% demonstra boa adeso. 
                 {analyticsData.voucherUsage.pending} vouchers ainda pendentes de uso.
               </p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold text-primary">Usuários</h4>
+              <h4 className="font-semibold text-primary">Usurios</h4>
               <p className="text-sm text-muted-foreground">
-                {((analyticsData.canvaUsers.active / analyticsData.canvaUsers.total) * 100).toFixed(1)}% dos usuários estão ativos. 
-                Crescimento de {analyticsData.trends.userGrowth}% no período.
+                {((analyticsData.canvaUsers.active / analyticsData.canvaUsers.total) * 100).toFixed(1)}% dos usu?rios esto ativos. 
+                Crescimento de {analyticsData.trends.userGrowth}% no perodo.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-semibold text-primary">Escolas</h4>
               <p className="text-sm text-muted-foreground">
                 {analyticsData.schoolPerformance.activeSchools} de {analyticsData.schoolPerformance.totalSchools} escolas ativas. 
-                São Paulo lidera com {analyticsData.schoolPerformance.byCluster['São Paulo']} unidades.
+                So Paulo lidera com {analyticsData.schoolPerformance.byCluster['So Paulo']} unidades.
               </p>
             </div>
           </div>

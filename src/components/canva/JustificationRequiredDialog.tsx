@@ -45,11 +45,11 @@ export const JustificationRequiredDialog = ({
     const newErrors: any = {};
     
     if (!reason.trim()) {
-      newErrors.reason = 'Motivo é obrigatório';
+      newErrors.reason = 'Motivo  obrigatrio';
     }
     
     if (!performedBy.trim()) {
-      newErrors.performedBy = 'Nome do solicitante é obrigatório';
+      newErrors.performedBy = 'Nome do solicitante  obrigatrio';
     }
     
     setErrors(newErrors);
@@ -107,7 +107,7 @@ export const JustificationRequiredDialog = ({
                 >
                   {selectedMember
                     ? selectedMember.fullName
-                    : "Selecione quem está fazendo a solicitação..."}
+                    : "Selecione quem est fazendo a solicitao..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -139,7 +139,7 @@ export const JustificationRequiredDialog = ({
                           <div className="flex flex-col">
                             <span className="font-medium">{member.fullName}</span>
                             <span className="text-xs text-muted-foreground">
-                              {member.username} • {member.role}
+                              {member.username}  {member.role}
                             </span>
                           </div>
                         </CommandItem>
@@ -155,7 +155,7 @@ export const JustificationRequiredDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reason">Motivo da Alteração *</Label>
+            <Label htmlFor="reason">Motivo da Alterao *</Label>
             <Textarea
               id="reason"
               value={reason}
@@ -165,7 +165,7 @@ export const JustificationRequiredDialog = ({
                   setErrors((prev: any) => ({ ...prev, reason: '' }));
                 }
               }}
-              placeholder="Descreva o motivo para esta alteração de licença..."
+              placeholder="Descreva o motivo para esta alterao de licen?a..."
               rows={4}
               className={errors.reason ? 'border-destructive' : ''}
             />
@@ -180,7 +180,7 @@ export const JustificationRequiredDialog = ({
             Cancelar
           </Button>
           <Button onClick={handleSubmit}>
-            Confirmar Alteração
+            Confirmar Alterao
           </Button>
         </DialogFooter>
       </DialogContent>

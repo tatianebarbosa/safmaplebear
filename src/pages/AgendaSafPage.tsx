@@ -55,7 +55,7 @@ const AgendaSafPage = () => {
 
   useEffect(() => {
     if (!error) return;
-    const message = error instanceof Error ? error.message : "Nao foi possivel carregar os eventos.";
+    const message = error instanceof Error ? error.message : "N?o foi possivel carregar os eventos.";
     toast({
       title: "Falha ao carregar agenda",
       description: message,
@@ -153,7 +153,7 @@ const AgendaSafPage = () => {
     setIsSubmitting(true);
     try {
       await deleteEvent(eventId);
-      toast({ title: "Evento removido", description: "Ele nao sera mais exibido no calendario." });
+      toast({ title: "Evento removido", description: "Ele n?o sera mais exibido no calendario." });
       await refetch();
     } catch (error: any) {
       toast({

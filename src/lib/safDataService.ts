@@ -130,7 +130,7 @@ const CENTRAL_SCHOOL_PLACEHOLDER: School = {
   logradouro: 'Av. Central Maple Bear',
   bairro: 'Centro',
   cep: '',
-  cidade: 'São Paulo',
+  cidade: 'So Paulo',
   estado: 'SP',
   regiao: 'Sudeste',
   telefone: null,
@@ -173,13 +173,13 @@ export const isEmailCompliant = (email: string): boolean => {
   const [localPart, domainRaw] = normalized.split('@');
   const domain = domainRaw ?? '';
 
-  // Domínios corporativos aceitos
+  // Domnios corporativos aceitos
   const domainKeywords = ['maplebear', 'mbcentral', 'sebsa', 'seb'];
   if (domainKeywords.some((kw) => domain.includes(kw))) {
     return true;
   }
 
-  // Domínios que começam com mb + nome da escola (ex: mbmogidascruzes.com.br)
+  // Domnios que comeam com mb + nome da escola (ex: mbmogidascruzes.com.br)
   if (/^mb[a-z0-9.-]{2,}$/.test(domain)) {
     return true;
   }
@@ -214,29 +214,29 @@ export const loadFranchisingSchools = async (): Promise<School[]> => {
         cep: getField(record, fieldMap, 'CEP Escola') || '',
         cidade: getField(record, fieldMap, 'Cidade da Escola') || '',
         estado: getField(record, fieldMap, 'Estado da Escola') || '',
-        regiao: getField(record, fieldMap, 'Regiao da Escola') || getField(record, fieldMap, 'Região da Escola') || '',
+        regiao: getField(record, fieldMap, 'Regiao da Escola') || getField(record, fieldMap, 'Regio da Escola') || '',
         telefone: optionalString(getField(record, fieldMap, 'Telefone de Contato da Escola') || ''),
         outroTelefone: optionalString(getField(record, fieldMap, 'Outro Telefone') || ''),
         email: optionalString(getField(record, fieldMap, 'E-mail da Escola') || ''),
-        razaoSocial: getField(record, fieldMap, 'Razao Social') || getField(record, fieldMap, 'Razão Social') || '',
+        razaoSocial: getField(record, fieldMap, 'Razao Social') || getField(record, fieldMap, 'Razo Social') || '',
         nomeFantasia: getField(record, fieldMap, 'Nome Fantasia') || '',
         statusCnpj: getField(record, fieldMap, 'Status CNPJ') || '',
         cluster: getField(record, fieldMap, 'Cluster') || '',
-        statusVisitaLideranca: optionalString(getField(record, fieldMap, 'Status Visita Lideranca') || getField(record, fieldMap, 'Status Visita Liderança') || ''),
+        statusVisitaLideranca: optionalString(getField(record, fieldMap, 'Status Visita Lideranca') || getField(record, fieldMap, 'Status Visita Liderana') || ''),
         performanceMeta: optionalString(getField(record, fieldMap, 'Performance da Meta') || ''),
-        atualSerie: optionalString(getField(record, fieldMap, 'Atual Serie') || getField(record, fieldMap, 'Atual Série') || ''),
+        atualSerie: optionalString(getField(record, fieldMap, 'Atual Serie') || getField(record, fieldMap, 'Atual Srie') || ''),
         avancandoSegmento: optionalString(getField(record, fieldMap, 'Avancando de Segmento') || ''),
         ticketMedio: optionalString(
           getField(record, fieldMap, 'Ticket Medio') ||
-            getField(record, fieldMap, 'Ticket Médio') ||
-            getField(record, fieldMap, 'Ticket MǸdio') ||
+            getField(record, fieldMap, 'Ticket Mdio') ||
+            getField(record, fieldMap, 'Ticket Mdio') ||
             ''
         ),
         ultimaAtualizacao:
           parseDateTime(
             getField(record, fieldMap, 'Data de Modificacao') ||
-              getField(record, fieldMap, 'Data de Modificação') ||
-              getField(record, fieldMap, '(Não Modificar) Data de Modificação') ||
+              getField(record, fieldMap, 'Data de Modificao') ||
+              getField(record, fieldMap, '(No Modificar) Data de Modificao') ||
               ''
           )?.toISOString() || null,
       };
@@ -341,7 +341,7 @@ export const buildSchoolCardViews = (
 
     let school: School | null = null;
     let schoolId: number | 'CENTRAL' | 'UNASSIGNED' = key;
-    let label = 'Usuários sem escola definida';
+    let label = 'Usurios sem escola definida';
     let totalLicenses = key === 'CENTRAL' ? Math.max(getMaxLicensesPerSchool(), groupUsers.length) : getMaxLicensesPerSchool();
 
     if (key === 'CENTRAL') {

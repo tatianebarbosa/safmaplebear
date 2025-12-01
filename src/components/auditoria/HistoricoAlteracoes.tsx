@@ -9,7 +9,7 @@ interface HistoricoAlteracoesProps {
 }
 
 /**
- * Componente para exibir o histórico de alterações
+ * Componente para exibir o histrico de alteraes
  */
 export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
   tipoEntidade,
@@ -22,7 +22,7 @@ export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // Carrega o histórico ao montar o componente
+  // Carrega o histrico ao montar o componente
   useEffect(() => {
     carregarHistorico();
   }, [tipoEntidade, idEntidade]);
@@ -34,23 +34,23 @@ export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
       const dados = await auditTrail.obterHistorico(tipoEntidade, idEntidade, limite);
       setHistorico(dados);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao carregar histórico');
+      setError(err instanceof Error ? err.message : 'Erro ao carregar histrico');
     } finally {
       setLoading(false);
     }
   };
 
   const reverterAlteracao = async (registroId: string) => {
-    if (!window.confirm('Tem certeza que deseja reverter esta alteração?')) {
+    if (!window.confirm('Tem certeza que deseja reverter esta alterao?')) {
       return;
     }
 
     try {
       await auditTrail.reverterAlteracao(registroId);
-      // Recarrega o histórico
+      // Recarrega o histrico
       await carregarHistorico();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao reverter alteração');
+      setError(err instanceof Error ? err.message : 'Erro ao reverter alterao');
     }
   };
 
@@ -59,22 +59,22 @@ export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
   };
 
   if (loading) {
-    return <div className="historico-loading">Carregando histórico...</div>;
+    return <div className="historico-loading">Carregando histrico...</div>;
   }
 
   return (
     <div className="historico-alteracoes">
       <div className="historico-header">
-        <h3>Histórico de Alterações - {nomeEntidade}</h3>
+        <h3>Histrico de Alteraes - {nomeEntidade}</h3>
         <button onClick={carregarHistorico} className="btn-refresh">
-          🔄 Atualizar
+           Atualizar
         </button>
       </div>
 
       {error && <div className="error-message">{error}</div>}
 
       {historico.length === 0 ? (
-        <div className="no-data">Nenhuma alteração registrada para esta entidade</div>
+        <div className="no-data">Nenhuma alterao registrada para esta entidade</div>
       ) : (
         <div className="historico-list">
           {historico.map((registro) => (
@@ -97,7 +97,7 @@ export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
                   <div className="item-details">
                     <p className="item-descricao">{registro.descricao}</p>
                     <p className="item-meta">
-                      {registro.data} às {registro.hora} • {registro.nomeUsuario} ({registro.emailUsuario})
+                      {registro.data} s {registro.hora}  {registro.nomeUsuario} ({registro.emailUsuario})
                     </p>
                   </div>
                 </div>
@@ -109,12 +109,12 @@ export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
                         reverterAlteracao(registro.id);
                       }}
                       className="btn-revert"
-                      title="Reverter esta alteração"
+                      title="Reverter esta alterao"
                     >
-                      ↶ Reverter
+                       Reverter
                     </button>
                   )}
-                  <span className="expand-icon">{expandedId === registro.id ? '▼' : '▶'}</span>
+                  <span className="expand-icon">{expandedId === registro.id ? '' : ''}</span>
                 </div>
               </div>
 
@@ -125,7 +125,7 @@ export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
                     <span className="value">{registro.id}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="label">Tipo de Alteração:</span>
+                    <span className="label">Tipo de Alterao:</span>
                     <span className="value">{registro.tipoAlteracao}</span>
                   </div>
                   <div className="detail-row">
@@ -137,12 +137,12 @@ export const HistoricoAlteracoes: React.FC<HistoricoAlteracoesProps> = ({
                     <span className="value">{registro.idEntidade}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="label">Usuário:</span>
+                    <span className="label">Usurio:</span>
                     <span className="value">{registro.nomeUsuario} ({registro.emailUsuario})</span>
                   </div>
                   <div className="detail-row">
                     <span className="label">Data/Hora:</span>
-                    <span className="value">{registro.data} às {registro.hora}</span>
+                    <span className="value">{registro.data} s {registro.hora}</span>
                   </div>
                   {registro.ipAddress && (
                     <div className="detail-row">

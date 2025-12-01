@@ -32,7 +32,7 @@ export interface ProcessedSchoolData {
   compliantUsers: number;
   nonCompliantUsers: number;
   estimatedLicenses: number;
-  licenseStatus: 'Disponível' | 'Completo' | 'Excedido';
+  licenseStatus: 'Disponvel' | 'Completo' | 'Excedido';
 }
 
 export interface CanvaOverviewData {

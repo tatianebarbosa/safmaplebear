@@ -1,14 +1,14 @@
 /**
- * Utilitários de validação para email, CPF, domínios e compliance
- * Centraliza lógica duplicada encontrada em múltiplos componentes
+ * Utilitrios de validao para email, CPF, dom?nios e compliance
+ * Centraliza lgica duplicada encontrada em mltiplos componentes
  */
 
 // ============================================================================
-// CONFIGURAÇÕES DE DOMÍNIOS
+// CONFIGURAES DE DOMNIOS
 // ============================================================================
 
 /**
- * Lista de domínios corporativos permitidos
+ * Lista de dom?nios corporativos permitidos
  */
 export const ALLOWED_DOMAINS = [
   'mbcentral.com.br',
@@ -18,7 +18,7 @@ export const ALLOWED_DOMAINS = [
 ] as const;
 
 /**
- * Lista de domínios compliance para Canva
+ * Lista de dom?nios compliance para Canva
  */
 export const COMPLIANT_DOMAINS = [
   'maplebear.com.br',
@@ -52,14 +52,14 @@ const hasMapleBearSchoolIdentifier = (localPart: string): boolean => {
 };
 
 // ============================================================================
-// VALIDAÇÃO DE EMAIL
+// VALIDAO DE EMAIL
 // ============================================================================
 
 /**
- * Valida o formato de um endereço de email
+ * Valida o formato de um endereo de email
  * @param email - Email a ser validado
- * @returns true se o email é válido, false caso contrário
- * @example validateEmail("usuario@exemplo.com") // true
+ * @returns true se o email  vlido, false caso contrrio
+ * @example validateEmail("usu?rio@exemplo.com") // true
  * @example validateEmail("email-invalido") // false
  */
 export function validateEmail(email: string): boolean {
@@ -72,10 +72,10 @@ export function validateEmail(email: string): boolean {
 }
 
 /**
- * Extrai o domínio de um endereço de email
- * @param email - Email do qual extrair o domínio
- * @returns Domínio do email ou string vazia se inválido
- * @example getEmailDomain("usuario@exemplo.com") // "exemplo.com"
+ * Extrai o dom?nio de um endereo de email
+ * @param email - Email do qual extrair o dom?nio
+ * @returns Domnio do email ou string vazia se invlido
+ * @example getEmailDomain("usu?rio@exemplo.com") // "exemplo.com"
  */
 export function getEmailDomain(email: string): string {
   if (!email || typeof email !== 'string') {
@@ -87,10 +87,10 @@ export function getEmailDomain(email: string): string {
 }
 
 /**
- * Extrai o nome de usuário de um endereço de email
+ * Extrai o nome de usu?rio de um endereo de email
  * @param email - Email do qual extrair o nome
- * @returns Nome de usuário do email
- * @example getEmailUsername("usuario@exemplo.com") // "usuario"
+ * @returns Nome de usu?rio do email
+ * @example getEmailUsername("usu?rio@exemplo.com") // "usu?rio"
  */
 export function getEmailUsername(email: string): string {
   if (!email || typeof email !== 'string') {
@@ -102,11 +102,11 @@ export function getEmailUsername(email: string): string {
 }
 
 /**
- * Verifica se um email pertence a um domínio permitido
+ * Verifica se um email pertence a um dom?nio permitido
  * @param email - Email a ser verificado
- * @returns true se o domínio é permitido, false caso contrário
- * @example isAllowedDomain("usuario@mbcentral.com.br") // true
- * @example isAllowedDomain("usuario@gmail.com") // false
+ * @returns true se o dom?nio  permitido, false caso contrrio
+ * @example isAllowedDomain("usu?rio@mbcentral.com.br") // true
+ * @example isAllowedDomain("usu?rio@gmail.com") // false
  */
 export function isAllowedDomain(email: string): boolean {
   if (!validateEmail(email)) {
@@ -118,11 +118,11 @@ export function isAllowedDomain(email: string): boolean {
 }
 
 /**
- * Verifica se um email está em compliance (domínios Maplebear/SEB)
+ * Verifica se um email est em compliance (dom?nios Maplebear/SEB)
  * @param email - Email a ser verificado
- * @returns true se o email está em compliance, false caso contrário
- * @example isCompliantEmail("usuario@maplebear.com.br") // true
- * @example isCompliantEmail("usuario@gmail.com") // false
+ * @returns true se o email est em compliance, false caso contrrio
+ * @example isCompliantEmail("usu?rio@maplebear.com.br") // true
+ * @example isCompliantEmail("usu?rio@gmail.com") // false
  */
 export function isCompliantEmail(email: string): boolean {
   if (!validateEmail(email)) {
@@ -144,15 +144,15 @@ export function isCompliantEmail(email: string): boolean {
 }
 
 /**
- * Retorna a razão pela qual um email não está em compliance
+ * Retorna a razo pela qual um email no est em compliance
  * @param email - Email a ser verificado
  * @returns Mensagem descrevendo o problema de compliance
- * @example getNonComplianceReason("usuario@gmail.com") 
- * // "Domínio não autorizado: gmail.com"
+ * @example getNonComplianceReason("usu?rio@gmail.com") 
+ * // "Domnio no autorizado: gmail.com"
  */
 export function getNonComplianceReason(email: string): string {
   if (!email || typeof email !== 'string') {
-    return 'Email nao fornecido';
+    return 'Email n?o fornecido';
   }
   
   if (!validateEmail(email)) {
@@ -167,7 +167,7 @@ export function getNonComplianceReason(email: string): string {
   }
   
   if (!isCorporateDomain(domain)) {
-    return `Dominio nao autorizado: ${domain}`;
+    return `Dominio n?o autorizado: ${domain}`;
   }
 
   if (isMapleBearDomain(domain) && !hasMapleBearSchoolIdentifier(localPart)) {
@@ -182,10 +182,10 @@ export function getNonComplianceReason(email: string): string {
 }
 
 /**
- * Verifica se um email pertence ao domínio Maplebear
+ * Verifica se um email pertence ao dom?nio Maplebear
  * @param email - Email a ser verificado
- * @returns true se o email é @maplebear.com.br
- * @example isMaplebearEmail("usuario@maplebear.com.br") // true
+ * @returns true se o email  @maplebear.com.br
+ * @example isMaplebearEmail("usu?rio@maplebear.com.br") // true
  */
 export function isMaplebearEmail(email: string): boolean {
   const domain = getEmailDomain(email);
@@ -193,10 +193,10 @@ export function isMaplebearEmail(email: string): boolean {
 }
 
 /**
- * Verifica se um email pertence aos domínios SEB
+ * Verifica se um email pertence aos dom?nios SEB
  * @param email - Email a ser verificado
- * @returns true se o email é @seb.com.br ou @sebsa.com.br
- * @example isSEBEmail("usuario@seb.com.br") // true
+ * @returns true se o email  @seb.com.br ou @sebsa.com.br
+ * @example isSEBEmail("usu?rio@seb.com.br") // true
  */
 export function isSEBEmail(email: string): boolean {
   const domain = getEmailDomain(email);
@@ -204,13 +204,13 @@ export function isSEBEmail(email: string): boolean {
 }
 
 // ============================================================================
-// VALIDAÇÃO DE CPF
+// VALIDAO DE CPF
 // ============================================================================
 
 /**
- * Remove caracteres não numéricos de uma string
+ * Remove caracteres no numricos de uma string
  * @param value - String a ser limpa
- * @returns String contendo apenas números
+ * @returns String contendo apenas nmeros
  * @example cleanNumericString("123.456.789-00") // "12345678900"
  */
 export function cleanNumericString(value: string): string {
@@ -222,35 +222,35 @@ export function cleanNumericString(value: string): string {
 }
 
 /**
- * Valida um número de CPF
- * @param cpf - CPF a ser validado (com ou sem formatação)
- * @returns true se o CPF é válido, false caso contrário
- * @example validateCPF("123.456.789-00") // false (CPF inválido)
- * @example validateCPF("12345678900") // false (CPF inválido)
+ * Valida um nmero de CPF
+ * @param cpf - CPF a ser validado (com ou sem formatao)
+ * @returns true se o CPF  vlido, false caso contrrio
+ * @example validateCPF("123.456.789-00") // false (CPF invlido)
+ * @example validateCPF("12345678900") // false (CPF invlido)
  */
 export function validateCPF(cpf: string): boolean {
   if (!cpf || typeof cpf !== 'string') {
     return false;
   }
   
-  // Remove caracteres não numéricos
+  // Remove caracteres no numricos
   const cleanedCPF = cleanNumericString(cpf);
   
-  // Verifica se tem 11 dígitos
+  // Verifica se tem 11 dgitos
   if (cleanedCPF.length !== 11) {
     return false;
   }
   
-  // Verifica se todos os dígitos são iguais
+  // Verifica se todos os dgitos so iguais
   if (/^(\d)\1{10}$/.test(cleanedCPF)) {
     return false;
   }
   
-  // Validação dos dígitos verificadores
+  // Validao dos dgitos verificadores
   let sum = 0;
   let remainder;
   
-  // Valida primeiro dígito
+  // Valida primeiro dgito
   for (let i = 1; i <= 9; i++) {
     sum += parseInt(cleanedCPF.substring(i - 1, i)) * (11 - i);
   }
@@ -259,7 +259,7 @@ export function validateCPF(cpf: string): boolean {
   if (remainder === 10 || remainder === 11) remainder = 0;
   if (remainder !== parseInt(cleanedCPF.substring(9, 10))) return false;
   
-  // Valida segundo dígito
+  // Valida segundo dgito
   sum = 0;
   for (let i = 1; i <= 10; i++) {
     sum += parseInt(cleanedCPF.substring(i - 1, i)) * (12 - i);
@@ -273,8 +273,8 @@ export function validateCPF(cpf: string): boolean {
 }
 
 /**
- * Formata um CPF com máscara
- * @param cpf - CPF a ser formatado (apenas números)
+ * Formata um CPF com mscara
+ * @param cpf - CPF a ser formatado (apenas nmeros)
  * @returns CPF formatado (000.000.000-00)
  * @example formatCPF("12345678900") // "123.456.789-00"
  */
@@ -289,41 +289,41 @@ export function formatCPF(cpf: string): string {
 }
 
 // ============================================================================
-// VALIDAÇÃO DE CNPJ
+// VALIDAO DE CNPJ
 // ============================================================================
 
 /**
- * Valida um número de CNPJ
- * @param cnpj - CNPJ a ser validado (com ou sem formatação)
- * @returns true se o CNPJ é válido, false caso contrário
- * @example validateCNPJ("00.000.000/0000-00") // false (CNPJ inválido)
+ * Valida um nmero de CNPJ
+ * @param cnpj - CNPJ a ser validado (com ou sem formatao)
+ * @returns true se o CNPJ  vlido, false caso contrrio
+ * @example validateCNPJ("00.000.000/0000-00") // false (CNPJ invlido)
  */
 export function validateCNPJ(cnpj: string): boolean {
   if (!cnpj || typeof cnpj !== 'string') {
     return false;
   }
   
-  // Remove caracteres não numéricos
+  // Remove caracteres no numricos
   const cleanedCNPJ = cleanNumericString(cnpj);
   
-  // Verifica se tem 14 dígitos
+  // Verifica se tem 14 dgitos
   if (cleanedCNPJ.length !== 14) {
     return false;
   }
   
-  // Verifica se todos os dígitos são iguais
+  // Verifica se todos os dgitos so iguais
   if (/^(\d)\1{13}$/.test(cleanedCNPJ)) {
     return false;
   }
   
-  // Validação dos dígitos verificadores
+  // Validao dos dgitos verificadores
   let length = cleanedCNPJ.length - 2;
   let numbers = cleanedCNPJ.substring(0, length);
   const digits = cleanedCNPJ.substring(length);
   let sum = 0;
   let pos = length - 7;
   
-  // Valida primeiro dígito
+  // Valida primeiro dgito
   for (let i = length; i >= 1; i--) {
     sum += parseInt(numbers.charAt(length - i)) * pos--;
     if (pos < 2) pos = 9;
@@ -332,7 +332,7 @@ export function validateCNPJ(cnpj: string): boolean {
   let result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
   if (result !== parseInt(digits.charAt(0))) return false;
   
-  // Valida segundo dígito
+  // Valida segundo dgito
   length = length + 1;
   numbers = cleanedCNPJ.substring(0, length);
   sum = 0;
@@ -350,8 +350,8 @@ export function validateCNPJ(cnpj: string): boolean {
 }
 
 /**
- * Formata um CNPJ com máscara
- * @param cnpj - CNPJ a ser formatado (apenas números)
+ * Formata um CNPJ com mscara
+ * @param cnpj - CNPJ a ser formatado (apenas nmeros)
  * @returns CNPJ formatado (00.000.000/0000-00)
  * @example formatCNPJ("00000000000000") // "00.000.000/0000-00"
  */
@@ -366,13 +366,13 @@ export function formatCNPJ(cnpj: string): string {
 }
 
 // ============================================================================
-// VALIDAÇÃO DE TELEFONE
+// VALIDAO DE TELEFONE
 // ============================================================================
 
 /**
- * Valida um número de telefone brasileiro
+ * Valida um nmero de telefone brasileiro
  * @param phone - Telefone a ser validado
- * @returns true se o telefone é válido, false caso contrário
+ * @returns true se o telefone  vlido, false caso contrrio
  * @example validatePhone("(11) 98765-4321") // true
  * @example validatePhone("11987654321") // true
  */
@@ -383,12 +383,12 @@ export function validatePhone(phone: string): boolean {
   
   const cleaned = cleanNumericString(phone);
   
-  // Aceita telefones com 10 (fixo) ou 11 (celular) dígitos
+  // Aceita telefones com 10 (fixo) ou 11 (celular) dgitos
   return cleaned.length === 10 || cleaned.length === 11;
 }
 
 /**
- * Formata um número de telefone brasileiro
+ * Formata um nmero de telefone brasileiro
  * @param phone - Telefone a ser formatado
  * @returns Telefone formatado
  * @example formatPhone("11987654321") // "(11) 98765-4321"

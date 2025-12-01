@@ -58,7 +58,7 @@ export const CostManagementDashboard = () => {
 
   const handleExportInvoices = () => {
     const csvData = [
-      ['Data', 'Número', 'Descrição', 'Equipe', 'Valor', 'Status'],
+      ['Data', 'Nmero', 'Descrio', 'Equipe', 'Valor', 'Status'],
       ...invoices.map(inv => [
         formatDateBR(inv.date),
         inv.invoiceNumber,
@@ -78,9 +78,9 @@ export const CostManagementDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Gestão de Custos Canva</h2>
+          <h2 className="text-2xl font-bold">Gest?o de Custos Canva</h2>
           <p className="text-muted-foreground">
-            Controle financeiro e análise de gastos com licenças
+            Controle financeiro e an�lise de gastos com licen�as
           </p>
         </div>
         <div className="flex gap-2">
@@ -133,30 +133,30 @@ export const CostManagementDashboard = () => {
         <StatsCard
           title="Gasto Total"
           value={formatCurrency(analytics.totalYearCost)}
-          description={`${selectedYear} • ${analytics.totalInvoices} faturas`}
+          description={`${selectedYear}  ${analytics.totalInvoices} faturas`}
           icon={<DollarSign className="h-4 w-4" />}
         />
         <StatsCard
-          title="Média Mensal"
+          title="Mdia Mensal"
           value={formatCurrency(analytics.averageMonthly)}
-          description="Gasto médio por mês"
+          description="Gasto mdio por ms"
           icon={<Calendar className="h-4 w-4" />}
         />
         <StatsCard
-          title="Custo por Licença"
+          title="Custo por Licen?a"
           value={formatCurrency(analytics.costPerLicense)}
-          description="Baseado em licenças ativas"
+          description="Baseado em licen�as ativas"
           icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatsCard
-          title="Orçamento Utilizado"
+          title="Oramento Utilizado"
           value={formatPercentage(budgetUsagePercent)}
           description={`${formatCurrency(remainingBudget)} restante`}
           icon={<Target className="h-4 w-4" />}
           variant={budgetUsagePercent > 100 ? "destructive" : "default"}
         />
         <StatsCard
-          title="Orçamento Anual"
+          title="Oramento Anual"
           value={formatCurrency(annualBudget)}
           description="Meta estabelecida"
           icon={<Target className="h-4 w-4" />}
@@ -166,13 +166,13 @@ export const CostManagementDashboard = () => {
       {/* Budget Configuration */}
       <Card>
         <CardHeader>
-          <CardTitle>Configuração de Orçamento</CardTitle>
-          <CardDescription>Defina o orçamento anual para controle de gastos</CardDescription>
+          <CardTitle>Configurao de Oramento</CardTitle>
+          <CardDescription>Defina o oramento anual para controle de gastos</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
             <div className="flex-1">
-              <Label htmlFor="budget">Orçamento Anual (R$)</Label>
+              <Label htmlFor="budget">Oramento Anual (R$)</Label>
               <Input
                 id="budget"
                 type="number"
@@ -182,7 +182,7 @@ export const CostManagementDashboard = () => {
               />
             </div>
             <div className="pt-6">
-              <Button onClick={() => toast.success('Orçamento atualizado')}>
+              <Button onClick={() => toast.success('Oramento atualizado')}>
                 Salvar
               </Button>
             </div>
@@ -196,7 +196,7 @@ export const CostManagementDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>Gastos Mensais</CardTitle>
-            <CardDescription>Evolução dos custos ao longo do ano</CardDescription>
+            <CardDescription>Evoluo dos custos ao longo do ano</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -222,7 +222,7 @@ export const CostManagementDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>Gastos por Equipe</CardTitle>
-            <CardDescription>Distribuição de custos entre equipes</CardDescription>
+            <CardDescription>Distribuio de custos entre equipes</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -252,7 +252,7 @@ export const CostManagementDashboard = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Faturas Canva</CardTitle>
-            <CardDescription>Histórico de pagamentos e pendências</CardDescription>
+            <CardDescription>Histrico de pagamentos e pendncias</CardDescription>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleExportInvoices}>
@@ -277,7 +277,7 @@ export const CostManagementDashboard = () => {
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {invoice.invoiceNumber} • {invoice.team} • {formatDateBR(invoice.date)}
+                      {invoice.invoiceNumber}  {invoice.team}  {formatDateBR(invoice.date)}
                     </div>
                   </div>
                   <div className="text-right">

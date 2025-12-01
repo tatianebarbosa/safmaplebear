@@ -12,7 +12,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Método não permitido"}),
             status_code=405,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json; charset=utf-8"}
         )
     
     try:
@@ -23,7 +23,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Invalid JSON"}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         username = body.get('username', '').strip().lower()
@@ -33,7 +33,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Username e password são obrigatórios"}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         # Authenticate user using the secure_auth service
@@ -46,7 +46,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": auth_result.get("message", "Credenciais inválidas")}),
                 status_code=status_code,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json; charset=utf-8"}
             )
         
         user_info = auth_result["user"]
@@ -82,5 +82,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"success": False, "message": f"Erro interno: {str(e)}"}),
             status_code=500,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json; charset=utf-8"}
         )

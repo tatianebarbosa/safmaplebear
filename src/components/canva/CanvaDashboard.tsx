@@ -1,5 +1,4 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
-import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -27,24 +26,12 @@ const resolveInitialTab = () => {
 const CanvaDashboard = () => {
   const [activeTab, setActiveTab] = useState(resolveInitialTab());
   const [schoolSearch, setSchoolSearch] = useState("");
-  const {
-    overviewData,
-    loading,
-    loadOfficialData,
-    schools,
-    getDomainCounts,
-    getNonMapleBearCount,
-  } = useSchoolLicenseStore();
+  const { overviewData, loading, loadOfficialData, schools } = useSchoolLicenseStore();
+  const getDomainCounts = useSchoolLicenseStore((state) => state.getDomainCounts || (() => []));
+  const getNonMapleBearCount = useSchoolLicenseStore((state) => state.getNonMapleBearCount || (() => 0));
   const { toast } = useToast();
 
   const [isNonCompliantDialogOpen, setIsNonCompliantDialogOpen] = useState(false);
-
-  useAutoRefresh({
-    onRefresh: loadOfficialData,
-    interval: 5 * 60 * 1000,
-    enabled: true,
-    immediate: true,
-  });
 
   const nonCompliantUserDetails = useMemo(() => {
     if (!schools?.length) return [];
@@ -65,16 +52,29 @@ const CanvaDashboard = () => {
 
   const nonCompliantDomainCounts = useMemo(() => getDomainCounts(), [getDomainCounts]);
   const nonCompliantUserCount = useMemo(() => getNonMapleBearCount(), [getNonMapleBearCount]);
+  const effectiveOverview =
+    overviewData || {
+      totalUsers: 0,
+      totalSchools: 0,
+      compliantUsers: 0,
+      nonCompliantUsers: 0,
+      complianceRate: 0,
+      nonMapleBearDomains: 0,
+      topNonCompliantDomains: [],
+      schoolsWithUsers: 0,
+      schoolsAtCapacity: 0,
+    };
 
   const handleViewNonCompliantUsers = useCallback(() => {
     if (nonCompliantUserDetails.length === 0) {
       toast({
-        title: "Nenhum usuário fora da política carregado no momento.",
+        title: "Nenhum usuario fora da politica carregado no momento.",
       });
       return;
     }
     setIsNonCompliantDialogOpen(true);
   }, [nonCompliantUserDetails, toast]);
+
   useEffect(() => {
     const hashListener = () => {
       const hash = window.location.hash?.replace("#", "").toLowerCase();
@@ -86,6 +86,11 @@ const CanvaDashboard = () => {
     return () => window.removeEventListener("hashchange", hashListener);
   }, [activeTab]);
 
+  // Carrega dados ao montar (usa fallback se API falhar)
+  useEffect(() => {
+    loadOfficialData();
+  }, [loadOfficialData]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -93,18 +98,6 @@ const CanvaDashboard = () => {
       </div>
     );
   }
-
-  if (!overviewData) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-sm text-muted-foreground">Erro ao carregar dados do Canva.</p>
-        <Button onClick={loadOfficialData} className="mt-4">
-          Tentar Novamente
-        </Button>
-      </div>
-    );
-  }
-
 
   return (
     <div className="w-full pb-10">
@@ -118,7 +111,7 @@ const CanvaDashboard = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {overviewData.nonCompliantUsers > 0 && (
+            {effectiveOverview.nonCompliantUsers > 0 && (
               <Card className="border-destructive/20 bg-destructive/5 shadow-sm">
                 <CardHeader>
                   <div className="flex items-start gap-2">
@@ -128,7 +121,7 @@ const CanvaDashboard = () => {
                         Alerta de Conformidade - Alto Risco
                       </CardTitle>
                       <CardDescription className="text-sm text-destructive">
-                        {nonCompliantUserCount} usuários com domínios não autorizados identificados
+                        {nonCompliantUserCount} usuarios com dominios nao autorizados identificados
                       </CardDescription>
                     </div>
                   </div>
@@ -146,51 +139,51 @@ const CanvaDashboard = () => {
                       ))}
                       {(nonCompliantDomainCounts || []).length > 5 && (
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
-                          +{(nonCompliantDomainCounts || []).length - 5} domínios
+                          +{(nonCompliantDomainCounts || []).length - 5} dominios
                         </span>
                       )}
                     </div>
                     <Button variant="destructive" size="sm" onClick={handleViewNonCompliantUsers} className="mt-4">
-                      Ver Detalhes dos Usuários Não Conformes
+                      Ver detalhes dos usuarios nao conformes
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             )}
-            <CanvaMetricsDisplay />
+            <CanvaMetricsDisplay overviewData={effectiveOverview} />
           </TabsContent>
 
-        <TabsContent value="schools" className="space-y-6">
-          <SchoolLicenseManagement
-            externalSearchTerm={schoolSearch}
-            onExternalSearchConsumed={() => setSchoolSearch("")}
-          />
-        </TabsContent>
+          <TabsContent value="schools" className="space-y-6">
+            <SchoolLicenseManagement
+              externalSearchTerm={schoolSearch}
+              onExternalSearchConsumed={() => setSchoolSearch("")}
+            />
+          </TabsContent>
 
-        <TabsContent value="usage" className="space-y-6">
-          <CanvaUsageDashboard
-            onNavigateToUsers={(email) => {
-              setSchoolSearch(email ?? "");
-              setActiveTab("schools");
-              toast({
-                title: "Buscando na aba Escolas",
-                description: email ? `Filtrando por ${email}` : undefined,
-              });
-            }}
-          />
-        </TabsContent>
+          <TabsContent value="usage" className="space-y-6">
+            <CanvaUsageDashboard
+              onNavigateToUsers={(email) => {
+                setSchoolSearch(email ?? "");
+                setActiveTab("schools");
+                toast({
+                  title: "Buscando na aba Escolas",
+                  description: email ? `Filtrando por ${email}` : undefined,
+                });
+              }}
+            />
+          </TabsContent>
 
-        <TabsContent value="costs" className="space-y-6">
-          <CostManagementDashboard />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="costs" className="space-y-6">
+            <CostManagementDashboard />
+          </TabsContent>
+        </Tabs>
 
-      <FloatingAIChat />
-      <NonCompliantUsersDialog
-        open={isNonCompliantDialogOpen}
-        onOpenChange={setIsNonCompliantDialogOpen}
-        users={nonCompliantUserDetails}
-      />
+        <FloatingAIChat />
+        <NonCompliantUsersDialog
+          open={isNonCompliantDialogOpen}
+          onOpenChange={setIsNonCompliantDialogOpen}
+          users={nonCompliantUserDetails}
+        />
       </div>
     </div>
   );

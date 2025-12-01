@@ -52,7 +52,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                 
                 if not user:
                     self.send_response(401)
-                    self.send_header('Content-Type', 'application/json')
+                    self.send_header('Content-Type', 'application/json; charset=utf-8')
                     self.end_headers()
                     self.wfile.write(json.dumps({
                         'success': False,
@@ -73,7 +73,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                 )
                 
                 self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.end_headers()
                 self.wfile.write(json.dumps({
                     'success': True,
@@ -86,7 +86,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                 }).encode())
             except Exception as e:
                 self.send_response(400)
-                self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
                 self.end_headers()
                 self.wfile.write(json.dumps({
                     'success': False,
@@ -94,7 +94,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                 }).encode())
         else:
             self.send_response(404)
-            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
             self.end_headers()
             self.wfile.write(json.dumps({
                 'success': False,

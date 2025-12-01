@@ -1,30 +1,30 @@
 /**
  * Hook customizado para auto-refresh de dados
  * 
- * Este hook implementa polling automático para manter os dados
- * sincronizados sem necessidade de intervenção manual do usuário.
+ * Este hook implementa polling automtico para manter os dados
+ * sincronizados sem necessidade de interveno manual do usu?rio.
  */
 
 import { useEffect, useRef, useCallback } from 'react';
 
 interface UseAutoRefreshOptions {
   /**
-   * Função a ser executada no refresh
+   * Funo a ser executada no refresh
    */
   onRefresh: () => void | Promise<void>;
   
   /**
-   * Intervalo em milissegundos (padrão: 5 minutos)
+   * Intervalo em milissegundos (padro: 5 minutos)
    */
   interval?: number;
   
   /**
-   * Se o auto-refresh está habilitado (padrão: true)
+   * Se o auto-refresh est habilitado (padro: true)
    */
   enabled?: boolean;
   
   /**
-   * Se deve executar imediatamente ao montar (padrão: true)
+   * Se deve executar imediatamente ao montar (padro: true)
    */
   immediate?: boolean;
 }
@@ -43,19 +43,19 @@ interface UseAutoRefreshOptions {
  */
 export function useAutoRefresh({
   onRefresh,
-  interval = 5 * 60 * 1000, // 5 minutos por padrão
+  interval = 5 * 60 * 1000, // 5 minutos por padrao
   enabled = true,
   immediate = true
 }: UseAutoRefreshOptions) {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const onRefreshRef = useRef(onRefresh);
 
-  // Atualiza a referência da função de refresh
+  // Atualiza a referncia da funo de refresh
   useEffect(() => {
     onRefreshRef.current = onRefresh;
   }, [onRefresh]);
 
-  // Função para executar o refresh
+  // Funo para executar o refresh
   const executeRefresh = useCallback(async () => {
     try {
       await onRefreshRef.current();
@@ -96,16 +96,16 @@ export function useAutoRefresh({
 
   return {
     /**
-     * Força um refresh manual imediato
+     * Fora um refresh manual imediato
      */
     refresh: executeRefresh
   };
 }
 
 /**
- * Hook para auto-refresh com notificação visual
+ * Hook para auto-refresh com notificao visual
  * 
- * Similar ao useAutoRefresh, mas também retorna estado de loading
+ * Similar ao useAutoRefresh, mas tambm retorna estado de loading
  */
 export function useAutoRefreshWithStatus({
   onRefresh,

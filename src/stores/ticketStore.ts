@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Ticket, TicketStatus, Agente, TicketNote, TicketPriority } from "@/types/tickets";
+import { Ticket, TicketStatus, Agente, TicketNote, TicketPriority, TicketHistoryEntry } from "@/types/tickets";
 import { addDays, subDays, format } from "date-fns";
 
 interface TicketFilters {
@@ -23,6 +23,8 @@ interface TicketStore {
   moveTicket: (id: string, newStatus: TicketStatus) => void;
   removeTicket: (id: string) => void;
   addNoteToTicket: (id: string, note: TicketNote) => void;
+  addHistoryEntry: (id: string, entry: TicketHistoryEntry) => void;
+  revertHistoryEntry: (id: string, entryId: string, performedBy: string) => void;
 
   // Computed
   getFilteredTickets: () => Ticket[];
@@ -58,6 +60,9 @@ const calculateDueDate = (createdAt: string, slaDias?: number) => {
   const sla = slaDias ?? DEFAULT_SLA_DAYS;
   return addDays(new Date(createdAt), sla).toISOString();
 };
+
+// Seeds ficam ativos por padro; defina VITE_USE_SEED_TICKETS="false" para desativar
+const USE_SEED_TICKETS = import.meta.env.VITE_USE_SEED_TICKETS !== "false";
 
 const normalizeTicketId = (id: string) => (id.startsWith("#") ? id : `#${id}`);
 
@@ -193,6 +198,7 @@ const seedTickets: Ticket[] = pendingSeedTickets.map((ticket) => {
   return {
     id: normalizeTicketId(ticket.id),
     agente: ticket.agente,
+    responsavel: ticket.agente,
     diasAberto: ticket.diasAberto,
     status: "Pendente",
     observacao: ticket.observacao?.trim() || "Sem observacao registrada",
@@ -209,23 +215,10 @@ const seedTickets: Ticket[] = pendingSeedTickets.map((ticket) => {
   };
 });
 
-const mergeSeedTickets = (tickets: Ticket[]) => {
-  const existingIds = new Set(tickets.map((ticket) => ticket.id));
-  const merged = [...tickets];
-
-  seedTickets.forEach((ticket) => {
-    if (!existingIds.has(ticket.id)) {
-      merged.push(ticket);
-    }
-  });
-
-  return merged;
-};
-
 export const useTicketStore = create<TicketStore>()(
   persist(
     (set, get) => ({
-      tickets: seedTickets,
+      tickets: USE_SEED_TICKETS ? seedTickets : [],
       filters: {},
       dueLog: {},
 
@@ -250,7 +243,9 @@ export const useTicketStore = create<TicketStore>()(
           slaDias,
           dueDate,
           assigneeEmail: agentEmails[ticketData.agente] || ticketData.assigneeEmail,
+          responsavel: ticketData.responsavel || ticketData.agente,
           notes: ticketData.notes || [],
+          history: ticketData.history || [],
         };
 
         set((state) => ({
@@ -318,6 +313,68 @@ export const useTicketStore = create<TicketStore>()(
         }));
       },
 
+      addHistoryEntry: (id, entry) => {
+        set((state) => ({
+          tickets: state.tickets.map((ticket) =>
+            ticket.id === id
+              ? {
+                  ...ticket,
+                  history: [entry, ...(ticket.history || [])],
+                  updatedAt: new Date().toISOString(),
+                }
+              : ticket
+          ),
+        }));
+      },
+
+      revertHistoryEntry: (id, entryId, performedBy) => {
+        set((state) => {
+          const ticket = state.tickets.find((t) => t.id === id);
+          if (!ticket) return state;
+          const target = ticket.history?.find((h) => h.id === entryId);
+          if (!target) return state;
+
+          const now = new Date().toISOString();
+          const updates = target.before || {};
+          let resolvedAt = ticket.resolvedAt;
+
+          if (updates.status) {
+            resolvedAt = updates.status === "Resolvido" ? now : null;
+          }
+
+          const revertedTicket: Ticket = {
+            ...ticket,
+            ...updates,
+            resolvedAt,
+            updatedAt: now,
+            history: [
+              {
+                id: `${id}-revert-${Date.now()}`,
+                author: performedBy,
+                action: `Reverteu: ${target.action}`,
+                timestamp: now,
+                before: target.after,
+                after: updates,
+              },
+              ...(ticket.history || []),
+            ],
+            notes: [
+              {
+                id: `${id}-revert-note-${Date.now()}`,
+                author: performedBy,
+                content: `Revertido: ${target.action}`,
+                createdAt: now,
+              },
+              ...(ticket.notes || []),
+            ],
+          };
+
+          return {
+            tickets: state.tickets.map((t) => (t.id === id ? revertedTicket : t)),
+          };
+        });
+      },
+
       getFilteredTickets: () => {
         const { tickets, filters } = get();
         return tickets.filter((ticket) => {
@@ -368,7 +425,19 @@ export const useTicketStore = create<TicketStore>()(
       name: "saf-tickets-storage",
       onRehydrateStorage: () => (state) => {
         if (state) {
-          state.setTickets(mergeSeedTickets(state.tickets || []));
+          if (USE_SEED_TICKETS) {
+            const existingIds = new Set((state.tickets || []).map((t) => t.id));
+            const merged = [...(state.tickets || [])];
+            seedTickets.forEach((ticket) => {
+              if (!existingIds.has(ticket.id)) {
+                merged.push(ticket);
+              }
+            });
+            state.setTickets(merged);
+          } else {
+            // Limpa seeds persistidos ao migrar para fonte remota
+            state.setTickets([]);
+          }
           state.setFilters({});
         }
       },

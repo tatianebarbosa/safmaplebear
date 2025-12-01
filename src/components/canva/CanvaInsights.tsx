@@ -33,21 +33,21 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
 
   const insights = [
     {
-      title: 'Taxa de Utilização Global',
+      title: 'Taxa de Utilizao Global',
       value: `${utilizationRate.toFixed(1)}%`,
-      description: `${analytics.totalUsers} usuários de ${totalLicenses} licenças disponíveis`,
+      description: `${analytics.totalUsers} usu�rios de ${totalLicenses} licen�as dispon?veis`,
       status: utilizationRate > 90 ? 'warning' : utilizationRate > 70 ? 'success' : 'info',
       icon: Users
     },
     {
-      title: 'Conformidade de Política',
+      title: 'Conformidade de Pol?tica',
       value: `${analytics.complianceRate.toFixed(1)}%`,
-      description: `${analytics.nonCompliantUsers} usuários fora da política`,
+      description: `${analytics.nonCompliantUsers} usu�rios fora da pol?tica`,
       status: analytics.complianceRate > 95 ? 'success' : analytics.complianceRate > 80 ? 'warning' : 'danger',
       icon: analytics.complianceRate > 95 ? CheckCircle : AlertTriangle
     },
     {
-      title: 'Escolas em Capacidade Máxima',
+      title: 'Escolas em Capacidade Mxima',
       value: analytics.schoolsAtCapacity.toString(),
       description: `${((analytics.schoolsAtCapacity / analytics.totalSchools) * 100).toFixed(1)}% das escolas`,
       status: analytics.schoolsAtCapacity > analytics.totalSchools * 0.8 ? 'warning' : 'info',
@@ -91,14 +91,14 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
-              Questões Críticas Identificadas
+              Questes Crticas Identificadas
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {schoolsOverCapacity.length > 0 && (
               <div className="p-3 bg-background rounded border">
                 <div className="font-medium text-sm mb-2">
-                  🚨 {schoolsOverCapacity.length} escola(s) excederam limite de licenças
+                   {schoolsOverCapacity.length} escola(s) excederam limite de licen�as
                 </div>
                 <div className="space-y-1">
                   {schoolsOverCapacity.slice(0, 3).map(school => (
@@ -121,10 +121,10 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
             {analytics.nonCompliantUsers > 0 && (
               <div className="p-3 bg-background rounded border">
                 <div className="font-medium text-sm">
-                  ⚠️ {analytics.nonCompliantUsers} usuários com domínio não autorizado
+                   {analytics.nonCompliantUsers} usu�rios com dom?nio no autorizado
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Domínios permitidos: @maplebear.com.br, @mbcentral.com.br, @sebsa.com.br, @seb.com.br
+                  Domnios permitidos: @maplebear.com.br, @mbcentral.com.br, @sebsa.com.br, @seb.com.br
                 </div>
               </div>
             )}
@@ -132,10 +132,10 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
             {lowActivitySchools.length > 0 && (
               <div className="p-3 bg-background rounded border">
                 <div className="font-medium text-sm">
-                  📊 {lowActivitySchools.length} escola(s) sem atividade registrada
+                   {lowActivitySchools.length} escola(s) sem atividade registrada
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Escolas com usuários ativos mas sem designs criados
+                  Escolas com usu�rios ativos mas sem designs criados
                 </div>
               </div>
             )}
@@ -147,9 +147,9 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Distribuição de Performance</CardTitle>
+            <CardTitle>Distribuio de Performance</CardTitle>
             <CardDescription>
-              Classificação das escolas por nível de atividade
+              Classificao das escolas por nvel de atividade
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -159,7 +159,7 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
                 const percentage = (schools.length / schoolsData.length) * 100;
                 const labels = {
                   high: { label: 'Alta Performance', color: 'bg-success' },
-                  medium: { label: 'Média Performance', color: 'bg-warning' },
+                  medium: { label: 'Mdia Performance', color: 'bg-warning' },
                   low: { label: 'Baixa Performance', color: 'bg-destructive' }
                 };
                 const config = labels[level as keyof typeof labels];
@@ -195,11 +195,11 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm truncate">{school.schoolName}</div>
                     <div className="text-xs text-muted-foreground">
-                      {school.totalActivity.designsCreated} designs • {school.users.length} usuários
+                      {school.totalActivity.designsCreated} designs  {school.users.length} usu�rios
                     </div>
                   </div>
                   <Badge variant="default" className="text-xs">
-                    {school.performance === 'high' ? '🏆' : '⭐'} 
+                    {school.performance === 'high' ? '' : ''} 
                   </Badge>
                 </div>
               ))}
@@ -213,7 +213,7 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
         <CardHeader>
           <CardTitle>Resumo de Atividade</CardTitle>
           <CardDescription>
-            Métricas consolidadas de uso do Canva no período
+            Mtricas consolidadas de uso do Canva no perodo
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -265,7 +265,7 @@ export const CanvaInsights = ({ analytics, schoolsData, previousPeriodData }: Ca
               <div className="text-3xl font-bold text-primary">
                 {analytics.totalActivity.designsViewed.toLocaleString()}
               </div>
-              <div className="text-sm text-muted-foreground">Visualizações</div>
+              <div className="text-sm text-muted-foreground">Visualizaes</div>
             </div>
           </div>
         </CardContent>

@@ -109,7 +109,7 @@ export function getUsersBySchool(users: UserData[]): Map<string, UserData[]> {
 }
 
 export function getClusterSAFResponsibles(users: UserData[]): UserData[] {
-  // Filtrar usuários que podem ser responsáveis SAF baseado no email/função
+  // Filtrar usu?rios que podem ser respons?veis SAF baseado no email/funo
   return users.filter(user => 
     user.email.includes('@seb.com.br') || 
     user.email.includes('@sebsa.com.br') ||
@@ -122,11 +122,11 @@ export function getClusterSAFResponsibles(users: UserData[]): UserData[] {
 
 export async function loadUserData(): Promise<UserData[]> {
   try {
-    const response = await fetch('/data/usuarios_updated.csv');
+    const response = await fetch('/data/usu?rios_updated.csv');
     const csvContent = await response.text();
     return parseUsersCSV(csvContent);
   } catch (error) {
-    console.error('Erro ao carregar dados dos usuários:', error);
+    console.error('Erro ao carregar dados dos usu?rios:', error);
     return [];
   }
 }
@@ -142,14 +142,14 @@ export const userProfiles: UserProfile[] = [
   },
   {
     id: '2',
-    name: 'Usuário SAF',
+    name: 'Usurio SAF',
     email: 'saf@sebsa.com.br',
     role: 'user',
     permissions: ['view_schools', 'view_reports']
   },
   {
     id: '3',
-    name: 'Manutenção',
+    name: 'Manuteno',
     email: 'manutencao@maplebear.com.br',
     role: 'maintenance',
     permissions: ['view_all', 'edit_all', 'system_config']

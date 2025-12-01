@@ -38,10 +38,10 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
 
   const getSLABadge = (diasAberto: number) => {
     if (diasAberto >= 15) {
-      return <Badge variant="destructive" className="text-xs">Crítico</Badge>;
+      return <Badge variant="destructive" className="text-xs">Crtico</Badge>;
     }
     if (diasAberto >= 8) {
-      return <Badge variant="warning" className="text-xs">Atenção</Badge>;
+      return <Badge variant="warning" className="text-xs">Ateno</Badge>;
     }
     return <Badge variant="outline" className="text-xs">Normal</Badge>;
   };
@@ -125,7 +125,7 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
               <TableHead>Dias</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Vencimento</TableHead>
-              <TableHead>Observação</TableHead>
+              <TableHead>Observao</TableHead>
               <TableHead>Atualizado</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>

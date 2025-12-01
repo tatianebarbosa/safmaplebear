@@ -55,11 +55,11 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
     const newErrors: any = {};
 
     if (!formData.invoiceNumber.trim()) {
-      newErrors.invoiceNumber = 'Número da fatura é obrigatório';
+      newErrors.invoiceNumber = 'Nmero da fatura  obrigatrio';
     }
 
     if (!formData.date) {
-      newErrors.date = 'Data é obrigatória';
+      newErrors.date = 'Data  obrigatria';
     }
 
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
@@ -67,7 +67,7 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Descrição é obrigatória';
+      newErrors.description = 'Descrio  obrigatria';
     }
 
     setErrors(newErrors);
@@ -122,7 +122,7 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="invoiceNumber">Número da Fatura</Label>
+              <Label htmlFor="invoiceNumber">Nmero da Fatura</Label>
               <Input
                 id="invoiceNumber"
                 value={formData.invoiceNumber}
@@ -182,7 +182,7 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="description">Descrio</Label>
             <Input
               id="description"
               value={formData.description}
@@ -219,10 +219,10 @@ export const InvoiceDialog = ({ open, onOpenChange }: InvoiceDialogProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label>Período de Cobertura</Label>
+            <Label>Perodo de Cobertura</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="periodStart" className="text-sm text-muted-foreground">Início</Label>
+                <Label htmlFor="periodStart" className="text-sm text-muted-foreground">Incio</Label>
                 <Input
                   id="periodStart"
                   type="date"

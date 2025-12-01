@@ -38,7 +38,7 @@ export const AssetCard = ({ asset, totalContacts, lastContactAt, onOpen, onConfi
             </div>
             {asset.owners?.length ? (
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <span className="text-muted-foreground">Responsáveis:</span>
+                <span className="text-muted-foreground">Responsveis:</span>
                 {asset.owners.map((owner) => (
                   <Badge key={owner} variant="outline" className="border-primary/20 bg-primary/5 text-foreground">
                     {owner}
@@ -56,7 +56,7 @@ export const AssetCard = ({ asset, totalContacts, lastContactAt, onOpen, onConfi
         <div className="flex flex-col gap-1 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <NotebookPen className="w-4 h-4 text-primary" />
-            <span>Último contato: {lastContactLabel || "sem registros"}</span>
+            <span>ltimo contato: {lastContactLabel || "sem registros"}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">

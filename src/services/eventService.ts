@@ -63,7 +63,7 @@ const buildLocalEvent = (input: CalendarEventInput): CalendarEvent => {
     dataFim: input.dataFim,
     tipo: input.tipo,
     createdByUserId: user?.id ?? user?.username ?? "local-user",
-    createdByName: user?.username ?? "Usuario local",
+    createdByName: user?.username ?? "Usu?rio local",
     createdAt: now,
     updatedAt: now,
   };

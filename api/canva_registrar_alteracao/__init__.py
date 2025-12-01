@@ -39,7 +39,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "message": "O corpo da requisição deve ser um JSON válido."
             }, ensure_ascii=False),
              status_code=400,
-             mimetype="application/json"
+             mimetype="application/json; charset=utf-8"
         )
 
     descricao = req_body.get('descricao')
@@ -53,7 +53,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "message": "Os campos 'descricao' e 'usuario' são obrigatórios."
             }, ensure_ascii=False),
              status_code=400,
-             mimetype="application/json"
+             mimetype="application/json; charset=utf-8"
         )
 
     try:
@@ -89,7 +89,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps(new_record, ensure_ascii=False, indent=2),
             status_code=201,
-            mimetype="application/json",
+            mimetype="application/json; charset=utf-8",
             headers={
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -105,5 +105,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 "message": str(e)
             }, ensure_ascii=False),
             status_code=500,
-            mimetype="application/json"
+            mimetype="application/json; charset=utf-8"
         )

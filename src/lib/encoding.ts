@@ -1,29 +1,29 @@
 const WINDOWS_1252_DECODER = new TextDecoder("windows-1252");
 
 const ENCODING_FIXES: Record<string, string> = {
-  "AdimplǦncia": "Adimplência",
-  "Utiliza��ǜo": "Utilização",
-  "Habilita��ǜo": "Habilitação",
-  "Observa��ǜo": "Observação",
-  "C��digo": "Código",
-  "Eleg��vel": "Elegível",
-  Nǜo: "Não",
-  "Cama��ari": "Camaçari",
-  "Paul��nia": "Paulínia",
-  "Cambu��": "Cambuí",
-  "Bǭrbara": "Bárbara",
-  "orienta����es": "orientações",
-  "AndrǸ": "André",
-  "Joǜo": "João",
-  "Florian��polis": "Florianópolis",
-  "Goi��nia": "Goiânia",
-  Paranǭ: "Paraná",
-  "Ribeirǜo": "Ribeirão",
-  "Sǜo": "São",
+  "Adimpl?ncia": "Adimpl?ncia",
+  "Utiliza??o": "Utiliza??o",
+  "Habilita??o": "Habilita??o",
+  "Observa??o": "Observa??o",
+  "C?digo": "C?digo",
+  "Eleg?vel": "Eleg?vel",
+  "N?o": "N?o",
+  "Cama?ari": "Cama?ari",
+  "Paul?nia": "Paul?nia",
+  "Cambu?": "Cambu?",
+  "B?rbara": "B?rbara",
+  "orienta??es": "orienta??es",
+  "Andr?": "Andr?",
+  "Jo?o": "Jo?o",
+  "Florian?polis": "Florian?polis",
+  "Goi?nia": "Goi?nia",
+  "Paran?": "Paran?",
+  "Ribeir?o": "Ribeir?o",
+  "S?o": "S?o",
 };
 
 export function decodeWindows1252(buffer: ArrayBuffer): string {
-  return WINDOWS_1252_DECODER.decode(buffer).replace(/^\uFEFF/, "");
+  return WINDOWS_1252_DECODER.decode(buffer).replace(/^/, "");
 }
 
 export async function fetchCsvWindows1252(path: string): Promise<string> {
@@ -41,7 +41,7 @@ export function normalizeForMatch(value: string): string {
   return value
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[-]/g, "")
     .trim();
 }
 

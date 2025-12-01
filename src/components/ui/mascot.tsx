@@ -19,7 +19,7 @@ const sizeClasses = {
 /**
  * Componente Mascot
  * 
- * Exibe os mascotes da Maple Bear com tamanhos padronizados e animações opcionais.
+ * Exibe os mascotes da Maple Bear com tamanhos padronizados e animaes opcionais.
  * 
  * @example
  * import { Mascot } from '@/components/ui/mascot';

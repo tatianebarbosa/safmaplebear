@@ -46,11 +46,11 @@ const AIAssistant = () => {
     loadData();
   }, []);
 
-  // Função para consultar dados de escolas
+  // Funo para consultar dados de escolas
   const querySchoolData = async (message: string) => {
     if (!schoolDataLoaded) {
       toast.error(
-        "Aguarde: os dados das escolas ainda estão sendo carregados."
+        "Aguarde: os dados das escolas ainda esto sendo carregados."
       );
       return;
     }
@@ -74,7 +74,7 @@ const AIAssistant = () => {
       }
 
       if (!schoolInfo) {
-        toast.error("Escola não encontrada. Tente o nome completo.");
+        toast.error("Escola no encontrada. Tente o nome completo.");
         return;
       }
 
@@ -98,14 +98,14 @@ const AIAssistant = () => {
     }
   };
 
-  // Simulação de IA - em produção seria uma chamada real para API
+  // Simulao de IA - em produo seria uma chamada real para API
   const improveText = async (
     text: string,
     type: "polite" | "welcoming" | "professional"
   ) => {
     setLoading(true);
 
-    // Simulação de delay da API
+    // Simulao de delay da API
     await new Promise((resolve) => setTimeout(resolve, DELAY_AI_SIMULATION));
 
     let improvedText = "";
@@ -116,21 +116,21 @@ const AIAssistant = () => {
 
 Espero que esteja bem. ${text}
 
-Caso tenha alguma dúvida, estarei à disposição para esclarecimentos.
+Caso tenha alguma dvida, estarei  disposio para esclarecimentos.
 
 Atenciosamente,
 Equipe Maple Bear`;
         break;
 
       case "welcoming":
-        improvedText = `Olá! 😊
+        improvedText = `Ol! 
 
-Que alegria poder conversar com você! ${text}
+Que alegria poder conversar com voc! ${text}
 
-Estamos aqui para tornar sua experiência ainda melhor. Se precisar de qualquer coisa, é só nos avisar!
+Estamos aqui para tornar sua experincia ainda melhor. Se precisar de qualquer coisa,  s nos avisar!
 
 Com carinho,
-Equipe Maple Bear 🍁`;
+Equipe Maple Bear `;
         break;
 
       case "professional":
@@ -138,7 +138,7 @@ Equipe Maple Bear 🍁`;
 
 ${text}
 
-Permanecemos à disposição para quaisquer esclarecimentos adicionais que se façam necessários.
+Permanecemos  disposio para quaisquer esclarecimentos adicionais que se faam necessrios.
 
 Cordialmente,
 Equipe Maple Bear
@@ -166,7 +166,7 @@ Departamento de Atendimento`;
 
   const clearHistory = () => {
     setResponses([]);
-    toast.success("Histórico limpo.");
+    toast.success("Histrico limpo.");
   };
 
   return (
@@ -184,7 +184,7 @@ Departamento de Atendimento`;
         {responses.length > 0 && (
           <Button variant="outline" onClick={clearHistory}>
             <RotateCcw className="mr-2 h-4 w-4" />
-            Limpar Histórico
+            Limpar Histrico
           </Button>
         )}
       </div>
@@ -199,7 +199,7 @@ Departamento de Atendimento`;
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
-            placeholder="Digite o texto que quer aprimorar ou o nome da escola (ex.: 'Escola São Roque')."
+            placeholder="Digite o texto que quer aprimorar ou o nome da escola (ex.: 'Escola So Roque')."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             rows={4}
@@ -252,10 +252,10 @@ Departamento de Atendimento`;
         </CardContent>
       </Card>
 
-      {/* Histórico de Respostas */}
+      {/* Histrico de Respostas */}
       {responses.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Histórico</h2>
+          <h2 className="text-2xl font-semibold">Histrico</h2>
 
           {responses.map((response) => (
             <Card key={response.id}>
@@ -323,7 +323,7 @@ Departamento de Atendimento`;
       {/* Dicas de Uso */}
       <Card>
         <CardHeader>
-          <CardTitle>Guia Rápido</CardTitle>
+          <CardTitle>Guia Rpido</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm">
@@ -338,13 +338,13 @@ Departamento de Atendimento`;
               <Smile className="h-4 w-4 text-primary mt-0.5" />
               <span>
                 <strong>Acolhedor:</strong> Torna o texto mais caloroso e
-                empático.
+                emptico.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <Send className="h-4 w-4 text-primary mt-0.5" />
               <span>
-                <strong>Profissional:</strong> Adequa o texto para comunicação
+                <strong>Profissional:</strong> Adequa o texto para comunicao
                 formal.
               </span>
             </li>

@@ -43,7 +43,7 @@ const Index = () => {
   const quickActions = [
     {
       title: "Painel Canva",
-      description: "Governanca de licencas, conformidade e uso em um so lugar.",
+      description: "Governanca de licen?as, conformidade e uso em um so lugar.",
       icon: <Palette className="w-5 h-5 text-primary" />,
       action: "Abrir Canva",
       path: "/dashboard/canva",
@@ -65,7 +65,7 @@ const Index = () => {
   ];
 
   const highlightStats = [
-    { label: "Licencas ativas", value: "1.240", note: "+32 esta semana", icon: <ShieldCheck className="w-4 h-4" /> },
+    { label: "Licenças ativas", value: "1.240", note: "+32 esta semana", icon: <ShieldCheck className="w-4 h-4" /> },
     { label: "Escolas sincronizadas", value: "241", note: "dados oficiais", icon: <Rocket className="w-4 h-4" /> },
     { label: "Conformidade", value: "79,6%", note: "alertas monitorados", icon: <Activity className="w-4 h-4" /> },
   ];
@@ -113,7 +113,7 @@ const Index = () => {
                     Bem-vindo a central integrada da SAF
                   </h1>
                   <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
-                    Acompanhe licencas Canva, tickets e conhecimento em um so lugar. Escolha para onde ir ou veja os destaques.
+                    Acompanhe licen?as Canva, tickets e conhecimento em um so lugar. Escolha para onde ir ou veja os destaques.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -177,7 +177,7 @@ const Index = () => {
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Licencas, conformidade e uso em tempo real.
+                  Licenças, conformidade e uso em tempo real.
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -185,7 +185,7 @@ const Index = () => {
                   <div className="rounded-lg border bg-primary/5 p-4">
                     <p className="text-xs text-muted-foreground">Alertas ativos</p>
                     <p className="text-2xl font-semibold text-primary mt-1">12</p>
-                    <p className="text-xs text-primary mt-1">Dominios nao conformes</p>
+                    <p className="text-xs text-primary mt-1">Dominios n?o conformes</p>
                   </div>
                   <div className="rounded-lg border bg-success-bg p-4">
                     <p className="text-xs text-muted-foreground">Escolas sincronizadas</p>
@@ -197,7 +197,7 @@ const Index = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ShieldCheck className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-semibold text-foreground">Saude das licencas</span>
+                      <span className="text-sm font-semibold text-foreground">Saude das licen?as</span>
                     </div>
                     <span className="text-sm font-semibold text-primary">79,6%</span>
                   </div>
@@ -205,7 +205,7 @@ const Index = () => {
                     <div className="h-full bg-primary rounded-full" style={{ width: "80%" }} />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Continue convidando usuarios com dominio autorizado para elevar a conformidade.
+                    Continue convidando usu?rios com dominio autorizado para elevar a conformidade.
                   </p>
                 </div>
                 <div className="flex justify-end">

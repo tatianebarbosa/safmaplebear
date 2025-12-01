@@ -17,7 +17,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
 
   const getRiskLevel = () => {
     if (isHighRisk) return { level: 'Alto Risco', color: 'destructive', icon: AlertTriangle };
-    if (isMediumRisk) return { level: 'MÃ©dio Risco', color: 'warning', icon: Shield };
+    if (isMediumRisk) return { level: 'Mdio Risco', color: 'warning', icon: Shield };
     return { level: 'Baixo Risco', color: 'success', icon: Shield };
   };
 
@@ -30,9 +30,9 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-success" />
-            <CardTitle className="text-success">PolÃ­tica de Conformidade</CardTitle>
+            <CardTitle className="text-success">Pol?tica de Conformidade</CardTitle>
           </div>
-          <CardDescription>Todos os usuÃ¡rios estÃ£o em conformidade com a polÃ­tica de domÃ­nio.</CardDescription>
+          <CardDescription>Todos os usu?rios esto em conformidade com a pol?tica de dom?nio.</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -53,7 +53,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
           </Badge>
         </div>
         <CardDescription>
-          {nonCompliantUsers.length} usuÃ¡rios estÃ£o usando domÃ­nios fora da polÃ­tica corporativa
+          {nonCompliantUsers.length} usuários estão usando domínios fora da política corporativa
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -62,7 +62,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">
-                <strong>{nonCompliantUsers.length}</strong> usuÃ¡rios nÃ£o conformes
+                <strong>{nonCompliantUsers.length}</strong> usu?rios no conformes
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
           </div>
           
           <div className="space-y-2">
-            <p className="text-sm font-medium">Principais domÃ­nios nÃ£o conformes:</p>
+            <p className="text-sm font-medium">Principais domínios não conformes:</p>
             <div className="flex flex-wrap gap-1">
               {Object.entries(
                 nonCompliantUsers.reduce((acc, user) => {
@@ -94,7 +94,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
           </div>
 
           <Button onClick={onViewDetails} variant="destructive" size="sm" className="w-full">
-            Ver Detalhes dos UsuÃ¡rios NÃ£o Conformes
+            Ver Detalhes dos Usurios No Conformes
           </Button>
         </div>
       </CardContent>

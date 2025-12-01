@@ -17,14 +17,17 @@ import { UserRole } from '@/types/schoolLicense';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { Badge } from '@/components/ui/badge';
 import { dialogLayouts } from './dialogLayouts';
+import { useAssetStore } from '@/stores/assetStore';
 
 type NewUserMeta = {
-  origemSolicitacao: 'Ticket SAF' | 'E-mail';
+  origemSolicitacao: 'Ticket SAF' | 'E-mail' | 'Ativo';
   solicitadoPorNome: string;
   solicitadoPorEmail: string;
   observacao: string;
   ticketNumber?: string;
   emailTitle?: string;
+  assetId?: string;
+  assetName?: string;
 };
 
 type UserDialogPayload =
@@ -45,7 +48,9 @@ const INITIAL_META: NewUserMeta = {
   solicitadoPorEmail: '',
   observacao: '',
   ticketNumber: '',
-  emailTitle: ''
+  emailTitle: '',
+  assetId: '',
+  assetName: ''
 };
 
 export const UserDialog = ({
@@ -65,6 +70,7 @@ export const UserDialog = ({
   const [errors, setErrors] = useState<any>({});
 
   const { isEmailValid } = useSchoolLicenseStore();
+  const assets = useAssetStore((state) => state.assets);
 
   useEffect(() => {
     if (initialData) {
@@ -111,6 +117,9 @@ export const UserDialog = ({
       if (!meta.observacao.trim()) {
         newErrors.observacao = 'Informe a observação';
       }
+      if (meta.origemSolicitacao === 'Ativo' && !meta.assetId?.trim()) {
+        newErrors.assetId = 'Selecione o ativo';
+      }
       if (meta.origemSolicitacao === 'Ticket SAF' && !meta.ticketNumber?.trim()) {
         newErrors.ticketNumber = 'Informe o número do ticket';
       }
@@ -156,6 +165,42 @@ export const UserDialog = ({
     }
   };
 
+  const handleOriginChange = (value: NewUserMeta['origemSolicitacao']) => {
+    setMeta((prev) => ({
+      ...prev,
+      origemSolicitacao: value,
+      ticketNumber: value === 'Ticket SAF' ? prev.ticketNumber : '',
+      emailTitle: value === 'E-mail' ? prev.emailTitle : '',
+      assetId: value === 'Ativo' ? prev.assetId : '',
+      assetName: value === 'Ativo' ? prev.assetName : '',
+    }));
+    setErrors((prev: any) => ({
+      ...prev,
+      ticketNumber: '',
+      emailTitle: '',
+      assetId: '',
+    }));
+  };
+
+  const handleAssetSelect = (assetId: string) => {
+    const selectedAsset = assets.find((asset) => asset.id === assetId);
+    setMeta((prev) => ({
+      ...prev,
+      assetId,
+      assetName: selectedAsset?.name || '',
+    }));
+    if (errors.assetId) {
+      setErrors((prev: any) => ({ ...prev, assetId: '' }));
+    }
+  };
+
+  const originDetailFilled =
+    meta.origemSolicitacao === 'Ticket SAF'
+      ? meta.ticketNumber?.trim()
+      : meta.origemSolicitacao === 'E-mail'
+      ? meta.emailTitle?.trim()
+      : meta.assetId?.trim();
+
   const canSubmit =
     formData.name.trim() &&
     formData.email.trim() &&
@@ -164,10 +209,7 @@ export const UserDialog = ({
       (meta.solicitadoPorNome.trim() &&
         meta.solicitadoPorEmail.trim() &&
         meta.observacao.trim() &&
-        (meta.origemSolicitacao === 'Ticket SAF'
-          ? meta.ticketNumber?.trim()
-          : meta.emailTitle?.trim())));
-
+        originDetailFilled));
   const emailCompliant = formData.email ? isEmailValid(formData.email) : true;
 
   return (
@@ -245,7 +287,7 @@ export const UserDialog = ({
                 <Label htmlFor="origem">Origem da solicitação</Label>
                 <Select
                   value={meta.origemSolicitacao}
-                  onValueChange={(value: 'Ticket SAF' | 'E-mail') => updateMeta('origemSolicitacao', value)}
+                  onValueChange={(value: NewUserMeta['origemSolicitacao']) => handleOriginChange(value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione a origem" />
@@ -253,6 +295,7 @@ export const UserDialog = ({
                   <SelectContent>
                     <SelectItem value="Ticket SAF">Ticket SAF</SelectItem>
                     <SelectItem value="E-mail">E-mail</SelectItem>
+                    <SelectItem value="Ativo">Ativo</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -280,7 +323,7 @@ export const UserDialog = ({
                 )}
               </div>
 
-              {meta.origemSolicitacao === 'Ticket SAF' ? (
+              {meta.origemSolicitacao === 'Ticket SAF' && (
                 <div className="space-y-2">
                   <Label htmlFor="ticketNumber">Número do Ticket</Label>
                   <Input
@@ -294,7 +337,9 @@ export const UserDialog = ({
                     <p className="text-xs text-destructive">{errors.ticketNumber}</p>
                   )}
                 </div>
-              ) : (
+              )}
+
+              {meta.origemSolicitacao === 'E-mail' && (
                 <div className="space-y-2">
                   <Label htmlFor="emailTitle">Título do e-mail</Label>
                   <Input
@@ -306,6 +351,37 @@ export const UserDialog = ({
                   />
                   {errors.emailTitle && (
                     <p className="text-xs text-destructive">{errors.emailTitle}</p>
+                  )}
+                </div>
+              )}
+
+              {meta.origemSolicitacao === 'Ativo' && (
+                <div className="space-y-2">
+                  <Label htmlFor="assetId">Ativo</Label>
+                  <Select
+                    value={meta.assetId || ''}
+                    onValueChange={handleAssetSelect}
+                    disabled={!assets.length}
+                  >
+                    <SelectTrigger className={errors.assetId ? 'border-destructive' : ''}>
+                      <SelectValue placeholder={assets.length ? 'Selecione o ativo' : 'Nenhum ativo cadastrado'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {assets.length ? (
+                        assets.map((asset) => (
+                          <SelectItem key={asset.id} value={asset.id}>
+                            {asset.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-assets" disabled>
+                          Nenhum ativo cadastrado
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {errors.assetId && (
+                    <p className="text-xs text-destructive">{errors.assetId}</p>
                   )}
                 </div>
               )}

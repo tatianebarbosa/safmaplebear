@@ -192,6 +192,9 @@ export const SchoolDetailsDialog = ({
         user.email.toLowerCase().includes(normalizedUserSearch)
   );
 
+  const clusterLabel = resolvedCluster?.trim();
+  const showCluster = clusterLabel && !clusterLabel.toLowerCase().startsWith('outros');
+
   const getNonComplianceReason = getComplianceReason;
 
   const handleEditUser = (userId: string) => {
@@ -266,23 +269,16 @@ export const SchoolDetailsDialog = ({
                       Dados gerais
                     </p>
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Nome:</span>
-                        <span className="text-foreground">{school.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
+                      {school.status && (
                         <Badge variant="outline" size="md" className="px-3 py-1 text-sm rounded-full">
                           {school.status}
                         </Badge>
+                      )}
+                      {showCluster && (
                         <Badge variant="muted" size="md" className="px-3 py-1 text-sm rounded-full">
-                          {resolvedCluster}
+                          {clusterLabel}
                         </Badge>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        <span>{school.city || 'Localidade nao informada'}</span>
-                      </div>
+                      )}
                       <div className="flex items-center gap-2 text-sm">
                         <User className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">Responsavel do cluster:</span>
@@ -291,11 +287,11 @@ export const SchoolDetailsDialog = ({
                     </div>
                   </div>
                   
-                  <div className="rounded-2xl border border-border/60 bg-amber-50/70 p-4 space-y-3">
+                  <div className="rounded-2xl border border-border/60 bg-amber-50/70 p-4 space-y-3 flex flex-col h-full">
                     <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                       Licencas e conformidade
                     </p>
-                    <div className="space-y-3">
+                    <div className="space-y-3 flex-1">
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">Licencas:</span>
@@ -314,30 +310,6 @@ export const SchoolDetailsDialog = ({
                           {licenseStatus}
                         </Badge>
                       </div>
-                      <Button
-                        type="button"
-                        variant={licenseStatus === 'Excedido' ? 'destructive' : 'secondary'}
-                        size="sm"
-                        className="gap-2"
-                        onClick={() => {
-                          const emails = school.users.map((u) => u.email).filter(Boolean);
-                          const body = [
-                            `A Escola ${school.name} ja possui ${school.usedLicenses} licencas ativas na plataforma, vinculadas aos seguintes e-mails:`,
-                            '',
-                            ...emails.map((email) => `- ${email}`),
-                            '',
-                            'Cada escola tem direito a duas licencas para uso da plataforma de marketing (Canva). Para que possamos conceder uma nova licenca, e necessario transferir ou remover um dos usuarios existentes. Lembramos que a remocao so pode ser realizada mediante autorizacao do responsavel pelo e-mail vinculado a licenca.',
-                          ].join('\n');
-                          navigator.clipboard?.writeText(body);
-                          toast({
-                            title: 'Mensagem copiada',
-                            description: 'Cole no e-mail ou chat com o responsavel do cluster.',
-                          });
-                        }}
-                      >
-                        <AlertTriangle className="h-4 w-4" />
-                        Copiar aviso de licencas
-                      </Button>
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">Nao conformes:</span>
@@ -346,6 +318,30 @@ export const SchoolDetailsDialog = ({
                         </span>
                       </div>
                     </div>
+                    <Button
+                      type="button"
+                      variant={licenseStatus === 'Excedido' ? 'destructive' : 'secondary'}
+                      size="sm"
+                      className="gap-2 mt-auto self-end ml-auto"
+                      onClick={() => {
+                        const emails = school.users.map((u) => u.email).filter(Boolean);
+                        const body = [
+                          `A Escola ${school.name} ja possui ${school.usedLicenses} licencas ativas na plataforma, vinculadas aos seguintes e-mails:`,
+                          '',
+                          ...emails.map((email) => `- ${email}`),
+                          '',
+                          'Cada escola tem direito a duas licencas para uso da plataforma de marketing (Canva). Para que possamos conceder uma nova licenca, e necessario transferir ou remover um dos usuarios existentes. Lembramos que a remocao so pode ser realizada mediante autorizacao do responsavel pelo e-mail vinculado a licenca.',
+                        ].join('\n');
+                        navigator.clipboard?.writeText(body);
+                        toast({
+                          title: 'Mensagem copiada',
+                          description: 'Cole no e-mail ou chat com o responsavel do cluster.',
+                        });
+                      }}
+                    >
+                      <AlertTriangle className="h-4 w-4" />
+                      Copiar aviso de licencas
+                    </Button>
                   </div>
                 </div>
               </CardContent>

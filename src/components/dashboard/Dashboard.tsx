@@ -27,8 +27,8 @@ const mockSchools = [
   },
   {
     id: "2",
-    name: "Maple Bear Vila Olímpia",
-    location: "São Paulo, SP",
+    name: "Maple Bear Vila Olmpia",
+    location: "So Paulo, SP",
     totalUsers: 112,
     activeUsers: 95,
     licenseStatus: "complete" as const,
@@ -37,7 +37,7 @@ const mockSchools = [
   {
     id: "3",
     name: "Maple Bear Moema",
-    location: "São Paulo, SP",
+    location: "So Paulo, SP",
     totalUsers: 78,
     activeUsers: 82,
     licenseStatus: "excess" as const,
@@ -46,7 +46,7 @@ const mockSchools = [
   {
     id: "4",
     name: "Maple Bear Pinheiros",
-    location: "São Paulo, SP",
+    location: "So Paulo, SP",
     totalUsers: 94,
     activeUsers: 67,
     licenseStatus: "available" as const,
@@ -79,8 +79,8 @@ const Dashboard = () => {
   }, [activeFilter, searchTerm]);
 
   const handleViewSchoolDetails = (schoolId: string) => {
-    // Implementar navegação ou modal para detalhes da escola
-    void schoolId; // Para evitar aviso de parâmetro não utilizado
+    // Implementar navegao ou modal para detalhes da escola
+    void schoolId; // Para evitar aviso de parmetro no utilizado
   };
 
   return (
@@ -94,7 +94,7 @@ const Dashboard = () => {
           Maple Bear SAF - Dashboard Principal
         </h1>
         <p className="text-muted-foreground">
-          Visão geral das operações e performance das escolas
+          Viso geral das operaes e performance das escolas
         </p>
       </div>
 
@@ -107,19 +107,19 @@ const Dashboard = () => {
           trend={{ value: 4.2, isPositive: true }}
         />
         <StatsCard
-          title="Total de Usuários"
+          title="Total de Usurios"
           value={mockStats.totalUsers.toLocaleString()}
           icon={<Users className="h-4 w-4" />}
           trend={{ value: 7.8, isPositive: true }}
         />
         <StatsCard
-          title="Usuários Ativos"
+          title="Usurios Ativos"
           value={mockStats.activeUsers.toLocaleString()}
           icon={<Zap className="h-4 w-4" />}
           trend={{ value: 5.3, isPositive: true }}
         />
         <StatsCard
-          title="Taxa de Utilização"
+          title="Taxa de Utilizao"
           value={`${mockStats.utilizationRate}%`}
           icon={<TrendingUp className="h-4 w-4" />}
           trend={{ value: -1.2, isPositive: false }}
@@ -139,7 +139,7 @@ const Dashboard = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por escola ou localização..."
+                placeholder="Buscar por escola ou localizao..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -160,14 +160,14 @@ const Dashboard = () => {
               size="sm"
               onClick={() => setActiveFilter("high-priority")}
             >
-              Alta Prioridade 🔥
+              Alta Prioridade 
             </Button>
             <Button
               variant={activeFilter === "excess" ? "default" : "outline"}
               size="sm"
               onClick={() => setActiveFilter("excess")}
             >
-              Excesso de Usuários
+              Excesso de Usurios
             </Button>
             <Button
               variant={activeFilter === "available" ? "default" : "outline"}
@@ -187,7 +187,7 @@ const Dashboard = () => {
             Escolas ({filteredSchools.length})
           </h2>
           <div className="flex gap-2">
-            <StatusBadge variant="available">Disponível</StatusBadge>
+            <StatusBadge variant="available">Disponvel</StatusBadge>
             <StatusBadge variant="complete">Completo</StatusBadge>
             <StatusBadge variant="excess">Excesso</StatusBadge>
           </div>

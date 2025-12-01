@@ -1,18 +1,18 @@
 export type AssetTeam =
   | "SAF"
   | "Marketing"
-  | "Acadêmico"
-  | "Implantação"
+  | "Acadmico"
+  | "Implantao"
   | "RH"
   | "Eventos"
-  | "Jurídico"
+  | "Jurdico"
   | "Comercial"
-  | "Expansão"
+  | "Expanso"
   | "Financeiro"
   | "Outros";
 
 export type AssetChannel =
-  | "Ligação telefônica"
+  | "Ligao telefnica"
   | "E-mail"
   | "Mensagem no ticket"
   | "Mensagem no WhatsApp"
@@ -23,15 +23,15 @@ export type AssetChannel =
 export type AssetStatus =
   | "Pendente"
   | "Em andamento"
-  | "Concluído"
-  | "Não concluído (sem contato / escola indisponível)";
+  | "Concludo"
+  | "No concludo (sem contato / escola indispon?vel)";
 
 export type AssetOutcome =
-  | "Contato realizado, alinhamento concluído"
+  | "Contato realizado, alinhamento concludo"
   | "Contato realizado, pendente retorno da escola"
-  | "Contato realizado, pendente ação interna"
-  | "Não atendeu"
-  | "Número incorreto"
+  | "Contato realizado, pendente ao interna"
+  | "No atendeu"
+  | "Nmero incorreto"
   | "Reagendado";
 
 export interface SafAsset {
@@ -73,19 +73,19 @@ export interface AssetContactFilters {
 export const ASSET_TEAMS: AssetTeam[] = [
   "SAF",
   "Marketing",
-  "Acadêmico",
-  "Implantação",
+  "Acadmico",
+  "Implantao",
   "RH",
   "Eventos",
-  "Jurídico",
+  "Jurdico",
   "Comercial",
-  "Expansão",
+  "Expanso",
   "Financeiro",
   "Outros",
 ];
 
 export const ASSET_CHANNELS: AssetChannel[] = [
-  "Ligação telefônica",
+  "Ligao telefnica",
   "E-mail",
   "Mensagem no ticket",
   "Mensagem no WhatsApp",
@@ -97,15 +97,15 @@ export const ASSET_CHANNELS: AssetChannel[] = [
 export const ASSET_STATUSES: AssetStatus[] = [
   "Pendente",
   "Em andamento",
-  "Concluído",
-  "Não concluído (sem contato / escola indisponível)",
+  "Concludo",
+  "No concludo (sem contato / escola indispon?vel)",
 ];
 
 export const ASSET_OUTCOMES: AssetOutcome[] = [
-  "Contato realizado, alinhamento concluído",
+  "Contato realizado, alinhamento concludo",
   "Contato realizado, pendente retorno da escola",
-  "Contato realizado, pendente ação interna",
-  "Não atendeu",
-  "Número incorreto",
+  "Contato realizado, pendente ao interna",
+  "No atendeu",
+  "Nmero incorreto",
   "Reagendado",
 ];

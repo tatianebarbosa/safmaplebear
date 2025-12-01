@@ -41,7 +41,7 @@ const seedUsers: User[] = [
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
-      currentUser: null,
+      currentUser: seedUsers.find((u) => u.role === "Admin") || null,
       users: [],
 
       setCurrentUser: (user) => set({ currentUser: user }),
@@ -75,10 +75,13 @@ export const useAuthStore = create<AuthStore>()(
         const { currentUser } = get();
         if (!currentUser) return false;
 
-        if (currentUser.role === "Admin") return true;
-        if (currentUser.role === "Coordinator" && (role === "Agent" || role === "Coordinator")) return true;
+        const current = (currentUser.role || "").toLowerCase();
+        const target = (role || "").toLowerCase();
 
-        return currentUser.role === role;
+        if (current === "admin") return true;
+        if (current === "coordinator" && (target === "agent" || target === "coordinator")) return true;
+
+        return current === target;
       },
 
       canManageTicket: (ticketAgente) => {
@@ -89,9 +92,9 @@ export const useAuthStore = create<AuthStore>()(
         return currentUser.role === "Agent" && currentUser.agente === ticketAgente;
       },
 
-      isAgent: () => get().currentUser?.role === "Agent",
-      isCoordinator: () => get().currentUser?.role === "Coordinator",
-      isAdmin: () => get().currentUser?.role === "Admin",
+      isAgent: () => get().currentUser?.role?.toLowerCase() === "agent",
+      isCoordinator: () => get().currentUser?.role?.toLowerCase() === "coordinator",
+      isAdmin: () => get().currentUser?.role?.toLowerCase() === "admin",
       canAddNote: () => {
         const role = get().currentUser?.role;
         return role === "Coordinator" || role === "Admin";
@@ -100,8 +103,16 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: "saf-auth-storage",
       onRehydrateStorage: () => (state) => {
-        if (state && state.users.length === 0) {
+        if (!state) return;
+        if (state.users.length === 0) {
           state.setUsers(seedUsers);
+        }
+        // Se nenhum usu�rio estiver logado, definimos Admin como padr�o para habilitar gest�o.
+        if (!state.currentUser) {
+          const admin = state.users.find((u) => u.role === "Admin") || seedUsers.find((u) => u.role === "Admin");
+          if (admin) {
+            state.setCurrentUser(admin);
+          }
         }
       },
     }

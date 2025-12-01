@@ -18,18 +18,18 @@ const SCHOOL_FIELDS = [
   'CEP Escola',
   'Cidade da Escola',
   'Estado da Escola',
-  'Região da Escola',
+  'Regio da Escola',
   'Telefone de Contato da Escola',
   'E-mail da Escola',
-  'Razão Social',
+  'Razo Social',
   'Nome Fantasia',
   'Status CNPJ',
-  'Status Visita Liderança',
+  'Status Visita Liderana',
   'Performance da Meta',
-  'Atual Série',
-  'Avançando de Segmento',
+  'Atual Srie',
+  'Avanando de Segmento',
   'Cluster',
-  'Ticket Médio',
+  'Ticket Mdio',
   'Ultima Atualizacao',
   'Toddle'
 ];
@@ -82,11 +82,11 @@ const SCHOOL_FIELD_INTENTS: FieldIntent[] = [
   { field: 'Carteira SAF', label: 'Responsavel SAF', keywords: ['carteira saf', 'responsavel saf', 'consultor saf'] },
   { field: 'Status da Escola', label: 'Status da escola', keywords: ['status da escola', 'status da unidade'] },
   { field: 'Telefone de Contato da Escola', label: 'Telefone', keywords: ['telefone', 'contato'] },
-  { field: 'Razão Social', label: 'Razao social', keywords: ['razao social'] },
+  { field: 'Razo Social', label: 'Razao social', keywords: ['razao social'] },
   { field: 'Nome Fantasia', label: 'Nome fantasia', keywords: ['nome fantasia'] },
   { field: 'Cidade da Escola', label: 'Cidade', keywords: ['cidade', 'municipio'] },
   { field: 'Estado da Escola', label: 'Estado', keywords: ['estado', 'uf'] },
-  { field: 'Ticket Médio', label: 'Ticket medio', keywords: ['ticket medio', 'ticket médio'] },
+  { field: 'Ticket Mdio', label: 'Ticket medio', keywords: ['ticket medio', 'ticket mdio'] },
 ];
 
 const extractSchoolQuery = (message: string): string | null => {
@@ -162,7 +162,7 @@ export const formatSchoolHighlights = (school: SchoolData): string => {
     formatSingleFieldAnswer(school, { field: 'E-mail da Escola', label: 'E-mail', keywords: [] }),
     formatSingleFieldAnswer(school, { field: 'CNPJ', label: 'CNPJ', keywords: [] }),
     formatSingleFieldAnswer(school, { field: 'Status da Escola', label: 'Status', keywords: [] }),
-    formatSingleFieldAnswer(school, { field: 'Ticket Médio', label: 'Ticket medio', keywords: [] }),
+    formatSingleFieldAnswer(school, { field: 'Ticket Mdio', label: 'Ticket medio', keywords: [] }),
     formatSingleFieldAnswer(school, { field: 'Cidade da Escola', label: 'Cidade', keywords: [] }),
     formatSingleFieldAnswer(school, { field: 'Estado da Escola', label: 'UF', keywords: [] }),
   ].filter(Boolean);
@@ -184,15 +184,15 @@ export const formatTopSchoolsList = (
   };
 
   const top = [...schools]
-    .sort((a, b) => parseTicket(b['Ticket Médio']) - parseTicket(a['Ticket Médio']))
+    .sort((a, b) => parseTicket(b['Ticket Mdio']) - parseTicket(a['Ticket Mdio']))
     .slice(0, limit);
 
   const lines = top.map((school) => {
-    const ticket = school['Ticket Médio'] || 'N/A';
-    return `${school['Nome da Escola']} | Cluster: ${school['Cluster'] || 'N/A'} | Ticket médio: ${ticket}`;
+    const ticket = school['Ticket Mdio'] || 'N/A';
+    return `${school['Nome da Escola']} | Cluster: ${school['Cluster'] || 'N/A'} | Ticket mdio: ${ticket}`;
   });
 
-  return `Top ${top.length} escolas em ${label} (ticket médio): ${lines.join('; ')}`;
+  return `Top ${top.length} escolas em ${label} (ticket mdio): ${lines.join('; ')}`;
 };
 
 const normalizeLabel = (value?: string | null) =>
@@ -316,18 +316,18 @@ const buildSchoolRecord = (school: FranchisingSchool): SchoolData => ({
   'CEP Escola': school.cep,
   'Cidade da Escola': school.cidade,
   'Estado da Escola': school.estado,
-  'Região da Escola': school.regiao,
-  'Telefone de Contato da Escola': school.telefone || 'Não informado',
-  'E-mail da Escola': school.email || 'Não informado',
-  'Razão Social': school.razaoSocial,
+  'Regio da Escola': school.regiao,
+  'Telefone de Contato da Escola': school.telefone || 'No informado',
+  'E-mail da Escola': school.email || 'No informado',
+  'Razo Social': school.razaoSocial,
   'Nome Fantasia': school.nomeFantasia,
   'Status CNPJ': school.statusCnpj,
-  'Status Visita Liderança': school.statusVisitaLideranca || 'N/A',
+  'Status Visita Liderana': school.statusVisitaLideranca || 'N/A',
   'Performance da Meta': school.performanceMeta || 'N/A',
-  'Atual Série': school.atualSerie || 'N/A',
-  'Avançando de Segmento': school.avancandoSegmento || 'N/A',
+  'Atual Srie': school.atualSerie || 'N/A',
+  'Avanando de Segmento': school.avancandoSegmento || 'N/A',
   'Cluster': school.cluster,
-  'Ticket Médio': school.ticketMedio || 'N/A',
+  'Ticket Mdio': school.ticketMedio || 'N/A',
   'Ultima Atualizacao': school.ultimaAtualizacao || null,
   'Toddle': 'N/A'
 });
@@ -501,7 +501,7 @@ export const buildSchoolSafSummary = (school: SchoolData): string => {
     ? matchedMember.fullName
     : responsavel;
 
-  const clusterLabel = cluster || 'Nao informado';
+  const clusterLabel = cluster || 'N?o informado';
 
   return `Responsavel SAF: ${responsibleLabel}; Cluster: ${clusterLabel}`;
 };
@@ -525,7 +525,7 @@ export const generateSchoolContext = async (): Promise<string> => {
 };
 
 export const formatSchoolData = (school: SchoolData): string => {
-  if (!school) return 'Escola não encontrada.';
+  if (!school) return 'Escola no encontrada.';
 
   let formatted = '**Detalhes da Escola:**\n\n';
   SCHOOL_FIELDS.forEach(field => {

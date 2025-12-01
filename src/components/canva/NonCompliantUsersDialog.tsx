@@ -82,7 +82,7 @@ export const NonCompliantUsersDialog = ({
         if (!acc[key]) {
           acc[key] = {
             id: key,
-            name: user.schoolName || 'Usuários sem escola',
+            name: user.schoolName || 'Usurios sem escola',
             users: [],
             contactEmail: schoolEmailMap[key],
           };
@@ -171,7 +171,7 @@ export const NonCompliantUsersDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShieldAlert className="h-5 w-5 text-destructive" />
-            Usuários Não Conformes
+            Usurios No Conformes
           </DialogTitle>
           <DialogDescription>
             Lista detalhada dos usuários com domínios fora da política corporativa
@@ -181,7 +181,7 @@ export const NonCompliantUsersDialog = ({
         <div className="space-y-3 overflow-y-auto pr-1">
           <div className="grid gap-2 md:grid-cols-3">
             <div className="rounded-lg border bg-card/70 p-2 shadow-sm">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Total de Usuários</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Total de Usurios</p>
               <p className="text-2xl font-semibold text-destructive">{users.length}</p>
             </div>
             <div className="rounded-lg border bg-card/70 p-2 shadow-sm">
@@ -189,7 +189,7 @@ export const NonCompliantUsersDialog = ({
               <p className="text-2xl font-semibold">{impactedSchools}</p>
             </div>
             <div className="rounded-lg border bg-card/70 p-2 shadow-sm">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Domínios Diferentes</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Domnios Diferentes</p>
               <p className="text-2xl font-semibold">{Object.keys(domainStats).length}</p>
             </div>
           </div>
@@ -211,7 +211,7 @@ export const NonCompliantUsersDialog = ({
             <div className="rounded-lg border bg-muted/30 p-2 space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Filter className="h-4 w-4" />
-                <span>Filtrar por domínio</span>
+                <span>Filtrar por dom?nio</span>
                 {(searchTerm || domainFilter) && (
                   <Button size="sm" variant="ghost" onClick={handleClearFilters} className="h-8 px-2">
                     Limpar
@@ -220,7 +220,7 @@ export const NonCompliantUsersDialog = ({
               </div>
               <div className="flex max-h-20 flex-wrap gap-2 overflow-y-auto pr-1">
                 {topDomains.length === 0 && (
-                  <span className="text-xs text-muted-foreground">Nenhum domínio encontrado</span>
+                  <span className="text-xs text-muted-foreground">Nenhum dom?nio encontrado</span>
                 )}
                 {topDomains.map((domain) => (
                   <Button
@@ -244,7 +244,7 @@ export const NonCompliantUsersDialog = ({
               <div className="space-y-1 flex-1 min-w-[220px]">
                 <p className="text-sm font-semibold">Contato ativo com escolas</p>
                 <p className="text-xs text-muted-foreground">
-                  Envie um e-mail pedindo ajuste para manter apenas 2 licenças.
+                  Envie um e-mail pedindo ajuste para manter apenas 2 licen?as.
                 </p>
               </div>
               {schoolOptions.length > 0 && (
@@ -263,32 +263,32 @@ export const NonCompliantUsersDialog = ({
             </div>
             {selectedSchool ? (
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span>Usuários envolvidos:</span>
+                <span>Usurios envolvidos:</span>
                 {selectedSchool.users.slice(0, 4).map((u) => (
                   <Badge key={u.email} variant="outline" className="bg-background">
                     {u.email}
                   </Badge>
                 ))}
                 {selectedSchool.users.length > 4 && (
-                  <span className="text-[11px]">+{selectedSchool.users.length - 4} usuários</span>
+                  <span className="text-[11px]">+{selectedSchool.users.length - 4} usu?rios</span>
                 )}
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground">Nenhuma escola com usuários listados.</p>
+              <p className="text-xs text-muted-foreground">Nenhuma escola com usu?rios listados.</p>
             )}
           </div>
 
           <div className="hidden rounded-t-lg bg-muted/30 px-4 py-2 text-xs font-medium uppercase text-muted-foreground md:grid md:grid-cols-[minmax(180px,2fr)_120px_minmax(180px,2fr)_150px]">
-            <span>Usuário</span>
+            <span>Usurio</span>
             <span>Perfil</span>
             <span>Escola</span>
-            <span>Domínio</span>
+            <span>Domnio</span>
           </div>
 
           <ScrollArea className="h-[320px] rounded-b-lg border">
             {filteredUsers.length === 0 ? (
               <div className="p-6 text-center text-sm text-muted-foreground">
-                Nenhum usuário corresponde aos filtros atuais.
+                Nenhum usu?rio corresponde aos filtros atuais.
               </div>
             ) : (
               <div className="divide-y">
@@ -321,7 +321,7 @@ export const NonCompliantUsersDialog = ({
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="font-medium">Domínio</p>
+                      <p className="font-medium">Domnio</p>
                       <Badge variant="destructive">{user.domain || 'Indefinido'}</Badge>
                     </div>
                   </button>
