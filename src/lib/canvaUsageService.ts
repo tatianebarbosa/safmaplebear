@@ -4,7 +4,9 @@ import { CanvaUsageData, UsagePeriod } from '@/types/schoolLicense';
 const LICENSE_FILE = '/data/licencas_canva.csv';
 
 const MEMBER_FILE_MAP: Record<UsagePeriod, string> = {
-  // 30d passa a usar o dump real mais recente enviado pelo time
+  // Amostragem principal: novembro/2025
+  nov2025: '/data/member-novembro2025.csv',
+  // Demais períodos (mantidos para histórico/compatibilidade)
   '30d': '/data/relatoriodeusosdemembros_23_11.csv',
   '3m': '/data/relatoriomembro canva18_11__3messes.csv',
   '6m': '/data/relatoriomembro canva18_11__6 messes.csv',
@@ -12,13 +14,14 @@ const MEMBER_FILE_MAP: Record<UsagePeriod, string> = {
 };
 
 const MODEL_FILE_MAP: Record<UsagePeriod, string> = {
+  nov2025: '/data/template-novembro2025.csv',
   '30d': '/data/modelos18_11__30dias.csv',
   '3m': '/data/modelos18_11__3messes.csv',
   '6m': '/data/modelos18_11__6 messes.csv',
   '12m': '/data/12messesModelo.csv'
 };
 
-const DEFAULT_USAGE_PERIOD: UsagePeriod = '30d';
+const DEFAULT_USAGE_PERIOD: UsagePeriod = 'nov2025';
 const MIN_USAGE_YEAR = 2024;
 
 type ReportType = 'members' | 'models';
@@ -28,6 +31,7 @@ type StoredOverride = {
   filename: string;
   uploadedAt: string;
   period: UsagePeriod;
+  label?: string | null;
 };
 
 const STORAGE_KEY = (type: ReportType, period: UsagePeriod) => `canva_override_${type}_${period}`;
@@ -196,12 +200,24 @@ const getLatestOverride = (type: ReportType): StoredOverride | null => {
 export const getUploadInfo = (type: ReportType, period?: UsagePeriod) => {
   if (period) {
     const override = loadOverride(type, period);
-    return override ? { filename: override.filename, uploadedAt: override.uploadedAt } : null;
+    return override ? { filename: override.filename, uploadedAt: override.uploadedAt, label: override.label ?? null } : null;
   }
-  const overrides = ALL_PERIODS.map((p) => loadOverride(type, p)).filter(Boolean) as StoredOverride[];
-  if (!overrides.length) return null;
-  const latest = overrides.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())[0];
-  return { filename: latest.filename, uploadedAt: latest.uploadedAt };
+  const latest = getLatestOverride(type);
+  return latest ? { filename: latest.filename, uploadedAt: latest.uploadedAt, label: latest.label ?? null } : null;
+};
+
+export const getOverridesByPeriod = (type: ReportType) => {
+  return ALL_PERIODS.map((p) => {
+    const override = loadOverride(type, p);
+    const rows = override?.text ? Math.max(0, override.text.trim().split(/\r?\n/).length - 1) : 0;
+    return {
+      period: p,
+      filename: override?.filename ?? null,
+      uploadedAt: override?.uploadedAt ?? null,
+      rows,
+      label: override?.label ?? null,
+    };
+  });
 };
 
 const loadLicenseMap = async () => {
@@ -230,6 +246,8 @@ export type ModelUsage = {
 export type TimeSeriesPoint = {
   period: string;
   designs: number;
+  /** Timestamp usado para ordenar corretamente series dd/mm/aaaa ou ISO. */
+  timestamp?: number;
 };
 
 export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD) => {
@@ -331,13 +349,40 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
     topCreators: creators.sort((a, b) => b.designs - a.designs).slice(0, 50),
   }));
 
+  const toTimestamp = (period: string) => {
+    const trimmed = period?.trim?.() ?? "";
+    // tenta ISO direto
+    const iso = new Date(trimmed);
+    if (!Number.isNaN(iso.getTime())) return iso.getTime();
+    // tenta dd/mm/aaaa ou dd-mm-aaaa
+    const match = trimmed.match(/(\d{1,2})[\\/\\-](\d{1,2})[\\/\\-](\d{2,4})/);
+    if (match) {
+      const day = Number(match[1]);
+      const month = Number(match[2]) - 1;
+      let year = Number(match[3]);
+      if (year < 100) year += 2000;
+      const parsed = new Date(year, month, day);
+      if (!Number.isNaN(parsed.getTime())) return parsed.getTime();
+    }
+    return null;
+  };
+
   const timeSeries: TimeSeriesPoint[] = Array.from(timeSeriesMap.entries())
     .filter(([period]) => {
       const year = extractYear(period);
       return !year || year >= MIN_USAGE_YEAR;
     })
-    .map(([period, designs]) => ({ period, designs }))
-    .sort((a, b) => a.period.localeCompare(b.period, 'pt-BR'));
+    .map(([period, designs]) => ({
+      period,
+      designs,
+      timestamp: toTimestamp(period) ?? undefined,
+    }))
+    .sort((a, b) => {
+      if (a.timestamp && b.timestamp) return a.timestamp - b.timestamp;
+      if (a.timestamp) return -1;
+      if (b.timestamp) return 1;
+      return a.period.localeCompare(b.period, 'pt-BR');
+    });
 
   return { usageData, timeSeries };
 };
@@ -361,8 +406,13 @@ export const loadModelUsageRanking = async (period: UsagePeriod = DEFAULT_USAGE_
     .slice(0, 10);
 };
 
-export const uploadMemberReport = async (file: File, period: UsagePeriod | 'all' = 'all', rawText?: string) => {
-  const text = rawText ?? await file.text();
+export const uploadMemberReport = async (
+  file: File,
+  period: UsagePeriod | 'all' = 'all',
+  rawText?: string,
+  label?: string
+) => {
+  const text = rawText ?? (await file.text());
   const uploadedAt = new Date().toISOString();
   const targets = period === 'all' ? ALL_PERIODS : [period];
   archiveCurrentOverrides('members', targets);
@@ -381,6 +431,7 @@ export const uploadMemberReport = async (file: File, period: UsagePeriod | 'all'
       filename: file.name,
       uploadedAt,
       period: p,
+      label,
     })
   );
   if (typeof window !== 'undefined') {
@@ -397,8 +448,13 @@ export const clearUploadOverrides = () => {
   });
 };
 
-export const uploadModelReport = async (file: File, period: UsagePeriod | 'all' = 'all', rawText?: string) => {
-  const text = rawText ?? await file.text();
+export const uploadModelReport = async (
+  file: File,
+  period: UsagePeriod | 'all' = 'all',
+  rawText?: string,
+  label?: string
+) => {
+  const text = rawText ?? (await file.text());
   const uploadedAt = new Date().toISOString();
   const targets = period === 'all' ? ALL_PERIODS : [period];
   archiveCurrentOverrides('models', targets);
@@ -417,6 +473,7 @@ export const uploadModelReport = async (file: File, period: UsagePeriod | 'all' 
       filename: file.name,
       uploadedAt,
       period: p,
+      label,
     })
   );
   if (typeof window !== 'undefined') {

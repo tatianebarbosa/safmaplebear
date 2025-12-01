@@ -1,4 +1,4 @@
-/* Maple Bear SAF Design System - Cores em HSL */
+﻿/* Maple Bear SAF Design System - Cores em HSL */
 
 @import "./styles/spacing.css";
 @import "./styles/typography.css";
@@ -19,13 +19,13 @@
   :root {
     /* BRAND OFICIAL - Maple Bear */
     --brand-red-main: 359 83% 44%;   /* #cc1316 Pantone 186 C */
-    --brand-red-deep: 354 95% 34%;   /* #aa0414 Vermelho vívido */
+    --brand-red-deep: 354 95% 34%;   /* #aa0414 Vermelho vÃ­vido */
     --brand-gray-light: 0 0% 93%;    /* #ededed */
     --brand-black: 0 0% 0%;          /* #000000 */
 
-    /* PRIMÁRIAS DO DESIGN SYSTEM */
+    /* PRIMÃRIAS DO DESIGN SYSTEM */
     --primary: var(--brand-red-main);
-    --primary-light: 359 83% 52%;    /* ~#ea1f22 – para hover/surfaces */
+    --primary-light: 359 83% 52%;    /* ~#ea1f22 â€“ para hover/surfaces */
     --primary-dark: var(--brand-red-deep);
     --primary-foreground: 0 0% 100%;
 
@@ -129,8 +129,8 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Layout / centralização:
-       1120px → mais comprimido, parecido com o retângulo vermelho que você marcou */
+    /* Layout / centralizaÃ§Ã£o:
+       1120px â†’ mais comprimido, parecido com o retÃ¢ngulo vermelho que vocÃª marcou */
     --global-content-padding: clamp(18px, 3vw, 36px);
     --layout-max-width: 980px;
   }
@@ -178,12 +178,25 @@
   }
 }
 
+/* Modal mais compacto para o dialog de usuário */
+.user-dialog-compact {
+  width: min(92vw, 460px) !important;
+  max-width: 460px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-height: calc(100vh - 2rem) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 10px !important;
+}
+
 /* ===================================================================== */
 /* 2) BASE TYPO / TAMANHO GLOBAL                                         */
 /* ===================================================================== */
 
 @layer base {
-  /* ~67% do tamanho padrão do navegador */
+  /* ~67% do tamanho padrÃ£o do navegador */
   html {
     font-size: 10.7px;
   }
@@ -213,7 +226,7 @@
 }
 
 /* ===================================================================== */
-/* 3) COMPONENTS / UTILITÁRIOS                                           */
+/* 3) COMPONENTS / UTILITÃRIOS                                           */
 /* ===================================================================== */
 
 @layer components {
@@ -260,6 +273,13 @@
   .menu-underline[aria-current="page"],
   .menu-underline[aria-selected="true"] {
     color: hsl(var(--foreground));
+  }
+
+  /* Variacao para abas sem a underline animada */
+  .tabs-no-underline .menu-underline::after,
+  .tabs-no-underline .menu-underline:hover::after,
+  .tabs-no-underline .menu-underline:focus-visible::after {
+    display: none;
   }
 
   /* Status Components */
@@ -398,19 +418,19 @@
 }
 
 @layer components {
-  /* Padr�o global de modais: largura/altura limitadas, cantos arredondados e scroll interno. */
-  div[role="dialog"],
-  .modal {
-    width: 100% !important;
-    max-width: 720px !important;
+  /* Padrão global de modais: largura/altura limitadas, cantos arredondados e scroll interno. */
+  div[role="dialog"]:not(.user-dialog-compact),
+  .modal:not(.user-dialog-compact) {
+    width: 70% !important;
+    max-width: 600px !important;
     max-height: calc(100vh - 2rem) !important;
     margin: 1rem !important;
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35) !important;
     background: #ffffff !important;
     display: flex !important;
     flex-direction: column !important;
-    overflow: auto !important; /* fallback caso o corpo n�o esteja isolado */
+    overflow: auto !important; /* fallback caso o corpo não esteja isolado */
     font-family: inherit !important;
   }
 
@@ -436,10 +456,12 @@
   }
 
   @media (max-width: 768px) {
-    div[role="dialog"],
-    .modal {
+    div[role="dialog"]:not(.user-dialog-compact),
+    .modal:not(.user-dialog-compact) {
       max-width: min(600px, calc(100vw - 1.5rem)) !important;
+      
       margin: 0.75rem !important;
     }
   }
 }
+

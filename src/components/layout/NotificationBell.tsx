@@ -170,26 +170,26 @@ const NotificationBell = () => {
         side="bottom"
         sideOffset={2}
         collisionPadding={16}
-        style={{ maxHeight: "70vh" }}
-        className="flex flex-col w-[400px] max-w-[92vw] overflow-hidden rounded-xl border border-border/70 bg-white p-0 shadow-[0_18px_34px_-18px_rgba(30,32,36,0.45)]"
+        style={{ maxHeight: "72vh", width: "520px", maxWidth: "96vw" }}
+        className="flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-white p-0 shadow-[0_22px_48px_-18px_rgba(30,32,36,0.55)]"
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/70 bg-white">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/70 bg-white/90 backdrop-blur-sm">
           <p className="text-sm font-semibold text-foreground">Notificaes</p>
           <Badge
             variant="destructive"
             size="xs"
-            className="border-none bg-[#c1121f] text-white px-2.5 py-[3px] text-[11px] leading-[1.1] font-semibold uppercase tracking-wide"
+            className="border-none bg-[#c1121f] text-white px-3 py-[4px] text-[11px] leading-[1.1] font-semibold uppercase tracking-wide shadow-[0_8px_18px_rgba(193,18,31,0.25)]"
           >
             {notifications.length ? `${notifications.length} ativas` : "Nenhuma"}
           </Badge>
         </div>
 
         <div
-          className="flex-1 overflow-y-auto px-3 py-3 space-y-3 pr-3"
-          style={{ scrollbarWidth: "thin", maxHeight: "calc(70vh - 110px)" }}
+          className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pr-4"
+          style={{ scrollbarWidth: "thin", maxHeight: "calc(72vh - 120px)" }}
         >
           {notifications.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+            <div className="px-4 py-10 text-center text-sm text-muted-foreground">
               Nenhum alerta no momento.
             </div>
           ) : (
@@ -197,21 +197,21 @@ const NotificationBell = () => {
               const isOverdue = notification.type === "overdue";
               const statusLabel = isOverdue ? "VENCIDO" : "CRTICO";
               const statusClasses = isOverdue
-                ? "bg-red-100 text-red-700"
-                : "bg-amber-100 text-amber-700";
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : "bg-amber-50 text-amber-700 border border-amber-200";
 
               return (
                 <article
                   key={notification.id}
-                  className="group relative flex gap-3 rounded-xl border border-border/60 bg-white px-3.5 py-3 shadow-[0_10px_24px_-18px_rgba(0,0,0,0.28)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-18px_rgba(0,0,0,0.32)]"
+                  className="group relative flex gap-3 rounded-2xl border border-border/60 bg-white px-4 py-3.5 shadow-[0_12px_28px_-18px_rgba(0,0,0,0.24)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-18px_rgba(0,0,0,0.30)]"
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                     {isOverdue ? <Clock className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
                   </div>
                   <div className="flex-1 space-y-1.5">
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-3">
                       <p className="text-sm font-semibold leading-snug text-foreground">{notification.title}</p>
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${statusClasses}`}>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-[3px] text-[10px] font-semibold uppercase tracking-wide ${statusClasses}`}>
                         {statusLabel}
                       </span>
                     </div>

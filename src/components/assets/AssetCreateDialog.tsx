@@ -29,18 +29,31 @@ type AssetCreateDialogProps = {
     assetType?: string;
     owners?: string[];
   }) => void;
+  onBulkSave?: (items: {
+    name: string;
+    description?: string;
+    requesterTeam?: AssetTeam;
+    channel?: AssetChannel;
+    assetType?: string;
+    owners?: string[];
+  }[]) => void;
   initialAsset?: SafAsset | null;
   mode?: "create" | "edit";
 };
+
+const MAX_BULK_ASSETS = 50;
 
 export const AssetCreateDialog = ({
   open,
   onOpenChange,
   onSave,
+  onBulkSave,
   initialAsset,
   mode = "create",
 }: AssetCreateDialogProps) => {
   const [name, setName] = useState("");
+  const [creationMode, setCreationMode] = useState<"single" | "list">("single");
+  const [bulkNames, setBulkNames] = useState("");
   const [description, setDescription] = useState("");
   const [requesterTeam, setRequesterTeam] = useState<AssetTeam>("SAF");
   const [channel, setChannel] = useState<AssetChannel>(ASSET_CHANNELS[0]);
@@ -79,6 +92,8 @@ export const AssetCreateDialog = ({
   useEffect(() => {
     if (!open) return;
     setName(initialAsset?.name || "");
+    setCreationMode("single");
+    setBulkNames("");
     setDescription(initialAsset?.description || "");
     setRequesterTeam(initialAsset?.requesterTeam || "SAF");
     setChannel(initialAsset?.channel || ASSET_CHANNELS[0]);
@@ -118,8 +133,66 @@ export const AssetCreateDialog = ({
     setOwners((prev) => prev.filter((owner) => owner !== name));
   };
 
+  const parseBulkNames = (raw: string) => {
+    const uniqueNames: string[] = [];
+    const seen = new Set<string>();
+
+    raw
+      .split(/[\n,;]+/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .forEach((item) => {
+        const key = item.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        uniqueNames.push(item);
+      });
+
+    return uniqueNames;
+  };
+
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
+    const canUseListMode = mode === "create" && Boolean(onBulkSave);
+    if (canUseListMode && creationMode === "list") {
+      const parsed = parseBulkNames(bulkNames);
+      if (!parsed.length) {
+        toast({
+          title: "Adicione pelo menos um nome",
+          description: "Cole uma lista, um por linha ou separados por virgula.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const limited = parsed.slice(0, MAX_BULK_ASSETS);
+      if (parsed.length > MAX_BULK_ASSETS) {
+        toast({
+          title: `Limite de ${MAX_BULK_ASSETS} nomes`,
+          description: "Somente os primeiros foram considerados para criar os ativos.",
+        });
+      }
+
+      const commonFields = {
+        description: description.trim() || undefined,
+        requesterTeam,
+        channel,
+        assetType: assetType.trim() || undefined,
+        owners: owners.length ? owners : undefined,
+      };
+
+      onBulkSave?.(limited.map((item) => ({ ...commonFields, name: item })));
+      setName("");
+      setBulkNames("");
+      setDescription("");
+      setRequesterTeam("SAF");
+      setChannel(ASSET_CHANNELS[0]);
+      setAssetType("");
+      setOwners([]);
+      setOwnerInput("");
+      onOpenChange(false);
+      return;
+    }
     const trimmedName = name.trim();
     if (!trimmedName) {
       toast({
@@ -139,6 +212,7 @@ export const AssetCreateDialog = ({
       owners: owners.length ? owners : undefined,
     });
     setName("");
+    setBulkNames("");
     setDescription("");
     setRequesterTeam("SAF");
     setChannel(ASSET_CHANNELS[0]);
@@ -156,21 +230,64 @@ export const AssetCreateDialog = ({
           <DialogDescription>
             {mode === "edit"
               ? "Atualize o nome e a descrio deste ativo."
-              : "Monte um menu interno para acompanhar escolas e contatos desse ativo."}
+              : "Monte um menu interno para acompanhar escolas e contatos desse ativo. Crie um a um ou cole uma lista."}
           </DialogDescription>
         </DialogHeader>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="asset-name">Nome do ativo</Label>
-            <Input
-              id="asset-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Ex.: Ativo Canva Novembro"
-              required
-            />
-          </div>
+          {mode === "create" && onBulkSave && (
+            <div className="flex items-center gap-2">
+              <Label className="text-sm text-muted-foreground">Modo de criao</Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant={creationMode === "single" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setCreationMode("single")}
+                >
+                  Formulario
+                </Button>
+                <Button
+                  type="button"
+                  variant={creationMode === "list" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setCreationMode("list")}
+                >
+                  Lista
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {mode === "create" && creationMode === "list" && onBulkSave ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="asset-list">Lista de ativos</Label>
+                <span className="text-xs text-muted-foreground">Um nome por linha (ate {MAX_BULK_ASSETS})</span>
+              </div>
+              <Textarea
+                id="asset-list"
+                value={bulkNames}
+                onChange={(event) => setBulkNames(event.target.value)}
+                placeholder="Cole ou digite os nomes dos ativos"
+                rows={4}
+              />
+              <p className="text-xs text-muted-foreground">
+                Os campos abaixo serao aplicados em todos os ativos criados.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Label htmlFor="asset-name">Nome do ativo</Label>
+              <Input
+                id="asset-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Ex.: Ativo Canva Novembro"
+                required
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="asset-description">Descrio (opcional)</Label>

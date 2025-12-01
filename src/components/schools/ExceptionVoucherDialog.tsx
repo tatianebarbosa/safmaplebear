@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/sonner";
 import { VoucherSchool, ExceptionVoucher } from "@/lib/voucherDataProcessor";
+import { normalizeTicketId } from "@/lib/stringUtils";
 
 interface ExceptionVoucherDialogProps {
   isOpen: boolean;
@@ -192,9 +193,8 @@ const ExceptionVoucherDialog = ({ isOpen, onClose, school, onSave }: ExceptionVo
               <Label htmlFor="ticketNumber">Nmero do Ticket *</Label>
               <Input
                 id="ticketNumber"
-                placeholder="Ex: #12345"
                 value={formData.ticketNumber}
-                onChange={(e) => setFormData({ ...formData, ticketNumber: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, ticketNumber: normalizeTicketId(e.target.value) })}
               />
             </div>
           )}

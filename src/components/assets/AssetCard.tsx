@@ -47,8 +47,12 @@ export const AssetCard = ({ asset, totalContacts, lastContactAt, onOpen, onConfi
               </div>
             ) : null}
           </div>
-          <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-            <span className="font-semibold">{totalContacts}</span> registros
+          <Badge
+            variant="secondary"
+            className="inline-flex items-center gap-1 bg-primary/10 text-primary border-primary/20 px-3 py-1 rounded-full text-xs font-semibold"
+          >
+            <span className="font-semibold">{totalContacts}</span>
+            <span>registros</span>
           </Badge>
         </div>
       </CardHeader>

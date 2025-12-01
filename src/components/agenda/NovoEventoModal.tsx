@@ -165,7 +165,7 @@ export const NovoEventoModal = ({
             </Button>
             <Button type="submit" className="gap-2" disabled={loading || !canSubmit}>
               <Save className="w-4 h-4" />
-              {editingEvent ? "Salvar alteracoes" : "Salvar evento"}
+              {editingEvent ? "Salvar alterações" : "Salvar evento"}
             </Button>
           </DialogFooter>
         </form>

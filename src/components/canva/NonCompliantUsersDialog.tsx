@@ -248,17 +248,25 @@ export const NonCompliantUsersDialog = ({
                 </p>
               </div>
               {schoolOptions.length > 0 && (
-                <select
-                  className="border rounded-md px-2 py-1 text-sm"
-                  value={selectedSchool?.id || ''}
-                  onChange={(e) => setSelectedSchoolId(e.target.value)}
-                >
-                  {schoolOptions.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} ({s.users.length})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <select
+                    className="border rounded-md px-2 py-1 text-sm"
+                    value={selectedSchool?.id || ''}
+                    onChange={(e) => setSelectedSchoolId(e.target.value)}
+                  >
+                    {schoolOptions.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} ({s.users.length})
+                      </option>
+                    ))}
+                  </select>
+                  <Button asChild size="sm" className="gap-2">
+                    <a href={buildEmailLink()}>
+                      <Mail className="h-4 w-4" />
+                      Abrir e-mail
+                    </a>
+                  </Button>
+                </div>
               )}
             </div>
             {selectedSchool ? (

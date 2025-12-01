@@ -101,12 +101,9 @@ const Index = () => {
           <section className="grid md:grid-cols-[1.05fr_0.95fr] gap-5 lg:gap-6 items-start">
             <Card className="rounded-xl border shadow-[var(--shadow-card)]">
               <CardContent className="p-6 sm:p-8 space-y-6">
-                <div className="flex items-center gap-3">
-                  <Badge className="bg-primary/10 text-primary border-none">SAF Maple Bear</Badge>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    Nova tela inicial
-                  </div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  Nova tela inicial
                 </div>
                 <div className="space-y-3">
                   <h1 className="text-4xl sm:text-5xl font-bold text-foreground leading-tight">

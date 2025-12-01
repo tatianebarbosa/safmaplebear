@@ -18,6 +18,7 @@ import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
 import { Badge } from '@/components/ui/badge';
 import { dialogLayouts } from './dialogLayouts';
 import { useAssetStore } from '@/stores/assetStore';
+import { normalizeTicketId } from '@/lib/stringUtils';
 
 type NewUserMeta = {
   origemSolicitacao: 'Ticket SAF' | 'E-mail' | 'Ativo';
@@ -214,7 +215,10 @@ export const UserDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
+      <DialogContent
+        className={`${dialogLayouts.xs} flex flex-col user-dialog-compact`}
+        style={{ width: "min(90vw, 520px)", maxWidth: "520px" }}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -329,8 +333,7 @@ export const UserDialog = ({
                   <Input
                     id="ticketNumber"
                     value={meta.ticketNumber}
-                    onChange={(event) => updateMeta('ticketNumber', event.target.value)}
-                    placeholder="Ex: SAF-12345"
+                    onChange={(event) => updateMeta('ticketNumber', normalizeTicketId(event.target.value))}
                     className={errors.ticketNumber ? 'border-destructive' : ''}
                   />
                   {errors.ticketNumber && (

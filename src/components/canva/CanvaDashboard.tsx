@@ -1,8 +1,11 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 import { SchoolLicenseManagement } from "./SchoolLicenseManagement";
 import { CanvaUsageDashboard } from "./CanvaUsageDashboard";
 import { CanvaMetricsDisplay } from "./CanvaMetricsDisplay";
@@ -10,28 +13,40 @@ import { CostManagementDashboard } from "./CostManagementDashboard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
 import { NonCompliantUsersDialog } from "./NonCompliantUsersDialog";
-import { useToast } from "@/hooks/use-toast";
-
-const resolveInitialTab = () => {
-  if (typeof window === "undefined") return "overview";
-  const hash = window.location.hash?.replace("#", "").toLowerCase();
-  const searchTab = new URLSearchParams(window.location.search).get("tab")?.toLowerCase();
-  const target = searchTab || hash;
-  if (target === "schools" || target === "escolas") return "schools";
-  if (target === "usage" || target === "usos") return "usage";
-  if (target === "costs" || target === "custos") return "costs";
-  return "overview";
-};
 
 const CanvaDashboard = () => {
-  const [activeTab, setActiveTab] = useState(resolveInitialTab());
-  const [schoolSearch, setSchoolSearch] = useState("");
-  const { overviewData, loading, loadOfficialData, schools } = useSchoolLicenseStore();
-  const getDomainCounts = useSchoolLicenseStore((state) => state.getDomainCounts || (() => []));
-  const getNonMapleBearCount = useSchoolLicenseStore((state) => state.getNonMapleBearCount || (() => 0));
-  const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const tabRoutes: Record<string, string> = {
+    overview: "/dashboard/canva",
+    schools: "/dashboard/canva/escolas",
+    usage: "/dashboard/canva/usos",
+    costs: "/dashboard/canva/custos",
+  };
 
+  const resolveTabFromPath = (path: string): string => {
+    const entry = Object.entries(tabRoutes).find(([, route]) => route === path);
+    return entry ? entry[0] : "overview";
+  };
+
+  const [activeTab, setActiveTab] = useState<string>(resolveTabFromPath(location.pathname));
+  const [schoolSearch, setSchoolSearch] = useState("");
+  const {
+    overviewData,
+    loading,
+    loadOfficialData,
+    schools,
+    getDomainCounts,
+    getNonMapleBearCount,
+  } = useSchoolLicenseStore();
   const [isNonCompliantDialogOpen, setIsNonCompliantDialogOpen] = useState(false);
+
+  useAutoRefresh({
+    onRefresh: loadOfficialData,
+    interval: 5 * 60 * 1000,
+    enabled: true,
+    immediate: true,
+  });
 
   const nonCompliantUserDetails = useMemo(() => {
     if (!schools?.length) return [];
@@ -50,46 +65,46 @@ const CanvaDashboard = () => {
     );
   }, [schools]);
 
-  const nonCompliantDomainCounts = useMemo(() => getDomainCounts(), [getDomainCounts]);
-  const nonCompliantUserCount = useMemo(() => getNonMapleBearCount(), [getNonMapleBearCount]);
-  const effectiveOverview =
-    overviewData || {
-      totalUsers: 0,
-      totalSchools: 0,
-      compliantUsers: 0,
-      nonCompliantUsers: 0,
-      complianceRate: 0,
-      nonMapleBearDomains: 0,
-      topNonCompliantDomains: [],
-      schoolsWithUsers: 0,
-      schoolsAtCapacity: 0,
-    };
+  const resolvedNonCompliantCount = useMemo(() => {
+    if (nonCompliantUserDetails.length > 0) return nonCompliantUserDetails.length;
+    if (overviewData?.nonCompliantUsers !== undefined && overviewData?.nonCompliantUsers !== null) {
+      return overviewData.nonCompliantUsers;
+    }
+    return getNonMapleBearCount();
+  }, [nonCompliantUserDetails.length, overviewData, getNonMapleBearCount]);
+
+  const resolvedDomainCounts = useMemo(() => {
+    const domains = getDomainCounts();
+    if (domains?.length) return domains;
+    if (overviewData?.topNonCompliantDomains?.length) return overviewData.topNonCompliantDomains;
+    return [];
+  }, [getDomainCounts, overviewData]);
+
+  const hasNonCompliant =
+    (resolvedNonCompliantCount ?? 0) > 0 || (resolvedDomainCounts?.length ?? 0) > 0;
 
   const handleViewNonCompliantUsers = useCallback(() => {
     if (nonCompliantUserDetails.length === 0) {
-      toast({
-        title: "Nenhum usuario fora da politica carregado no momento.",
-      });
+      toast.info("Carregue os dados oficiais para ver os detalhes dos usuarios nao conformes.");
       return;
     }
     setIsNonCompliantDialogOpen(true);
-  }, [nonCompliantUserDetails, toast]);
+  }, [nonCompliantUserDetails.length]);
 
   useEffect(() => {
-    const hashListener = () => {
-      const hash = window.location.hash?.replace("#", "").toLowerCase();
-      if (hash && hash !== activeTab) {
-        setActiveTab(resolveInitialTab());
-      }
-    };
-    window.addEventListener("hashchange", hashListener);
-    return () => window.removeEventListener("hashchange", hashListener);
-  }, [activeTab]);
+    const tab = resolveTabFromPath(location.pathname);
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [location.pathname, activeTab]);
 
-  // Carrega dados ao montar (usa fallback se API falhar)
-  useEffect(() => {
-    loadOfficialData();
-  }, [loadOfficialData]);
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    const target = tabRoutes[tab] || tabRoutes.overview;
+    if (location.pathname !== target) {
+      navigate(target, { replace: true });
+    }
+  };
 
   if (loading) {
     return (
@@ -99,19 +114,50 @@ const CanvaDashboard = () => {
     );
   }
 
+  if (!overviewData) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-sm text-muted-foreground">Erro ao carregar dados do Canva.</p>
+        <Button onClick={loadOfficialData} className="mt-4">
+          Tentar novamente
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full pb-10">
-      <div className="layout-wide space-y-6 mt-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="justify-center gap-6 overflow-x-auto px-2 border-none pb-2">
-            <TabsTrigger value="overview">Visao Geral</TabsTrigger>
-            <TabsTrigger value="schools">Escolas</TabsTrigger>
-            <TabsTrigger value="usage">Usos</TabsTrigger>
-            <TabsTrigger value="costs">Custos</TabsTrigger>
+      <div className="layout-wide space-y-6 mt-4" style={{ maxWidth: 920 }}>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="tabs-no-underline flex w-full max-w-3xl mx-auto overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50 justify-center gap-4 px-2">
+            <TabsTrigger
+              value="overview"
+              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Visao Geral
+            </TabsTrigger>
+            <TabsTrigger
+              value="schools"
+              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Escolas
+            </TabsTrigger>
+            <TabsTrigger
+              value="usage"
+              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Usos
+            </TabsTrigger>
+            <TabsTrigger
+              value="costs"
+              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+            >
+              Custos
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {effectiveOverview.nonCompliantUsers > 0 && (
+            {hasNonCompliant && (
               <Card className="border-destructive/20 bg-destructive/5 shadow-sm">
                 <CardHeader>
                   <div className="flex items-start gap-2">
@@ -121,7 +167,7 @@ const CanvaDashboard = () => {
                         Alerta de Conformidade - Alto Risco
                       </CardTitle>
                       <CardDescription className="text-sm text-destructive">
-                        {nonCompliantUserCount} usuarios com dominios nao autorizados identificados
+                        {resolvedNonCompliantCount} usuarios com dominios nao autorizados identificados
                       </CardDescription>
                     </div>
                   </div>
@@ -129,17 +175,17 @@ const CanvaDashboard = () => {
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
-                      {(nonCompliantDomainCounts || []).slice(0, 5).map(({ domain, count }) => (
+                      {(resolvedDomainCounts || []).slice(0, 5).map(({ domain, count }) => (
                         <span
                           key={domain}
-                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive text-white"
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive text-destructive-foreground"
                         >
                           {domain} ({count})
                         </span>
                       ))}
-                      {(nonCompliantDomainCounts || []).length > 5 && (
+                      {(resolvedDomainCounts || []).length > 5 && (
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
-                          +{(nonCompliantDomainCounts || []).length - 5} dominios
+                          +{(resolvedDomainCounts || []).length - 5} dominios
                         </span>
                       )}
                     </div>
@@ -150,7 +196,7 @@ const CanvaDashboard = () => {
                 </CardContent>
               </Card>
             )}
-            <CanvaMetricsDisplay overviewData={effectiveOverview} />
+            <CanvaMetricsDisplay />
           </TabsContent>
 
           <TabsContent value="schools" className="space-y-6">
@@ -165,10 +211,7 @@ const CanvaDashboard = () => {
               onNavigateToUsers={(email) => {
                 setSchoolSearch(email ?? "");
                 setActiveTab("schools");
-                toast({
-                  title: "Buscando na aba Escolas",
-                  description: email ? `Filtrando por ${email}` : undefined,
-                });
+                toast.info("Buscando na aba Escolas");
               }}
             />
           </TabsContent>

@@ -19,6 +19,7 @@ import { AlertTriangle, ShieldCheck, ArrowLeftRight } from "lucide-react";
 import { Combobox } from "@/components/ui/combobox";
 import { dialogLayouts } from "./dialogLayouts";
 import { useAssetStore } from "@/stores/assetStore";
+import { normalizeTicketId } from "@/lib/stringUtils";
 
 interface SwapUserDialogProps {
   open: boolean;
@@ -128,9 +129,9 @@ export const SwapUserDialog = ({
       if (!targetSchoolId) {
         newErrors.targetSchoolId = "Escolha a escola de destino";
       }
-      // Quando a escola n?o tem usu?rios, vamos criar automaticamente usando o usu?rio atual.
+      // Quando a escola nao tem usuarios, vamos criar automaticamente usando o usuario atual.
       if (!selectedTargetUserId && targetSchoolUsers.length > 0) {
-        newErrors.targetUserId = "A escola destino precisa ter um usu?rio para receber a licen?a.";
+        newErrors.targetUserId = "A escola destino precisa ter um usuario para receber a licenca.";
       }
     }
 
@@ -194,7 +195,8 @@ export const SwapUserDialog = ({
   };
 
   const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    const nextValue = field === "ticketNumber" ? normalizeTicketId(value) : value;
+    setFormData((prev) => ({ ...prev, [field]: nextValue }));
     if (errors[field]) {
       setErrors((prev: any) => ({ ...prev, [field]: "" }));
     }
@@ -328,9 +330,9 @@ export const SwapUserDialog = ({
     >
       <DialogContent className={`${dialogLayouts.md} flex flex-col overflow-x-hidden gap-3 glass-scrollbar pb-5`}>
         <DialogHeader>
-          <DialogTitle>Trocar usu?rio</DialogTitle>
+          <DialogTitle>Trocar usuario</DialogTitle>
           <DialogDescription>
-            Substitua o usu?rio atual. Vamos registrar a transferencia no historico para auditoria e reversao.
+            Substitua o usuario atual. Vamos registrar a transferencia no historico para auditoria e reversao.
           </DialogDescription>
         </DialogHeader>
 
@@ -358,7 +360,7 @@ export const SwapUserDialog = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="outgoingUser">Quem vai liberar a licen?a</Label>
+          <Label htmlFor="outgoingUser">Quem vai liberar a licenca</Label>
           <Combobox
             options={userOptions}
             value={outgoingUser?.id || ""}
@@ -366,8 +368,8 @@ export const SwapUserDialog = ({
               if (value) onUserChange(value);
             }}
             placeholder="Buscar por nome ou email"
-            searchPlaceholder="Digite para filtrar usu?rios"
-            emptyMessage="Nenhum usu?rio encontrado"
+            searchPlaceholder="Digite para filtrar usuarios"
+            emptyMessage="Nenhum usuario encontrado"
             className="rounded-lg border-border/70 bg-background text-left"
           />
         </div>
@@ -376,7 +378,7 @@ export const SwapUserDialog = ({
           <div className="space-y-3 rounded-xl border border-border/60 bg-gradient-to-r from-muted/60 via-muted/40 to-muted/20 p-4 shadow-sm">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <ArrowLeftRight className="h-4 w-4 text-primary" />
-              <span>Transferir licen?a para outra escola</span>
+              <span>Transferir licenca para outra escola</span>
             </div>
             <div className="space-y-2">
               <Label>Escola destino</Label>
@@ -391,15 +393,15 @@ export const SwapUserDialog = ({
                 emptyMessage="Nenhuma escola encontrada"
                 className="rounded-lg border-border/70 bg-background text-left"
               />
-      {errors.targetSchoolId && <p className="text-sm text-destructive">{errors.targetSchoolId}</p>}
-      {targetSchoolId && !selectedTargetUserId && !errors.targetSchoolId && (
-        <p className="text-sm text-muted-foreground">
-          Esta escola n?o possui usu?rios cadastrados. Vamos criar automaticamente um usu?rio com base em quem esta liberando a licen?a.
-        </p>
-      )}
-      {selectedTargetUser && (
-        <p className="text-xs text-muted-foreground">
-          Usu?rio alvo: <span className="font-medium text-foreground">{selectedTargetUser.name}</span> (
+              {errors.targetSchoolId && <p className="text-sm text-destructive">{errors.targetSchoolId}</p>}
+              {targetSchoolId && !selectedTargetUserId && !errors.targetSchoolId && (
+                <p className="text-sm text-muted-foreground">
+                  Esta escola nao possui usuarios cadastrados. Vamos criar automaticamente um usuario com base em quem esta liberando a licenca.
+                </p>
+              )}
+              {selectedTargetUser && (
+                <p className="text-xs text-muted-foreground">
+                  Usuario alvo: <span className="font-medium text-foreground">{selectedTargetUser.name}</span> (
                   {selectedTargetUser.email})
                 </p>
               )}
@@ -418,7 +420,7 @@ export const SwapUserDialog = ({
                   id="newName"
                   value={formData.newName}
                   onChange={(e) => handleChange("newName", e.target.value)}
-                  placeholder="Nome completo do novo usu?rio"
+                  placeholder="Nome completo do novo usuario"
                   className={errors.newName ? "border-destructive" : ""}
                 />
                 {errors.newName && <p className="text-sm text-destructive">{errors.newName}</p>}
@@ -431,7 +433,7 @@ export const SwapUserDialog = ({
                   type="email"
                   value={formData.newEmail}
                   onChange={(e) => handleChange("newEmail", e.target.value)}
-                  placeholder="usu?rio@maplebear.com.br"
+                  placeholder="usuario@maplebear.com.br"
                   className={errors.newEmail ? "border-destructive" : ""}
                 />
                 {errors.newEmail && <p className="text-sm text-destructive">{errors.newEmail}</p>}
@@ -448,10 +450,10 @@ export const SwapUserDialog = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newRole">Nova fun??o</Label>
+                <Label htmlFor="newRole">Nova funcao</Label>
                 <Select value={formData.newRole} onValueChange={(value: UserRole) => handleChange("newRole", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione a fun??o" />
+                    <SelectValue placeholder="Selecione a funcao" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Estudante">Estudante</SelectItem>
@@ -493,12 +495,11 @@ export const SwapUserDialog = ({
 
           {formData.origemSolicitacao === "Ticket SAF" && (
             <div className="space-y-2">
-              <Label htmlFor="ticketNumber">Ticket/Email (referencia) *</Label>
+              <Label htmlFor="ticketNumber">Ticket (referencia) *</Label>
               <Input
                 id="ticketNumber"
                 value={formData.ticketNumber}
                 onChange={(e) => handleChange("ticketNumber", e.target.value)}
-                placeholder="Numero do ticket ou titulo do e-mail"
                 className={errors.ticketNumber ? "border-destructive" : ""}
               />
               {errors.ticketNumber && <p className="text-sm text-destructive">{errors.ticketNumber}</p>}
@@ -554,7 +555,7 @@ export const SwapUserDialog = ({
               id="reason"
               value={formData.reason}
               onChange={(e) => handleChange("reason", e.target.value)}
-              placeholder="Explique por que esta licen?a deve ser transferida"
+              placeholder="Explique por que esta licenca deve ser transferida"
               rows={3}
               className={errors.reason ? "border-destructive" : ""}
             />

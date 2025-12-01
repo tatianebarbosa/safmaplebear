@@ -60,6 +60,25 @@ const AssetsPage = () => {
     navigate(`/saf/ativos/${asset.id}`);
   };
 
+  const handleBulkCreateAssets = (items: AssetFormPayload[]) => {
+    const created = items.map((item) => addAsset(item));
+    if (created.length === 0) return;
+
+    if (created.length === 1) {
+      toast({
+        title: "Ativo criado",
+        description: `Ativo \"${created[0].name}\" adicionado. Abra para incluir escolas e contatos.`,
+      });
+      navigate(`/saf/ativos/${created[0].id}`);
+      return;
+    }
+
+    toast({
+      title: `${created.length} ativos criados`,
+      description: "Todos foram adicionados. Escolha um para incluir escolas e registrar contatos.",
+    });
+  };
+
   const handleUpdateAsset = (data: AssetFormPayload) => {
     if (!editingAsset) return;
     updateAsset(editingAsset.id, data);
@@ -159,6 +178,7 @@ const AssetsPage = () => {
         open={showCreate}
         onOpenChange={setShowCreate}
         onSave={handleCreateAsset}
+        onBulkSave={handleBulkCreateAssets}
       />
       <AssetCreateDialog
         open={Boolean(editingAsset)}

@@ -45,7 +45,7 @@ export interface Justification {
   performedBy: string;
 }
 
-export type UsagePeriod = '30d' | '3m' | '6m' | '12m';
+export type UsagePeriod = '30d' | '3m' | '6m' | '12m' | 'nov2025';
 
 export interface CanvaUsageData {
   schoolId: string;

@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { normalizeTicketId } from "@/lib/stringUtils";
 
 interface Ticket {
   id: string;
@@ -110,7 +111,13 @@ const MonitoringPortal = () => {
   });
 
   const handleCreateTicket = () => {
-    if (!newTicket.numero || !newTicket.responsavel || !newTicket.observacao) {
+    const normalizedNumber = normalizeTicketId(newTicket.numero);
+
+    if (normalizedNumber !== newTicket.numero) {
+      setNewTicket((prev) => ({ ...prev, numero: normalizedNumber }));
+    }
+
+    if (!normalizedNumber || !newTicket.responsavel || !newTicket.observacao) {
       toast({
         title: "Erro",
         description: "Preencha todos os campos obrigatórios",
@@ -121,7 +128,7 @@ const MonitoringPortal = () => {
 
     const ticket: Ticket = {
       id: Date.now().toString(),
-      numero: newTicket.numero,
+      numero: normalizedNumber,
       responsavel: newTicket.responsavel,
       diasPendente: 0,
       status: newTicket.status,
@@ -219,7 +226,7 @@ const MonitoringPortal = () => {
                   placeholder="#123456"
                   value={newTicket.numero}
                   onChange={(e) =>
-                    setNewTicket({ ...newTicket, numero: e.target.value })
+                    setNewTicket({ ...newTicket, numero: normalizeTicketId(e.target.value) })
                   }
                 />
               </div>

@@ -10,6 +10,7 @@ import { Footer } from "@/components/layout/Footer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
+const ENABLE_ONLY_CANVA = import.meta.env.VITE_ENABLE_ONLY_CANVA === "true";
 
 // Carregamento preguiçoso das páginas para deixar a navegação mais leve
 const Index = lazy(() => import("./pages/Index"));
@@ -62,30 +63,63 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route element={<ProtectedShell />}>
-              <Route path="/dashboard" element={<Index />} />
+              <Route
+                path="/dashboard"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <Index />}
+              />
               <Route path="/dashboard/canva" element={<CanvaDashboard />} />
-              <Route path="/dashboard/vouchers" element={<VoucherDashboard />} />
+              <Route path="/dashboard/canva/escolas" element={<CanvaDashboard />} />
+              <Route path="/dashboard/canva/usos" element={<CanvaDashboard />} />
+              <Route path="/dashboard/canva/custos" element={<CanvaDashboard />} />
+              <Route
+                path="/dashboard/vouchers"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <VoucherDashboard />}
+              />
               <Route
                 path="/dashboard/vouchers-2026"
-                element={<Voucher2026Dashboard />}
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <Voucher2026Dashboard />}
               />
-              <Route path="/insights" element={<InsightsAnalytics />} />
-              <Route path="/monitoring" element={<MonitoringPortal />} />
-              <Route path="/tickets" element={<TicketsPage />} />
-              <Route path="/admin" element={<AdminPage />} />
+              <Route
+                path="/insights"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <InsightsAnalytics />}
+              />
+              <Route
+                path="/monitoring"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <MonitoringPortal />}
+              />
+              <Route
+                path="/tickets"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <TicketsPage />}
+              />
+              <Route
+                path="/admin"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AdminPage />}
+              />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/monitoria-agentes" element={<AgentMonitoringPage />} />
+              <Route
+                path="/monitoria-agentes"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AgentMonitoringPage />}
+              />
               <Route
                 path="/knowledge-base"
-                element={<KnowledgeBasePage />}
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <KnowledgeBasePage />}
               />
-              <Route path="/saf/ativos" element={<AssetsPage />} />
-              <Route path="/saf/ativos/:assetId" element={<AssetDetailPage />} />
+              <Route
+                path="/saf/ativos"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AssetsPage />}
+              />
+              <Route
+                path="/saf/ativos/:assetId"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AssetDetailPage />}
+              />
               <Route
                 path="/saf/ativos/:assetId/escola/:schoolId"
-                element={<AssetSchoolPage />}
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AssetSchoolPage />}
               />
-              <Route path="/access-control" element={<AccessControl />} />
+              <Route
+                path="/access-control"
+                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AccessControl />}
+              />
             </Route>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             {/* Sempre deixe as rotas novas acima do catch-all "*" */}

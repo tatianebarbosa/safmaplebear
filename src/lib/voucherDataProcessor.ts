@@ -1,6 +1,6 @@
 import { getAgentDisplayName } from "@/data/teamMembers";
 import { downloadCSV } from "@/lib/fileUtils";
-import { fetchCsvWindows1252, fixEncoding, normalizeForMatch } from "@/lib/encoding";
+import { fetchCsvSmart, fixEncoding, normalizeForMatch } from "@/lib/encoding";
 
 export interface VoucherSchool {
   id: string;
@@ -51,6 +51,14 @@ export interface VoucherJustification {
   createdAt: string;
   oldValue?: any;
   newValue?: any;
+}
+
+export interface VoucherInstallment {
+  employeeName: string;
+  employeeCpf: string;
+  school: string;
+  childName: string;
+  series: string;
 }
 
 const SAF_CONSULTANTS = {
@@ -195,6 +203,39 @@ export function parseExceptionVouchersCSV(csvContent: string): ExceptionVoucher[
     });
 }
 
+export function parseVoucherInstallments(csvContent: string): VoucherInstallment[] {
+  const rows = csvContent
+    .split("\n")
+    .map((line) => line.split(";"))
+    .filter((row) => row.length > 1);
+
+  const dataRows = rows.slice(1);
+  const installments: VoucherInstallment[] = [];
+
+  dataRows.forEach((row) => {
+    if (!row || row.length === 0) return;
+
+    const employeeName = fixEncoding((row[0] ?? "").toString().trim());
+    const employeeCpf = fixEncoding((row[1] ?? "").toString().trim());
+    const school = fixEncoding((row[2] ?? "").toString().trim());
+
+    for (let i = 3; i < row.length; i += 2) {
+      const childName = fixEncoding((row[i] ?? "").toString().trim());
+      const series = fixEncoding((row[i + 1] ?? "").toString().trim());
+      if (!childName && !series) continue;
+      installments.push({
+        employeeName,
+        employeeCpf,
+        school,
+        childName,
+        series,
+      });
+    }
+  });
+
+  return installments;
+}
+
 export function getVoucherStats(schools: VoucherSchool[], exceptions: ExceptionVoucher[]) {
   const totalSchools = schools.length;
   const eligibleSchools = schools.filter((s) => s.voucherEligible).length;
@@ -275,23 +316,84 @@ export function searchVoucherByCode(
   return { found: false };
 }
 
-export async function loadVoucherData(): Promise<{
+type CampaignYear = string | number;
+
+const customCampaignFiles: Record<
+  CampaignYear,
+  { vouchers: string[]; exceptions: string[]; installments?: string[] }
+> = {
+  piloto_welcome: {
+    vouchers: [
+      "/data/campanha_piloto_welcome_b.b.csv",
+      "/data/campanha_piloto_welcome.csv",
+    ],
+    exceptions: [
+      "/data/excecoes_2025.csv",
+      "/data/excecoes_2026.csv",
+    ],
+  },
+};
+
+const voucherFileCandidates = (year: CampaignYear) =>
+  customCampaignFiles[year]?.vouchers || [
+    `/data/vouchers_${year}.csv`,
+    `/data/voucher_${year}.csv`,
+    `/data/vouchers${year}.csv`,
+  ];
+
+const exceptionFileCandidates = (year: CampaignYear) =>
+  customCampaignFiles[year]?.exceptions || [
+    `/data/voucher_campanha${year}_excecoes.csv`,
+    `/data/excecoes_${year}.csv`,
+    `/data/excecoes${year}.csv`,
+  ];
+
+const installmentFileCandidates = (year: CampaignYear) =>
+  customCampaignFiles[year]?.installments || [
+    `/data/voucher_campanha${year}_parcelamento_func.csv`,
+    `/data/parcelamento_${year}.csv`,
+  ];
+
+async function fetchFirstAvailable(paths: string[]) {
+  let lastError: unknown = null;
+  for (const path of paths) {
+    try {
+      return await fetchCsvSmart(path);
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError ?? new Error("Nenhum arquivo encontrado");
+}
+
+export async function loadVoucherData(
+  campaignYear: CampaignYear = "2026"
+): Promise<{
   schools: VoucherSchool[];
   exceptions: ExceptionVoucher[];
+  installments: VoucherInstallment[];
 }> {
   try {
     const [schoolsCsv, exceptionsCsv] = await Promise.all([
-      fetchCsvWindows1252("/data/vouchers_2026.csv"),
-      fetchCsvWindows1252("/data/voucher_campanha2026_excecoes.csv"),
+      fetchFirstAvailable(voucherFileCandidates(campaignYear)),
+      fetchFirstAvailable(exceptionFileCandidates(campaignYear)),
     ]);
 
     const schools = parseVouchersCSV(schoolsCsv);
     const exceptions = parseExceptionVouchersCSV(exceptionsCsv);
 
-    return { schools, exceptions };
+    let installments: VoucherInstallment[] = [];
+    try {
+      const installmentsCsv = await fetchFirstAvailable(installmentFileCandidates(campaignYear));
+      installments = parseVoucherInstallments(installmentsCsv);
+    } catch {
+      installments = [];
+    }
+
+    return { schools, exceptions, installments };
   } catch (error) {
     console.error("Erro ao carregar dados dos vouchers:", error);
-    return { schools: [], exceptions: [] };
+    return { schools: [], exceptions: [], installments: [] };
   }
 }
 

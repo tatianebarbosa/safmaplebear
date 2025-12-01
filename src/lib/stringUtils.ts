@@ -180,6 +180,21 @@ export function cleanString(text: string): string {
   return removeExtraSpaces(text);
 }
 
+/**
+ * Normaliza IDs de ticket garantindo o prefixo "#"
+ * @param value - Valor digitado pelo usuario
+ * @returns ID com "#" aplicado quando houver conteudo
+ */
+export function normalizeTicketId(value: string): string {
+  const raw = (value || '').trim();
+  if (!raw) return '';
+
+  const cleaned = raw.replace(/^#+/, '').replace(/\s+/g, '');
+  if (!cleaned) return '';
+
+  return `#${cleaned}`;
+}
+
 // ============================================================================
 // TRUNCAMENTO E LIMITAO
 // ============================================================================

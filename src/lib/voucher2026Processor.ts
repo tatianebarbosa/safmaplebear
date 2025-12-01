@@ -1,6 +1,6 @@
 import Papa from "papaparse";
 import { getAgentDisplayName } from "@/data/teamMembers";
-import { fetchCsvWindows1252, fixEncoding, normalizeForMatch } from "@/lib/encoding";
+import { fetchCsvSmart, fixEncoding, normalizeForMatch } from "@/lib/encoding";
 
 export interface Voucher2026 {
   id: string;
@@ -293,16 +293,49 @@ export function filterVouchers2026(
   });
 }
 
-export async function loadVoucher2026Data(): Promise<{
+type CampaignYear = string | number;
+
+const voucher2026FileCandidates = (year: CampaignYear) => [
+  `/data/vouchers_${year}.csv`,
+  `/data/voucher_${year}.csv`,
+  `/data/vouchers${year}.csv`,
+];
+
+const exceptions2026FileCandidates = (year: CampaignYear) => [
+  `/data/voucher_campanha${year}_excecoes.csv`,
+  `/data/excecoes_${year}.csv`,
+  `/data/excecoes${year}.csv`,
+];
+
+const installmentsFileCandidates = (year: CampaignYear) => [
+  `/data/voucher_campanha${year}_parcelamento_func.csv`,
+  `/data/parcelamento_${year}.csv`,
+];
+
+async function fetchFirstAvailable(paths: string[]) {
+  let lastError: unknown = null;
+  for (const path of paths) {
+    try {
+      return await fetchCsvSmart(path);
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError ?? new Error("Nenhum arquivo encontrado");
+}
+
+export async function loadVoucher2026Data(
+  campaignYear: CampaignYear = "2026"
+): Promise<{
   vouchers: Voucher2026[];
   exceptions: Voucher2026Exception[];
   installments: Voucher2026Installment[];
 }> {
   try {
     const [vouchersCsv, exceptionsCsv, installmentsCsv] = await Promise.all([
-      fetchCsvWindows1252("/data/vouchers_2026.csv"),
-      fetchCsvWindows1252("/data/voucher_campanha2026_excecoes.csv"),
-      fetchCsvWindows1252("/data/voucher_campanha2026_parcelamento_func.csv"),
+      fetchFirstAvailable(voucher2026FileCandidates(campaignYear)),
+      fetchFirstAvailable(exceptions2026FileCandidates(campaignYear)),
+      fetchFirstAvailable(installmentsFileCandidates(campaignYear)),
     ]);
 
     const vouchers = parseVouchers2026CSV(vouchersCsv);

@@ -27,6 +27,8 @@ import { useAuthStore } from "@/stores/authStore";
 import NotificationBell from "@/components/layout/NotificationBell";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
+const ENABLE_ONLY_CANVA = import.meta.env.VITE_ENABLE_ONLY_CANVA === "true";
+
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,14 +44,16 @@ const Header = () => {
   );
   const showManagement = hasRole("Admin") || hasRole("Coordinator");
 
-  const navItems = [
-    { label: "Inicio", path: "/dashboard" },
-    { label: "Canva", path: "/dashboard/canva" },
-    { label: "Vouchers", path: "/dashboard/vouchers" },
-    { label: "Ativos", path: "/saf/ativos" },
-    { label: "Tickets", path: "/tickets" },
-    { label: "Base de Conhecimento", path: "/knowledge-base" },
-  ];
+  const navItems = ENABLE_ONLY_CANVA
+    ? [{ label: "Canva", path: "/dashboard/canva" }]
+    : [
+        { label: "Inicio", path: "/dashboard" },
+        { label: "Canva", path: "/dashboard/canva" },
+        { label: "Vouchers", path: "/dashboard/vouchers" },
+        { label: "Ativos", path: "/saf/ativos" },
+        { label: "Tickets", path: "/tickets" },
+        { label: "Base de Conhecimento", path: "/knowledge-base" },
+      ];
 
   const handleLogout = () => {
     authService.logout();
@@ -211,20 +215,24 @@ const Header = () => {
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem onClick={() => navigate("/knowledge-base")}>
-                <BookOpenText className="w-4 h-4 mr-2" />
-                Base de Conhecimento
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-                {showManagement && (
-                  <>
-                    <DropdownMenuItem onClick={() => navigate("/admin")}>
-                      <Grid className="w-4 h-4 mr-2" />
-                      Gerenciamento
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
+              {!ENABLE_ONLY_CANVA && (
+                <>
+                  <DropdownMenuItem onClick={() => navigate("/knowledge-base")}>
+                    <BookOpenText className="w-4 h-4 mr-2" />
+                    Base de Conhecimento
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {showManagement && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate("/admin")}>
+                        <Grid className="w-4 h-4 mr-2" />
+                        Gerenciamento
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                </>
+              )}
                 <DropdownMenuItem
                   onClick={handleLogout}
                   className="text-destructive"

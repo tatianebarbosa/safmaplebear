@@ -320,12 +320,12 @@ export default function AccessManagement() {
 
       <Card className="border">
         <CardHeader>
-          <CardTitle>Historico de alteracoes</CardTitle>
+          <CardTitle>Histórico de alterações</CardTitle>
           <CardDescription />
         </CardHeader>
         <CardContent className="space-y-3">
           {auditEntries.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nenhuma alteracao registrada.</p>
+            <p className="text-sm text-muted-foreground">Nenhuma alteração registrada.</p>
           ) : (
             auditEntries.slice(0, 40).map((entry) => (
               <div
@@ -347,7 +347,7 @@ export default function AccessManagement() {
                         "Desconhecido";
                       const email = looksLikeEmail(entry.actor) ? entry.actor : "";
                       return `Por ${display}${email ? ` (${email})` : ""}${
-                        entry.actorRole ? ` • ${entry.actorRole}` : ""
+                        entry.actorRole ? ` - ${entry.actorRole}` : ""
                       }`;
                     })()}
                   </div>

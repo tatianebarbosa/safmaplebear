@@ -1,8 +1,10 @@
-import { useState, useCallback, useMemo, useRef, ChangeEvent } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { canvaCollector, CanvaData, CanvaHistorico } from "@/lib/canvaDataCollector";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   AlertTriangle,
   Clock,
@@ -15,32 +17,26 @@ import {
   TrendingUp,
   Building2,
   Shield,
-  Upload,
 } from "lucide-react";
 import { formatNumber, formatDateBR } from "@/lib/formatters";
-import { toast } from "@/components/ui/sonner";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
-import { useAuthStore } from "@/stores/authStore";
-import { uploadMemberReport, uploadModelReport, getUploadInfo, clearUploadOverrides } from "@/lib/canvaUsageService";
+import { clearUploadOverrides } from "@/lib/canvaUsageService";
 import { getAgentDisplayName } from "@/data/teamMembers";
+import { useToast } from "@/hooks/use-toast";
 
 export const CanvaMetricsDisplay = () => {
   const { overviewData } = useSchoolLicenseStore();
-  const canManageUploads = useAuthStore((s) => s.hasRole("Coordinator"));
+  const { toast } = useToast();
   const overviewSummary = overviewData;
   const [canvaData, setCanvaData] = useState<CanvaData | null>(null);
   const [historico, setHistorico] = useState<CanvaHistorico[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadingMembers, setUploadingMembers] = useState(false);
-  const [uploadingModels, setUploadingModels] = useState(false);
-  const [lastMemberUpload, setLastMemberUpload] = useState<string | null>(null);
-  const [lastModelUpload, setLastModelUpload] = useState<string | null>(null);
-  const [lastMemberUploadedAt, setLastMemberUploadedAt] = useState<Date | null>(null);
-  const [lastModelUploadedAt, setLastModelUploadedAt] = useState<Date | null>(null);
-  const memberFileRef = useRef<HTMLInputElement | null>(null);
-  const modelFileRef = useRef<HTMLInputElement | null>(null);
+  const [revertDialogOpen, setRevertDialogOpen] = useState(false);
+  const [revertReason, setRevertReason] = useState("");
+  const [pendingRevertId, setPendingRevertId] = useState<string | null>(null);
+  const [reverting, setReverting] = useState(false);
 
   const formatChangeDescription = (change?: number | null) => {
     if (!change) {
@@ -60,17 +56,6 @@ export const CanvaMetricsDisplay = () => {
       }
       const hist = await canvaCollector.obterHistorico();
       setHistorico(hist);
-      // Exibimos o ultimo upload registrado (replicado para todos os periodos)
-      const memberInfo = getUploadInfo("members");
-      const modelInfo = getUploadInfo("models");
-      setLastMemberUpload(
-        memberInfo ? `${memberInfo.filename} em ${new Date(memberInfo.uploadedAt).toLocaleString("pt-BR")}` : null
-      );
-      setLastMemberUploadedAt(memberInfo ? new Date(memberInfo.uploadedAt) : null);
-      setLastModelUpload(
-        modelInfo ? `${modelInfo.filename} em ${new Date(modelInfo.uploadedAt).toLocaleString("pt-BR")}` : null
-      );
-      setLastModelUploadedAt(modelInfo ? new Date(modelInfo.uploadedAt) : null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao carregar dados");
     } finally {
@@ -85,79 +70,37 @@ export const CanvaMetricsDisplay = () => {
     immediate: true,
   });
 
-  const reverterAlteracao = async (historicoId: string) => {
-    const reason = window.prompt("Informe uma justificativa para reverter o upload:", "");
-    if (reason === null || reason.trim() === "") {
-      toast.info("Reversao cancelada - justificativa obrigatoria.");
+  const reverterAlteracao = async () => {
+    if (!pendingRevertId) return;
+    if (!revertReason.trim()) {
+      toast({
+        title: "Justificativa obrigatoria",
+        description: "Explique por que deseja reverter este upload.",
+        variant: "warning",
+      });
       return;
     }
+    setReverting(true);
     try {
-      await canvaCollector.reverterAlteracao(historicoId, reason.trim());
+      await canvaCollector.reverterAlteracao(pendingRevertId, revertReason.trim());
       clearUploadOverrides();
       await carregarDados();
       window.dispatchEvent(new CustomEvent("canva-upload-refresh"));
-      toast.success("Upload revertido com sucesso.");
+      toast({
+        title: "Upload revertido com sucesso.",
+        variant: "success",
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao reverter alteracao");
-      toast.error("Erro ao reverter alteracao.");
-    }
-  };
-
-  const handleMemberUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploadingMembers(true);
-    try {
-      const text = await file.text();
-      await uploadMemberReport(file, "all", text);
-      const summary = await canvaCollector.summarizeCsvContent(text);
-      if (summary) {
-        canvaCollector.registrarHistoricoUploadManual({
-          filename: file.name,
-          totalPessoas: summary.totalPessoas,
-          designsCriados: summary.designsCriados,
-          uploadType: "members",
-        });
-      }
-      await carregarDados();
-      window.dispatchEvent(new CustomEvent("canva-upload-refresh"));
-      toast.success("Relatorio de membros atualizado (snapshot anterior preservado).");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Falha ao processar o CSV de membros.";
-      setError(message);
-      toast.error(message);
+      toast({
+        title: "Erro ao reverter alteracao.",
+        variant: "destructive",
+      });
     } finally {
-      setUploadingMembers(false);
-      event.target.value = "";
-    }
-  };
-
-  const handleModelUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setUploadingModels(true);
-    try {
-      const text = await file.text();
-      await uploadModelReport(file, "all", text);
-      const summary = await canvaCollector.summarizeCsvContent(text);
-      if (summary) {
-        canvaCollector.registrarHistoricoUploadManual({
-          filename: file.name,
-          totalPessoas: summary.totalPessoas,
-          designsCriados: summary.designsCriados,
-          uploadType: "models",
-        });
-      }
-      await carregarDados();
-      window.dispatchEvent(new CustomEvent("canva-upload-refresh"));
-      toast.success("Relatorio de modelos atualizado (snapshot anterior preservado).");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Falha ao processar o CSV de modelos.";
-      setError(message);
-      toast.error(message);
-    } finally {
-      setUploadingModels(false);
-      event.target.value = "";
+      setReverting(false);
+      setRevertDialogOpen(false);
+      setPendingRevertId(null);
+      setRevertReason("");
     }
   };
 
@@ -218,7 +161,16 @@ export const CanvaMetricsDisplay = () => {
             )}
           </div>
         </div>
-        <Button onClick={() => reverterAlteracao(item.id)} variant="outline" size="sm" className="text-xs">
+        <Button
+          onClick={() => {
+            setPendingRevertId(item.id);
+            setRevertReason("");
+            setRevertDialogOpen(true);
+          }}
+          variant="outline"
+          size="sm"
+          className="text-xs"
+        >
           Reverter
         </Button>
       </div>
@@ -233,19 +185,6 @@ export const CanvaMetricsDisplay = () => {
     () => overviewSummary?.nonMapleBearDomains ?? 0,
     [overviewSummary]
   );
-  const { isMemberStale, isModelStale } = useMemo(() => {
-    const now = Date.now();
-    const limitMs = 30 * 24 * 60 * 60 * 1000;
-    const memberStale = !lastMemberUploadedAt || now - lastMemberUploadedAt.getTime() > limitMs;
-    const modelStale = !lastModelUploadedAt || now - lastModelUploadedAt.getTime() > limitMs;
-    return { isMemberStale: memberStale, isModelStale: modelStale };
-  }, [lastMemberUploadedAt, lastModelUploadedAt]);
-  const pendingUploadsLabel = useMemo(() => {
-    const pending: string[] = [];
-    if (isMemberStale) pending.push("membros");
-    if (isModelStale) pending.push("modelos");
-    return pending.join(" e ");
-  }, [isMemberStale, isModelStale]);
 
   return (
     <div className="space-y-6">
@@ -253,63 +192,6 @@ export const CanvaMetricsDisplay = () => {
         <div className="rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
           Atualizando dados do Canva...
         </div>
-      )}
-      {error && (
-      <div className="flex items-center p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
-        <AlertTriangle className="h-5 w-5 text-destructive mr-3" />
-        <p className="text-sm text-destructive">Erro: {error}</p>
-      </div>
-    )}
-
-      {canManageUploads && (
-        <>
-          {(isMemberStale || isModelStale) && (
-            <div className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
-              <div className="space-y-1 text-sm">
-                <p className="font-semibold text-amber-800">Uploads do Canva estao vencidos</p>
-                <p className="text-muted-foreground">
-                  Faltam arquivos de {pendingUploadsLabel || "membros e modelos"}; atualize os CSVs (30 dias). Último membros: {lastMemberUpload ?? "não encontrado"} | Último modelos: {lastModelUpload ?? "não encontrado"}.
-                </p>
-              </div>
-            </div>
-          )}
-          <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3">
-            <div className="space-y-1">
-              <h3 className="text-sm font-semibold flex items-center gap-2">
-                <Upload className="h-4 w-4 text-muted-foreground" />
-                Atualizar relatorios (membros e modelos)
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                Envie os CSVs exportados do Canva (periodo de 30 dias). Eles sao aplicados em todas as visoes (30d/3m/6m/12m) e o snapshot anterior e mantido para historico.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                ref={memberFileRef}
-                type="file"
-                accept=".csv,text/csv"
-                className="hidden"
-                onChange={handleMemberUpload}
-              />
-              <input
-                ref={modelFileRef}
-                type="file"
-                accept=".csv,text/csv"
-                className="hidden"
-                onChange={handleModelUpload}
-              />
-              <Button onClick={() => memberFileRef.current?.click()} disabled={uploadingMembers} variant="outline" className="gap-2">
-                <Upload className="h-4 w-4" />
-                {uploadingMembers ? "Enviando membros..." : "Subir membros CSV"}
-              </Button>
-              <Button onClick={() => modelFileRef.current?.click()} disabled={uploadingModels} variant="outline" className="gap-2">
-                <Upload className="h-4 w-4" />
-                {uploadingModels ? "Enviando modelos..." : "Subir modelos CSV"}
-              </Button>
-            </div>
-          </div>
-        </>
       )}
 
       {overviewSummary && (
@@ -429,6 +311,34 @@ export const CanvaMetricsDisplay = () => {
           )}
         </>
       )}
+
+      <Dialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reverter upload</DialogTitle>
+            <DialogDescription>
+              Informe uma justificativa para reverter o snapshot e restaurar o estado anterior.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="modal__body space-y-3">
+            <Input
+              autoFocus
+              placeholder="Ex.: CSV incorreto, data de coleta errada..."
+              value={revertReason}
+              onChange={(e) => setRevertReason(e.target.value)}
+              disabled={reverting}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRevertDialogOpen(false)} disabled={reverting}>
+              Cancelar
+            </Button>
+            <Button onClick={reverterAlteracao} disabled={reverting}>
+              {reverting ? "Revertendo..." : "Confirmar reversao"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

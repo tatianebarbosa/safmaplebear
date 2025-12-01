@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef, ChangeEvent } from "react";
 import {
   Card,
   CardContent,
@@ -16,13 +16,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   BarChart,
   Bar,
   LineChart,
   Line,
-  AreaChart,
-  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -30,6 +29,8 @@ import {
   ResponsiveContainer,
   LabelList,
   ReferenceLine,
+  AreaChart,
+  Area,
 } from "recharts";
 import {
   Share2,
@@ -37,23 +38,33 @@ import {
   Users,
   ExternalLink,
   Calendar,
-  Layers,
   Building2,
-  Activity,
-  BarChart3,
-  Trophy,
+  Upload,
+  Search,
+  Download,
 } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
-import { UsageFilters, CanvaUsageData } from "@/types/schoolLicense";
+import { UsageFilters, CanvaUsageData, UsagePeriod } from "@/types/schoolLicense";
 import {
   loadUsageReport,
   loadModelUsageRanking,
+  uploadMemberReport,
+  uploadModelReport,
+  getUploadInfo,
+  getOverridesByPeriod,
+  clearUploadOverrides,
   ModelUsage,
   TimeSeriesPoint,
 } from "@/lib/canvaUsageService";
 import { filterRecentTimeSeries } from "@/lib/chartUtils";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as DatePicker } from "@/components/ui/calendar";
+import { DateRange } from "react-day-picker";
+import { canvaCollector } from "@/lib/canvaDataCollector";
 
 interface CanvaUsageDashboardProps {
   onNavigateToUsers: (searchEmail?: string) => void;
@@ -65,6 +76,7 @@ const periodLabel = (period: UsageFilters["period"]) => {
     "3m": "Ultimos 3 meses",
     "6m": "Ultimos 6 meses",
     "12m": "Ultimos 12 meses",
+    nov2025: "Novembro 2025",
   };
   return labels[period] ?? period;
 };
@@ -79,6 +91,9 @@ export const CanvaUsageDashboard = ({
   const { schools } = useSchoolLicenseStore();
   type MetricKey = "designsCreated" | "designsPublished" | "designsShared" | "designsViewed";
   type CreatorMetric = "designs" | "published" | "shared" | "viewed";
+  const [activeTab, setActiveTab] = useState<"models" | "members" | "kits">("models");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedOwner, setSelectedOwner] = useState<string | "all">("all");
   const [filters, setFilters] = useState<UsageFilters>({
     period: "12m",
     cluster: undefined,
@@ -91,6 +106,26 @@ export const CanvaUsageDashboard = ({
   const [rankLimit, setRankLimit] = useState(3);
   const [schoolSort, setSchoolSort] = useState<MetricKey>("designsCreated");
   const [creatorSort, setCreatorSort] = useState<CreatorMetric>("designs");
+  const [memberUploadPeriod, setMemberUploadPeriod] = useState<UsagePeriod>("30d");
+  const [modelUploadPeriod, setModelUploadPeriod] = useState<UsagePeriod>("30d");
+  const [applyMembersToAll, setApplyMembersToAll] = useState(false);
+  const [applyModelsToAll, setApplyModelsToAll] = useState(false);
+  const [memberDateRange, setMemberDateRange] = useState<DateRange | undefined>();
+  const [modelDateRange, setModelDateRange] = useState<DateRange | undefined>();
+  const [memberLabel, setMemberLabel] = useState("");
+  const [modelLabel, setModelLabel] = useState("");
+  const memberFileRef = useRef<HTMLInputElement | null>(null);
+  const modelFileRef = useRef<HTMLInputElement | null>(null);
+  const [uploadingMembers, setUploadingMembers] = useState(false);
+  const [uploadingModels, setUploadingModels] = useState(false);
+  const [lastMemberUpload, setLastMemberUpload] = useState<string | null>(null);
+  const [lastModelUpload, setLastModelUpload] = useState<string | null>(null);
+  const [memberOverrides, setMemberOverrides] = useState<
+    Array<{ period: UsagePeriod; filename: string | null; uploadedAt: string | null; rows: number; label?: string | null }>
+  >([]);
+  const [modelOverrides, setModelOverrides] = useState<
+    Array<{ period: UsagePeriod; filename: string | null; uploadedAt: string | null; rows: number; label?: string | null }>
+  >([]);
 
   const metricLabels: Record<MetricKey, string> = {
     designsCreated: "Designs criados",
@@ -106,13 +141,34 @@ export const CanvaUsageDashboard = ({
   };
 
   const clusterOptions = [
-    { value: "Implantao", label: "Implantao" },
+    { value: "Implantação", label: "Implantação" },
     { value: "Alta Performance", label: "Alta Performance" },
     { value: "Potente", label: "Potente" },
     { value: "Desenvolvimento", label: "Desenvolvimento" },
     { value: "Alerta", label: "Alerta" },
-    { value: "Outros/Implantao", label: "Outros/Implantao" },
+    { value: "Outros/Implantação", label: "Outros/Implantação" },
   ];
+
+  const refreshUploadInfo = useCallback(() => {
+    const memberInfo = getUploadInfo("members");
+    const modelInfo = getUploadInfo("models");
+    setLastMemberUpload(
+      memberInfo
+        ? `${memberInfo.filename} em ${new Date(memberInfo.uploadedAt).toLocaleDateString("pt-BR")}${
+            memberInfo.label ? ` - ${memberInfo.label}` : ""
+          }`
+        : null
+    );
+    setLastModelUpload(
+      modelInfo
+        ? `${modelInfo.filename} em ${new Date(modelInfo.uploadedAt).toLocaleDateString("pt-BR")}${
+            modelInfo.label ? ` - ${modelInfo.label}` : ""
+          }`
+        : null
+    );
+    setMemberOverrides(getOverridesByPeriod("members"));
+    setModelOverrides(getOverridesByPeriod("models"));
+  }, []);
 
   const loadDashboardData = useCallback(async () => {
     const [{ usageData, timeSeries }, models] = await Promise.all([
@@ -123,7 +179,8 @@ export const CanvaUsageDashboard = ({
     const cleanedSeries = filterRecentTimeSeries(timeSeries);
     setTimeData(cleanedSeries);
     setModelRanking(models);
-  }, [filters.period]);
+    refreshUploadInfo();
+  }, [filters.period, refreshUploadInfo]);
 
   useEffect(() => {
     loadDashboardData();
@@ -174,19 +231,11 @@ export const CanvaUsageDashboard = ({
     }
   }, [filters.school, schoolOptions]);
 
-  const condensedTimeData = useMemo(() => {
-    if (!timeData?.length) return [];
-    const sanitized = timeData.map((point) => ({
-      period: point.period,
-      designs: Math.max(0, point.designs ?? 0),
-    }));
-    // Limita para os pontos mais recentes para evitar grfico muito longo
-    return sanitized.slice(-24);
-  }, [timeData]);
-
-  const timeDomain = useMemo<[number, number | "auto"]>(() => {
-    const max = condensedTimeData.reduce((acc, point) => Math.max(acc, point.designs ?? 0), 0);
-    return [0, max ? Math.ceil(max * 1.1) : "auto"];
+  const condensedTimeData = useMemo(() => timeData.slice(-12), [timeData]);
+  const timeDomain = useMemo((): [number, number] => {
+    if (!condensedTimeData.length) return [0, 10];
+    const maxValue = Math.max(...condensedTimeData.map((point) => point.designs));
+    return [0, Math.max(10, Math.ceil(maxValue * 1.1))];
   }, [condensedTimeData]);
 
   const averageDesigns =
@@ -220,10 +269,7 @@ export const CanvaUsageDashboard = ({
   const designsPerSchool = filteredUsage.length ? totals.designs / filteredUsage.length : 0;
 
   const clusterBreakdown = useMemo(() => {
-    const map = new Map<
-      string,
-      { cluster: string; schools: number; designs: number; published: number }
-    >();
+    const map = new Map<string, { cluster: string; schools: number; designs: number; published: number }>();
     filteredUsage.forEach((school) => {
       const key = school.cluster || "Sem cluster";
       const entry = map.get(key) ?? { cluster: key, schools: 0, designs: 0, published: 0 };
@@ -237,18 +283,13 @@ export const CanvaUsageDashboard = ({
 
   const topSchools = useMemo(() => {
     const sorted = [...filteredUsage].sort((a, b) => (b[schoolSort] ?? 0) - (a[schoolSort] ?? 0));
-    return sorted
-      .slice(0, 10)
-      .map((school) => ({ ...school, metricValue: school[schoolSort] ?? 0 }));
+    return sorted.slice(0, 10).map((school) => ({ ...school, metricValue: school[schoolSort] ?? 0 }));
   }, [filteredUsage, schoolSort]);
 
   const excludedEmails = new Set(["comunicacao@maplebear.com.br"]);
 
   const schoolLookup = useMemo(() => {
-    const map = new Map<
-      string,
-      { name: string; cluster?: string; id?: string }
-    >();
+    const map = new Map<string, { name: string; cluster?: string; id?: string }>();
     schools.forEach((school) => {
       school.users.forEach((user) => {
         const email = user.email?.toLowerCase?.();
@@ -298,7 +339,128 @@ export const CanvaUsageDashboard = ({
     navigator.clipboard
       ?.writeText(email)
       .then(() => toast.success("Email copiado para comunicar o destaque."))
-      .catch(() => toast.error("N?o foi possivel copiar o email agora."));
+      .catch(() => toast.error("Nao foi possivel copiar o email agora."));
+  };
+
+  const ownerOptions = useMemo(() => {
+    const owners = new Set<string>();
+    modelRanking.forEach((model) => {
+      if (model.owner) owners.add(model.owner);
+    });
+    return Array.from(owners).sort();
+  }, [modelRanking]);
+
+  const filteredModels = useMemo(() => {
+    return modelRanking.filter((model) => {
+      const matchesOwner = selectedOwner === "all" || model.owner === selectedOwner;
+      const matchesSearch =
+        !searchTerm ||
+        model.modelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        model.owner.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesOwner && matchesSearch;
+    });
+  }, [modelRanking, searchTerm, selectedOwner]);
+
+  const overrideCount = useMemo(() => {
+    const memberCount = memberOverrides.filter((o) => o.filename).length;
+    const modelCount = modelOverrides.filter((o) => o.filename).length;
+    return memberCount + modelCount;
+  }, [memberOverrides, modelOverrides]);
+
+  const memberTotals = useMemo(() => {
+    let admins = 0;
+    let teachers = 0;
+    let students = 0;
+    let total = 0;
+    schools.forEach((school) => {
+      total += Number(school.usedLicenses ?? school.users?.length ?? 0);
+      school.users?.forEach((user) => {
+        if (user.role === "Administrador") admins += 1;
+        if (user.role === "Professor") teachers += 1;
+        if (user.role === "Estudante") students += 1;
+      });
+    });
+    const computedTotal = total || admins + teachers + students;
+    return { total: computedTotal, admins, teachers, students };
+  }, [schools]);
+
+  const latestDesigns =
+    condensedTimeData.length > 0 ? condensedTimeData[condensedTimeData.length - 1].designs : totals.designs;
+  const previousDesigns =
+    condensedTimeData.length > 1 ? condensedTimeData[condensedTimeData.length - 2].designs : latestDesigns;
+  const designDelta = latestDesigns - previousDesigns;
+  const designDeltaPct = previousDesigns ? (designDelta / Math.max(previousDesigns, 1)) * 100 : 0;
+
+  const formatRangeLabel = (range?: DateRange) => {
+    if (!range?.from && !range?.to) return null;
+    const fmt = (d: Date) => d.toLocaleDateString("pt-BR");
+    if (range?.from && range?.to) return `${fmt(range.from)} a ${fmt(range.to)}`;
+    if (range?.from) return fmt(range.from);
+    if (range?.to) return fmt(range.to);
+    return null;
+  };
+
+  const handleMemberUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploadingMembers(true);
+    try {
+      const text = await file.text();
+      const label = memberLabel.trim() || formatRangeLabel(memberDateRange) || undefined;
+      await uploadMemberReport(file, applyMembersToAll ? "all" : memberUploadPeriod, text, label);
+      const summary = await canvaCollector.summarizeCsvContent(text);
+      if (summary) {
+        canvaCollector.registrarHistoricoUploadManual({
+          filename: file.name,
+          totalPessoas: summary.totalPessoas ?? 0,
+          designsCriados: summary.designsCriados ?? 0,
+          uploadType: "members",
+        });
+      }
+      await loadDashboardData();
+      toast.success("CSV de membros aplicado. Snapshot anterior preservado.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Falha ao processar o CSV de membros.";
+      toast.error(message);
+    } finally {
+      setUploadingMembers(false);
+      event.target.value = "";
+    }
+  };
+
+  const handleModelUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploadingModels(true);
+    try {
+      const text = await file.text();
+      const label = modelLabel.trim() || formatRangeLabel(modelDateRange) || undefined;
+      await uploadModelReport(file, applyModelsToAll ? "all" : modelUploadPeriod, text, label);
+      const summary = await canvaCollector.summarizeCsvContent(text);
+      if (summary) {
+        canvaCollector.registrarHistoricoUploadManual({
+          filename: file.name,
+          totalPessoas: summary.totalPessoas ?? 0,
+          designsCriados: summary.designsCriados ?? 0,
+          uploadType: "models",
+        });
+      }
+      await loadDashboardData();
+      toast.success("CSV de modelos aplicado. Snapshot anterior preservado.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Falha ao processar o CSV de modelos.";
+      toast.error(message);
+    } finally {
+      setUploadingModels(false);
+      event.target.value = "";
+    }
+  };
+
+  const handleClearUploads = () => {
+    clearUploadOverrides();
+    refreshUploadInfo();
+    loadDashboardData();
+    toast.success("Uploads manuais removidos; voltamos aos arquivos base.");
   };
 
   const rankStyle = (position: number) => {
@@ -309,96 +471,376 @@ export const CanvaUsageDashboard = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold">Analise de Uso do Canva</h2>
-          <p className="text-sm text-muted-foreground">
-            Acompanhe o desempenho e engajamento das escolas
-          </p>
-        </div>
-        <div className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5" />
-              Periodo de analise
-            </Label>
-            <Select
-              value={filters.period}
-              onValueChange={(value: UsageFilters["period"]) =>
-                setFilters((prev) => ({ ...prev, period: value }))
-              }
-            >
-              <SelectTrigger className="h-11 rounded-xl border border-border/50 bg-background text-sm font-medium">
-                <SelectValue placeholder="Selecione o periodo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="30d">Ultimos 30 dias</SelectItem>
-                <SelectItem value="3m">Ultimos 3 meses</SelectItem>
-                <SelectItem value="6m">Ultimos 6 meses</SelectItem>
-                <SelectItem value="12m">Ultimos 12 meses</SelectItem>
-              </SelectContent>
-            </Select>
+    <div className="space-y-8">
+      <Card className="rounded-2xl border-border/60 shadow-sm">
+        <CardHeader className="space-y-4">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <CardTitle className="text-2xl font-semibold">Uso do Canva</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                Importe os CSVs exportados do Canva para atualizar modelos e pessoas todo mes.
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary">Atualizacao mensal</Badge>
+              <Select
+                value={filters.period}
+                onValueChange={(value: UsageFilters["period"]) =>
+                  setFilters((prev) => ({ ...prev, period: value }))
+                }
+              >
+                <SelectTrigger className="h-10 w-44 rounded-full border-border/60 bg-background text-sm font-medium">
+                  <SelectValue placeholder="Periodo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30d">Ultimos 30 dias</SelectItem>
+                  <SelectItem value="3m">Ultimos 3 meses</SelectItem>
+                  <SelectItem value="6m">Ultimos 6 meses</SelectItem>
+                  <SelectItem value="12m">Ultimos 12 meses</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              <Layers className="h-3.5 w-3.5" />
-              Cluster
-            </Label>
-            <Select
-              value={filters.cluster ?? "all"}
-              onValueChange={(value) =>
-                setFilters((prev) => ({ ...prev, cluster: value === "all" ? undefined : value }))
-              }
-            >
-              <SelectTrigger className="h-11 rounded-xl border border-border/50 bg-background text-sm font-medium">
-                <SelectValue placeholder="Selecione o cluster" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os clusters</SelectItem>
-                {clusterOptions.map((cluster) => (
-                  <SelectItem key={cluster.value} value={cluster.value}>
-                    {cluster.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-xl border border-border/50 bg-gradient-to-r from-sky-50 to-white p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Designs criados</p>
+                  <div className="text-3xl font-semibold">{totals.designs.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {designDelta >= 0 ? "+" : "-"} {Math.abs(designDeltaPct).toFixed(1)}% vs periodo anterior
+                  </p>
+                </div>
+                <Badge variant="outline" className="rounded-full">{periodLabel(filters.period)}</Badge>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                <div className="rounded-lg border bg-white/70 p-3">
+                  <p className="text-foreground font-semibold">{totals.published.toLocaleString()}</p>
+                  <span>Total publicado</span>
+                </div>
+                <div className="rounded-lg border bg-white/70 p-3">
+                  <p className="text-foreground font-semibold">{totals.shared.toLocaleString()}</p>
+                  <span>Total compartilhado</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-border/50 bg-gradient-to-r from-purple-50 to-white p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Membros ativos</p>
+                  <div className="text-3xl font-semibold">{memberTotals.total.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Snapshot baseado nos licenciados atuais
+                  </p>
+                </div>
+                <div className="flex flex-col items-end text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Users className="h-3.5 w-3.5" /> {schools.length} escolas
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Share2 className="h-3.5 w-3.5" /> Engajamento {viewsPerDesign.toFixed(1)}x
+                  </span>
+                </div>
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+                <div className="rounded-lg border bg-white/70 p-3">
+                  <p className="text-foreground font-semibold">{memberTotals.admins}</p>
+                  <span>Administradores</span>
+                </div>
+                <div className="rounded-lg border bg-white/70 p-3">
+                  <p className="text-foreground font-semibold">{memberTotals.teachers}</p>
+                  <span>Professores</span>
+                </div>
+                <div className="rounded-lg border bg-white/70 p-3">
+                  <p className="text-foreground font-semibold">{memberTotals.students}</p>
+                  <span>Alunos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-3 items-end">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Cluster</Label>
+              <Select
+                value={filters.cluster ?? "all"}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, cluster: value === "all" ? undefined : value }))
+                }
+              >
+                <SelectTrigger className="h-10 rounded-lg border-border/60 bg-background text-sm font-medium">
+                  <SelectValue placeholder="Todos os clusters" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  {clusterOptions.map((cluster) => (
+                    <SelectItem key={cluster.value} value={cluster.value}>
+                      {cluster.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Escola</Label>
+              <Select
+                value={filters.school ?? "all"}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, school: value === "all" ? undefined : value }))
+                }
+              >
+                <SelectTrigger className="h-10 rounded-lg border-border/60 bg-background text-sm font-medium">
+                  <SelectValue placeholder="Todas as escolas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {schoolOptions.map((school) => (
+                    <SelectItem key={school} value={school}>
+                      {school}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end">
+              <Button variant="outline" className="w-full md:w-auto" onClick={loadDashboardData}>
+                Recarregar dados
+              </Button>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              <Building2 className="h-3.5 w-3.5" />
-              Escola
-            </Label>
-            <Select
-              value={filters.school ?? "all"}
-              onValueChange={(value) =>
-                setFilters((prev) => ({ ...prev, school: value === "all" ? undefined : value }))
-              }
-            >
-              <SelectTrigger className="h-11 rounded-xl border border-border/50 bg-background text-sm font-medium">
-                <SelectValue placeholder="Selecione a escola" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                {schoolOptions.map((school) => (
-                  <SelectItem key={school} value={school}>
-                    {school}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-end">
-            <Button variant="outline" className="w-full" onClick={loadDashboardData}>
-              Recarregar dados
-            </Button>
-          </div>
-        </div>
-      </div>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="space-y-4">
+            <TabsList className="w-fit rounded-full bg-muted/60 p-1">
+              <TabsTrigger value="models" className="rounded-full px-3 py-1 text-sm">Modelos</TabsTrigger>
+              <TabsTrigger value="members" className="rounded-full px-3 py-1 text-sm">Membros</TabsTrigger>
+              <TabsTrigger value="kits" className="rounded-full px-3 py-1 text-sm">Kits de marca</TabsTrigger>
+            </TabsList>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+            <TabsContent value="models" className="space-y-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative flex items-center">
+                  <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    className="pl-9 w-56"
+                    placeholder="Busque um modelo"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <Select value={selectedOwner} onValueChange={(value) => setSelectedOwner(value as any)}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="Selecionar titular" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os titulares</SelectItem>
+                    {ownerOptions.map((owner) => (
+                      <SelectItem key={owner} value={owner}>
+                        {owner}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Calendar className="h-4 w-4" />
+                      {formatRangeLabel(modelDateRange) ?? "Intervalo"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0" align="start">
+                    <DatePicker mode="range" selected={modelDateRange} onSelect={setModelDateRange} numberOfMonths={2} />
+                  </PopoverContent>
+                </Popover>
+                <Input
+                  className="w-48"
+                  placeholder="Etiqueta (ex: Dez/2024)"
+                  value={modelLabel}
+                  onChange={(e) => setModelLabel(e.target.value)}
+                />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Switch id="models-all" checked={applyModelsToAll} onCheckedChange={setApplyModelsToAll} />
+                  <label htmlFor="models-all">Aplicar em todos os periodos</label>
+                </div>
+                <Button onClick={() => modelFileRef.current?.click()} disabled={uploadingModels} className="gap-2">
+                  <Upload className="h-4 w-4" />
+                  {uploadingModels ? "Importando..." : "Importar modelos CSV"}
+                </Button>
+                <Button variant="ghost" onClick={handleClearUploads} disabled={!overrideCount} className="text-xs">
+                  Remover todos {overrideCount ? `(${overrideCount})` : ""}
+                </Button>
+                <Button variant="outline" className="gap-2" asChild>
+                  <a href="/data/template-novembro2025.csv" download>
+                    <Download className="h-4 w-4" />
+                    Baixar template
+                  </a>
+                </Button>
+              </div>
+              <input
+                ref={modelFileRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={handleModelUpload}
+              />
+              <p className="text-xs text-muted-foreground">
+                Ultimo upload de modelos: {lastModelUpload ?? "Nenhum"}
+              </p>
+              {modelOverrides.some((o) => o.filename) && (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {modelOverrides.map((o) => (
+                    <div key={o.period} className="flex items-center justify-between rounded-lg border border-dashed px-3 py-2 text-xs">
+                      <span className="font-medium">{o.period}</span>
+                      <span className="text-right text-muted-foreground">
+                        {o.filename ? `${o.filename}${o.label ? ` - ${o.label}` : ""}` : "Sem upload"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredModels.length === 0 ? (
+                  <div className="col-span-full rounded-lg border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
+                    Nenhum modelo encontrado para os filtros atuais.
+                  </div>
+                ) : (
+                  filteredModels.map((model) => (
+                    <Card key={`${model.modelName}-${model.owner}`} className="border-border/60 shadow-sm">
+                      <CardContent className="p-4 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="font-medium text-foreground">{model.modelName}</p>
+                            <p className="text-xs text-muted-foreground">Titular: {model.owner}</p>
+                          </div>
+                          <Badge variant="secondary">{model.uses} usos</Badge>
+                        </div>
+                        <div className="flex gap-3 text-xs text-muted-foreground">
+                          <span>Publicados: {model.published}</span>
+                          <span>Compartilhados: {model.shared}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="members" className="space-y-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Calendar className="h-4 w-4" />
+                      {formatRangeLabel(memberDateRange) ?? "Intervalo"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0" align="start">
+                    <DatePicker mode="range" selected={memberDateRange} onSelect={setMemberDateRange} numberOfMonths={2} />
+                  </PopoverContent>
+                </Popover>
+                <Input
+                  className="w-48"
+                  placeholder="Etiqueta (ex: Dez/2024)"
+                  value={memberLabel}
+                  onChange={(e) => setMemberLabel(e.target.value)}
+                />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Switch id="members-all" checked={applyMembersToAll} onCheckedChange={setApplyMembersToAll} />
+                  <label htmlFor="members-all">Aplicar em todos os periodos</label>
+                </div>
+                <Select value={memberUploadPeriod} onValueChange={(value: UsagePeriod) => setMemberUploadPeriod(value)}>
+                  <SelectTrigger className="h-9 w-32">
+                    <SelectValue placeholder="Periodo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="30d">30 dias</SelectItem>
+                    <SelectItem value="3m">3 meses</SelectItem>
+                    <SelectItem value="6m">6 meses</SelectItem>
+                    <SelectItem value="12m">12 meses</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={() => memberFileRef.current?.click()} disabled={uploadingMembers} className="gap-2">
+                  <Upload className="h-4 w-4" />
+                  {uploadingMembers ? "Importando..." : "Importar membros CSV"}
+                </Button>
+              </div>
+              <input
+                ref={memberFileRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={handleMemberUpload}
+              />
+              <p className="text-xs text-muted-foreground">
+                Ultimo upload de membros: {lastMemberUpload ?? "Nenhum"}
+              </p>
+              {memberOverrides.some((o) => o.filename) && (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {memberOverrides.map((o) => (
+                    <div key={o.period} className="flex items-center justify-between rounded-lg border border-dashed px-3 py-2 text-xs">
+                      <span className="font-medium">{o.period}</span>
+                      <span className="text-right text-muted-foreground">
+                        {o.filename ? `${o.filename}${o.label ? ` - ${o.label}` : ""}` : "Sem upload"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="grid gap-3 sm:grid-cols-3">
+                <Card className="border-border/60 shadow-sm">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">Licencas em uso</p>
+                    <div className="text-2xl font-semibold">{memberTotals.total.toLocaleString()}</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border/60 shadow-sm">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">Administradores</p>
+                    <div className="text-2xl font-semibold">{memberTotals.admins}</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border/60 shadow-sm">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">Professores</p>
+                    <div className="text-2xl font-semibold">{memberTotals.teachers}</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="kits" className="space-y-3">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                Kits de marca usam os mesmos uploads. Mantenha os CSVs atualizados para refletir compartilhamentos e publicacoes.
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <Card className="border-border/60 shadow-sm">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">Total publicado</p>
+                    <div className="text-2xl font-semibold">{totals.published.toLocaleString()}</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border/60 shadow-sm">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">Total compartilhado</p>
+                    <div className="text-2xl font-semibold">{totals.shared.toLocaleString()}</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border/60 shadow-sm">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">Engajamento medio</p>
+                    <div className="text-2xl font-semibold">{viewsPerDesign.toFixed(1)}x</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         <StatsCard
           title="Designs criados"
           value={totals.designs.toLocaleString()}
@@ -432,16 +874,13 @@ export const CanvaUsageDashboard = ({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-      <Card className="rounded-xl shadow-sm border-border/40">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-primary" />
+        <Card className="rounded-xl shadow-sm border-border/40">
+          <CardHeader className="pb-3">
             <CardTitle className="text-xl font-medium">Designs criados por periodo</CardTitle>
-          </div>
-          <CardDescription className="text-sm text-muted-foreground">
-            Evolucao temporal dos designs registrados
-          </CardDescription>
-        </CardHeader>
+            <CardDescription className="text-sm text-muted-foreground">
+              Evolucao temporal dos designs registrados
+            </CardDescription>
+          </CardHeader>
           <CardContent>
                         <ResponsiveContainer width="100%" height={320}>
               <AreaChart data={condensedTimeData} margin={{ top: 16, right: 16, left: 0, bottom: 8 }}>
@@ -475,10 +914,7 @@ export const CanvaUsageDashboard = ({
 
         <Card className="rounded-xl shadow-sm border-border/40">
           <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-amber-500" />
-              <CardTitle className="text-xl font-medium">Top 10 escolas mais ativas</CardTitle>
-            </div>
+            <CardTitle className="text-xl font-medium">Top 10 escolas mais ativas</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Ranking por designs registrados no periodo
             </CardDescription>
@@ -564,48 +1000,50 @@ export const CanvaUsageDashboard = ({
         </CardContent>
       </Card>
 
-        <Card className="rounded-xl shadow-sm border-border/40">
-          <CardHeader className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-primary" />
-                <CardTitle className="text-xl font-medium">Ranking de criadores</CardTitle>
-              </div>
-              <CardDescription className="text-sm text-muted-foreground">
-                Ranking priorizado para comunicados de reconhecimento (marketing central excluido)
-              </CardDescription>
-              <p className="text-xs text-muted-foreground mt-1">
-                Mostrando {rankedCreators.length} de {rankLimit} posicoes com os filtros atuais.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3 justify-end">
-              <div className="flex items-center gap-2">
-                <Label className="text-xs text-muted-foreground">Ordenar por</Label>
-                <Select value={creatorSort} onValueChange={(value: CreatorMetric) => setCreatorSort(value)}>
-                  <SelectTrigger className="w-44">
-                    <SelectValue placeholder="Metrica" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="designs">Designs criados</SelectItem>
-                    <SelectItem value="published">Designs publicados</SelectItem>
-                    <SelectItem value="shared">Links compartilhados</SelectItem>
-                    <SelectItem value="viewed">Designs visualizados</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Select value={String(rankLimit)} onValueChange={(value) => setRankLimit(Number(value))}>
-                <SelectTrigger className="w-28">
-                  <SelectValue placeholder="Top" />
+      <Card className="rounded-xl shadow-sm border-border/40">
+        <CardHeader className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <CardTitle className="text-xl font-medium">Ranking de criadores</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
+              Ranking priorizado para comunicados de reconhecimento (marketing central excluido)
+            </CardDescription>
+            <p className="text-xs text-muted-foreground mt-1">
+              Mostrando {rankedCreators.length} de {rankLimit} posicoes com os filtros atuais.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 justify-end">
+            <Select value={String(rankLimit)} onValueChange={(value) => setRankLimit(Number(value))}>
+              <SelectTrigger className="w-28">
+                <SelectValue placeholder="Top" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3">Top 3</SelectItem>
+                <SelectItem value="5">Top 5</SelectItem>
+                <SelectItem value="10">Top 10</SelectItem>
+                <SelectItem value="20">Top 20</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-2">
+              <Label className="text-xs text-muted-foreground">Ordenar por</Label>
+              <Select value={creatorSort} onValueChange={(value: CreatorMetric) => setCreatorSort(value)}>
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="Metrica" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="3">Top 3</SelectItem>
-                  <SelectItem value="5">Top 5</SelectItem>
-                  <SelectItem value="10">Top 10</SelectItem>
-                  <SelectItem value="20">Top 20</SelectItem>
+                  <SelectItem value="designs">Designs criados</SelectItem>
+                  <SelectItem value="published">Designs publicados</SelectItem>
+                  <SelectItem value="shared">Links compartilhados</SelectItem>
+                  <SelectItem value="viewed">Designs visualizados</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </CardHeader>
+            <Button variant="outline" onClick={() => onNavigateToUsers()} className="gap-2">
+              <Users className="h-4 w-4" />
+              Ver usuarios
+              <ExternalLink className="h-3 w-3" />
+            </Button>
+          </div>
+        </CardHeader>
         <CardContent>
           {rankedCreators.length === 0 ? (
             <div className="text-center py-8">
@@ -641,6 +1079,9 @@ export const CanvaUsageDashboard = ({
                     <div className="text-sm text-muted-foreground">designs</div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                    <Button size="sm" variant="ghost" className="whitespace-nowrap" onClick={() => handleCopyEmail(creator.email)}>
+                      Copiar email
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
@@ -677,7 +1118,7 @@ export const CanvaUsageDashboard = ({
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground"></div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">—</div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">Aguardando dado</div>
                     </div>
                   );
@@ -687,43 +1128,40 @@ export const CanvaUsageDashboard = ({
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl shadow-sm border-border/40">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-primary" />
+      {activeTab === "models" && (
+        <Card className="rounded-xl shadow-sm border-border/40">
+          <CardHeader>
             <CardTitle className="text-xl font-medium">Top modelos mais utilizados</CardTitle>
-          </div>
-          <CardDescription className="text-sm text-muted-foreground">
-            Ranking das artes disponibilizadas pela equipe de marketing
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {modelRanking.length === 0 ? (
-            <div className="text-center py-8 text-sm text-muted-foreground">
-              Nenhum modelo registrado ainda.
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={modelRanking} margin={{ top: 8, right: 16, left: 0, bottom: 40 }}>
-                <CartesianGrid strokeDasharray="2 6" stroke={chartStroke} />
-                <XAxis
-                  dataKey="modelName"
-                  tick={{ fontSize: 12, fill: chartText }}
-                  interval={0}
-                  height={80}
-                  angle={-25}
-                  textAnchor="end"
-                />
-                <YAxis tick={{ fill: chartText, fontSize: 12 }} allowDecimals={false} />
-                <Tooltip formatter={(value: number) => [value, "Usos"]} contentStyle={{ borderRadius: 12 }} />
-                <Bar dataKey="uses" fill={primaryColor} radius={[6, 6, 6, 6]}>
-                  <LabelList dataKey="uses" position="top" fill="hsl(var(--foreground))" fontSize={12} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </CardContent>
-      </Card>
+            <CardDescription className="text-sm text-muted-foreground">
+              Ranking das artes disponibilizadas pela equipe de marketing
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {modelRanking.length === 0 ? (
+              <div className="text-center py-8 text-sm text-muted-foreground">Nenhum modelo registrado ainda.</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={modelRanking} margin={{ top: 8, right: 16, left: 0, bottom: 40 }}>
+                  <CartesianGrid strokeDasharray="2 6" stroke={chartStroke} />
+                  <XAxis
+                    dataKey="modelName"
+                    tick={{ fontSize: 12, fill: chartText }}
+                    interval={0}
+                    height={80}
+                    angle={-25}
+                    textAnchor="end"
+                  />
+                  <YAxis tick={{ fill: chartText, fontSize: 12 }} allowDecimals={false} />
+                  <Tooltip formatter={(value: number) => [value, "Usos"]} contentStyle={{ borderRadius: 12 }} />
+                  <Bar dataKey="uses" fill={primaryColor} radius={[6, 6, 6, 6]}>
+                    <LabelList dataKey="uses" position="top" fill="hsl(var(--foreground))" fontSize={12} />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="rounded-xl shadow-sm border-border/40">
         <CardHeader>
@@ -765,4 +1203,3 @@ export const CanvaUsageDashboard = ({
 };
 
 export default CanvaUsageDashboard;
-

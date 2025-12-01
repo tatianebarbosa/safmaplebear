@@ -9,7 +9,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Download, X, AlertTriangle, Building2, Users } from "lucide-react";
+import {
+  Search,
+  Download,
+  X,
+  AlertTriangle,
+  Building2,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { SchoolLicenseCard } from "./SchoolLicenseCard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import { School } from "@/types/schoolLicense";
@@ -156,6 +165,7 @@ export const SchoolLicenseManagement = ({
     const end = start + pageSize;
     return filteredSchools.slice(start, end);
   }, [filteredSchools, currentPage, pageSize]);
+  const paginationProgress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0;
 
   const {
     totalSchools,
@@ -491,26 +501,44 @@ export const SchoolLicenseManagement = ({
             Nenhuma escola encontrada com os filtros aplicados.
           </div>
         )}
-        <div className="flex justify-between items-center px-1 sm:px-2 py-4 text-sm text-muted-foreground">
-          <Button
-            variant="outline"
-            disabled={currentPage === 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="rounded-full px-4"
-          >
-            Anterior
-          </Button>
-          <span>
-            {currentPage} / {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            disabled={currentPage === totalPages}
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            className="rounded-full px-4"
-          >
-            Prxima
-          </Button>
+        <div className="rounded-2xl border border-border/50 bg-gradient-to-r from-white via-slate-50 to-white shadow-sm px-3 py-4 sm:px-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <Button
+              variant="outline"
+              disabled={currentPage === 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="rounded-full px-4 sm:px-5 bg-white/80 border-border/60 shadow-sm hover:bg-white"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="ml-2 hidden sm:inline">Anterior</span>
+              <span className="ml-2 sm:hidden">Voltar</span>
+            </Button>
+
+            <div className="flex flex-1 flex-col items-center gap-2 text-center min-w-[240px] sm:min-w-[320px]">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                <span className="text-lg">{currentPage}</span>
+                <span className="text-xs font-medium text-muted-foreground">de</span>
+                <span className="text-lg">{totalPages}</span>
+              </div>
+              <div className="w-full max-w-md h-2 rounded-full bg-muted/70 overflow-hidden shadow-inner">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-primary to-amber-500 transition-all duration-300 ease-out"
+                  style={{ width: `${Math.min(100, paginationProgress)}%` }}
+                />
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              disabled={currentPage === totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              className="rounded-full px-4 sm:px-5 bg-white/80 border-border/60 shadow-sm hover:bg-white"
+            >
+              <span className="mr-2 hidden sm:inline">Proxima</span>
+              <span className="mr-2 sm:hidden">Avancar</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 

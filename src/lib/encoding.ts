@@ -1,4 +1,5 @@
 const WINDOWS_1252_DECODER = new TextDecoder("windows-1252");
+const UTF8_DECODER = new TextDecoder("utf-8");
 
 const ENCODING_FIXES: Record<string, string> = {
   "Adimpl?ncia": "Adimpl?ncia",
@@ -35,6 +36,25 @@ export async function fetchCsvWindows1252(path: string): Promise<string> {
 
   const buffer = await response.arrayBuffer();
   return decodeWindows1252(buffer);
+}
+
+function garbledScore(value: string): number {
+  const patterns = [/�/g, /Ã./g, /�/g];
+  return patterns.reduce((score, regex) => score + (value.match(regex)?.length || 0), 0);
+}
+
+export async function fetchCsvSmart(path: string): Promise<string> {
+  const response = await fetch(path);
+
+  if (!response.ok) {
+    throw new Error(`Falha ao carregar CSV ${path}: ${response.status}`);
+  }
+
+  const buffer = await response.arrayBuffer();
+  const utf8 = UTF8_DECODER.decode(buffer);
+  const win1252 = WINDOWS_1252_DECODER.decode(buffer);
+
+  return garbledScore(utf8) <= garbledScore(win1252) ? utf8 : win1252;
 }
 
 export function normalizeForMatch(value: string): string {

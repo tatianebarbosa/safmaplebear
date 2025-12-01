@@ -189,8 +189,12 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       <DialogContent className="max-w-4xl w-[96vw] max-h-[85vh] p-0 overflow-hidden border border-border/70 shadow-2xl flex flex-col">
         <DialogHeader className="border-b border-border/60 bg-muted/40 px-6 py-4">
           <DialogTitle className="flex items-center gap-3 text-xl sm:text-2xl">
-            <Badge variant="secondary" className="font-mono text-base sm:text-lg px-3 py-2 rounded-full bg-muted text-foreground">
-              {ticket.id}
+            <Badge
+              variant="secondary"
+              className="inline-flex items-center gap-1.5 font-mono text-base sm:text-lg px-3 py-1.5 rounded-full bg-destructive/10 text-destructive border border-destructive/60 shadow-inner"
+            >
+              <Tag className="w-4 h-4" />
+              #{ticket.id}
             </Badge>
             <span className="leading-tight text-base sm:text-lg">
               {ticket.observacao.slice(0, 80) || "Ticket SAF"}
@@ -305,7 +309,12 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
                   <MessageSquare className="h-4 w-4" />
                   Atividade
                 </div>
-                <Badge variant="outline">{notes.length} registros</Badge>
+                <Badge
+                  variant="outline"
+                  className="px-3 py-1 rounded-full text-xs font-semibold bg-destructive/10 text-destructive border-destructive/40"
+                >
+                  {notes.length} registros
+                </Badge>
               </div>
               <Separator />
 
@@ -342,14 +351,19 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                   <Clock3 className="h-4 w-4" />
-                  Historico de alteracoes
+                  Histórico de alterações
                 </div>
-                <Badge variant="outline">{historyEntries.length} registros</Badge>
+                <Badge
+                  variant="outline"
+                  className="px-3 py-1 rounded-full text-xs font-semibold bg-destructive/10 text-destructive border-destructive/40"
+                >
+                  {historyEntries.length} registros
+                </Badge>
               </div>
               <Separator />
               <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
                 {historyEntries.length === 0 && (
-                  <p className="text-sm text-muted-foreground">Nenhuma alteracao registrada.</p>
+                  <p className="text-sm text-muted-foreground">Nenhuma alteração registrada.</p>
                 )}
                 {historyEntries.map((h) => (
                   <div key={h.id} className="rounded-md border border-border/60 bg-background p-2">

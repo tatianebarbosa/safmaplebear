@@ -40,6 +40,7 @@ import { ptBR } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { showCanvaSyncReminder } from '@/lib/canvaReminder';
 import { dialogLayouts } from './dialogLayouts';
+import { normalizeTicketId } from '@/lib/stringUtils';
 
 interface SchoolDetailsDialogProps {
   open: boolean;
@@ -230,7 +231,7 @@ export const SchoolDetailsDialog = ({
             {school.name}
           </DialogTitle>
           <DialogDescription>
-            Detalhes completos da escola e Historico de alteracoes
+            Detalhes completos da escola e Histórico de alterações
           </DialogDescription>
         </DialogHeader>
         
@@ -252,7 +253,7 @@ export const SchoolDetailsDialog = ({
               value="history"
               className="w-full h-12 text-base font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm"
             >
-              Historico
+              Histórico
             </TabsTrigger>
           </TabsList>
 
@@ -269,20 +270,17 @@ export const SchoolDetailsDialog = ({
                       Dados gerais
                     </p>
                     <div className="space-y-2">
-                      {school.status && (
-                        <Badge variant="outline" size="md" className="px-3 py-1 text-sm rounded-full">
-                          {school.status}
-                        </Badge>
-                      )}
                       {showCluster && (
-                        <Badge variant="muted" size="md" className="px-3 py-1 text-sm rounded-full">
-                          {clusterLabel}
-                        </Badge>
+                        <div className="flex items-center gap-2 text-sm text-foreground">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">Cluster:</span>
+                          <span className="font-semibold">{clusterLabel}</span>
+                        </div>
                       )}
                       <div className="flex items-center gap-2 text-sm">
                         <User className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">Responsavel do cluster:</span>
-                        <span className="text-foreground">{resolvedSafManager || 'Nao informado'}</span>
+                        <span className="text-foreground whitespace-nowrap">{resolvedSafManager || 'Nao informado'}</span>
                       </div>
                     </div>
                   </div>
@@ -322,7 +320,8 @@ export const SchoolDetailsDialog = ({
                       type="button"
                       variant={licenseStatus === 'Excedido' ? 'destructive' : 'secondary'}
                       size="sm"
-                      className="gap-2 mt-auto self-end ml-auto"
+                      className="gap-2 mt-auto self-center min-w-[360px] px-8 py-3 justify-center !text-white [&_*]:!text-white"
+                      style={{ color: 'white' }}
                       onClick={() => {
                         const emails = school.users.map((u) => u.email).filter(Boolean);
                         const body = [
@@ -339,13 +338,15 @@ export const SchoolDetailsDialog = ({
                         });
                       }}
                     >
-                      <AlertTriangle className="h-4 w-4" />
-                      Copiar aviso de licencas
+                      <AlertTriangle className="h-4 w-4 text-white" />
+                      <span className="text-white">Copiar aviso de licencas</span>
                     </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+           
           </TabsContent>
 
           <TabsContent value="users" className="space-y-4 min-h-[55vh] sm:min-h-[60vh]">
@@ -485,9 +486,9 @@ export const SchoolDetailsDialog = ({
 	            {/* History */}
 	            <Card>
 	              <CardHeader>
-	                <CardTitle className="text-lg">Historico de alteracoes</CardTitle>
+	                <CardTitle className="text-lg">Histórico de alterações</CardTitle>
 	                <DialogDescription>
-	                  Registro de todas as alteracoes realizadas nesta escola
+	                  Registro de todas as alterações realizadas nesta escola
 	                </DialogDescription>
 	              </CardHeader>
 	              <CardContent>
@@ -496,7 +497,7 @@ export const SchoolDetailsDialog = ({
 	                    <div className="text-center py-8">
 	                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
 	                      <p className="text-muted-foreground">
-	                        Nenhuma alteracao registrada para esta escola.
+	                        Nenhuma alteração registrada para esta escola.
 	                      </p>
 	                    </div>
 	                  ) : (
@@ -709,15 +710,14 @@ export const SchoolDetailsDialog = ({
           <div className="text-sm text-muted-foreground">
             Por: <span className="font-medium text-foreground">{actorName}</span>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="editTicket">Ticket *</Label>
-            <Input
-              id="editTicket"
-              placeholder="Numero do ticket ou titulo do e-mail"
-              value={editTicket}
-              onChange={(e) => setEditTicket(e.target.value)}
-              className={!editTicket.trim() ? "border-destructive" : ""}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="editTicket">Ticket *</Label>
+              <Input
+                id="editTicket"
+                value={editTicket}
+                onChange={(e) => setEditTicket(normalizeTicketId(e.target.value))}
+                className={!editTicket.trim() ? "border-destructive" : ""}
+              />
           </div>
           <div className="space-y-2">
             <Label htmlFor="editObs">Observacao</Label>
@@ -765,7 +765,7 @@ export const SchoolDetailsDialog = ({
 
     {/* Dialog de remocao com ticket/observacao */}
     <Dialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
-      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
+      <DialogContent className={`${dialogLayouts.sm} flex flex-col user-dialog-compact`}>
         <DialogHeader>
           <DialogTitle>Remover usuario</DialogTitle>
           <DialogDescription>
@@ -777,16 +777,15 @@ export const SchoolDetailsDialog = ({
             <div className="font-medium">{removeTarget?.name}</div>
             <div className="text-muted-foreground text-xs">{removeTarget?.email}</div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="removeTicket">Ticket *</Label>
-            <Input
-              id="removeTicket"
-              placeholder="Numero do ticket ou titulo do e-mail"
-              value={removeTicket}
-              onChange={(e) => setRemoveTicket(e.target.value)}
-              className={!removeTicket ? "border-destructive" : ""}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="removeTicket">Ticket *</Label>
+              <Input
+                id="removeTicket"
+                value={removeTicket}
+                onChange={(e) => setRemoveTicket(normalizeTicketId(e.target.value))}
+                className={!removeTicket ? "border-destructive" : ""}
+              />
+            </div>
           <div className="space-y-2">
             <Label htmlFor="removeObs">Observacao</Label>
             <Textarea
