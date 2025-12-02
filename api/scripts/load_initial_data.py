@@ -136,7 +136,7 @@ def load_users():
         return
 
     # Lê o arquivo “na mão” porque ele vem todo entre aspas
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, "r", encoding="latin-1") as f:
         lines = [line.strip() for line in f.readlines() if line.strip()]
 
     if len(lines) <= 1:

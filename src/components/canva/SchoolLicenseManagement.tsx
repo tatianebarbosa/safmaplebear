@@ -18,6 +18,8 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { SchoolLicenseCard } from "./SchoolLicenseCard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
@@ -175,6 +177,12 @@ export const SchoolLicenseManagement = ({
   const clampPage = (value: number) =>
     Math.min(totalPages, Math.max(1, Number.isFinite(value) ? value : 1));
 
+  const goToPage = (value: number) => {
+    const next = clampPage(value);
+    setPage(next);
+    setPageInput(next.toString());
+  };
+
   const handlePageInputChange = (value: string) => {
     const onlyDigits = value.replace(/[^0-9]/g, "");
     setPageInput(onlyDigits);
@@ -182,7 +190,7 @@ export const SchoolLicenseManagement = ({
 
   const handlePageSubmit = () => {
     const targetPage = clampPage(Number(pageInput) || 1);
-    setPage(targetPage);
+    goToPage(targetPage);
   };
 
   const {
@@ -532,11 +540,52 @@ export const SchoolLicenseManagement = ({
               <span className="ml-2 sm:hidden">Voltar</span>
             </Button>
 
-            <div className="flex flex-1 flex-col items-center gap-2 text-center min-w-[240px] sm:min-w-[320px]">
+            <div className="flex flex-1 flex-col items-center gap-2 text-center sm:min-w-[200px]">
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <span className="text-lg">{currentPage}</span>
-                <span className="text-xs font-medium text-muted-foreground">de</span>
-                <span className="text-lg">{totalPages}</span>
+                <div className="flex items-center gap-1.5 rounded-full border-2 border-primary bg-white px-2 py-1 shadow-[0_6px_16px_-12px_rgba(0,0,0,0.35)]">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={totalPages}
+                    inputMode="numeric"
+                    value={pageInput}
+                    onChange={(e) => handlePageInputChange(e.target.value)}
+                    onBlur={handlePageSubmit}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handlePageSubmit();
+                      }
+                    }}
+                    className="w-12 h-8 border border-slate-200 text-center text-sm font-semibold px-0 py-0 rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 focus-visible:border-primary"
+                  />
+                  <div className="flex flex-col gap-0.5">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={currentPage === 1}
+                      onClick={() => goToPage(currentPage - 1)}
+                      className="h-4 w-7 p-0 text-muted-foreground hover:text-primary"
+                    >
+                      <ChevronUp className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={currentPage === totalPages}
+                      onClick={() => goToPage(currentPage + 1)}
+                      className="h-4 w-7 p-0 text-muted-foreground hover:text-primary"
+                    >
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 text-sm text-slate-700">
+                  <span className="text-muted-foreground text-base">/</span>
+                  <span className="text-base font-semibold">{totalPages}</span>
+                </div>
               </div>
               <div className="w-full max-w-md h-2 rounded-full bg-muted/70 overflow-hidden shadow-inner">
                 <div

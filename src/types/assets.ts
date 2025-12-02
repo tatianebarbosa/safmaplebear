@@ -1,7 +1,7 @@
 export type AssetTeam =
   | "SAF"
   | "Marketing"
-  | "Acadmico"
+  | "Academico"
   | "Implantao"
   | "RH"
   | "Eventos"
@@ -73,7 +73,7 @@ export interface AssetContactFilters {
 export const ASSET_TEAMS: AssetTeam[] = [
   "SAF",
   "Marketing",
-  "Acadmico",
+  "Academico",
   "Implantao",
   "RH",
   "Eventos",
