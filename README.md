@@ -1,4 +1,4 @@
-# SAF MapleBear – Painel de Licenças Canva
+# SAF MapleBear 
 
 Aplicação web em React/TypeScript para a governança das licenças Canva na rede MapleBear. O painel centraliza dados de uso, conformidade, tickets, base de conhecimento e operações de ativos, servindo como ponto único para time SAF e escolas.
 
