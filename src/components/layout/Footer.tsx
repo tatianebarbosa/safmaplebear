@@ -14,7 +14,6 @@ const navLinks = ENABLE_ONLY_CANVA
       { label: "Custos", href: "/dashboard/canva/custos" },
     ]
   : [
-      { label: "Inicio", href: "/dashboard" },
       { label: "Canva", href: "/dashboard/canva" },
       { label: "Vouchers", href: "/dashboard/vouchers" },
       { label: "Ativos", href: "/saf/ativos" },
@@ -32,9 +31,10 @@ export const Footer = ({ className, ...props }: FooterProps) => {
   return (
     <footer
       className={cn(
-        "relative mt-12 bg-[#c1121f] text-white shadow-[0_-24px_60px_-38px_rgba(0,0,0,0.65)]",
+        "relative mt-10 bg-[#c1121f] text-white shadow-[0_-24px_60px_-38px_rgba(0,0,0,0.65)]",
         className
       )}
+      style={{ backgroundColor: "#c1121f" }}
       {...props}
     >
       <div className="absolute inset-0 overflow-hidden">
@@ -43,9 +43,9 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         <div className="pointer-events-none absolute bottom-0 right-10 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.18),transparent_55%)]" />
       </div>
 
-      <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-8 px-6 py-12 sm:px-10 sm:py-14">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex flex-col items-center gap-3 sm:flex-row">
+      <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-4 px-6 py-8 sm:px-10 sm:py-10">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex flex-col items-center gap-2 sm:flex-row">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15 shadow-[0_16px_34px_-18px_rgba(0,0,0,0.7)]">
               <img
                 src={Logos.Outline}
@@ -54,7 +54,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               />
             </div>
             <div className="space-y-1">
-              <p className="text-2xl font-bold tracking-tight text-white sm:text-[26px]">
+              <p className="text-3xl font-semibold tracking-tight text-white sm:text-[32px]">
                 SAF Maple Bear
               </p>
             </div>
@@ -66,15 +66,16 @@ export const Footer = ({ className, ...props }: FooterProps) => {
             <a
               key={link.label}
               href={link.href}
-              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-white/80 transition-all duration-200 hover:-translate-y-[1px] hover:border-white/30 hover:bg-white/10 hover:text-white"
+              className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-white transition-all duration-200 hover:-translate-y-[1px] hover:border-white/30 hover:bg-white/10 hover:text-white"
+              style={{ color: "#ffffff" }}
             >
               {link.label}
             </a>
           ))}
         </div>
 
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {socialLinks.map(({ label, href, Icon }) => (
               <a
                 key={label}
@@ -88,8 +89,8 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               </a>
             ))}
           </div>
-          <p className="text-xs text-white/55">
-            Copyright 2025 Maple Bear SAF - Todos os direitos reservados.
+          <p className="text-xs text-white" style={{ color: "#ffffff" }}>
+            © 2025 Maple Bear SAF. Todos os direitos reservados.
           </p>
         </div>
       </div>

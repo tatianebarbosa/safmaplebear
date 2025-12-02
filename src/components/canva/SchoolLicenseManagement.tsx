@@ -42,6 +42,7 @@ export const SchoolLicenseManagement = ({
   const [licenseFilter, setLicenseFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
+  const [pageInput, setPageInput] = useState("1");
   const pageSize = 24;
   const licenseLimit = useLicenseLimit();
 
@@ -166,6 +167,23 @@ export const SchoolLicenseManagement = ({
     return filteredSchools.slice(start, end);
   }, [filteredSchools, currentPage, pageSize]);
   const paginationProgress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0;
+
+  useEffect(() => {
+    setPageInput(currentPage.toString());
+  }, [currentPage]);
+
+  const clampPage = (value: number) =>
+    Math.min(totalPages, Math.max(1, Number.isFinite(value) ? value : 1));
+
+  const handlePageInputChange = (value: string) => {
+    const onlyDigits = value.replace(/[^0-9]/g, "");
+    setPageInput(onlyDigits);
+  };
+
+  const handlePageSubmit = () => {
+    const targetPage = clampPage(Number(pageInput) || 1);
+    setPage(targetPage);
+  };
 
   const {
     totalSchools,

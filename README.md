@@ -1,73 +1,53 @@
-# Welcome to your Lovable project
+# SAF MapleBear – Painel de Licenças Canva
 
-## Project info
+Aplicação web em React/TypeScript para a governança das licenças Canva na rede MapleBear. O painel centraliza dados de uso, conformidade, tickets, base de conhecimento e operações de ativos, servindo como ponto único para time SAF e escolas.
 
-**URL**: https://lovable.dev/projects/4a648c3f-b9f0-4a79-a006-fa130dc516f9
+## Principais recursos
+- Painel Canva com visão de licenças, conformidade de domínios e uso por escola.
+- Dashboards de vouchers (incluindo campanha 2026) e insights analíticos.
+- Monitoramento operacional, tickets, base de conhecimento e perfis de usuários.
+- Gestão de ativos SAF, detalhes por escola e monitoria de agentes.
+- Modo focado no Canva via `VITE_ENABLE_ONLY_CANVA=true` para restringir rotas.
 
-## How can I edit this code?
+## Requisitos
+- Node.js 18+ e npm (ou pnpm).
+- Opcional: Azure Functions Core Tools para rodar o backend em `api/`.
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/4a648c3f-b9f0-4a79-a006-fa130dc516f9) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+## Configuração rápida
+1) Clone o repositório e instale dependências:
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+git clone <url-do-repo>
+cd safmaplebear
+npm install
+# ou pnpm install
 ```
+2) Copie `.env.example` para `.env` e ajuste valores principais:
+- `VITE_API_BASE_URL`: URL base da API (opcional em dev, usada no build).
+- `VITE_ADMIN_EMAIL`, `VITE_ADMIN_PASSWORD`, `VITE_ADMIN_NAME`, `VITE_ADMIN_ROLE`: login temporário do painel.
+- `VITE_MAX_LICENSES_PER_SCHOOL`: limite padrão por escola.
+- `VITE_ENABLE_ONLY_CANVA`: defina `true` para liberar apenas as rotas do painel Canva.
+3) Para usar o backend local, configure `api/local.settings.json` (Azure Functions) e as credenciais do Canva (`CANVA_EMAIL`, `CANVA_PASSWORD`, `CANVA_PERIODO`). Nunca versione credenciais reais.
 
-**Edit a file directly in GitHub**
+## Scripts úteis
+- `npm run dev`: sobe o Vite em modo desenvolvimento (http://localhost:5173).
+- `npm run build`: checa tipos (`tsc`) e gera build em `dist/`.
+- `npm run preview`: serve o build gerado para validação rápida.
+- `npm run css-build`: compila Tailwind para `src/assets/styles.css`.
+- `npm run type-check`: verificação de tipos sem emitir saída.
+- `npm run test`: suite de testes com Jest (jsdom).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Estrutura de pastas (resumo)
+- `src/`: componentes, páginas e fluxos principais (Canva, vouchers, insights, tickets, base de conhecimento, ativos, monitoria).
+- `api/`: Azure Functions usadas para integrações e serviços.
+- `public/`: assets estáticos servidos diretamente.
+- `scripts/`: utilitários de build/infra.
 
-**Use GitHub Codespaces**
+## Como contribuir
+1) Crie um branch ou fork.
+2) Ajuste o que for necessário e rode `npm run type-check` e `npm run test`.
+3) Faça commit e abra PR descrevendo impacto e passos de validação.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/4a648c3f-b9f0-4a79-a006-fa130dc516f9) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Build e deploy
+1) Execute `npm run build` para gerar `dist/`.
+2) Publique `dist/` em seu host estático preferido e, se necessário, deploy das Functions em `api/` (ex.: Azure Static Web Apps).
+3) Configure as variáveis de ambiente de produção conforme as de `.env.example` e `api/local.settings.json`.

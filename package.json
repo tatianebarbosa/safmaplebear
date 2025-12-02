@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "css-build": "tailwindcss -i ./src/index.css -o ./src/assets/styles.css --minify",
     "type-check": "tsc --noEmit",
+    "lint:spell": "cspell --config ./cspell.json \"src/**/*.{ts,tsx,js,jsx,md,mdx}\" \"api/**/*.{ts,js}\" \"scripts/**/*.{ts,js}\" \"tests/**/*.{ts,js,md}\"",
     "test": "jest"
   },
   "dependencies": {
@@ -74,6 +75,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@cspell/dict-pt-br": "^2.4.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/jest": "^30.0.0",
@@ -81,6 +83,7 @@
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.2.2",
     "autoprefixer": "^10.4.17",
+    "cspell": "^9.4.0",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8.4.33",

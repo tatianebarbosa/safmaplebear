@@ -1,376 +1,353 @@
-# Business logic service layer
-from collections import Counter
-import pandas as pd
-from typing import Dict, List, Optional, Tuple
-from .blob import blob_service
-from .model import (
-    OfficialSchool, OfficialUser, SchoolOverview, LicenseAction, AuditLogEntry,
-    LicenseBadgeHelper, EmailComplianceHelper, StatusLicencaHelper, APIResponse
-)
-from .unit_data_service import unit_data_service
+"""Business logic backed by Postgres (Neon) via SQLAlchemy."""
+from __future__ import annotations
 
+from collections import Counter
+from typing import Dict, List
+
+from sqlalchemy import func, select
+
+from .db import get_session
+from .db_models import AuditLog, School, User
+from .model import (
+    OfficialUser,
+    SchoolOverview,
+    LicenseAction,
+    LicenseBadgeHelper,
+    APIResponse,
+)
+
+# Limite padrão caso não haja valor salvo no banco
 DEFAULT_MAX_LICENSE_LIMIT = 2
 
+
 class DataProcessingService:
-    """Service for processing official data from Blob Storage"""
-    
-    def __init__(self):
-        self._schools_cache: List[OfficialSchool] = []
-        self._users_cache: List[OfficialUser] = []
-        self._school_limits_cache: Dict[str, int] = {}
-        self._user_overrides_cache: Dict[str, Dict] = {}
-        self._last_reload = None
-    
-    def load_official_data(self, force_reload: bool = False) -> Tuple[List[OfficialSchool], List[OfficialUser]]:
-        """Load official data from Excel/CSV files"""
-        try:
-            # Load school limits and user overrides
-            self._school_limits_cache = blob_service.read_json_file("config/school-limits.json")
-            self._user_overrides_cache = blob_service.read_json_file("data/overrides/users-overrides.json")
-            
-            # Load data from centralized unit_data_service
-            unit_data = unit_data_service.get_unit_data()
-            schools_data = unit_data.get("schools", [])
-            users_data = unit_data.get("users", [])
+    """Service layer que lê/escreve no Postgres."""
 
-            schools = [OfficialSchool(**s) for s in schools_data]
-            users = [OfficialUser(**u) for u in users_data]
-            
-            self._schools_cache = schools
-            self._users_cache = users
-            
-            return schools, users
-            
-        except Exception as e:
-            raise Exception(f"Erro ao carregar dados oficiais: {str(e)}")
-    
-    # Remove _process_schools_dataframe and _process_users_dataframe as data is now loaded directly
-    # from unit_data_service
-
+    # --- Consultas ---
     def get_schools_overview(self) -> List[SchoolOverview]:
-        """Get schools with computed license usage"""
-        if not self._schools_cache:
-            self.load_official_data()
-        
-        # Calculate license usage per school
-        usage_by_school = {}
-        for user in self._users_cache:
-            if user.has_canva and user.school_id:
-                usage_by_school[user.school_id] = usage_by_school.get(user.school_id, 0) + 1
-        
-        # Create overview objects
-        overviews = []
-        for school in self._schools_cache:
-            used_licenses = usage_by_school.get(school.id, 0)
-            
-            overview = SchoolOverview(
-                id=school.id,
-                name=school.name,
-                status=school.status,
-                cluster=school.cluster,
-                city=school.city,
-                state=school.state,
-                region=school.region,
-                carteira_saf=school.carteira_saf,
-                used=used_licenses,
-                limit=school.license_limit,
-                badge=LicenseBadgeHelper.generate_badge(used_licenses, school.license_limit),
-                contact={
-                    "phone": school.phone,
-                    "email": school.email,
-                    "address": f"{school.address}, {school.neighborhood}, {school.city}/{school.state}"
-                }
+        """Lista escolas com uso de licenças calculado a partir do banco."""
+        with get_session() as session:
+            usage_rows = (
+                session.execute(
+                    select(User.school_id, func.count())
+                    .where(User.has_canva.is_(True))
+                    .group_by(User.school_id)
+                ).all()
             )
-            
-            overviews.append(overview)
-        
+            usage_map = {sid: cnt for sid, cnt in usage_rows}
+            schools = session.execute(select(School)).scalars().all()
+
+        overviews: List[SchoolOverview] = []
+        for school in schools:
+            used = usage_map.get(school.id, 0)
+            limit = school.license_limit or DEFAULT_MAX_LICENSE_LIMIT
+            overviews.append(
+                SchoolOverview(
+                    id=school.id,
+                    name=school.name,
+                    status=school.status or "",
+                    cluster=school.cluster or "",
+                    city=school.city or "",
+                    state=school.state or "",
+                    region=school.region or "",
+                    carteira_saf=school.carteira_saf or "",
+                    used=used,
+                    limit=limit,
+                    badge=LicenseBadgeHelper.generate_badge(used, limit),
+                    contact={
+                        "phone": school.contact_phone or "",
+                        "email": school.contact_email or "",
+                        "address": f"{school.address or ''}, {school.neighborhood or ''}, {school.city or ''}/{school.state or ''}",
+                    },
+                )
+            )
         return overviews
-    
+
     def get_school_users(self, school_id: str) -> List[OfficialUser]:
-        """Get users for a specific school"""
-        if not self._users_cache:
-            self.load_official_data()
-        
-        return [user for user in self._users_cache if user.school_id == school_id]
-    
+        """Retorna usuários de uma escola."""
+        with get_session() as session:
+            school = session.get(School, school_id)
+            users = (
+                session.execute(
+                    select(User).where(User.school_id == school_id)
+                ).scalars().all()
+            )
+
+        school_name = school.name if school else ""
+        result: List[OfficialUser] = []
+        for user in users:
+            result.append(
+                OfficialUser(
+                    name=user.name or "",
+                    email=user.email,
+                    role="",  # role não está modelada na tabela atual
+                    school_name=school_name,
+                    school_id=school_id,
+                    status_licenca="Ativa" if user.has_canva else "Sem licença",
+                    has_canva=user.has_canva,
+                    is_compliant=user.is_compliant,
+                )
+            )
+        return result
+
+    # --- Ações de licença ---
     def assign_license(self, action: LicenseAction, actor: str) -> Dict[str, any]:
-        """Assign license to user"""
+        """Concede licença a um usuário."""
         try:
-            # Validate school exists
-            school = self._get_school_by_id(action.school_id)
-            if not school:
-                return APIResponse.error("Escola não encontrada")
-            
-            # Find user
-            user = self._get_user_by_email(action.user_email, action.school_id)
-            if not user:
-                return APIResponse.error("Usuário não encontrado na escola")
-            
-            if user.has_canva:
-                return APIResponse.error("Usuário já possui licença Canva")
-            
-            # Check if user email is compliant
-            if not user.is_compliant:
-                return APIResponse.error("Email do usuário não pertence a domínio autorizado")
-            
-            # Update user override
-            self._update_user_override(action.school_id, action.user_email, True)
-            
-            # Log audit
-            self._log_audit_action("assign", action, actor, {
-                "user_email": action.user_email,
-                "motivo": action.motivo,
-                "ticket": action.ticket
-            })
-            
+            with get_session() as session:
+                school = session.get(School, action.school_id)
+                if not school:
+                    return APIResponse.error("Escola não encontrada")
+
+                user = (
+                    session.execute(
+                        select(User).where(
+                            User.school_id == action.school_id,
+                            User.email == action.user_email,
+                        )
+                    )
+                    .scalars()
+                    .first()
+                )
+                if not user:
+                    return APIResponse.error("Usuário não encontrado na escola")
+                if user.has_canva:
+                    return APIResponse.error("Usuário já possui licença Canva")
+                if not user.is_compliant:
+                    return APIResponse.error("Email do usuário não pertence a domínio autorizado")
+
+                used = (
+                    session.execute(
+                        select(func.count())
+                        .select_from(User)
+                        .where(User.school_id == action.school_id, User.has_canva.is_(True))
+                    ).scalar_one()
+                )
+                limit = school.license_limit or DEFAULT_MAX_LICENSE_LIMIT
+                if used >= limit:
+                    return APIResponse.error("Limite de licenças atingido para a escola")
+
+                user.has_canva = True
+                session.add(
+                    self._build_audit(
+                        "assign",
+                        action,
+                        actor,
+                        {"user_email": action.user_email, "motivo": action.motivo, "ticket": action.ticket},
+                    )
+                )
+                session.commit()
+
             return APIResponse.success(message="Licença atribuída com sucesso")
-            
         except Exception as e:
             return APIResponse.error(f"Erro ao atribuir licença: {str(e)}")
-    
+
     def revoke_license(self, action: LicenseAction, actor: str) -> Dict[str, any]:
-        """Revoke license from user"""
+        """Revoga licença de um usuário."""
         try:
-            # Validate school exists
-            school = self._get_school_by_id(action.school_id)
-            if not school:
-                return APIResponse.error("Escola não encontrada")
-            
-            # Find user
-            user = self._get_user_by_email(action.user_email, action.school_id)
-            if not user:
-                return APIResponse.error("Usuário não encontrado na escola")
-            
-            if not user.has_canva:
-                return APIResponse.error("Usuário não possui licença Canva")
-            
-            # Update user override
-            self._update_user_override(action.school_id, action.user_email, False)
-            
-            # Log audit
-            self._log_audit_action("revoke", action, actor, {
-                "user_email": action.user_email,
-                "motivo": action.motivo,
-                "ticket": action.ticket
-            })
-            
+            with get_session() as session:
+                user = (
+                    session.execute(
+                        select(User).where(
+                            User.school_id == action.school_id,
+                            User.email == action.user_email,
+                        )
+                    )
+                    .scalars()
+                    .first()
+                )
+                if not user:
+                    return APIResponse.error("Usuário não encontrado na escola")
+                if not user.has_canva:
+                    return APIResponse.error("Usuário não possui licença Canva")
+
+                user.has_canva = False
+                session.add(
+                    self._build_audit(
+                        "revoke",
+                        action,
+                        actor,
+                        {"user_email": action.user_email, "motivo": action.motivo, "ticket": action.ticket},
+                    )
+                )
+                session.commit()
+
             return APIResponse.success(message="Licença revogada com sucesso")
-            
         except Exception as e:
             return APIResponse.error(f"Erro ao revogar licença: {str(e)}")
-    
+
     def transfer_license(self, action: LicenseAction, actor: str) -> Dict[str, any]:
-        """Transfer license between users in same school"""
+        """Transfere licença entre usuários da mesma escola."""
         try:
-            # Validate school exists
-            school = self._get_school_by_id(action.school_id)
-            if not school:
-                return APIResponse.error("Escola não encontrada")
-            
-            # Find both users
-            from_user = self._get_user_by_email(action.from_email, action.school_id)
-            to_user = self._get_user_by_email(action.to_email, action.school_id)
-            
-            if not from_user:
-                return APIResponse.error("Usuário de origem não encontrado na escola")
-            
-            if not to_user:
-                return APIResponse.error("Usuário de destino não encontrado na escola")
-            
-            if not from_user.has_canva:
-                return APIResponse.error("Usuário de origem não possui licença Canva")
-            
-            if to_user.has_canva:
-                return APIResponse.error("Usuário de destino já possui licença Canva")
-            
-            if not to_user.is_compliant:
-                return APIResponse.error("Email do usuário de destino não é de domínio autorizado")
-            
-            # Perform transfer (revoke + assign)
-            self._update_user_override(action.school_id, action.from_email, False)
-            self._update_user_override(action.school_id, action.to_email, True)
-            
-            # Log audit
-            self._log_audit_action("transfer", action, actor, {
-                "from_email": action.from_email,
-                "to_email": action.to_email,
-                "motivo": action.motivo,
-                "ticket": action.ticket
-            })
-            
+            with get_session() as session:
+                from_user = (
+                    session.execute(
+                        select(User).where(
+                            User.school_id == action.school_id,
+                            User.email == action.from_email,
+                        )
+                    )
+                    .scalars()
+                    .first()
+                )
+                to_user = (
+                    session.execute(
+                        select(User).where(
+                            User.school_id == action.school_id,
+                            User.email == action.to_email,
+                        )
+                    )
+                    .scalars()
+                    .first()
+                )
+
+                if not from_user:
+                    return APIResponse.error("Usuário de origem não encontrado na escola")
+                if not to_user:
+                    return APIResponse.error("Usuário de destino não encontrado na escola")
+                if not from_user.has_canva:
+                    return APIResponse.error("Usuário de origem não possui licença Canva")
+                if to_user.has_canva:
+                    return APIResponse.error("Usuário de destino já possui licença Canva")
+                if not to_user.is_compliant:
+                    return APIResponse.error("Email do usuário de destino não é de domínio autorizado")
+
+                from_user.has_canva = False
+                to_user.has_canva = True
+                session.add(
+                    self._build_audit(
+                        "transfer",
+                        action,
+                        actor,
+                        {
+                            "from_email": action.from_email,
+                            "to_email": action.to_email,
+                            "motivo": action.motivo,
+                            "ticket": action.ticket,
+                        },
+                    )
+                )
+                session.commit()
+
             return APIResponse.success(message="Licença transferida com sucesso")
-            
         except Exception as e:
             return APIResponse.error(f"Erro ao transferir licença: {str(e)}")
-    
+
     def change_school_limit(self, school_id: str, new_limit: int, motivo: str, actor: str) -> Dict[str, any]:
-        """Change license limit for a school"""
+        """Altera limite de licenças de uma escola."""
         try:
-            # Validate school exists
-            school = self._get_school_by_id(school_id)
-            if not school:
-                return APIResponse.error("Escola não encontrada")
-            
             if new_limit < 0:
                 return APIResponse.error("Limite deve ser maior ou igual a zero")
-            
-            # Update limit
-            self._school_limits_cache[school_id] = new_limit
-            blob_service.write_json_file("config/school-limits.json", self._school_limits_cache)
-            
-            # Update cached school
-            school.license_limit = new_limit
-            
-            # Log audit
-            action = LicenseAction(school_id=school_id, new_limit=new_limit, motivo=motivo)
-            self._log_audit_action("alter_limit", action, actor, {
-                "old_limit": school.license_limit,
-                "new_limit": new_limit,
-                "motivo": motivo
-            })
+
+            with get_session() as session:
+                school = session.get(School, school_id)
+                if not school:
+                    return APIResponse.error("Escola não encontrada")
+
+                old_limit = school.license_limit or DEFAULT_MAX_LICENSE_LIMIT
+                school.license_limit = new_limit
+                action = LicenseAction(school_id=school_id, new_limit=new_limit, motivo=motivo)
+                session.add(
+                    self._build_audit(
+                        "alter_limit",
+                        action,
+                        actor,
+                        {"old_limit": old_limit, "new_limit": new_limit, "motivo": motivo},
+                    )
+                )
+                session.commit()
 
             return APIResponse.success(message="Limite alterado com sucesso")
-            
         except Exception as e:
             return APIResponse.error(f"Erro ao alterar limite: {str(e)}")
 
     def set_global_license_limit(self, new_limit: int, motivo: str, actor: str) -> Dict[str, any]:
-        """Change license limit for all schools and persist in blob storage."""
+        """Altera o limite de todas as escolas."""
         try:
             if new_limit < 0:
                 return APIResponse.error("Limite deve ser maior ou igual a zero")
 
-            if not self._schools_cache:
-                self.load_official_data()
-
-            # Capture old limits before updating
-            old_limits = {school.id: school.license_limit for school in self._schools_cache}
-
-            for school in self._schools_cache:
-                school.license_limit = new_limit
-                self._school_limits_cache[school.id] = new_limit
-
-            blob_service.write_json_file("config/school-limits.json", self._school_limits_cache)
-
-            for school in self._schools_cache:
-                action = LicenseAction(school_id=school.id, new_limit=new_limit, motivo=motivo)
-                self._log_audit_action("alter_limit", action, actor, {
-                    "old_limit": old_limits.get(school.id, DEFAULT_MAX_LICENSE_LIMIT),
-                    "new_limit": new_limit,
-                    "motivo": motivo
-                })
+            with get_session() as session:
+                schools = session.execute(select(School)).scalars().all()
+                old_limits = {s.id: s.license_limit or DEFAULT_MAX_LICENSE_LIMIT for s in schools}
+                for school in schools:
+                    school.license_limit = new_limit
+                    action = LicenseAction(school_id=school.id, new_limit=new_limit, motivo=motivo)
+                    session.add(
+                        self._build_audit(
+                            "alter_limit",
+                            action,
+                            actor,
+                            {"old_limit": old_limits.get(school.id), "new_limit": new_limit, "motivo": motivo},
+                        )
+                    )
+                session.commit()
 
             return APIResponse.success(
-                data={"updated": len(self._schools_cache), "limit": new_limit},
-                message="Limite global alterado com sucesso"
+                data={"updated": len(old_limits), "limit": new_limit},
+                message="Limite global alterado com sucesso",
             )
         except Exception as e:
             return APIResponse.error(f"Erro ao alterar limite global: {str(e)}")
 
     def get_global_license_limit(self) -> int:
-        """Return the most common license limit value across schools."""
-        if not self._schools_cache:
-            self.load_official_data()
-
-        limits = [s.license_limit for s in self._schools_cache if s.license_limit is not None]
+        """Retorna o limite mais comum entre as escolas."""
+        with get_session() as session:
+            limits = (
+                session.execute(
+                    select(School.license_limit).where(School.license_limit.isnot(None))
+                ).scalars().all()
+            )
         if not limits:
             return DEFAULT_MAX_LICENSE_LIMIT
-
         most_common = Counter(limits).most_common(1)
         return int(most_common[0][0]) if most_common else DEFAULT_MAX_LICENSE_LIMIT
-    
+
     def reload_data(self, actor: str) -> Dict[str, any]:
-        """Force reload of all data from blob storage"""
+        """Compat: registra no log; dados já vêm do banco."""
         try:
-            self.load_official_data(force_reload=True)
-            
-            # Log audit
-            action = LicenseAction(school_id="system")
-            self._log_audit_action("reload_data", action, actor, {
-                "schools_count": len(self._schools_cache),
-                "users_count": len(self._users_cache)
-            })
-            
-            return APIResponse.success(message="Dados recarregados com sucesso")
-            
+            with get_session() as session:
+                action = LicenseAction(school_id="system")
+                session.add(self._build_audit("reload_data", action, actor, {}))
+                session.commit()
+            return APIResponse.success(message="Dados já são lidos do banco (nada a recarregar)")
         except Exception as e:
-            return APIResponse.error(f"Erro ao recarregar dados: {str(e)}")
-    
+            return APIResponse.error(f"Erro ao registrar reload: {str(e)}")
+
     def get_audit_logs(self, filters: Dict[str, str] = None) -> List[Dict]:
-        """Get audit logs with optional filters"""
-        try:
-            logs = blob_service.read_audit_logs(
-                start_date=filters.get("start") if filters else None,
-                end_date=filters.get("end") if filters else None
-            )
-            
-            # Apply additional filters
+        """Obtém logs de auditoria do Postgres."""
+        with get_session() as session:
+            stmt = select(AuditLog)
             if filters:
-                if "schoolId" in filters and filters["schoolId"]:
-                    logs = [log for log in logs if log.get("school_id") == filters["schoolId"]]
-                
-                if "action" in filters and filters["action"]:
-                    logs = [log for log in logs if log.get("action") == filters["action"]]
-                
-                if "actor" in filters and filters["actor"]:
-                    logs = [log for log in logs if filters["actor"].lower() in log.get("actor", "").lower()]
-            
-            return logs
-            
-        except Exception as e:
-            print(f"Erro ao obter logs de auditoria: {str(e)}")
-            return []
-    
-    # Private helper methods
-    
-    def _get_school_by_id(self, school_id: str) -> Optional[OfficialSchool]:
-        """Get school by ID"""
-        if not self._schools_cache:
-            self.load_official_data()
-        
-        return next((s for s in self._schools_cache if s.id == school_id), None)
-    
-    def _get_user_by_email(self, email: str, school_id: str) -> Optional[OfficialUser]:
-        """Get user by email and school"""
-        if not self._users_cache:
-            self.load_official_data()
-        
-        return next((u for u in self._users_cache if u.email == email and u.school_id == school_id), None)
-    
-    def _update_user_override(self, school_id: str, email: str, has_canva: bool):
-        """Update user license override"""
-        override_key = f"{school_id}:{email}"
-        self._user_overrides_cache[override_key] = {
-            "has_canva": has_canva,
-            "updated_at": pd.Timestamp.now().isoformat()
-        }
-        
-        # Save to blob
-        blob_service.write_json_file("data/overrides/users-overrides.json", self._user_overrides_cache)
-        
-        # Update cached user
-        user = self._get_user_by_email(email, school_id)
-        if user:
-            user.has_canva = has_canva
-    
-    def _log_audit_action(self, action: str, license_action: LicenseAction, actor: str, payload: Dict):
-        """Log audit action"""
-        school = self._get_school_by_id(license_action.school_id)
-        if not school:
-            school_name = "Unknown School"
-        else:
-            school_name = school.name
-            
-        entry = AuditLogEntry(
+                if filters.get("schoolId"):
+                    stmt = stmt.where(AuditLog.school_id == filters["schoolId"])
+                if filters.get("action"):
+                    stmt = stmt.where(AuditLog.action == filters["action"])
+                if filters.get("actor"):
+                    stmt = stmt.where(AuditLog.actor.ilike(f"%{filters['actor']}%"))
+            stmt = stmt.order_by(AuditLog.ts.desc())
+            logs = session.execute(stmt).scalars().all()
+
+        return [
+            {
+                "id": log.id,
+                "action": log.action,
+                "school_id": log.school_id,
+                "actor": log.actor,
+                "payload": log.payload or {},
+                "ts": log.ts.isoformat() if log.ts else None,
+            }
+            for log in logs
+        ]
+
+    # --- Helpers ---
+    def _build_audit(self, action: str, license_action: LicenseAction, actor: str, payload: Dict) -> AuditLog:
+        return AuditLog(
             action=action,
             school_id=license_action.school_id,
-            school_name=school_name,
             actor=actor,
             payload=payload,
-            ts=datetime.utcnow().isoformat()
         )
-        blob_service.append_audit_log(entry.to_dict())
+
 
 data_service = DataProcessingService()
-
-

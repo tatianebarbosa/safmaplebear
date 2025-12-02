@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import azure.functions as func
-from openai import OpenAI
+import httpx
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DATA_FILE = PROJECT_ROOT / "canva_data_integrated_latest.json"
@@ -16,8 +16,8 @@ SITE_CONTEXT_FILE = KNOWLEDGE_DIR / "site_context.json"
 DATA_FILE_ENV = "CANVA_DATA_FILE"
 MODEL_ENV = "CHAT_IA_MODEL"
 TEMPERATURE_ENV = "CHAT_IA_TEMPERATURE"
-
-client = OpenAI()
+OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
+OPENAI_BASE_URL_ENV = "OPENAI_BASE_URL"
 
 
 def _json_response(payload: Dict[str, Any], status_code: int) -> func.HttpResponse:
@@ -177,6 +177,10 @@ def build_system_prompt(
 def call_openai(system_prompt: str, user_question: str, user_documents: Optional[str] = None) -> str:
   """Envia a pergunta do usuario para o modelo configurado."""
   model = os.environ.get(MODEL_ENV, "gpt-4.1")
+  api_key = os.environ.get(OPENAI_API_KEY_ENV)
+
+  if not api_key:
+    raise RuntimeError("OPENAI_API_KEY nao configurada.")
 
   try:
     temperature = float(os.environ.get(TEMPERATURE_ENV, "0.2"))
@@ -193,14 +197,28 @@ def call_openai(system_prompt: str, user_question: str, user_documents: Optional
 
   messages.append({"role": "user", "content": user_question})
 
-  response = client.chat.completions.create(
-    model=model,
-    messages=messages,
-    temperature=temperature,
-  )
+  base_url = os.environ.get(OPENAI_BASE_URL_ENV, "https://api.openai.com/v1")
+  payload = {
+    "model": model,
+    "messages": messages,
+    "temperature": temperature,
+  }
+
+  # Usa httpx direto para evitar issues de compatibilidade do SDK dentro do worker
+  with httpx.Client(base_url=base_url, timeout=30.0) as client:
+    resp = client.post(
+      "/chat/completions",
+      headers={
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+      },
+      json=payload,
+    )
+    resp.raise_for_status()
+    response = resp.json()
 
   logging.info("Resposta da IA gerada com sucesso.")
-  return response.choices[0].message.content
+  return response["choices"][0]["message"]["content"]
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:

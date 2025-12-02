@@ -73,6 +73,9 @@ class Config:
         
         return True
 
+# Convenience export for code that expects a module-level DATABASE_URL (e.g., Alembic)
+DATABASE_URL = Config.DATABASE_URL
+
 # Environment-specific configurations
 class DevelopmentConfig(Config):
     DEBUG = True

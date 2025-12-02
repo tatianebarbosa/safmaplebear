@@ -12,7 +12,7 @@ export type AssetTeam =
   | "Outros";
 
 export type AssetChannel =
-  | "Ligao telefnica"
+  | "Ligação telefônica"
   | "E-mail"
   | "Mensagem no ticket"
   | "Mensagem no WhatsApp"
@@ -85,7 +85,7 @@ export const ASSET_TEAMS: AssetTeam[] = [
 ];
 
 export const ASSET_CHANNELS: AssetChannel[] = [
-  "Ligao telefnica",
+  "Ligação telefônica",
   "E-mail",
   "Mensagem no ticket",
   "Mensagem no WhatsApp",

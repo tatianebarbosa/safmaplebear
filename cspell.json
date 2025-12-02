@@ -1,0 +1,26 @@
+{
+  "version": "0.2",
+  "language": "pt-BR,pt,en",
+  "useGitignore": true,
+  "dictionaryDefinitions": [
+    {
+      "name": "pt-BR",
+      "path": "@cspell/dict-pt-br/cspell-ext.json"
+    }
+  ],
+  "dictionaries": ["pt-BR", "softwareTerms", "en_US"],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "public",
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "yarn.lock",
+    ".git",
+    "*.log"
+  ],
+  "words": ["MapleBear", "Canva", "WhatsApp", "SAF", "safmaplebear"],
+  "flagWords": ["ligao", "ligacao", "telefnica", "telefnicas"]
+}
