@@ -7,6 +7,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -43,6 +51,9 @@ import {
   Search,
   Download,
   ArrowUpDown,
+  CalendarRange,
+  Check,
+  ChevronRight,
 } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { UsageFilters, CanvaUsageData, UsagePeriod } from "@/types/schoolLicense";
@@ -135,6 +146,7 @@ export const CanvaUsageDashboard = ({
   const [modelOverrides, setModelOverrides] = useState<
     Array<{ period: UsagePeriod; filename: string | null; uploadedAt: string | null; rows: number; label?: string | null }>
   >([]);
+  const [periodDialogOpen, setPeriodDialogOpen] = useState(false);
 
   const metricLabels: Record<MetricKey, string> = {
     designsCreated: "Designs criados",
@@ -200,6 +212,12 @@ export const CanvaUsageDashboard = ({
     window.addEventListener("canva-upload-refresh", handler);
     return () => window.removeEventListener("canva-upload-refresh", handler);
   }, [loadDashboardData]);
+
+  const activePeriod = filters.period;
+  const handlePeriodChange = (value: UsageFilters["period"]) => {
+    setFilters((prev) => ({ ...prev, period: value }));
+    setPeriodDialogOpen(false);
+  };
 
   useEffect(() => {
     const handleVisibility = () => {
@@ -596,23 +614,74 @@ export const CanvaUsageDashboard = ({
             </div>
             <div className="flex items-center gap-3">
               <Badge variant="secondary">Atualizacao mensal</Badge>
-              <Select
-                value={filters.period}
-                onValueChange={(value: UsageFilters["period"]) =>
-                  setFilters((prev) => ({ ...prev, period: value }))
-                }
-              >
-                <SelectTrigger className="h-10 w-44 rounded-full border-border/60 bg-background text-sm font-medium">
-                  <SelectValue placeholder="Periodo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7d">Ultimos 7 dias</SelectItem>
-                  <SelectItem value="30d">Ultimos 30 dias</SelectItem>
-                  <SelectItem value="3m">Ultimos 3 meses</SelectItem>
-                  <SelectItem value="6m">Ultimos 6 meses</SelectItem>
-                  <SelectItem value="12m">Ultimos 12 meses</SelectItem>
-                </SelectContent>
-              </Select>
+              <Dialog open={periodDialogOpen} onOpenChange={setPeriodDialogOpen}>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground text-left">Periodo</p>
+                  <DialogTrigger asChild>
+                    <Button className="flex h-auto w-full min-w-[220px] items-center gap-3 rounded-2xl border border-border/60 bg-white px-3 py-2 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <CalendarRange className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Periodo ativo
+                        </p>
+                        <p className="text-sm font-semibold leading-tight text-foreground">
+                          {periodLabel(filters.period)}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">Aplicado em cards e graficos</p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </DialogTrigger>
+                </div>
+
+                <DialogContent className="max-w-md overflow-hidden p-0">
+                  <div className="border-b border-border/70 bg-white px-4 py-3">
+                    <DialogHeader className="space-y-1">
+                      <DialogTitle className="text-lg font-semibold">Periodo da busca</DialogTitle>
+                      <DialogDescription className="text-xs text-muted-foreground">
+                        Escolha um recorte rapido igual ao seletor do Canva.
+                      </DialogDescription>
+                    </DialogHeader>
+                  </div>
+                  <div className="space-y-2 p-2">
+                    {[
+                      { key: "12m", label: "12 meses", description: "Ultimos 12 meses" },
+                      { key: "6m", label: "6 meses", description: "Ultimos 6 meses" },
+                      { key: "3m", label: "3 meses", description: "Ultimos 3 meses" },
+                      { key: "30d", label: "Ultimos 30 dias", description: "Periodo padrao" },
+                      { key: "7d", label: "Ultimos 7 dias", description: "Semana atual" },
+                    ].map((option) => (
+                      <Button
+                        key={option.key}
+                        variant="ghost"
+                        className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition ${
+                          activePeriod === option.key ? "bg-white shadow-sm ring-1 ring-primary/20" : "hover:bg-white"
+                        }`}
+                        onClick={() => handlePeriodChange(option.key as UsageFilters["period"])}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`flex h-6 w-6 items-center justify-center rounded-full border ${
+                              activePeriod === option.key
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border text-muted-foreground"
+                            }`}
+                          >
+                            {activePeriod === option.key && <Check className="h-3 w-3" />}
+                          </span>
+                          <div className="flex flex-col text-sm">
+                            <span className="font-medium">{option.label}</span>
+                            <span className="text-xs text-muted-foreground">{option.description}</span>
+                          </div>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground/70" />
+                      </Button>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 

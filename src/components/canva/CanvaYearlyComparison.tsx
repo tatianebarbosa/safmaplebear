@@ -25,7 +25,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   ResponsiveContainer,
@@ -41,7 +52,8 @@ import {
   LabelList,
 } from "recharts";
 import { Calendar } from "@/components/ui/calendar";
-import { PenSquare, UploadCloud, Share2, TrendingUp } from "lucide-react";
+import type { DateRange } from "react-day-picker";
+import { CalendarRange, Check, ChevronRight, PenSquare, UploadCloud, Share2, TrendingUp, Trash2 } from "lucide-react";
 import {
   loadYearlyDataset,
   computeYearlyAnalytics,
@@ -49,10 +61,12 @@ import {
   listClusters,
   listSchools,
   CanvaYearlyRecord,
+  ImportHistoryEntry,
   YearlyFilters,
   extractCsvHeaders,
   suggestMapping,
   importYearlyCsv,
+  deleteImportEntry,
 } from "@/lib/canvaYearlyRepository";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import { readFileAsUtf8 } from "@/lib/fileUtils";
@@ -116,6 +130,9 @@ const CanvaYearlyComparison = () => {
   const schools = useSchoolLicenseStore((state) => state.schools);
   const [importOpen, setImportOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState<ImportHistoryEntry | null>(null);
+  const [deleteReason, setDeleteReason] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [importDataType, setImportDataType] = useState<CanvaYearlyRecord["dataType"]>("models");
@@ -123,7 +140,8 @@ const CanvaYearlyComparison = () => {
   const [customEndDateFilter, setCustomEndDateFilter] = useState<string>("");
   const [importStartDate, setImportStartDate] = useState<string>("");
   const [importEndDate, setImportEndDate] = useState<string>("");
-  const [lastDaysPreset, setLastDaysPreset] = useState<7 | 30 | null>(null);
+  const [lastDaysPreset, setLastDaysPreset] = useState<7 | 14 | 30 | null>(null);
+  const [periodDialogOpen, setPeriodDialogOpen] = useState(false);
 
   // Recarrega dados se outro upload atualizar o armazenamento local
   useEffect(() => {
@@ -198,6 +216,11 @@ const CanvaYearlyComparison = () => {
     });
   }, [dataset.records]);
 
+  const activeHistory = useMemo(
+    () => dataset.history.filter((h) => !h.deletedAt),
+    [dataset.history]
+  );
+
   const formatDisplayDate = (value: string) => {
     if (!value) return "";
     const date = new Date(value);
@@ -213,6 +236,19 @@ const CanvaYearlyComparison = () => {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
+
+  const parseInputDate = (value: string) => {
+    if (!value) return undefined;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+  };
+
+  const customRange = useMemo<DateRange | undefined>(() => {
+    const fromDate = parseInputDate(customStartDateFilter);
+    const toDate = parseInputDate(customEndDateFilter);
+    if (!fromDate && !toDate) return undefined;
+    return { from: fromDate, to: toDate };
+  }, [customStartDateFilter, customEndDateFilter]);
 
   const enrichedRecords: CanvaYearlyRecord[] = useMemo(() => {
     if (!schools?.length) return dataset.records;
@@ -655,21 +691,21 @@ const CanvaYearlyComparison = () => {
   }, [filters, view, customStartDateFilter, customEndDateFilter]);
 
   const applyCustomDatePeriod = (start: string, end: string) => {
-    if (!filters) return;
-    if (!start || !end) return;
+    if (!filters) return false;
+    if (!start || !end) return false;
     const startDate = new Date(start);
     const endDate = new Date(end);
-    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return;
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return false;
     if (startDate > endDate) {
       toast.error("Data inicial maior que a final.");
-      return;
+      return false;
     }
     if (
       startDate.getFullYear() !== filters.baseYear ||
       endDate.getFullYear() !== filters.baseYear
     ) {
       toast.error(`Use datas dentro do ano base ${filters.baseYear}.`);
-      return;
+      return false;
     }
     const startMonth = startDate.getMonth() + 1;
     const endMonth = endDate.getMonth() + 1;
@@ -686,11 +722,12 @@ const CanvaYearlyComparison = () => {
           }
         : prev
     );
+    return true;
   };
 
-const setPeriodPreset = (type: "year" | "h1" | "h2") => {
-  setFilters((prev) => (prev ? { ...prev, period: { type } } : prev));
-  setLastDaysPreset(null);
+  const setPeriodPreset = (type: "year" | "h1" | "h2") => {
+    setFilters((prev) => (prev ? { ...prev, period: { type } } : prev));
+    setLastDaysPreset(null);
 
     const baseYear = filters?.baseYear;
     if (!baseYear) return;
@@ -710,7 +747,7 @@ const setPeriodPreset = (type: "year" | "h1" | "h2") => {
     }
   };
 
-  const setPeriodLastDays = (days: number) => {
+  const setPeriodLastDays = (days: 7 | 14 | 30) => {
     if (!filters) return;
     const baseYear = filters.baseYear;
     const today = new Date();
@@ -729,7 +766,42 @@ const setPeriodPreset = (type: "year" | "h1" | "h2") => {
     setCustomStartDateFilter(startStr);
     setCustomEndDateFilter(endStr);
     applyCustomDatePeriod(startStr, endStr);
-    setLastDaysPreset(days as 7 | 30);
+    setLastDaysPreset(days);
+  };
+
+  const handleCustomRangeSelect = (range?: DateRange) => {
+    const start = range?.from ? toInputDate(range.from) : "";
+    const end = range?.to ? toInputDate(range.to) : "";
+    setLastDaysPreset(null);
+    setCustomStartDateFilter(start);
+    setCustomEndDateFilter(end);
+    if (start && end) {
+      applyCustomDatePeriod(start, end);
+    }
+  };
+
+  const handleResetPeriod = () => {
+    if (!filters) return;
+    setPeriodPreset("year");
+  };
+
+  const handlePresetClick = (preset: "year" | "h1" | "h2") => {
+    setPeriodPreset(preset);
+    setPeriodDialogOpen(false);
+  };
+
+  const handleLastDaysClick = (days: 7 | 14 | 30) => {
+    setPeriodLastDays(days);
+    setPeriodDialogOpen(false);
+  };
+
+  const applyAndCloseCustomRange = () => {
+    if (!customStartDateFilter || !customEndDateFilter) {
+      toast.error("Informe data inicial e final.");
+      return;
+    }
+    const success = applyCustomDatePeriod(customStartDateFilter, customEndDateFilter);
+    if (success) setPeriodDialogOpen(false);
   };
 
   const setImportPresetDays = (days: number) => {
@@ -821,7 +893,41 @@ const setPeriodPreset = (type: "year" | "h1" | "h2") => {
     }
   };
 
+  const openDeleteDialog = (entry: ImportHistoryEntry) => {
+    setEntryToDelete(entry);
+    setDeleteReason("");
+  };
+
+  const closeDeleteDialog = () => {
+    setEntryToDelete(null);
+    setDeleteReason("");
+  };
+
+  const confirmDeleteHistoryEntry = () => {
+    if (!entryToDelete) return;
+    setDeleting(true);
+    try {
+      const reason = deleteReason.trim() || "Exclusao manual pelo usuario";
+      const { removed } = deleteImportEntry(entryToDelete.id, reason);
+      setDataset(loadYearlyDataset());
+      toast.success(
+        removed > 0
+          ? `Upload removido e ${removed} linha(s) de metricas excluidas.`
+          : "Upload removido do historico."
+      );
+      closeDeleteDialog();
+    } catch (error) {
+      console.error(error);
+      toast.error("Falha ao excluir o upload.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (!filters) return null;
+
+  const baseYearStart = new Date(`${filters.baseYear}-01-01T00:00:00`);
+  const baseYearEnd = new Date(`${filters.baseYear}-12-31T00:00:00`);
 
   const currentPeriodRange = periodRangeFromFilter(filters.period);
   const periodLabelText =
@@ -834,6 +940,20 @@ const setPeriodPreset = (type: "year" | "h1" | "h2") => {
       : customStartDateFilter && customEndDateFilter
       ? `${formatDisplayDate(customStartDateFilter)} a ${formatDisplayDate(customEndDateFilter)}`
       : `Meses ${currentPeriodRange.startMonth} a ${currentPeriodRange.endMonth}`;
+  const activePeriodKey =
+    lastDaysPreset === 30
+      ? "30d"
+      : lastDaysPreset === 14
+      ? "14d"
+      : lastDaysPreset === 7
+      ? "7d"
+      : filters.period.type === "year"
+      ? "year"
+      : filters.period.type === "h1"
+      ? "h1"
+      : filters.period.type === "h2"
+      ? "h2"
+      : "custom";
 
   return (
     <div className="space-y-3 pb-16 md:pb-20">
@@ -954,92 +1074,194 @@ const setPeriodPreset = (type: "year" | "h1" | "h2") => {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Periodo</p>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  size="sm"
-                  variant={filters.period.type === "year" ? "default" : "outline"}
-                  onClick={() => setPeriodPreset("year")}
-                >
-                  Ano completo
-                </Button>
-                <Button
-                  size="sm"
-                  variant={filters.period.type === "h1" ? "default" : "outline"}
-                  onClick={() => setPeriodPreset("h1")}
-                >
-                  1o semestre
-                </Button>
-                <Button
-                  size="sm"
-                  variant={filters.period.type === "h2" ? "default" : "outline"}
-                  onClick={() => setPeriodPreset("h2")}
-                >
-                  2o semestre
-                </Button>
-                <Button
-                  size="sm"
-                  variant={
-                    filters.period.type === "custom" && lastDaysPreset === null
-                      ? "default"
-                      : "outline"
-                  }
-                  onClick={() => {
-                    setLastDaysPreset(null);
-                    applyCustomDatePeriod(
-                      customStartDateFilter || `${filters.baseYear}-01-01`,
-                      customEndDateFilter || `${filters.baseYear}-12-31`
-                    );
-                  }}
-                >
-                  Datas personalizadas
-                </Button>
-                <Button
-                  size="sm"
-                  variant={lastDaysPreset === 7 ? "default" : "outline"}
-                  onClick={() => setPeriodLastDays(7)}
-                >
-                  Ultimos 7 dias
-                </Button>
-                <Button
-                  size="sm"
-                  variant={lastDaysPreset === 30 ? "default" : "outline"}
-                  onClick={() => setPeriodLastDays(30)}
-                >
-                  Ultimos 30 dias
-                </Button>
-              </div>
-            </div>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <Dialog open={periodDialogOpen} onOpenChange={setPeriodDialogOpen}>
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">Periodo</p>
+                <DialogTrigger asChild>
+                  <Button className="flex h-auto w-full min-w-[240px] items-center gap-3 rounded-2xl border border-border/70 bg-white px-3 py-2 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md md:w-auto">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <CalendarRange className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Filtro ativo
+                      </p>
+                      <p className="text-sm font-semibold leading-tight text-foreground">
+                        {periodLabelText}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Ano base {filters.baseYear}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </DialogTrigger>
 
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Data inicial / final</p>
-              <div className="flex gap-2">
-                <Input
-                  type="date"
-                  value={customStartDateFilter}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setCustomStartDateFilter(value);
-                    setLastDaysPreset(null);
-                    applyCustomDatePeriod(value, customEndDateFilter);
-                  }}
-                  className="h-8 text-xs w-[120px]"
-                />
-                <Input
-                  type="date"
-                  value={customEndDateFilter}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setCustomEndDateFilter(value);
-                    setLastDaysPreset(null);
-                    applyCustomDatePeriod(customStartDateFilter, value);
-                  }}
-                  className="h-8 text-xs w-[120px]"
-                />
+                <DialogContent className="max-w-4xl gap-0 overflow-hidden p-0">
+                  <div className="flex items-center justify-between border-b border-border/70 px-4 py-3">
+                    <div>
+                      <DialogTitle className="text-lg font-semibold">
+                        Selecionar um intervalo de datas
+                      </DialogTitle>
+                      <DialogDescription className="text-xs text-muted-foreground">
+                        Ajuste o periodo para sincronizar os cards e graficos do painel.
+                      </DialogDescription>
+                    </div>
+                    <Badge variant="outline" className="rounded-full">
+                      Ano base {filters.baseYear}
+                    </Badge>
+                  </div>
+
+                  <div className="grid md:grid-cols-[240px_1fr]">
+                    <div className="border-b border-border/60 bg-muted/40 md:border-b-0 md:border-r">
+                      <p className="px-4 pt-3 text-[11px] font-semibold uppercase text-muted-foreground">
+                        Periodos rapidos
+                      </p>
+                      <div className="space-y-1 p-2">
+                        {[
+                          {
+                            key: "year",
+                            label: "Ano completo",
+                            description: "Jan a Dez",
+                            action: () => handlePresetClick("year"),
+                          },
+                          {
+                            key: "h1",
+                            label: "1o semestre",
+                            description: "Jan a Jun",
+                            action: () => handlePresetClick("h1"),
+                          },
+                          {
+                            key: "h2",
+                            label: "2o semestre",
+                            description: "Jul a Dez",
+                            action: () => handlePresetClick("h2"),
+                          },
+                          {
+                            key: "30d",
+                            label: "Ultimos 30 dias",
+                            description: "Janela rolante",
+                            action: () => handleLastDaysClick(30),
+                          },
+                          {
+                            key: "14d",
+                            label: "Ultimos 14 dias",
+                            description: "2 semanas",
+                            action: () => handleLastDaysClick(14),
+                          },
+                          {
+                            key: "7d",
+                            label: "Ultimos 7 dias",
+                            description: "7 dias corridos",
+                            action: () => handleLastDaysClick(7),
+                          },
+                          {
+                            key: "custom",
+                            label: "Datas personalizadas",
+                            description:
+                              customStartDateFilter && customEndDateFilter
+                                ? `${formatDisplayDate(customStartDateFilter)} a ${formatDisplayDate(customEndDateFilter)}`
+                                : "Escolha no calendario",
+                            action: () => {
+                              const start = customStartDateFilter || `${filters.baseYear}-01-01`;
+                              const end = customEndDateFilter || `${filters.baseYear}-12-31`;
+                              setLastDaysPreset(null);
+                              setCustomStartDateFilter(start);
+                              setCustomEndDateFilter(end);
+                              applyCustomDatePeriod(start, end);
+                            },
+                          },
+                        ].map((option) => (
+                          <Button
+                            key={option.key}
+                            variant="ghost"
+                            className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition ${
+                              activePeriodKey === option.key
+                                ? "bg-white shadow-sm ring-1 ring-primary/20"
+                                : "hover:bg-white"
+                            }`}
+                            onClick={option.action}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span
+                                className={`flex h-6 w-6 items-center justify-center rounded-full border ${
+                                  activePeriodKey === option.key
+                                    ? "border-primary bg-primary/10 text-primary"
+                                    : "border-border text-muted-foreground"
+                                }`}
+                              >
+                                {activePeriodKey === option.key && <Check className="h-3 w-3" />}
+                              </span>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{option.label}</span>
+                                <span className="text-xs text-muted-foreground">{option.description}</span>
+                              </div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground/70" />
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 p-4">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Iniciar</Label>
+                          <Input
+                            type="date"
+                            value={customStartDateFilter}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setCustomStartDateFilter(value);
+                              setLastDaysPreset(null);
+                            }}
+                            className="h-10"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Finalizar</Label>
+                          <Input
+                            type="date"
+                            value={customEndDateFilter}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setCustomEndDateFilter(value);
+                              setLastDaysPreset(null);
+                            }}
+                            className="h-10"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-border/70 bg-background p-3 shadow-inner">
+                        <Calendar
+                          mode="range"
+                          numberOfMonths={2}
+                          selected={customRange}
+                          onSelect={handleCustomRangeSelect}
+                          fromDate={baseYearStart}
+                          toDate={baseYearEnd}
+                          defaultMonth={parseInputDate(customStartDateFilter) ?? baseYearStart}
+                        />
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <Button variant="ghost" size="sm" onClick={handleResetPeriod}>
+                          Limpar
+                        </Button>
+                        <div className="flex gap-2">
+                          <Button variant="outline" onClick={() => setPeriodDialogOpen(false)}>
+                            Cancelar
+                          </Button>
+                          <Button onClick={applyAndCloseCustomRange}>Aplicar</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
               </div>
-            </div>
+            </Dialog>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -2002,30 +2224,52 @@ const setPeriodPreset = (type: "year" | "h1" | "h2") => {
             <DialogDescription>Uploads recentes.</DialogDescription>
           </DialogHeader>
           <div className="max-h-[360px] overflow-y-auto space-y-2">
-            {dataset.history.length === 0 ? (
+            {activeHistory.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">
                 Nenhum upload registrado.
               </p>
             ) : (
-              dataset.history
-                .filter((h) => !h.deletedAt)
-                .map((entry) => (
+              activeHistory.map((entry) => {
+                const dataTypeLabel =
+                  entry.dataType === "models"
+                    ? "templates"
+                    : entry.dataType === "creators"
+                    ? "membros"
+                    : "geral";
+                return (
                   <div
                     key={entry.id}
-                    className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
+                    className="flex items-start justify-between gap-3 rounded-lg border px-3 py-2 text-sm"
                   >
                     <div className="space-y-1">
-                      <div className="font-medium">{entry.filename}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="font-medium">{entry.filename}</div>
+                        <Badge variant="secondary" className="capitalize">
+                          {dataTypeLabel}
+                        </Badge>
+                      </div>
                       <div className="text-xs text-muted-foreground">
-                        {entry.periodLabel} â€¢ {entry.year} â€¢ {entry.dataType}
+                        {entry.periodLabel} - {entry.year}
                       </div>
                     </div>
-                    <div className="text-right text-xs text-muted-foreground">
-                      <div>{new Date(entry.uploadedAt).toLocaleDateString("pt-BR")}</div>
-                      <div>{entry.rows} linhas</div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                      <div className="text-right text-xs text-muted-foreground">
+                        <div>{new Date(entry.uploadedAt).toLocaleDateString("pt-BR")}</div>
+                        <div>{entry.rows} linhas</div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:text-destructive flex items-center gap-2"
+                        onClick={() => openDeleteDialog(entry)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Excluir
+                      </Button>
                     </div>
                   </div>
-                ))
+                );
+              })
             )}
           </div>
           <DialogFooter>
@@ -2035,6 +2279,39 @@ const setPeriodPreset = (type: "year" | "h1" | "h2") => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={Boolean(entryToDelete)}
+        onOpenChange={(open) => {
+          if (!open) closeDeleteDialog();
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir upload e metricas?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Essa acao remove as metricas importadas para {entryToDelete?.year} ({entryToDelete?.periodLabel}) e
+              marca o upload como removido no historico.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label>Motivo (opcional)</Label>
+            <Input
+              placeholder="Ex.: arquivo incorreto ou intervalo duplicado"
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting} onClick={closeDeleteDialog}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction disabled={deleting} onClick={confirmDeleteHistoryEntry}>
+              {deleting ? "Excluindo..." : "Excluir upload e metricas"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

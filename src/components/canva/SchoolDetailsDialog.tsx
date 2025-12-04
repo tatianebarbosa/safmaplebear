@@ -48,13 +48,17 @@ interface SchoolDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   school: School | null;
   initialUserId?: string | null;
+  initialTab?: 'overview' | 'users' | 'history';
+  requestedTab?: 'overview' | 'users' | 'history' | null;
 }
 
 export const SchoolDetailsDialog = ({ 
   open, 
   onOpenChange, 
   school,
-  initialUserId = null
+  initialUserId = null,
+  initialTab = 'overview',
+  requestedTab = null,
 }: SchoolDetailsDialogProps) => {
   const currentUser = useAuthStore((s) => s.currentUser);
   const actorName =
@@ -91,7 +95,7 @@ export const SchoolDetailsDialog = ({
   const [removeTicket, setRemoveTicket] = useState('');
   const [removeObservation, setRemoveObservation] = useState('');
   const [userSearchTerm, setUserSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'history'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'history'>(initialTab);
 
   useEffect(() => {
     if (!open || !school) return;
@@ -106,8 +110,13 @@ export const SchoolDetailsDialog = ({
     }
 
     setUserSearchTerm('');
-    setActiveTab('overview');
-  }, [initialUserId, open, school]);
+    setActiveTab(initialTab);
+  }, [initialUserId, open, school, initialTab]);
+
+  useEffect(() => {
+    if (!open || !requestedTab) return;
+    setActiveTab(requestedTab);
+  }, [requestedTab, open]);
 
   const handleOpenRevertDialog = (entry: HistoryEntry) => {
     setRevertTarget(entry);

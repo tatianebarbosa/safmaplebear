@@ -23,6 +23,8 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
   const [focusedUserId, setFocusedUserId] = useState<string | null>(null);
+  const [initialTab, setInitialTab] = useState<'overview' | 'users' | 'history'>('overview');
+  const [requestedTab, setRequestedTab] = useState<'overview' | 'users' | 'history' | null>(null);
   const { getLicenseStatus, addUser } = useSchoolLicenseStore();
   const currentUser = useAuthStore((s) => s.currentUser);
 
@@ -52,12 +54,16 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
     return 'bg-success';
   };
 
-  const handleManageSchool = (userId?: string) => {
-    onViewDetails(school);
-    onManage(school);
-    setFocusedUserId(userId || null);
+  const handleManageSchool = (userId?: string, tab: 'overview' | 'users' | 'history' = 'overview') => {
+    setFocusedUserId(userId ?? null);
+    setInitialTab(tab);
+    setRequestedTab(tab);
     setShowDetailsDialog(true);
+    onViewDetails?.(school);
+    onManage?.(school);
   };
+
+  const handleOpenUsersTab = (userId?: string) => handleManageSchool(userId, 'users');
 
   const handleAddNewUser = (payload: any) => {
     if (!school || !('user' in payload)) return;
@@ -159,8 +165,9 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
             {school.users.slice(0, 3).map((user) => (
               <button
                 key={user.id}
+                type="button"
                 className="w-full text-left"
-                onClick={() => handleManageSchool(user.id)}
+                onClick={() => handleOpenUsersTab(user.id)}
               >
                 <div className="flex items-center justify-between gap-3 py-1.5 px-2.5 rounded-[14px] hover:bg-white/80 transition border border-transparent hover:border-border/50">
                   <div className="flex-1 min-w-0">
@@ -188,8 +195,9 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
             ))}
             {school.users.length > 3 && (
               <button
+                type="button"
                 className="w-full text-center text-xs text-primary hover:underline py-1"
-                onClick={() => handleManageSchool()}
+                onClick={() => handleOpenUsersTab()}
               >
                 +{school.users.length - 3} usuarios adicionais
               </button>
@@ -226,13 +234,20 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
 
       {/* Dialog */}
       <SchoolDetailsDialog
+        key={`${school.id}-${initialTab}-${focusedUserId ?? 'none'}`}
         open={showDetailsDialog}
         onOpenChange={(isOpen) => {
           setShowDetailsDialog(isOpen);
-          if (!isOpen) setFocusedUserId(null);
+          if (!isOpen) {
+            setFocusedUserId(null);
+            setRequestedTab(null);
+            setInitialTab('overview');
+          }
         }}
         school={school}
         initialUserId={focusedUserId}
+        initialTab={initialTab}
+        requestedTab={requestedTab}
       />
       <UserDialog
         open={showAddUserDialog}

@@ -86,10 +86,33 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
 
     // Fallback: se o DnD não identificar claramente a coluna de destino, usamos a posição final do card
     if (!overStatus) {
-      const translated = active.rect?.current?.translated || active.rect?.current;
-      if (translated) {
-        const centerX = translated.left + translated.width / 2;
-        const centerY = translated.top + translated.height / 2;
+      type RectLike = {
+        left: number;
+        right: number;
+        top: number;
+        bottom: number;
+        width: number;
+        height: number;
+      };
+      const toRect = (rect: typeof active.rect.current): RectLike | null => {
+        if (!rect) return null;
+        const pick = (r: any) => ({
+          left: r.left,
+          right: r.right,
+          top: r.top,
+          bottom: r.bottom,
+          width: r.width,
+          height: r.height,
+        });
+        if ("left" in rect) return pick(rect);
+        const fallback = rect.translated ?? rect.initial ?? null;
+        return fallback ? pick(fallback) : null;
+      };
+
+      const translatedRect = toRect(active.rect?.current);
+      if (translatedRect) {
+        const centerX = translatedRect.left + translatedRect.width / 2;
+        const centerY = translatedRect.top + translatedRect.height / 2;
         (Object.entries(columnRefs.current) as [TicketStatus, HTMLElement | null][]).forEach(
           ([status, el]) => {
             if (el) {
