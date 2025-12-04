@@ -1,0 +1,2043 @@
+﻿import { useMemo, useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  Legend,
+  BarChart,
+  Bar,
+  LabelList,
+} from "recharts";
+import { Calendar } from "@/components/ui/calendar";
+import { PenSquare, UploadCloud, Share2, TrendingUp } from "lucide-react";
+import {
+  loadYearlyDataset,
+  computeYearlyAnalytics,
+  listYears,
+  listClusters,
+  listSchools,
+  CanvaYearlyRecord,
+  YearlyFilters,
+  extractCsvHeaders,
+  suggestMapping,
+  importYearlyCsv,
+} from "@/lib/canvaYearlyRepository";
+import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
+import { readFileAsUtf8 } from "@/lib/fileUtils";
+import { toast } from "sonner";
+
+const numberFormat = new Intl.NumberFormat("pt-BR");
+const percent = (value: number) =>
+  `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
+
+const chartColors = {
+  primary: "hsl(var(--primary))",
+  muted: "hsl(var(--muted-foreground))",
+  accent: "hsl(var(--secondary))",
+};
+const showLegacyCharts = false;
+const monthLabels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+const periodRangeFromFilter = (period: YearlyFilters["period"]) => {
+  if (period.type === "h1") return { startMonth: 1, endMonth: 6 };
+  if (period.type === "h2") return { startMonth: 7, endMonth: 12 };
+  if (period.type === "custom") return { startMonth: period.startMonth, endMonth: period.endMonth };
+  return { startMonth: 1, endMonth: 12 };
+};
+
+const isWithinRange = (month: number | null, range: { startMonth: number; endMonth: number }) => {
+  if (month === null) return range.startMonth === 1 && range.endMonth === 12;
+  return month >= range.startMonth && month <= range.endMonth;
+};
+
+const allowedTypesForView = (view: YearlyFilters["view"]) => {
+  if (view === "models") return new Set<CanvaYearlyRecord["dataType"]>(["models", "general"]);
+  if (view === "creators") return new Set<CanvaYearlyRecord["dataType"]>(["creators", "general"]);
+  return new Set<CanvaYearlyRecord["dataType"]>(["models", "creators", "general"]);
+};
+
+// Remove contas da comunicação central dos rankings de criadores
+const shouldHideCreatorFromRanking = (name?: string | null) => {
+  if (!name) return false;
+  const normalized = name.toString().toLowerCase();
+  return normalized.includes("maple bear") && normalized.includes("comunic");
+};
+
+const formatDeltaLabel = (delta: number | null, comparisonYear?: number | null) => {
+  if (delta === null || comparisonYear === null || comparisonYear === undefined) return "Sem comparacao";
+  if (!Number.isFinite(delta)) return "Sem base anterior";
+  return `${delta >= 0 ? "+" : ""}${delta.toFixed(1)}% vs ${comparisonYear}`;
+};
+
+const CanvaYearlyComparison = () => {
+  const [dataset, setDataset] = useState(loadYearlyDataset());
+  const [filters, setFilters] = useState<YearlyFilters | null>(null);
+  const [view, setView] = useState<YearlyFilters["view"]>("models");
+  const [creatorRankLimit, setCreatorRankLimit] = useState<number | "all">(3); // Top 3 por padrÃ£o
+  const [creatorCardLimit, setCreatorCardLimit] = useState<number | "all">(5);
+  const [creatorView, setCreatorView] = useState<"list" | "chart">("list");
+  const [creatorSort, setCreatorSort] = useState<"value" | "delta">("value");
+  const [creatorDeltaFilter, setCreatorDeltaFilter] = useState<"all" | "positive" | "negative">("all");
+  const [sharedLimit, setSharedLimit] = useState<number | "all">(5);
+  const [sharedSearch, setSharedSearch] = useState("");
+  const [sharedView, setSharedView] = useState<"list" | "chart">("list");
+  const schools = useSchoolLicenseStore((state) => state.schools);
+  const [importOpen, setImportOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [importDataType, setImportDataType] = useState<CanvaYearlyRecord["dataType"]>("models");
+  const [customStartDateFilter, setCustomStartDateFilter] = useState<string>("");
+  const [customEndDateFilter, setCustomEndDateFilter] = useState<string>("");
+  const [importStartDate, setImportStartDate] = useState<string>("");
+  const [importEndDate, setImportEndDate] = useState<string>("");
+  const [lastDaysPreset, setLastDaysPreset] = useState<7 | 30 | null>(null);
+
+  // Recarrega dados se outro upload atualizar o armazenamento local
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const refresh = () => {
+      const data = loadYearlyDataset();
+      setDataset(data);
+      const years = listYears(data.records);
+      setFilters((prev) => {
+        const baseYear = prev?.baseYear && years.includes(prev.baseYear) ? prev.baseYear : years[0];
+        const comparisonYear =
+          prev?.comparisonYear && years.includes(prev.comparisonYear)
+            ? prev.comparisonYear
+            : years[1] ?? null;
+        return prev
+          ? { ...prev, baseYear, comparisonYear }
+          : {
+              baseYear,
+              comparisonYear,
+              period: { type: "year" as const },
+              view: "models" as const,
+            };
+      });
+    };
+
+    window.addEventListener("canva-yearly-data-updated", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("canva-yearly-data-updated", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
+  useEffect(() => {
+    const data = loadYearlyDataset();
+    setDataset(data);
+
+    const years = listYears(data.records);
+    const baseYear = years[0];
+    const comparisonYear = years[1] ?? years[0] - 1;
+
+    setFilters({
+      baseYear,
+      comparisonYear,
+      period: { type: "year" },
+      view: "models",
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!filters) return;
+    const baseYear = filters.baseYear;
+    setImportStartDate(`${baseYear}-01-01`);
+    setImportEndDate(`${baseYear}-12-31`);
+    setCustomStartDateFilter(`${baseYear}-01-01`);
+    setCustomEndDateFilter(`${baseYear}-12-31`);
+    setLastDaysPreset(null);
+  }, [filters?.baseYear]);
+
+  // Garante que os filtros estejam sempre em anos existentes apos um novo upload
+  useEffect(() => {
+    const years = listYears(dataset.records);
+    if (!years.length) return;
+    setFilters((prev) => {
+      if (!prev) return prev;
+      const baseYear = years.includes(prev.baseYear) ? prev.baseYear : years[0];
+      const comparisonYear =
+        prev.comparisonYear && years.includes(prev.comparisonYear)
+          ? prev.comparisonYear
+          : years.find((y) => y !== baseYear) ?? null;
+      return { ...prev, baseYear, comparisonYear };
+    });
+  }, [dataset.records]);
+
+  const formatDisplayDate = (value: string) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  };
+
+  // Gera data no formato yyyy-MM-dd sem risco de mudar o dia pelo fuso (evita toISOString).
+  const toInputDate = (date?: Date) => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const enrichedRecords: CanvaYearlyRecord[] = useMemo(() => {
+    if (!schools?.length) return dataset.records;
+
+    const emailToSchool = new Map<
+      string,
+      { schoolName: string; schoolId: string; cluster?: string }
+    >();
+
+    schools.forEach((school) => {
+      school.users.forEach((user) => {
+        const email = (user.email || "").toLowerCase();
+        if (email && !emailToSchool.has(email)) {
+          emailToSchool.set(email, {
+            schoolName: school.name,
+            schoolId: school.id,
+            cluster: school.cluster,
+          });
+        }
+      });
+    });
+
+    return dataset.records.map((record) => {
+      if (record.schoolName && record.schoolId) return record;
+
+      const email = (record.creatorEmail || "").toLowerCase();
+      const match = emailToSchool.get(email);
+      if (!match) return record;
+
+      return {
+        ...record,
+        schoolName: record.schoolName ?? match.schoolName,
+        schoolId: record.schoolId ?? match.schoolId,
+        cluster: record.cluster ?? match.cluster,
+      };
+    });
+  }, [dataset.records, schools]);
+
+  const analytics = useMemo(
+    () =>
+      filters
+        ? computeYearlyAnalytics(enrichedRecords, { ...filters, view })
+        : null,
+    [enrichedRecords, filters, view]
+  );
+
+  const creatorAnalytics = useMemo(
+    () =>
+      filters
+        ? computeYearlyAnalytics(enrichedRecords, { ...filters, view: "creators" })
+        : null,
+    [enrichedRecords, filters]
+  );
+
+  const availableYears = useMemo(
+    () => listYears(enrichedRecords),
+    [enrichedRecords]
+  );
+  const clusterOptions = useMemo(
+    () => listClusters(enrichedRecords),
+    [enrichedRecords]
+  );
+  const schoolOptions = useMemo(
+    () => listSchools(enrichedRecords),
+    [enrichedRecords]
+  );
+
+  const hasComparison = !!filters?.comparisonYear;
+
+  const summaryCards = useMemo(() => {
+    if (!analytics) return [];
+    const cards = [
+      {
+        key: "created",
+        title: "Designs criados",
+        value: analytics.baseTotals.created,
+        prev: analytics.comparisonTotals.created,
+      },
+      {
+        key: "published",
+        title: "Publicados",
+        value: analytics.baseTotals.published,
+        prev: analytics.comparisonTotals.published,
+      },
+      {
+        key: "shared",
+        title: "Compartilhados",
+        value: analytics.baseTotals.shared,
+        prev: analytics.comparisonTotals.shared,
+      },
+      {
+        key: "engagement",
+        title: "Engajamento mÃ©dio",
+        value: analytics.baseTotals.engagement,
+        prev: analytics.comparisonTotals.engagement,
+        isRatio: true,
+      },
+    ] as const;
+    return cards;
+  }, [analytics]);
+
+
+  // Lista completa de criadores
+  const topCreatorsFull = useMemo(
+    () =>
+      creatorAnalytics
+        ? ((creatorAnalytics as any).topCreators ?? [])
+            .map((c: any) => ({
+              name: c.name ?? c.creatorName ?? c.email,
+              value: c.base ?? c.value,
+              delta: c.deltaPct,
+            }))
+            .filter((creator: any) => !shouldHideCreatorFromRanking(creator.name))
+        : [],
+    [creatorAnalytics]
+  );
+
+  // Lista cortada pelo limite escolhido (3, 5, 10, 15 ou todos)
+  const topCreatorsChart = useMemo(
+    () => {
+      const limit = creatorRankLimit === "all" ? topCreatorsFull.length : creatorRankLimit;
+      return topCreatorsFull.slice(0, limit);
+    },
+    [topCreatorsFull, creatorRankLimit]
+  );
+
+  const handleYearChange = (
+    key: "baseYear" | "comparisonYear",
+    value: string
+  ) =>
+    setFilters((prev) =>
+      prev ? { ...prev, [key]: Number(value) || null } : prev
+    );
+
+  const yAxisFormatter = (value: number) => numberFormat.format(value);
+
+  const filteredRecords = useMemo(() => {
+    if (!filters) return [];
+    const allowed = allowedTypesForView(view);
+    const range = periodRangeFromFilter(filters.period);
+    return enrichedRecords.filter((record) => {
+      if (record.year !== filters.baseYear) return false;
+      if (!allowed.has(record.dataType)) return false;
+      if (filters.cluster && (record.cluster ?? "Sem cluster") !== filters.cluster) return false;
+      if (filters.school && (record.schoolName ?? "Sem escola") !== filters.school) return false;
+      return isWithinRange(record.month, range);
+    });
+  }, [enrichedRecords, filters, view]);
+
+  const comparisonFilteredRecords = useMemo(() => {
+    if (!filters?.comparisonYear) return [];
+    const allowed = allowedTypesForView(view);
+    const range = periodRangeFromFilter(filters.period);
+    return enrichedRecords.filter((record) => {
+      if (record.year !== filters.comparisonYear) return false;
+      if (!allowed.has(record.dataType)) return false;
+      if (filters.cluster && (record.cluster ?? "Sem cluster") !== filters.cluster) return false;
+      if (filters.school && (record.schoolName ?? "Sem escola") !== filters.school) return false;
+      return isWithinRange(record.month, range);
+    });
+  }, [enrichedRecords, filters, view]);
+
+  const baseAllRecords = useMemo(() => {
+    if (!filters) return [];
+    const range = periodRangeFromFilter(filters.period);
+    return enrichedRecords.filter(
+      (record) =>
+        record.year === filters.baseYear &&
+        isWithinRange(record.month, range)
+    );
+  }, [enrichedRecords, filters]);
+
+  const historyByMonth = useMemo(() => {
+    const map = new Map<
+      number,
+      Map<number, { models: number; creators: number; general: number; total: number }>
+    >();
+
+    dataset.history
+      .filter((entry) => !entry.deletedAt)
+      .forEach((entry) => {
+        const yearMap = map.get(entry.year) ?? new Map();
+        const start = entry.startMonth ?? 1;
+        const end = entry.endMonth ?? start ?? 12;
+        for (let month = start; month <= end; month++) {
+          const current =
+            yearMap.get(month) ?? { models: 0, creators: 0, general: 0, total: 0 };
+          if (entry.dataType === "models") current.models += entry.rows;
+          else if (entry.dataType === "creators") current.creators += entry.rows;
+          else current.general += entry.rows;
+          current.total += entry.rows;
+          yearMap.set(month, current);
+        }
+        map.set(entry.year, yearMap);
+      });
+
+    return map;
+  }, [dataset.history]);
+
+  const designsPerMonthData = useMemo(() => {
+    if (!filters) return [];
+    const range = periodRangeFromFilter(filters.period);
+    const allowedHistory = allowedTypesForView(view);
+
+    const baseByMonth = new Map<number, number>();
+    filteredRecords.forEach((record) => {
+      if (!record.month) return;
+      baseByMonth.set(
+        record.month,
+        (baseByMonth.get(record.month) ?? 0) + (record.designsCreated ?? 0)
+      );
+    });
+
+    const comparisonByMonth = new Map<number, number>();
+    comparisonFilteredRecords.forEach((record) => {
+      if (!record.month) return;
+      comparisonByMonth.set(
+        record.month,
+        (comparisonByMonth.get(record.month) ?? 0) + (record.designsCreated ?? 0)
+      );
+    });
+
+    const selectHistoryValue = (
+      entry?: { models: number; creators: number; general: number; total: number }
+    ) => {
+      if (!entry) return 0;
+      let total = 0;
+      if (allowedHistory.has("models")) total += entry.models;
+      if (allowedHistory.has("creators")) total += entry.creators;
+      if (allowedHistory.has("general")) total += entry.general;
+      return total || entry.total;
+    };
+
+    return monthLabels
+      .map((label, idx) => {
+        const month = idx + 1;
+        if (!isWithinRange(month, range)) return null;
+
+        const baseFromRecords = baseByMonth.get(month) ?? 0;
+        const comparisonFromRecords = comparisonByMonth.get(month) ?? 0;
+        const baseHistory = historyByMonth.get(filters.baseYear)?.get(month);
+        const comparisonHistory = filters.comparisonYear
+          ? historyByMonth.get(filters.comparisonYear)?.get(month)
+          : undefined;
+
+        const base = baseFromRecords > 0 ? baseFromRecords : selectHistoryValue(baseHistory);
+        const comparison =
+          comparisonFromRecords > 0
+            ? comparisonFromRecords
+            : selectHistoryValue(comparisonHistory);
+
+        return { label, base, comparison };
+      })
+      .filter(Boolean) as Array<{ label: string; base: number; comparison: number }>;
+  }, [filteredRecords, comparisonFilteredRecords, filters, historyByMonth, view]);
+
+  const topSchoolsAll = useMemo(() => {
+    const map = new Map<string, { name: string; value: number }>();
+    baseAllRecords.forEach((record) => {
+      const key = record.schoolName || "Sem escola";
+      const current = map.get(key) ?? { name: key, value: 0 };
+      current.value += record.designsCreated ?? 0;
+      map.set(key, current);
+    });
+    return Array.from(map.values()).sort((a, b) => b.value - a.value).slice(0, 10);
+  }, [baseAllRecords]);
+
+  const topModelsAll = useMemo(() => {
+    const map = new Map<string, { name: string; value: number }>();
+    baseAllRecords
+      .filter((r) => r.dataType === "models")
+      .forEach((record) => {
+        const key = record.templateName || "Modelo sem nome";
+        const current = map.get(key) ?? { name: key, value: 0 };
+        current.value += record.designsCreated ?? 0;
+        map.set(key, current);
+      });
+    return Array.from(map.values()).sort((a, b) => b.value - a.value).slice(0, 10);
+  }, [baseAllRecords]);
+
+  const topSchoolsChart = useMemo(() => topSchoolsAll, [topSchoolsAll]);
+  const topModelsChart = useMemo(() => topModelsAll, [topModelsAll]);
+
+  const monthlyImportCounts = useMemo(() => {
+    if (!filters) return [];
+    const range = periodRangeFromFilter(filters.period);
+    const baseHistory = historyByMonth.get(filters.baseYear) ?? new Map();
+
+    return monthLabels
+      .map((label, idx) => {
+        const month = idx + 1;
+        if (!isWithinRange(month, range)) return null;
+        const entry = baseHistory.get(month) ?? { models: 0, creators: 0, general: 0, total: 0 };
+        return { label, ...entry };
+      })
+      .filter(Boolean) as Array<{
+      label: string;
+      models: number;
+      creators: number;
+      general: number;
+      total: number;
+    }>;
+  }, [filters, historyByMonth]);
+
+  const usageHighlights = useMemo(() => {
+    if (!analytics) return null;
+    const { created, published, shared } = analytics.baseTotals;
+    const shareRate = created ? (shared / created) * 100 : 0;
+    const publishRate = created ? (published / created) * 100 : 0;
+
+    return {
+      year: filters?.baseYear,
+      created,
+      published,
+      shared,
+      shareRate,
+      publishRate,
+    };
+  }, [analytics, filters?.baseYear]);
+
+  const topSharedTemplates = useMemo(() => {
+    if (!baseAllRecords.length) return [];
+    const allowed = new Set<CanvaYearlyRecord["dataType"]>(["models", "general"]);
+    const map = new Map<string, { name: string; shared: number }>();
+
+    baseAllRecords
+      .filter((record) => allowed.has(record.dataType))
+      .forEach((record) => {
+        const key = record.templateName || record.templateId || "Modelo sem nome";
+        const current = map.get(key) ?? { name: key, shared: 0 };
+        current.shared += record.designsShared ?? 0;
+        map.set(key, current);
+      });
+
+    const query = sharedSearch.trim().toLowerCase();
+    return Array.from(map.values())
+      .filter((item) => item.shared > 0)
+      .filter((item) => (query ? item.name.toLowerCase().includes(query) : true))
+      .sort((a, b) => b.shared - a.shared)
+      .slice(0, sharedLimit === "all" ? map.size : sharedLimit);
+  }, [baseAllRecords, sharedLimit, sharedSearch, view]);
+
+  const topCreatorsCards = useMemo(() => {
+    let items = [...topCreatorsFull];
+
+    if (creatorDeltaFilter === "positive") {
+      items = items.filter((c) => (c.delta ?? 0) > 0);
+    } else if (creatorDeltaFilter === "negative") {
+      items = items.filter((c) => (c.delta ?? 0) < 0);
+    }
+
+    items.sort((a, b) => {
+      const aKey = creatorSort === "value" ? a.value ?? 0 : a.delta ?? -Infinity;
+      const bKey = creatorSort === "value" ? b.value ?? 0 : b.delta ?? -Infinity;
+      return bKey - aKey;
+    });
+
+    const limit = creatorCardLimit === "all" ? items.length : creatorCardLimit;
+    return items.slice(0, limit);
+  }, [creatorCardLimit, creatorDeltaFilter, creatorSort, topCreatorsFull]);
+
+  const topCreatorsInsight = useMemo(() => {
+    const totalDesigns = topCreatorsCards.reduce((sum, creator) => sum + (creator.value ?? 0), 0);
+    const deltas = topCreatorsCards
+      .map((creator) => creator.delta)
+      .filter((delta): delta is number => typeof delta === "number" && Number.isFinite(delta));
+    const avgDelta = deltas.length
+      ? deltas.reduce((sum, delta) => sum + delta, 0) / deltas.length
+      : null;
+    const participation = creatorAnalytics?.baseTotals.created
+      ? (totalDesigns / creatorAnalytics.baseTotals.created) * 100
+      : 0;
+
+    return { totalDesigns, avgDelta, participation };
+  }, [creatorAnalytics?.baseTotals.created, topCreatorsCards]);
+
+  const usageComparison = useMemo(() => {
+    if (!analytics) return null;
+    const { baseTotals, comparisonTotals } = analytics;
+    const calcDelta = (base: number, prev: number | null) => {
+      if (!prev) return null;
+      if (prev === 0) return base > 0 ? Infinity : 0;
+      return ((base - prev) / prev) * 100;
+    };
+    return {
+      createdDelta: calcDelta(baseTotals.created, comparisonTotals.created),
+      publishedDelta: calcDelta(baseTotals.published, comparisonTotals.published),
+      sharedDelta: calcDelta(baseTotals.shared, comparisonTotals.shared),
+      comparisonYear: filters?.comparisonYear,
+    };
+  }, [analytics, filters?.comparisonYear]);
+
+  const sharedTotals = useMemo(() => {
+    const allowed = new Set<CanvaYearlyRecord["dataType"]>(["models", "general"]);
+    const filtered = baseAllRecords.filter((record) => allowed.has(record.dataType));
+    const totalShared = filtered.reduce((sum, record) => sum + (record.designsShared ?? 0), 0);
+    const topSharedTotal = topSharedTemplates.reduce((sum, template) => sum + template.shared, 0);
+    return { totalShared, topSharedTotal };
+  }, [baseAllRecords, topSharedTemplates]);
+
+  const sharedChartData = useMemo(() => {
+    const total = sharedTotals.totalShared || 1;
+    return topSharedTemplates.map((item) => ({
+      name: item.name,
+      shared: item.shared,
+      pct: (item.shared / total) * 100,
+    }));
+  }, [sharedTotals.totalShared, topSharedTemplates]);
+
+  const isCreatorAll = creatorCardLimit === "all";
+  const isSharedAll = sharedLimit === "all";
+  const creatorsChartHeight = Math.max(320, Math.min(900, (topCreatorsCards.length || 1) * 42));
+  const sharedChartHeight = Math.max(320, Math.min(900, (sharedChartData.length || 1) * 42));
+
+  const appliedFiltersSummary = useMemo(() => {
+    if (!filters) return null;
+    const range = periodRangeFromFilter(filters.period);
+    const customDatesLabel =
+      filters.period.type === "custom" && customStartDateFilter && customEndDateFilter
+        ? `${formatDisplayDate(customStartDateFilter)} a ${formatDisplayDate(customEndDateFilter)}`
+        : null;
+    return {
+      periodLabel:
+        filters.period.type === "year"
+          ? "Ano completo"
+          : filters.period.type === "custom"
+          ? customDatesLabel ?? `Meses ${range.startMonth} a ${range.endMonth}`
+          : filters.period.type.toUpperCase(),
+      monthsLabel: customDatesLabel ?? `${range.startMonth} a ${range.endMonth}`,
+      cluster: filters.cluster ?? "Todos",
+      school: filters.school ?? "Todas",
+      comparison: filters.comparisonYear ?? "Sem comparacao",
+      view:
+        view === "models"
+          ? "Modelos"
+          : view === "creators"
+          ? "Criadores"
+          : "Escolas",
+    };
+  }, [filters, view, customStartDateFilter, customEndDateFilter]);
+
+  const applyCustomDatePeriod = (start: string, end: string) => {
+    if (!filters) return;
+    if (!start || !end) return;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return;
+    if (startDate > endDate) {
+      toast.error("Data inicial maior que a final.");
+      return;
+    }
+    if (
+      startDate.getFullYear() !== filters.baseYear ||
+      endDate.getFullYear() !== filters.baseYear
+    ) {
+      toast.error(`Use datas dentro do ano base ${filters.baseYear}.`);
+      return;
+    }
+    const startMonth = startDate.getMonth() + 1;
+    const endMonth = endDate.getMonth() + 1;
+    setLastDaysPreset(null);
+    setFilters((prev) =>
+      prev
+        ? {
+            ...prev,
+            period: {
+              type: "custom",
+              startMonth,
+              endMonth,
+            },
+          }
+        : prev
+    );
+  };
+
+const setPeriodPreset = (type: "year" | "h1" | "h2") => {
+  setFilters((prev) => (prev ? { ...prev, period: { type } } : prev));
+  setLastDaysPreset(null);
+
+    const baseYear = filters?.baseYear;
+    if (!baseYear) return;
+    if (type === "year") {
+      setCustomStartDateFilter(`${baseYear}-01-01`);
+      setCustomEndDateFilter(`${baseYear}-12-31`);
+      return;
+    }
+    if (type === "h1") {
+      setCustomStartDateFilter(`${baseYear}-01-01`);
+      setCustomEndDateFilter(`${baseYear}-06-30`);
+      return;
+    }
+    if (type === "h2") {
+      setCustomStartDateFilter(`${baseYear}-07-01`);
+      setCustomEndDateFilter(`${baseYear}-12-31`);
+    }
+  };
+
+  const setPeriodLastDays = (days: number) => {
+    if (!filters) return;
+    const baseYear = filters.baseYear;
+    const today = new Date();
+    const end =
+      today.getFullYear() === baseYear
+        ? new Date(`${baseYear}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}T00:00:00`)
+        : new Date(`${baseYear}-12-31T00:00:00`);
+    end.setHours(0, 0, 0, 0);
+    const start = new Date(end);
+    start.setDate(start.getDate() - (days - 1));
+    if (start.getFullYear() !== baseYear) {
+      start.setFullYear(baseYear, 0, 1);
+    }
+    const startStr = toInputDate(start);
+    const endStr = toInputDate(end);
+    setCustomStartDateFilter(startStr);
+    setCustomEndDateFilter(endStr);
+    applyCustomDatePeriod(startStr, endStr);
+    setLastDaysPreset(days as 7 | 30);
+  };
+
+  const setImportPresetDays = (days: number) => {
+    if (!filters) return;
+    const baseYear = filters.baseYear;
+    const today = new Date();
+    const end = new Date(
+      today.getFullYear() === baseYear
+        ? today
+        : new Date(`${baseYear}-12-31T00:00:00`)
+    );
+    end.setHours(0, 0, 0, 0);
+    const start = new Date(end);
+    start.setDate(start.getDate() - (days - 1));
+    if (start.getFullYear() !== baseYear) {
+      start.setFullYear(baseYear, 0, 1);
+    }
+    setImportStartDate(toInputDate(start));
+    setImportEndDate(toInputDate(end));
+  };
+
+  const topCreatorNames = topCreatorsCards
+    .slice(0, 3)
+    .map((creator) => creator.name)
+    .filter(Boolean)
+    .join(", ");
+
+  const handleImport = async () => {
+    if (!filters) {
+      toast.error("Defina um ano base antes de importar.");
+      return;
+    }
+    if (!selectedFile) {
+      toast.error("Selecione um arquivo CSV.");
+      return;
+    }
+    const startDate = new Date(importStartDate);
+    const endDate = new Date(importEndDate);
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+      toast.error("Informe datas validas.");
+      return;
+    }
+    if (startDate > endDate) {
+      toast.error("Data inicial maior que a final.");
+      return;
+    }
+    if (
+      startDate.getFullYear() !== filters.baseYear ||
+      endDate.getFullYear() !== filters.baseYear
+    ) {
+      toast.error(`Use datas dentro do ano base ${filters.baseYear}.`);
+      return;
+    }
+    setUploading(true);
+    try {
+      const text = await readFileAsUtf8(selectedFile);
+      const headers = extractCsvHeaders(text);
+      if (!headers.length) {
+        toast.error("CSV vazio ou invalido.");
+        return;
+      }
+      const mapping = suggestMapping(headers, dataset.defaultMapping);
+      const startMonth = startDate.getMonth() + 1;
+      const endMonth = endDate.getMonth() + 1;
+      const periodRange = { startMonth, endMonth };
+      const periodLabel = `${importStartDate} a ${importEndDate}`;
+      await importYearlyCsv({
+        csvText: text,
+        fileName: selectedFile.name,
+        year: filters.baseYear,
+        dataType: importDataType,
+        periodLabel,
+        periodRange,
+        replaceExisting: true,
+        columnMapping: mapping,
+        saveMappingAsDefault: true,
+      });
+      setDataset(loadYearlyDataset());
+      toast.success("Importacao concluida.");
+      setImportOpen(false);
+      setSelectedFile(null);
+      setImportStartDate(`${filters.baseYear}-01-01`);
+      setImportEndDate(`${filters.baseYear}-12-31`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Falha ao importar CSV.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  if (!filters) return null;
+
+  const currentPeriodRange = periodRangeFromFilter(filters.period);
+  const periodLabelText =
+    filters.period.type === "year"
+      ? "Ano completo"
+      : filters.period.type === "h1"
+      ? "1o semestre (jan-jun)"
+      : filters.period.type === "h2"
+      ? "2o semestre (jul-dez)"
+      : customStartDateFilter && customEndDateFilter
+      ? `${formatDisplayDate(customStartDateFilter)} a ${formatDisplayDate(customEndDateFilter)}`
+      : `Meses ${currentPeriodRange.startMonth} a ${currentPeriodRange.endMonth}`;
+
+  return (
+    <div className="space-y-3 pb-16 md:pb-20">
+      {/* Filtros principais + aÃ§Ãµes */}
+      <Card className="border-border/50 shadow-sm">
+        <CardContent className="pt-3 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="text-lg font-semibold">Controles</div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className="inline-flex items-center rounded-full bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:brightness-95 transition"
+                onClick={() => {
+                  setImportDataType(view === "creators" ? "creators" : "models");
+                  setImportOpen(true);
+                }}
+              >
+                Importar CSV
+              </button>
+              <button
+                className="inline-flex items-center rounded-full border border-border px-3 py-2 text-sm font-semibold hover:bg-muted transition"
+                onClick={() => setHistoryOpen(true)}
+              >
+                Ver histÃ³rico
+              </button>
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-4">
+            {/* Ano base */}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Ano base</p>
+              <Select
+                value={filters.baseYear.toString()}
+                onValueChange={(v) => handleYearChange("baseYear", v)}
+              >
+                <SelectTrigger className="h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableYears.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Comparar com</p>
+              <Select
+                value={filters.comparisonYear?.toString() ?? "none"}
+                onValueChange={(v) =>
+                  handleYearChange("comparisonYear", v === "none" ? "0" : v)
+                }
+              >
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem comparacao</SelectItem>
+                  {availableYears.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Cluster */}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Cluster</p>
+              <Select
+                value={filters.cluster ?? "all"}
+                onValueChange={(v) =>
+                  setFilters((prev) =>
+                    prev ? { ...prev, cluster: v === "all" ? undefined : v } : prev
+                  )
+                }
+              >
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Todos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  {clusterOptions.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Escola */}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Escola</p>
+              <Select
+                value={filters.school ?? "all"}
+                onValueChange={(v) =>
+                  setFilters((prev) =>
+                    prev ? { ...prev, school: v === "all" ? undefined : v } : prev
+                  )
+                }
+              >
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Todas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {schoolOptions.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Periodo</p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant={filters.period.type === "year" ? "default" : "outline"}
+                  onClick={() => setPeriodPreset("year")}
+                >
+                  Ano completo
+                </Button>
+                <Button
+                  size="sm"
+                  variant={filters.period.type === "h1" ? "default" : "outline"}
+                  onClick={() => setPeriodPreset("h1")}
+                >
+                  1o semestre
+                </Button>
+                <Button
+                  size="sm"
+                  variant={filters.period.type === "h2" ? "default" : "outline"}
+                  onClick={() => setPeriodPreset("h2")}
+                >
+                  2o semestre
+                </Button>
+                <Button
+                  size="sm"
+                  variant={
+                    filters.period.type === "custom" && lastDaysPreset === null
+                      ? "default"
+                      : "outline"
+                  }
+                  onClick={() => {
+                    setLastDaysPreset(null);
+                    applyCustomDatePeriod(
+                      customStartDateFilter || `${filters.baseYear}-01-01`,
+                      customEndDateFilter || `${filters.baseYear}-12-31`
+                    );
+                  }}
+                >
+                  Datas personalizadas
+                </Button>
+                <Button
+                  size="sm"
+                  variant={lastDaysPreset === 7 ? "default" : "outline"}
+                  onClick={() => setPeriodLastDays(7)}
+                >
+                  Ultimos 7 dias
+                </Button>
+                <Button
+                  size="sm"
+                  variant={lastDaysPreset === 30 ? "default" : "outline"}
+                  onClick={() => setPeriodLastDays(30)}
+                >
+                  Ultimos 30 dias
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Data inicial / final</p>
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  value={customStartDateFilter}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setCustomStartDateFilter(value);
+                    setLastDaysPreset(null);
+                    applyCustomDatePeriod(value, customEndDateFilter);
+                  }}
+                  className="h-8 text-xs w-[120px]"
+                />
+                <Input
+                  type="date"
+                  value={customEndDateFilter}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setCustomEndDateFilter(value);
+                    setLastDaysPreset(null);
+                    applyCustomDatePeriod(customStartDateFilter, value);
+                  }}
+                  className="h-8 text-xs w-[120px]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Tabs value={view} onValueChange={(v) => setView(v as any)}>
+              <TabsList>
+                <TabsTrigger value="models">Modelos</TabsTrigger>
+                <TabsTrigger value="creators">Criadores</TabsTrigger>
+                <TabsTrigger value="schools">Escolas</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            <div className="text-xs text-muted-foreground">
+              Periodo: {periodLabelText}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Cards resumo */}
+      {analytics && (
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {summaryCards.map((card) => {
+            const delta =
+              card.prev && card.prev !== 0
+                ? ((card.value - card.prev) / card.prev) * 100
+                : null;
+            const positive = (delta ?? 0) >= 0;
+
+            return (
+              <Card
+                key={card.key}
+                className="border-border/60 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <CardContent className="p-4 space-y-2">
+                  <p className="text-xs text-muted-foreground">{card.title}</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-semibold">
+                      {card.isRatio
+                        ? `${card.value.toFixed(2)}x`
+                        : numberFormat.format(card.value)}
+                    </span>
+                    {delta !== null && (
+                      <Badge
+                        variant="outline"
+                        className={
+                          positive
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                            : "border-red-200 bg-red-50 text-red-700"
+                        }
+                      >
+                        {percent(delta)}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {filters.comparisonYear
+                      ? `vs ${filters.comparisonYear}`
+                      : "Sem comparacao"}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {usageHighlights && (
+        <div className="space-y-6 pb-8">
+          <div className="space-y-4 rounded-2xl border border-border/60 bg-card/70 p-4 shadow-sm glass-effect">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Share2 className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Uso do Canva</p>
+                  <p className="text-xs text-muted-foreground">Ano base {usageHighlights.year}</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Cards resumidos com dados de uso e destaques
+              </p>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="dashboard-card stat-card hover-lift rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+                <p className="metric-label text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Designs criados
+                </p>
+                <p className="metric-value text-3xl font-semibold text-foreground">
+                  {numberFormat.format(usageHighlights.created)}
+                </p>
+                <p className="text-xs text-muted-foreground">Soma dos relatorios mais recentes</p>
+              </div>
+
+              <div className="dashboard-card stat-card hover-lift rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+                <p className="metric-label text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Links compartilhados
+                </p>
+                <p className="metric-value text-3xl font-semibold text-foreground">
+                  {numberFormat.format(usageHighlights.shared)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {usageHighlights.shareRate.toFixed(1)}% em relacao aos criados
+                </p>
+              </div>
+
+              <div className="dashboard-card stat-card hover-lift rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+                <p className="metric-label text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Destaques de criadores
+                </p>
+                <p className="metric-value text-lg font-semibold text-foreground">
+                  {topCreatorsCards[0]?.name || "Sem criadores"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {topCreatorNames ? `Top 3: ${topCreatorNames}` : "Nenhum destaque no periodo"}
+                </p>
+              </div>
+
+              <div className="dashboard-card stat-card hover-lift rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+                <p className="metric-label text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Arte mais compartilhada
+                </p>
+                <p className="metric-value text-lg font-semibold text-foreground">
+                  {topSharedTemplates[0]?.name || "Sem artes registradas"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {numberFormat.format(topSharedTemplates[0]?.shared ?? 0)} compartilhamentos
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-2 space-y-3">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle>Top criadores</CardTitle>
+                  <CardDescription>Ranking rapido em cards</CardDescription>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-1 rounded-full border bg-muted/50 px-1 py-0.5">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={creatorView === "list" ? "default" : "ghost"}
+                      className="h-8 px-3 rounded-full"
+                      onClick={() => setCreatorView("list")}
+                    >
+                      Lista
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={creatorView === "chart" ? "default" : "ghost"}
+                      className="h-8 px-3 rounded-full"
+                      onClick={() => setCreatorView("chart")}
+                    >
+                      Grafico
+                    </Button>
+                  </div>
+                  <Select
+                    value={creatorCardLimit === "all" ? "all" : creatorCardLimit.toString()}
+                    onValueChange={(v) => setCreatorCardLimit(v === "all" ? "all" : Number(v))}
+                  >
+                    <SelectTrigger className="h-8 w-[110px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="3">Top 3</SelectItem>
+                      <SelectItem value="5">Top 5</SelectItem>
+                      <SelectItem value="10">Top 10</SelectItem>
+                      <SelectItem value="15">Top 15</SelectItem>
+                      <SelectItem value="all">Todos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={creatorSort}
+                    onValueChange={(v) => setCreatorSort(v as "value" | "delta")}
+                  >
+                    <SelectTrigger className="h-8 w-[140px]">
+                      <SelectValue placeholder="Ordenar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="value">Designs criados</SelectItem>
+                      <SelectItem value="delta">VariaÃ§Ã£o %</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={creatorDeltaFilter}
+                    onValueChange={(v) =>
+                      setCreatorDeltaFilter(v as "all" | "positive" | "negative")
+                    }
+                  >
+                    <SelectTrigger className="h-8 w-[150px]">
+                      <SelectValue placeholder="Filtro de variaÃ§Ã£o" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="positive">Somente alta</SelectItem>
+                      <SelectItem value="negative">Somente queda</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3 text-xs text-muted-foreground">
+                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                  <span>Designs do topo</span>
+                  <span className="text-base font-semibold text-foreground">
+                    {numberFormat.format(topCreatorsInsight.totalDesigns)}
+                  </span>
+                </div>
+                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                  <span>Participacao no total</span>
+                  <span className="text-base font-semibold text-foreground">
+                    {topCreatorsInsight.participation.toFixed(1)}%
+                  </span>
+                </div>
+                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                  <span>Variacao media</span>
+                  <span
+                    className={`text-base font-semibold ${
+                      typeof topCreatorsInsight.avgDelta === "number"
+                        ? topCreatorsInsight.avgDelta >= 0
+                          ? "text-emerald-600"
+                          : "text-red-600"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {typeof topCreatorsInsight.avgDelta === "number"
+                      ? percent(topCreatorsInsight.avgDelta)
+                      : "Sem comparacao"}
+                  </span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {topCreatorsCards.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Nenhum criador encontrado para o periodo filtrado.
+                </p>
+              ) : creatorView === "list" ? (
+                <div className={`space-y-3 ${isCreatorAll ? "max-h-[360px] overflow-y-auto pr-1" : ""}`}>
+                  {topCreatorsCards.map((creator, idx) => (
+                    <div
+                      key={`${creator.name}-${idx}`}
+                      className="flex items-center justify-between rounded-lg border px-3 py-2"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Badge variant="outline" className="h-7 w-7 justify-center rounded-full text-xs font-bold">
+                          #{idx + 1}
+                        </Badge>
+                        <div className="flex flex-col">
+                          <span className="font-medium leading-tight">
+                            {creator.name || "Criador sem nome"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {numberFormat.format(creator.value ?? 0)} designs
+                          </span>
+                        </div>
+                      </div>
+                      {typeof creator.delta === "number" && (
+                        <span
+                          className={`text-xs font-semibold ${
+                            creator.delta >= 0 ? "text-emerald-600" : "text-red-600"
+                          }`}
+                        >
+                          {percent(creator.delta)}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  className={`pt-2 w-full overflow-auto ${isCreatorAll ? "max-h-[420px]" : "h-[360px]"}`}
+                  style={{ minWidth: 0 }}
+                >
+                  <BarChart
+                    key={`creators-chart-${filters.baseYear}-${creatorCardLimit}-${creatorSort}-${creatorDeltaFilter}-${topCreatorsCards.length}`}
+                    width={900}
+                    height={creatorsChartHeight}
+                    data={topCreatorsCards}
+                    layout="vertical"
+                    margin={{ left: 140, right: 36, top: 12, bottom: 12 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal />
+                    <XAxis type="number" tickFormatter={yAxisFormatter} />
+                    <YAxis dataKey="name" type="category" width={260} tick={{ fontSize: 12 }} />
+                    <RechartsTooltip
+                      formatter={(v: number) => numberFormat.format(v)}
+                      labelFormatter={(label) => `Criador: ${label}`}
+                    />
+                    <Legend />
+                    <Bar
+                      dataKey="value"
+                      name="Designs criados"
+                      fill={chartColors.primary}
+                      radius={[8, 8, 8, 8]}
+                      barSize={18}
+                    >
+                      <LabelList
+                        dataKey="value"
+                        position="right"
+                        formatter={(v: number) => numberFormat.format(v)}
+                        className="text-xs"
+                      />
+                    </Bar>
+                  </BarChart>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-2 space-y-3">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle>Artes mais compartilhadas</CardTitle>
+                  <CardDescription>Ranking por compartilhamentos</CardDescription>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-1 rounded-full border bg-muted/50 px-1 py-0.5">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={sharedView === "list" ? "default" : "ghost"}
+                      className="h-8 px-3 rounded-full"
+                      onClick={() => setSharedView("list")}
+                    >
+                      Lista
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                    variant={sharedView === "chart" ? "default" : "ghost"}
+                    className="h-8 px-3 rounded-full"
+                    onClick={() => setSharedView("chart")}
+                  >
+                    Grafico
+                  </Button>
+                </div>
+                  <Select
+                    value={filters.baseYear.toString()}
+                    onValueChange={(v) => handleYearChange("baseYear", v)}
+                  >
+                    <SelectTrigger className="h-8 w-[120px]">
+                      <SelectValue placeholder="Ano" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableYears.map((y) => (
+                        <SelectItem key={y} value={y.toString()}>
+                          {y}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder="Buscar arte"
+                    value={sharedSearch}
+                    onChange={(e) => setSharedSearch(e.target.value)}
+                    className="h-9 w-[180px]"
+                  />
+                  <Select
+                    value={sharedLimit === "all" ? "all" : sharedLimit.toString()}
+                    onValueChange={(v) => setSharedLimit(v === "all" ? "all" : Number(v))}
+                  >
+                    <SelectTrigger className="h-8 w-[120px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="3">Top 3</SelectItem>
+                      <SelectItem value="5">Top 5</SelectItem>
+                      <SelectItem value="10">Top 10</SelectItem>
+                      <SelectItem value="15">Top 15</SelectItem>
+                      <SelectItem value="all">Todos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3 text-xs text-muted-foreground">
+                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                  <span>Compartilhamentos totais</span>
+                  <span className="text-base font-semibold text-foreground">
+                    {numberFormat.format(sharedTotals.totalShared)}
+                  </span>
+                </div>
+                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                  <span>Volume do ranking</span>
+                  <span className="text-base font-semibold text-foreground">
+                    {numberFormat.format(sharedTotals.topSharedTotal)}
+                  </span>
+                </div>
+                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                  <span>Participacao do ranking</span>
+                  <span className="text-base font-semibold text-foreground">
+                    {sharedTotals.totalShared
+                      ? ((sharedTotals.topSharedTotal / sharedTotals.totalShared) * 100).toFixed(1)
+                      : "0.0"}
+                    %
+                  </span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {sharedView !== "chart" && (
+                <div className={`space-y-3 ${isSharedAll ? "max-h-[360px] overflow-y-auto pr-1" : ""}`}>
+                  {topSharedTemplates.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Ainda sem compartilhamentos registrados no periodo.
+                    </p>
+                  ) : (
+                    topSharedTemplates.map((template, idx) => {
+                      const sharePct = sharedTotals.totalShared
+                        ? (template.shared / sharedTotals.totalShared) * 100
+                        : 0;
+                      return (
+                        <div
+                          key={template.name}
+                          className="flex items-center justify-between rounded-lg border px-3 py-2"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Badge variant="secondary" className="h-7 w-7 justify-center rounded-full text-xs font-bold">
+                              #{idx + 1}
+                            </Badge>
+                            <div className="flex flex-col">
+                              <span className="font-medium leading-tight">
+                                {template.name}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {numberFormat.format(template.shared)} compartilhamentos
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs font-semibold text-foreground">
+                              {sharePct.toFixed(1)}%
+                            </div>
+                            <div className="text-[11px] text-muted-foreground">do total</div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+
+              {sharedView === "chart" && (
+                <div
+                  className={`pt-2 w-full overflow-auto ${isSharedAll ? "max-h-[420px]" : "h-[360px]"}`}
+                  style={{ minWidth: 0 }}
+                >
+                  {sharedChartData.length === 0 ? (
+                    <div className="text-sm text-muted-foreground text-center py-10">
+                      Nenhum dado para exibir.
+                    </div>
+                  ) : (
+                    <BarChart
+                      key={`shared-chart-${filters.baseYear}-${sharedLimit}-${sharedSearch}-${sharedChartData.length}`}
+                      width={900}
+                      height={sharedChartHeight}
+                      data={sharedChartData}
+                      layout="vertical"
+                      margin={{ left: 140, right: 48, top: 12, bottom: 12 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" horizontal />
+                      <XAxis type="number" tickFormatter={yAxisFormatter} />
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        width={260}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <RechartsTooltip
+                        formatter={(v: number, key) =>
+                          key === "pct" ? `${(v as number).toFixed(1)}%` : numberFormat.format(v as number)
+                        }
+                        labelFormatter={(label, payload) => {
+                          const pct = payload?.[0]?.payload?.pct;
+                          return `${label} - ${pct?.toFixed(1) ?? "0.0"}% do total`;
+                        }}
+                      />
+                      <Legend />
+                      <Bar
+                        dataKey="shared"
+                        name="Compartilhamentos"
+                        fill={chartColors.primary}
+                        radius={[8, 8, 8, 8]}
+                        barSize={18}
+                      >
+                        <LabelList
+                          dataKey="shared"
+                          position="right"
+                          formatter={(v: number) => numberFormat.format(v)}
+                          className="text-xs"
+                        />
+                      </Bar>
+                    </BarChart>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      {/* SÃ©rie mensal base vs comparaÃ§Ã£o */}
+      {showLegacyCharts && designsPerMonthData.length > 0 && (
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle>Designs por mes</CardTitle>
+            <CardDescription>
+              {filters.baseYear}
+              {hasComparison ? ` vs ${filters.comparisonYear}` : ""}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="h-[360px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={designsPerMonthData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="label" />
+                <YAxis tickFormatter={yAxisFormatter} />
+                <RechartsTooltip
+                  contentStyle={{
+                    borderRadius: 8,
+                    borderColor: "#e5e7eb",
+                  }}
+                  formatter={(v: number) => numberFormat.format(v)}
+                  labelFormatter={(label) => `Mes: ${label}`}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="base"
+                  name={`Ano base (${filters.baseYear})`}
+                  stroke={chartColors.primary}
+                  strokeWidth={3}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 6 }}
+                />
+                {hasComparison && (
+                  <Line
+                    type="monotone"
+                    dataKey="comparison"
+                    name={`Ano comparacao (${filters.comparisonYear})`}
+                    stroke={chartColors.muted}
+                    strokeWidth={3}
+                    strokeDasharray="5 5"
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 6 }}
+                  />
+                )}
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Rankings por aba */}
+      {showLegacyCharts && analytics && view === "models" && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          {/* Top escolas (para modelos) */}
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle>Top escolas mais ativas</CardTitle>
+              <CardDescription>
+                Ranking por designs criados no perÃ­odo selecionado
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-[360px]">
+              {topSchoolsChart.length === 0 ? (
+                <div className="text-sm text-muted-foreground text-center py-10">
+                  Nenhuma escola encontrada.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={topSchoolsChart}
+                    layout="vertical"
+                    margin={{ left: 80, right: 24 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal />
+                    <XAxis type="number" tickFormatter={yAxisFormatter} />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      width={180}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <RechartsTooltip
+                      formatter={(v: number) => numberFormat.format(v)}
+                  labelFormatter={(label) => `Mes: ${label}`}
+                    />
+                    <Legend />
+                    <Bar
+                      dataKey="value"
+                      name="Designs criados"
+                      fill={chartColors.primary}
+                      radius={[8, 8, 8, 8]}
+                    >
+                      <LabelList
+                        dataKey="value"
+                        position="right"
+                        formatter={(v: number) => numberFormat.format(v)}
+                        className="text-xs"
+                      />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Top modelos */}
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle>Top modelos mais utilizados</CardTitle>
+              <CardDescription>Artes mais usadas no perÃ­odo</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[360px]">
+              {topModelsChart.length === 0 ? (
+                <div className="text-sm text-muted-foreground text-center py-10">
+                  Nenhum modelo encontrado.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={topModelsChart}
+                    margin={{ bottom: 60, left: 12, right: 12 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="name"
+                      interval={0}
+                      angle={-18}
+                      textAnchor="end"
+                      height={70}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <YAxis tickFormatter={yAxisFormatter} />
+                    <RechartsTooltip
+                      formatter={(v: number) => numberFormat.format(v)}
+                  labelFormatter={(label) => `Mes: ${label}`}
+                    />
+                    <Legend />
+                    <Bar
+                      dataKey="value"
+                      name="Designs criados"
+                      fill={chartColors.primary}
+                      radius={[8, 8, 0, 0]}
+                    >
+                      <LabelList
+                        dataKey="value"
+                        position="top"
+                        formatter={(v: number) => numberFormat.format(v)}
+                        className="text-xs"
+                      />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {showLegacyCharts && topCreatorsChart.length > 0 && (
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>Top criadores</CardTitle>
+              <CardDescription>
+                UsuÃ¡rios com mais designs criados no perÃ­odo selecionado
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Mostrar</span>
+              <Select
+                value={creatorRankLimit === "all" ? "all" : creatorRankLimit.toString()}
+                onValueChange={(v) => setCreatorRankLimit(v === "all" ? "all" : Number(v))}
+              >
+                <SelectTrigger className="h-8 w-[90px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="3">Top 3</SelectItem>
+                  <SelectItem value="5">Top 5</SelectItem>
+                  <SelectItem value="10">Top 10</SelectItem>
+                  <SelectItem value="15">Top 15</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardHeader>
+          <CardContent className="h-[360px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={topCreatorsChart}
+                layout="vertical"
+                margin={{ left: 80, right: 24 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal />
+                <XAxis type="number" tickFormatter={yAxisFormatter} />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  width={200}
+                  tick={{ fontSize: 12 }}
+                />
+                <RechartsTooltip
+                  formatter={(v: number) => numberFormat.format(v)}
+                />
+                <Legend />
+                <Bar
+                  dataKey="value"
+                  name="Designs criados"
+                  fill={chartColors.primary}
+                  radius={[8, 8, 8, 8]}
+                >
+                  <LabelList
+                    dataKey="value"
+                    position="right"
+                    formatter={(v: number) => numberFormat.format(v)}
+                    className="text-xs"
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      {showLegacyCharts && analytics && view === "schools" && (
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle>Top escolas mais ativas</CardTitle>
+            <CardDescription>
+              Ranking por designs criados no perÃ­odo selecionado
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="h-[360px]">
+            {topSchoolsChart.length === 0 ? (
+              <div className="text-sm text-muted-foreground text-center py-10">
+                Nenhuma escola encontrada.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={topSchoolsChart}
+                  layout="vertical"
+                  margin={{ left: 80, right: 24 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal />
+                  <XAxis type="number" tickFormatter={yAxisFormatter} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={180}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <RechartsTooltip
+                    formatter={(v: number) => numberFormat.format(v)}
+                  labelFormatter={(label) => `Mes: ${label}`}
+                  />
+                  <Legend />
+                  <Bar
+                    dataKey="value"
+                    name="Designs criados"
+                    fill={chartColors.primary}
+                    radius={[8, 8, 8, 8]}
+                  >
+                    <LabelList
+                      dataKey="value"
+                      position="right"
+                      formatter={(v: number) => numberFormat.format(v)}
+                      className="text-xs"
+                    />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Comparativo mensal de linhas importadas */}
+      {showLegacyCharts && analytics && (
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle>Comparativo mensal (linhas importadas)</CardTitle>
+            <CardDescription>Modelos x Criadores x Geral</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyImportCounts}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="label" />
+                <YAxis tickFormatter={yAxisFormatter} />
+                <RechartsTooltip
+                  formatter={(v: number) => numberFormat.format(v)}
+                  labelFormatter={(label) => `Mes: ${label}`}
+                />
+                <Legend />
+                <Bar
+                  dataKey="models"
+                  name="Modelos (linhas)"
+                  stackId="a"
+                  fill={chartColors.primary}
+                  radius={[8, 8, 0, 0]}
+                />
+                <Bar
+                  dataKey="creators"
+                  name="Criadores (linhas)"
+                  stackId="a"
+                  fill={chartColors.muted}
+                />
+                <Bar
+                  dataKey="general"
+                  name="Total (linhas)"
+                  stackId="a"
+                  fill={chartColors.accent}
+                  radius={[0, 0, 8, 8]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Importar CSV</DialogTitle>
+            <DialogDescription>Selecione o tipo de arquivo, envie o CSV e confirme a importacao.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label>Arquivo CSV</Label>
+            <Input
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
+            />
+            {selectedFile && (
+              <p className="text-xs text-muted-foreground">
+                {selectedFile.name} - {(selectedFile.size / 1024).toFixed(1)} KB
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Mapeamento sugerido sera aplicado automaticamente.
+            </p>
+          </div>
+          <div className="space-y-1">
+            <Label>Tipo de arquivo</Label>
+            <Select
+              value={importDataType}
+              onValueChange={(value) => setImportDataType(value as CanvaYearlyRecord["dataType"])}
+            >
+              <SelectTrigger className="w-full rounded-full">
+                <SelectValue placeholder="Selecione o tipo do CSV" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="models">Templates / modelos</SelectItem>
+                <SelectItem value="creators">Membros</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Escolha se o CSV e de templates/modelos ou de membros.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              onClick={() => setImportPresetDays(7)}
+            >
+              Ultimos 7 dias
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              onClick={() => setImportPresetDays(30)}
+            >
+              Ultimos 30 dias
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="start-date">Data inicial</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start rounded-full text-left font-normal"
+                    aria-label="Abrir calendÃ¡rio de data inicial"
+                  >
+                    {importStartDate ? formatDisplayDate(importStartDate) : "Escolha a data"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-2 w-[320px] max-w-[360px] overflow-visible rounded-xl border bg-popover shadow-lg"
+                  align="start"
+                  sideOffset={4}
+                  collisionPadding={8}
+                  avoidCollisions
+                >
+                  <Calendar
+                    mode="single"
+                    selected={importStartDate ? new Date(importStartDate) : undefined}
+                    onSelect={(date) => setImportStartDate(toInputDate(date ?? undefined))}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="end-date">Data final</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start rounded-full text-left font-normal"
+                    aria-label="Abrir calendÃ¡rio de data final"
+                  >
+                    {importEndDate ? formatDisplayDate(importEndDate) : "Escolha a data"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-2 w-[320px] max-w-[360px] overflow-visible rounded-xl border bg-popover shadow-lg"
+                  align="start"
+                  sideOffset={4}
+                  collisionPadding={8}
+                  avoidCollisions
+                >
+                  <Calendar
+                    mode="single"
+                    selected={importEndDate ? new Date(importEndDate) : undefined}
+                    onSelect={(date) => setImportEndDate(toInputDate(date ?? undefined))}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setImportOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleImport} disabled={uploading || !selectedFile}>
+              {uploading ? "Importando..." : "Importar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Historico de importacoes</DialogTitle>
+            <DialogDescription>Uploads recentes.</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[360px] overflow-y-auto space-y-2">
+            {dataset.history.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">
+                Nenhum upload registrado.
+              </p>
+            ) : (
+              dataset.history
+                .filter((h) => !h.deletedAt)
+                .map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
+                  >
+                    <div className="space-y-1">
+                      <div className="font-medium">{entry.filename}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {entry.periodLabel} â€¢ {entry.year} â€¢ {entry.dataType}
+                      </div>
+                    </div>
+                    <div className="text-right text-xs text-muted-foreground">
+                      <div>{new Date(entry.uploadedAt).toLocaleDateString("pt-BR")}</div>
+                      <div>{entry.rows} linhas</div>
+                    </div>
+                  </div>
+                ))
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setHistoryOpen(false)}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default CanvaYearlyComparison;
+

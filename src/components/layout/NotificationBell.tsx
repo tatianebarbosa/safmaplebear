@@ -169,9 +169,9 @@ const NotificationBell = () => {
         align="end"
         side="bottom"
         sideOffset={2}
-        collisionPadding={16}
-        style={{ maxHeight: "72vh", width: "520px", maxWidth: "96vw" }}
-        className="flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-white p-0 shadow-[0_22px_48px_-18px_rgba(30,32,36,0.55)]"
+        collisionPadding={8}
+        style={{ maxHeight: "72vh", width: "440px", maxWidth: "calc(100vw - 32px)" }}
+        className="origin-top-right flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-white p-0 shadow-[0_22px_48px_-18px_rgba(30,32,36,0.55)]"
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/70 bg-white/90 backdrop-blur-sm">
           <p className="text-sm font-semibold text-foreground">Notificaes</p>

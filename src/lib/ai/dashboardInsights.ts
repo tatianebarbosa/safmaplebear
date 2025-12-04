@@ -428,17 +428,17 @@ const buildVisualizationSuggestions = (
 const buildSchoolAnswer = (schoolData: ProcessedSchoolData): string => {
   const { school, totalUsers } = schoolData;
   if (typeof totalUsers !== 'number') {
-    return 'Nao encontrei essa informacao na base local. No sistema SAF, voce pode verificar isso na tela de Licencas Canva pesquisando o nome da escola.';
+    return 'Não encontrei essa informação na base local. No sistema SAF, você pode verificar isso na tela de Licenças Canva pesquisando o nome da escola.';
   }
 
   const licenseLimit = MAX_LICENSES_PER_SCHOOL;
   const overLimit = Math.max(totalUsers - licenseLimit, 0);
   const limitNote =
     totalUsers > licenseLimit
-      ? `Atencao: limite de ${licenseLimit} licencas por escola, excesso de ${formatNumber(overLimit)} usuarios.`
-      : `Dentro do limite de ${licenseLimit} licencas por escola.`;
+      ? `Atenção: limite de ${licenseLimit} licenças por escola, excesso de ${formatNumber(overLimit)} usuários.`
+      : `Dentro do limite de ${licenseLimit} licenças por escola.`;
 
-  return `${school.name} esta com ${formatNumber(totalUsers)} usuarios ativos/vinculados. Licencas usadas: ${formatNumber(
+  return `${school.name} está com ${formatNumber(totalUsers)} usuários ativos/vinculados. Licenças usadas: ${formatNumber(
     totalUsers
   )}. ${limitNote}`;
 };

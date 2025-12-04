@@ -4,18 +4,23 @@ import { useAuthStore } from "@/stores/authStore";
 import { useTicketStore } from "@/stores/ticketStore";
 import { Ticket, TicketStatus } from "@/types/tickets";
 
-// Exigir justificativa apenas quando for marcar como resolvido
-const statusesRequiringJustification: TicketStatus[] = ["Resolvido"];
+// Exigir justificativa para qualquer mudanca de status via arrasto ou botoes
+const statusesRequiringJustification: TicketStatus[] = [
+  "Pendente",
+  "Em andamento",
+  "Resolvido",
+];
 
 export const requiresTicketJustification = (status: TicketStatus) =>
   statusesRequiringJustification.includes(status);
 
 export const useTicketStatusJustification = () => {
-  const { moveTicket, addNoteToTicket } = useTicketStore();
+  const { moveTicket } = useTicketStore();
   const { currentUser } = useAuthStore();
   const [pendingChange, setPendingChange] = useState<{
     ticket: Ticket;
     status: TicketStatus;
+    author: string;
     onAfterChange?: () => void;
   } | null>(null);
 
@@ -25,12 +30,14 @@ export const useTicketStatusJustification = () => {
       return;
     }
 
+    const author = currentUser?.name || currentUser?.agente || "Sistema";
+
     if (requiresTicketJustification(status)) {
-      setPendingChange({ ticket, status, onAfterChange });
+      setPendingChange({ ticket, status, author, onAfterChange });
       return;
     }
 
-    moveTicket(ticket.id, status);
+    moveTicket(ticket.id, status, { author });
     onAfterChange?.();
   };
 
@@ -38,14 +45,10 @@ export const useTicketStatusJustification = () => {
     if (!pendingChange) return;
 
     const trimmedJustification = justification.trim();
-    const noteTimestamp = new Date().toISOString();
 
-    moveTicket(pendingChange.ticket.id, pendingChange.status);
-    addNoteToTicket(pendingChange.ticket.id, {
-      id: `${pendingChange.ticket.id}-${Date.now()}`,
-      author: currentUser?.name || "Sistema",
-      content: `Status alterado para ${pendingChange.status}. Motivo: ${trimmedJustification}`,
-      createdAt: noteTimestamp,
+    moveTicket(pendingChange.ticket.id, pendingChange.status, {
+      reason: trimmedJustification,
+      author: pendingChange.author,
     });
     pendingChange.onAfterChange?.();
     setPendingChange(null);

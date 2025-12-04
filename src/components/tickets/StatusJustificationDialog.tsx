@@ -47,7 +47,7 @@ export const StatusJustificationDialog = ({
         <DialogHeader>
           <DialogTitle>Justificar mudanca de status</DialogTitle>
           <DialogDescription>
-            Informe o motivo para mover o ticket {ticketId} para {status}. A justificativa e obrigatoria e sera registrada como nota.
+            Informe o motivo para mover o ticket {ticketId} para {status}. A justificativa e obrigatoria e sera registrada como nota e no historico do ticket.
           </DialogDescription>
         </DialogHeader>
 

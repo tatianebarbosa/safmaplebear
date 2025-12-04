@@ -44,7 +44,8 @@ const ProtectedShell = () => (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
 
-      <main className="flex-1 w-full">
+      {/* AQUI: mais espaço entre conteúdo e rodapé para todas as páginas */}
+      <main className="flex-1 w-full pb-20 md:pb-28">
         <Outlet />
       </main>
 

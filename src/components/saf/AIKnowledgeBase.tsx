@@ -66,6 +66,7 @@ import {
   persistKnowledgeItems,
   seedKnowledgeBase,
 } from "@/lib/knowledgeBase";
+import { readFileAsUtf8 } from "@/lib/fileUtils";
 import StatsCard from "@/components/dashboard/StatsCard";
 
 const generateKnowledgeId = () => {
@@ -238,7 +239,7 @@ const AIKnowledgeBase = () => {
       const uploads: KnowledgeItem[] = [];
 
       for (const file of Array.from(fileList)) {
-        const rawText = await file.text();
+        const rawText = await readFileAsUtf8(file);
         const trimmed = rawText.trim();
 
         if (!trimmed) {

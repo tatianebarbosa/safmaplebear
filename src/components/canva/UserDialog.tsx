@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { validateEmail } from '@/lib/validators';
 import {
   Dialog,
@@ -95,17 +95,17 @@ export const UserDialog = ({
     const newErrors: any = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Nome é obrigatório';
+      newErrors.name = 'Nome obrigatorio';
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'E-mail é obrigatório';
+      newErrors.email = 'E-mail obrigatorio';
     } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'E-mail inválido';
+      newErrors.email = 'E-mail invalido';
     }
 
     if (!formData.role) {
-      newErrors.role = 'Função é obrigatória';
+      newErrors.role = 'Função obrigatória';
     }
 
     if (!isEdit) {
@@ -113,7 +113,7 @@ export const UserDialog = ({
         newErrors.solicitadoPorNome = 'Informe quem solicitou';
       }
       if (!meta.solicitadoPorEmail.trim() || !validateEmail(meta.solicitadoPorEmail)) {
-        newErrors.solicitadoPorEmail = 'Informe um e-mail válido';
+        newErrors.solicitadoPorEmail = 'Informe um e-mail valido';
       }
       if (!meta.observacao.trim()) {
         newErrors.observacao = 'Informe a observação';
@@ -122,10 +122,10 @@ export const UserDialog = ({
         newErrors.assetId = 'Selecione o ativo';
       }
       if (meta.origemSolicitacao === 'Ticket SAF' && !meta.ticketNumber?.trim()) {
-        newErrors.ticketNumber = 'Informe o número do ticket';
+        newErrors.ticketNumber = 'Informe o numero do ticket';
       }
       if (meta.origemSolicitacao === 'E-mail' && !meta.emailTitle?.trim()) {
-        newErrors.emailTitle = 'Informe o título do e-mail';
+        newErrors.emailTitle = 'Informe o titulo do e-mail';
       }
     }
 
@@ -264,7 +264,7 @@ export const UserDialog = ({
                 </Badge>
                 {!emailCompliant && (
                   <p className="text-xs text-muted-foreground">
-                    Domínio deve conter "maplebear"
+                    Use domínio corporativo (maplebear.com.br, mbcentral.com.br, seb.com.br ou sebsa.com.br).
                   </p>
                 )}
               </div>
@@ -297,7 +297,7 @@ export const UserDialog = ({
                     <SelectValue placeholder="Selecione a origem" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Ticket SAF">Ticket SAF</SelectItem>
+                    <SelectItem value="Ticket SAF">Ticket</SelectItem>
                     <SelectItem value="E-mail">E-mail</SelectItem>
                     <SelectItem value="Ativo">Ativo</SelectItem>
                   </SelectContent>
@@ -329,7 +329,7 @@ export const UserDialog = ({
 
               {meta.origemSolicitacao === 'Ticket SAF' && (
                 <div className="space-y-2">
-                  <Label htmlFor="ticketNumber">Número do Ticket</Label>
+                  <Label htmlFor="ticketNumber">Numero do ticket</Label>
                   <Input
                     id="ticketNumber"
                     value={meta.ticketNumber}
@@ -344,7 +344,7 @@ export const UserDialog = ({
 
               {meta.origemSolicitacao === 'E-mail' && (
                 <div className="space-y-2">
-                  <Label htmlFor="emailTitle">Título do e-mail</Label>
+                  <Label htmlFor="emailTitle">Titulo do e-mail</Label>
                   <Input
                     id="emailTitle"
                     value={meta.emailTitle}
@@ -410,7 +410,7 @@ export const UserDialog = ({
               Cancelar
             </Button>
             <Button type="submit" disabled={!canSubmit}>
-              {isEdit ? 'Salvar Alterações' : 'Adicionar Usuário'}
+              {isEdit ? 'Salvar alterações' : 'Adicionar usuário'}
             </Button>
           </DialogFooter>
         </form>
@@ -418,3 +418,4 @@ export const UserDialog = ({
     </Dialog>
   );
 };
+

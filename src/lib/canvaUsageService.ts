@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
 import { CanvaUsageData, UsagePeriod } from '@/types/schoolLicense';
+import { readFileAsUtf8 } from './fileUtils';
 
 const LICENSE_FILE = '/data/licencas_canva.csv';
 
@@ -7,6 +8,7 @@ const MEMBER_FILE_MAP: Record<UsagePeriod, string> = {
   // Amostragem principal: novembro/2025
   nov2025: '/data/member-novembro2025.csv',
   // Demais períodos (mantidos para histórico/compatibilidade)
+  '7d': '/data/member-ultimos7dias.csv',
   '30d': '/data/relatoriodeusosdemembros_23_11.csv',
   '3m': '/data/relatoriomembro canva18_11__3messes.csv',
   '6m': '/data/relatoriomembro canva18_11__6 messes.csv',
@@ -15,13 +17,14 @@ const MEMBER_FILE_MAP: Record<UsagePeriod, string> = {
 
 const MODEL_FILE_MAP: Record<UsagePeriod, string> = {
   nov2025: '/data/template-novembro2025.csv',
+  '7d': '/data/template-ultimos7dias.csv',
   '30d': '/data/modelos18_11__30dias.csv',
   '3m': '/data/modelos18_11__3messes.csv',
   '6m': '/data/modelos18_11__6 messes.csv',
   '12m': '/data/12messesModelo.csv'
 };
 
-const DEFAULT_USAGE_PERIOD: UsagePeriod = 'nov2025';
+const DEFAULT_USAGE_PERIOD: UsagePeriod = '7d';
 const MIN_USAGE_YEAR = 2024;
 
 type ReportType = 'members' | 'models';
@@ -336,6 +339,7 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
       schoolName,
       schoolId,
       cluster,
+      lastActivity: periodLabel ?? undefined,
     });
 
     if (periodLabel) {
@@ -412,7 +416,7 @@ export const uploadMemberReport = async (
   rawText?: string,
   label?: string
 ) => {
-  const text = rawText ?? (await file.text());
+  const text = rawText ?? (await readFileAsUtf8(file));
   const uploadedAt = new Date().toISOString();
   const targets = period === 'all' ? ALL_PERIODS : [period];
   archiveCurrentOverrides('members', targets);
@@ -454,7 +458,7 @@ export const uploadModelReport = async (
   rawText?: string,
   label?: string
 ) => {
-  const text = rawText ?? (await file.text());
+  const text = rawText ?? (await readFileAsUtf8(file));
   const uploadedAt = new Date().toISOString();
   const targets = period === 'all' ? ALL_PERIODS : [period];
   archiveCurrentOverrides('models', targets);

@@ -1,5 +1,7 @@
 import os
+import unicodedata
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 from sqlalchemy import (
@@ -126,49 +128,68 @@ def load_schools():
 
 
 def load_users():
-    print(">> Carregando usuários do CSV de licenças...")
+    print(">> Carregando usuarios do CSV de licencas...")
 
-    # copie licencas_canva.csv para api/local_data/licencas_canva.csv
-    path = "local_data/licencas_canva.csv"
+    # Preferir a fonte mais completa (usuarios_public.csv); cair para licencas_canva.csv se faltar.
+    candidate_paths = [
+        "local_data/usuarios_public.csv",
+        "local_data/licencas_canva.csv",
+    ]
+    path = next((p for p in candidate_paths if Path(p).exists()), None)
 
-    if not os.path.exists(path):
-        print(">> Arquivo local_data/licencas_canva.csv não encontrado. Pulando carga de usuários.")
+    if not path:
+        print(">> Nenhum arquivo de licencas encontrado em local_data/. Pulando carga de usuarios.")
         return
 
-    # Lê o arquivo “na mão” porque ele vem todo entre aspas
-    with open(path, "r", encoding="latin-1") as f:
-        lines = [line.strip() for line in f.readlines() if line.strip()]
+    print(f">> Usando fonte de licencas: {path}")
+
+    # Leitura simples, tolerando aspas extras e linhas vazias.
+    lines = Path(path).read_text(encoding='latin-1', errors='ignore').splitlines()
+    lines = [line.strip().replace('"', '') for line in lines if line.strip()]
 
     if len(lines) <= 1:
-        print(">> Arquivo de licenças está vazio ou só com cabeçalho. Pulando.")
+        print(">> Arquivo de licencas esta vazio ou so com cabecalho. Pulando.")
         return
 
-    # Cabeçalho: "Nome;E-mail;Função;Escola;Escola ID;Status Licença;Atualizado em"
-    header = lines[0].strip().strip('"')
-    cols = [c.strip() for c in header.split(";")]
+    header = [c.strip() for c in lines[0].split(';')]
 
-    EMAIL_COL = "E-mail"
-    SCHOOL_COL = "Escola ID"
-    NAME_COL = "Nome"
-    STATUS_COL = "Status Licença"
+    def normalize(label: str) -> str:
+        base = (
+            unicodedata.normalize("NFKD", str(label))
+            .encode("ascii", "ignore")
+            .decode("ascii")
+        )
+        return base.strip().lower()
 
-    def col_index(name: str) -> int:
-        try:
-            return cols.index(name)
-        except ValueError:
-            return -1
+    def find_index(candidates):
+        for i, col in enumerate(header):
+            norm = normalize(col)
+            if any(norm.startswith(candidate) or candidate in norm for candidate in candidates):
+                return i
+        return -1
 
-    idx_email = col_index(EMAIL_COL)
-    idx_school = col_index(SCHOOL_COL)
-    idx_name = col_index(NAME_COL)
-    idx_status = col_index(STATUS_COL)
+    idx_email = find_index(["e-mail", "email"])
+    idx_school = find_index(["escola id", "id da escola", "id"])
+    idx_name = find_index(["nome"])
+    idx_status = find_index(["status licenca", "status"])
 
     if idx_email == -1 or idx_school == -1:
-        print(
-            f">> Cabeçalho não contém as colunas obrigatórias '{EMAIL_COL}' e '{SCHOOL_COL}'. "
-            f"Colunas encontradas: {cols}. Pulando."
-        )
+        print(f">> Cabecalho nao contem colunas obrigatorias de E-mail e Escola ID. Colunas: {header}. Pulando.")
         return
+
+    def is_email_compliant(email: str) -> bool:
+        normalized = (email or '').strip().lower()
+        if '@' not in normalized:
+            return False
+        local_part, _, domain = normalized.partition('@')
+        domain_keywords = ['maplebear', 'mbcentral', 'sebsa', 'seb']
+        if any(kw in domain for kw in domain_keywords):
+            return True
+        if domain.startswith('mb') and len(domain) > 2:
+            return True
+        if local_part.startswith('mb') and len(local_part) > 2:
+            return True
+        return False
 
     session = SessionLocal()
     imported = 0
@@ -176,26 +197,22 @@ def load_users():
 
     try:
         for line in lines[1:]:
-            # remove aspas externas e quebra por ';'
-            row_text = line.strip().strip('"')
-            parts = [p.strip() for p in row_text.split(";")]
-
+            parts = [p.strip() for p in line.split(';')]
             if len(parts) <= max(idx_email, idx_school):
                 continue
 
             email = parts[idx_email]
             school_id = parts[idx_school]
-
             if not email or not school_id:
                 continue
 
             name = parts[idx_name] if idx_name != -1 and idx_name < len(parts) else None
-            status = parts[idx_status] if idx_status != -1 and idx_status < len(parts) else ""
+            status = parts[idx_status] if idx_status != -1 and idx_status < len(parts) else ''
 
-            has_canva = True  # se está no CSV, tem canva
-            status_lower = (status or "").lower()
-            is_compliant = any(
-                word in status_lower for word in ["dentro", "conforme", "ok", "regular"]
+            has_canva = True  # se esta no CSV, tem Canva
+            status_lower = (status or '').lower()
+            status_compliant = any(
+                word in status_lower for word in ['dentro', 'conforme', 'ok', 'regular']
             )
 
             user = User(
@@ -204,17 +221,16 @@ def load_users():
                 name=name,
                 school_id=str(school_id),
                 has_canva=has_canva,
-                is_compliant=is_compliant,
+                is_compliant=status_compliant or is_email_compliant(email),
             )
             session.merge(user)
             imported += 1
             user_id += 1
 
         session.commit()
-        print(f">> Usuários carregados: {imported}")
+        print(f">> Usuarios carregados: {imported}")
     finally:
         session.close()
-
 
 # --------------------------------------------------------------------
 # EXECUÇÃO

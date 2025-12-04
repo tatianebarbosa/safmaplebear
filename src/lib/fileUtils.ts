@@ -246,8 +246,17 @@ export function readFileAsText(file: File): Promise<string> {
       reject(new Error('Erro ao ler arquivo'));
     };
     
-    reader.readAsText(file);
+    reader.readAsText(file, 'utf-8');
   });
+}
+
+/**
+ * L arquivo como UTF-8 usando TextDecoder para garantir decodificao consistente
+ */
+export async function readFileAsUtf8(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const decoder = new TextDecoder('utf-8', { fatal: false, ignoreBOM: true });
+  return decoder.decode(buffer);
 }
 
 /**

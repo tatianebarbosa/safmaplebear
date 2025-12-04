@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -72,7 +72,7 @@ export const SwapUserDialog = ({
     newRole: "Estudante" as UserRole,
     reason: "",
     performedBy: "",
-    origemSolicitacao: "Ticket SAF" as const,
+  origemSolicitacao: "Ticket SAF" as const,
     ticketNumber: "",
     emailTitle: "",
     assetId: "",
@@ -129,9 +129,9 @@ export const SwapUserDialog = ({
       if (!targetSchoolId) {
         newErrors.targetSchoolId = "Escolha a escola de destino";
       }
-      // Quando a escola nao tem usuarios, vamos criar automaticamente usando o usuario atual.
+      // Quando a escola não tem usuários, vamos criar automaticamente usando o usuário atual.
       if (!selectedTargetUserId && targetSchoolUsers.length > 0) {
-        newErrors.targetUserId = "A escola destino precisa ter um usuario para receber a licenca.";
+        newErrors.targetUserId = "A escola destino precisa ter um usuário para receber a licença.";
       }
     }
 
@@ -330,13 +330,13 @@ export const SwapUserDialog = ({
     >
       <DialogContent className={`${dialogLayouts.md} flex flex-col overflow-x-hidden gap-3 glass-scrollbar pb-5`}>
         <DialogHeader>
-          <DialogTitle>Trocar usuario</DialogTitle>
+          <DialogTitle>Trocar usuário</DialogTitle>
           <DialogDescription>
-            Substitua o usuario atual. Vamos registrar a transferencia no historico para auditoria e reversao.
+            Substitua o usuário atual. Vamos registrar a transferência no histórico para auditoria e reversão.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-3">
           <Button
             type="button"
             variant={transferMode === "internal" ? "default" : "outline"}
@@ -360,7 +360,7 @@ export const SwapUserDialog = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="outgoingUser">Quem vai liberar a licenca</Label>
+          <Label htmlFor="outgoingUser">Quem vai liberar a licença</Label>
           <Combobox
             options={userOptions}
             value={outgoingUser?.id || ""}
@@ -368,8 +368,8 @@ export const SwapUserDialog = ({
               if (value) onUserChange(value);
             }}
             placeholder="Buscar por nome ou email"
-            searchPlaceholder="Digite para filtrar usuarios"
-            emptyMessage="Nenhum usuario encontrado"
+            searchPlaceholder="Digite para filtrar usuários"
+            emptyMessage="Nenhum usuário encontrado"
             className="rounded-lg border-border/70 bg-background text-left"
           />
         </div>
@@ -378,7 +378,7 @@ export const SwapUserDialog = ({
           <div className="space-y-3 rounded-xl border border-border/60 bg-gradient-to-r from-muted/60 via-muted/40 to-muted/20 p-4 shadow-sm">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <ArrowLeftRight className="h-4 w-4 text-primary" />
-              <span>Transferir licenca para outra escola</span>
+              <span>Transferir licença para outra escola</span>
             </div>
             <div className="space-y-2">
               <Label>Escola destino</Label>
@@ -396,7 +396,7 @@ export const SwapUserDialog = ({
               {errors.targetSchoolId && <p className="text-sm text-destructive">{errors.targetSchoolId}</p>}
               {targetSchoolId && !selectedTargetUserId && !errors.targetSchoolId && (
                 <p className="text-sm text-muted-foreground">
-                  Esta escola nao possui usuarios cadastrados. Vamos criar automaticamente um usuario com base em quem esta liberando a licenca.
+                  Esta escola não possui usuários cadastrados. Vamos criar automaticamente um usuário com base em quem está liberando a licença.
                 </p>
               )}
               {selectedTargetUser && (
@@ -420,7 +420,7 @@ export const SwapUserDialog = ({
                   id="newName"
                   value={formData.newName}
                   onChange={(e) => handleChange("newName", e.target.value)}
-                  placeholder="Nome completo do novo usuario"
+                  placeholder="Nome completo do novo usuário"
                   className={errors.newName ? "border-destructive" : ""}
                 />
                 {errors.newName && <p className="text-sm text-destructive">{errors.newName}</p>}
@@ -440,20 +440,20 @@ export const SwapUserDialog = ({
                 {formData.newEmail && (
                   <div className="flex items-center gap-2">
                     <Badge variant={emailCompliant ? "success" : "destructive"}>
-                      {emailCompliant ? "Conforme" : "Fora da politica"}
+                      {emailCompliant ? "Conforme" : "Fora da política"}
                     </Badge>
                     {!emailCompliant && (
-                      <p className="text-xs text-muted-foreground">Dominio deve conter "maplebear".</p>
+                      <p className="text-xs text-muted-foreground">Use domínio corporativo (maplebear.com.br, mbcentral.com.br, seb.com.br ou sebsa.com.br).</p>
                     )}
                   </div>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newRole">Nova funcao</Label>
+                <Label htmlFor="newRole">Nova função</Label>
                 <Select value={formData.newRole} onValueChange={(value: UserRole) => handleChange("newRole", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione a funcao" />
+                    <SelectValue placeholder="Selecione a função" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Estudante">Estudante</SelectItem>
@@ -479,13 +479,13 @@ export const SwapUserDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="origemSolicitacao">Origem da solicitacao</Label>
+              <Label htmlFor="origemSolicitacao">Origem da solicitação</Label>
               <Select value={formData.origemSolicitacao} onValueChange={handleOriginChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a origem" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Ticket SAF">Ticket SAF</SelectItem>
+                  <SelectItem value="Ticket SAF">Ticket</SelectItem>
                   <SelectItem value="E-mail">E-mail</SelectItem>
                   <SelectItem value="Ativo">Ativo</SelectItem>
                 </SelectContent>
@@ -495,7 +495,7 @@ export const SwapUserDialog = ({
 
           {formData.origemSolicitacao === "Ticket SAF" && (
             <div className="space-y-2">
-              <Label htmlFor="ticketNumber">Ticket (referencia) *</Label>
+              <Label htmlFor="ticketNumber">Ticket (referência) *</Label>
               <Input
                 id="ticketNumber"
                 value={formData.ticketNumber}
@@ -555,7 +555,7 @@ export const SwapUserDialog = ({
               id="reason"
               value={formData.reason}
               onChange={(e) => handleChange("reason", e.target.value)}
-              placeholder="Explique por que esta licenca deve ser transferida"
+              placeholder="Explique por que esta licença deve ser transferida"
               rows={3}
               className={errors.reason ? "border-destructive" : ""}
             />
@@ -565,7 +565,7 @@ export const SwapUserDialog = ({
           <div className="rounded-md border border-border/60 bg-muted/30 p-3 text-xs space-y-2">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-primary" />
-              <span>Esta troca sera registrada no historico e pode ser revertida.</span>
+              <span>Esta troca será registrada no histórico e pode ser revertida.</span>
             </div>
             <div className="flex items-start gap-2 text-muted-foreground">
               <AlertTriangle className="h-4 w-4 mt-0.5" />
@@ -586,3 +586,4 @@ export const SwapUserDialog = ({
     </Dialog>
   );
 };
+

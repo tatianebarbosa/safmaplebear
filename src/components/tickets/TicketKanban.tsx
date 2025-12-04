@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   DndContext,
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  MouseSensor,
   PointerSensor,
   useDroppable,
   useSensor,
   useSensors,
-  closestCenter,
+  closestCorners,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -17,7 +18,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Ticket, TicketStatus } from '@/types/tickets';
-import { useAuthStore } from '@/stores/authStore';
 import { TicketCard } from './TicketCard';
 import { Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
@@ -37,13 +37,22 @@ const columns: { status: TicketStatus; title: string; icon: any; color: string }
 
 export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
   const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
-  const { canManageTicket } = useAuthStore();
   const { requestStatusChange, justificationDialog } = useTicketStatusJustification();
+  const columnRefs = useRef<Record<TicketStatus, HTMLElement | null>>({
+    Pendente: null,
+    'Em andamento': null,
+    Resolvido: null,
+  });
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 0,
       },
     })
   );
@@ -51,6 +60,17 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
   const handleDragStart = (event: DragStartEvent) => {
     const ticket = tickets.find(t => t.id === event.active.id);
     setActiveTicket(ticket || null);
+  };
+
+  const getStatusFromOver = (over: DragEndEvent["over"]) => {
+    if (!over) return null;
+    const overId = over.id as string;
+    const overData = over.data?.current as { status?: TicketStatus; type?: string; sortable?: { containerId?: string } } | undefined;
+    const containerFromSortable = overData?.sortable?.containerId as TicketStatus | undefined;
+    const statusFromData = overData?.status;
+    const statusFromId = columns.find((column) => column.status === overId)?.status;
+    // Se estiver sobre outro ticket, usamos o containerId da sortable para pegar a coluna alvo
+    return statusFromData || containerFromSortable || statusFromId || null;
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -62,14 +82,35 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
     const ticket = tickets.find(t => t.id === active.id);
     if (!ticket) return;
 
-    const overId = over.id as string;
-    const overContainer = over.data?.current?.sortable?.containerId as TicketStatus | undefined;
-    const targetStatus =
-      columns.find((column) => column.status === overId)?.status || overContainer;
+    let overStatus = getStatusFromOver(over);
 
-    if (!targetStatus || ticket.status === targetStatus) return;
+    // Fallback: se o DnD não identificar claramente a coluna de destino, usamos a posição final do card
+    if (!overStatus) {
+      const translated = active.rect?.current?.translated || active.rect?.current;
+      if (translated) {
+        const centerX = translated.left + translated.width / 2;
+        const centerY = translated.top + translated.height / 2;
+        (Object.entries(columnRefs.current) as [TicketStatus, HTMLElement | null][]).forEach(
+          ([status, el]) => {
+            if (el) {
+              const rect = el.getBoundingClientRect();
+              const within =
+                centerX >= rect.left &&
+                centerX <= rect.right &&
+                centerY >= rect.top &&
+                centerY <= rect.bottom;
+              if (within) {
+                overStatus = status;
+              }
+            }
+          }
+        );
+      }
+    }
 
-    requestStatusChange(ticket, targetStatus);
+    if (!overStatus || ticket.status === overStatus) return;
+
+    requestStatusChange(ticket, overStatus);
   };
 
   const getTicketsByStatus = (status: TicketStatus) => {
@@ -109,7 +150,7 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
@@ -117,7 +158,10 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
         {columns.map((column) => {
           const columnTickets = getTicketsByStatus(column.status);
           const Icon = column.icon;
-          const { setNodeRef: setColumnRef } = useDroppable({ id: column.status });
+          const { setNodeRef: setColumnRef } = useDroppable({
+            id: column.status,
+            data: { status: column.status, type: "column" },
+          });
           
           return (
             <Card key={column.status} className={column.color}>
@@ -130,7 +174,15 @@ export const TicketKanban = ({ tickets, onOpenDetails }: TicketKanbanProps) => {
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3" ref={setColumnRef}>
+              <CardContent
+                className="space-y-3 min-h-[320px]"
+                ref={(el) => {
+                  setColumnRef(el);
+                  if (el) {
+                    columnRefs.current[column.status] = el;
+                  }
+                }}
+              >
                 <SortableContext
                   id={column.status}
                   items={columnTickets.map(t => t.id)}

@@ -84,8 +84,17 @@ def load_franchising_schools() -> List[Dict]:
 
 
 def load_license_users() -> List[Dict]:
-    """Le licencas_canva.csv replicando a logica do front (split por ';' e ignorando linhas vazias)."""
-    lines = _load_csv_lines("licencas_canva.csv")
+    """Le o arquivo de licencas (preferindo usuarios_public.csv) replicando a logica do front."""
+    lines: List[str] = []
+    source = None
+    for filename in ("usuarios_public.csv", "licencas_canva.csv"):
+        try:
+            lines = _load_csv_lines(filename)
+            source = filename
+            break
+        except FileNotFoundError:
+            continue
+
     if len(lines) <= 1:
         return []
 
@@ -108,6 +117,7 @@ def load_license_users() -> List[Dict]:
             "school_name": cells[3] if len(cells) > 3 else "",
             "school_id": cells[4] if len(cells) > 4 else "",
             "status": cells[5] if len(cells) > 5 else "",
+            "source": source or "",
         }
         users.append(user)
 
@@ -183,6 +193,8 @@ def compute_overview(license_limit: int = None) -> Dict:
     if total_licenses > 0:
         ocupacao = (licencas_utilizadas / total_licenses) * 100
 
+    source_file = users[0].get("source", "") if users else ""
+
     return {
         "totalEscolas": total_schools,
         "escolasComLicenca": escolas_com_licenca,
@@ -193,7 +205,7 @@ def compute_overview(license_limit: int = None) -> Dict:
         "usuariosNaoConformes": len(non_compliant),
         "dominiosNaoMapleBear": sum(dominio_contagem.values()),
         "dominiosNaoMapleBearTop": top_dominios[:10],
-        "fonte": "public/data/Franchising.csv e public/data/licencas_canva.csv",
+        "fonte": f"public/data/Franchising.csv e public/data/{source_file or 'usuarios_public.csv'}",
     }
 
 

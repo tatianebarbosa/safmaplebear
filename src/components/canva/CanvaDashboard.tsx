@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { SchoolLicenseManagement } from "./SchoolLicenseManagement";
-import { CanvaUsageDashboard } from "./CanvaUsageDashboard";
+import CanvaYearlyComparison from "./CanvaYearlyComparison";
 import { CanvaMetricsDisplay } from "./CanvaMetricsDisplay";
 import { CostManagementDashboard } from "./CostManagementDashboard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
@@ -106,6 +106,12 @@ const CanvaDashboard = () => {
     }
   };
 
+  const containerStyle = useMemo(() => {
+    if (activeTab === "overview") return { maxWidth: 860 };
+    if (activeTab === "usage") return { maxWidth: 860 };
+    return { maxWidth: 920 };
+  }, [activeTab]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -126,8 +132,8 @@ const CanvaDashboard = () => {
   }
 
   return (
-    <div className="w-full pb-10">
-      <div className="layout-wide space-y-6 mt-4" style={{ maxWidth: 920 }}>
+    <div className="w-full pb-32 md:pb-40">
+      <div className="layout-wide space-y-6 mt-4" style={containerStyle}>
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="tabs-no-underline flex w-full max-w-3xl mx-auto overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50 justify-center gap-4 px-2">
             <TabsTrigger
@@ -207,13 +213,7 @@ const CanvaDashboard = () => {
           </TabsContent>
 
           <TabsContent value="usage" className="space-y-6">
-            <CanvaUsageDashboard
-              onNavigateToUsers={(email) => {
-                setSchoolSearch(email ?? "");
-                setActiveTab("schools");
-                toast.info("Buscando na aba Escolas");
-              }}
-            />
+            <CanvaYearlyComparison />
           </TabsContent>
 
           <TabsContent value="costs" className="space-y-6">

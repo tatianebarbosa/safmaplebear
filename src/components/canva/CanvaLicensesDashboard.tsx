@@ -22,7 +22,7 @@ interface CanvaLicensesDashboardProps {
 }
 
 /**
- * Dashboard moderno e profissional para gerenciamento de licenças Canva
+ * Dashboard moderno e profissional para gerenciamento de licencas Canva
  */
 export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
   dados,
@@ -69,8 +69,8 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
           <div className="header-title">
             <div className="logo-canva"></div>
             <div>
-              <h1>Gestão de Licenças Canva</h1>
-              <p>Monitoramento centralizado de usuários e licenças</p>
+              <h1>Gestao de Licen?as Canva</h1>
+              <p>Monitoramento centralizado de usuarios e licencas</p>
             </div>
           </div>
           <button
@@ -89,7 +89,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
         {/* Total de Pessoas Card */}
         <div className="card card-primary">
           <div className="card-header">
-            <h3>Total de Usuários</h3>
+            <h3>Total de Usuarios</h3>
             <span className="card-icon"></span>
           </div>
           <div className={`card-value ${animateCount ? 'animate' : ''}`}>
@@ -104,7 +104,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
           </div>
           <div className="card-footer">
             <span className="tendencia" style={{ color: getTendenciaColor() }}>
-              {getTendenciaIcon()} {Math.abs(dados?.percentualMudanca || 0)}% em relação ao mês anterior
+              {getTendenciaIcon()} {Math.abs(dados?.percentualMudanca || 0)}% em relacao ao mes anterior
             </span>
           </div>
         </div>
@@ -161,10 +161,10 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
           </div>
         </div>
 
-        {/* Última Atualização Card */}
+        {/* Ultima Atualizacao Card */}
         <div className="card card-info">
           <div className="card-header">
-            <h3>Última Atualização</h3>
+            <h3>Ultima Atualizacao</h3>
             <span className="card-icon"></span>
           </div>
           <div className="card-value">
@@ -185,11 +185,11 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
         </div>
       </div>
 
-      {/* Histórico Chart */}
+      {/* Historico Chart */}
       {dados?.historico && dados.historico.length > 0 && (
         <div className="card card-chart">
           <div className="card-header">
-            <h3>Histórico de Usuários (últimos 7 dias)</h3>
+            <h3>Historico de Usuarios (ultimos 7 dias)</h3>
             <span className="card-icon"></span>
           </div>
           <div className="chart-container">
@@ -202,7 +202,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
                     <div
                       className="chart-bar"
                       style={{ height: `${height}%` }}
-                      title={`${item.data}: ${item.quantidade} usuários`}
+                      title={`${item.data}: ${item.quantidade} usuarios`}
                     ></div>
                     <div className="chart-label">{item.data}</div>
                   </div>
@@ -216,10 +216,10 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
       {/* Quick Actions */}
       <div className="quick-actions">
         <button className="action-btn action-btn-primary">
-          Exportar Relatório
+          Exportar Relatorio
         </button>
         <button className="action-btn action-btn-secondary">
-          Configurações
+          Configuracoes
         </button>
         <button className="action-btn action-btn-tertiary">
           Suporte Canva
@@ -232,7 +232,7 @@ export const CanvaLicensesDashboard: React.FC<CanvaLicensesDashboardProps> = ({
         <div className="info-content">
           <h4>Dica Profissional</h4>
           <p>
-            Os dados de licenças são sincronizados automaticamente a cada hora. Para uma sincronização manual, clique no botão "Atualizar Agora" acima.
+            Os dados de licencas sao sincronizados automaticamente a cada hora. Para uma sincronizacao manual, clique no botao "Atualizar Agora" acima.
           </p>
         </div>
       </div>

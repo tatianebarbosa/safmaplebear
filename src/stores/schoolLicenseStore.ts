@@ -323,45 +323,56 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
 
       loadOfficialData: async () => {
         set({ loading: true });
-        try {
-          const finalizeData = (
-            processedData: ProcessedSchoolData[],
-            overview: CanvaOverviewData
-          ) => {
-            const licenseLimit = getMaxLicensesPerSchool();
-            const convertedSchools: School[] = processedData.map((data) => ({
-              id: data.school.id,
-              name: data.school.name,
-              status: data.school.status,
-              city: data.school.city,
-              safManager: data.school.safManager,
-              cluster: data.school.cluster as any,
-              contactEmail: data.school.email?.toLowerCase(),
-              totalLicenses:
-                data.school.id === "no-school"
-                  ? Math.max(data.estimatedLicenses, 1)
-                  : licenseLimit,
-              usedLicenses: data.totalUsers,
-              users: data.users.map((user) => ({
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role as any,
-                isCompliant: user.isCompliant,
-                createdAt: resolveUserCreatedAt(user),
-              })),
-              hasRecentJustifications: false,
-            }));
 
-            set({
-              officialData: processedData,
-              overviewData: overview,
-              schools: ensureCentralSchool(convertedSchools),
-              loading: false,
-            });
-            // Garante que o limite global seja aplicado aos dados carregados
-            syncLicenseLimit(licenseLimit);
-          };
+        const finalizeData = (
+          processedData: ProcessedSchoolData[],
+          overview: CanvaOverviewData
+        ) => {
+          const licenseLimit = getMaxLicensesPerSchool();
+          const convertedSchools: School[] = processedData.map((data) => ({
+            id: data.school.id,
+            name: data.school.name,
+            status: data.school.status,
+            city: data.school.city,
+            safManager: data.school.safManager,
+            cluster: data.school.cluster as any,
+            contactEmail: data.school.email?.toLowerCase(),
+            totalLicenses:
+              data.school.id === "no-school"
+                ? Math.max(data.estimatedLicenses, 1)
+                : licenseLimit,
+            usedLicenses: data.totalUsers,
+            users: data.users.map((user) => ({
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role as any,
+              isCompliant: user.isCompliant,
+              createdAt: resolveUserCreatedAt(user),
+            })),
+            hasRecentJustifications: false,
+          }));
+
+          set({
+            officialData: processedData,
+            overviewData: overview,
+            schools: ensureCentralSchool(convertedSchools),
+            loading: false,
+          });
+          // Garante que o limite global seja aplicado aos dados carregados
+          syncLicenseLimit(licenseLimit);
+        };
+
+        let fallbackData: Awaited<ReturnType<typeof buildFallbackData>> | null = null;
+        let fallbackPromise: Promise<Awaited<ReturnType<typeof buildFallbackData>> | null> | null =
+          null;
+
+        try {
+          // Sempre prepara o fallback local para poder comparar se o JSON integrado estiver desatualizado
+          fallbackPromise = buildFallbackData().catch((err) => {
+            console.warn("Fallback local de licencas indisponivel:", err);
+            return null;
+          });
 
           // 1) Tentar carregar dados integrados do backend (/api/canva/dados-recentes)
           const integratedData = await fetchIntegratedCanvaData();
@@ -376,12 +387,21 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
               officialSchools,
               processedFromIntegration
             );
-            finalizeData(processedFromIntegration, overviewFromIntegration);
+
+            fallbackData = fallbackPromise ? await fallbackPromise : null;
+            const fallbackTotalUsers = fallbackData?.overview?.totalUsers ?? 0;
+            const integratedTotalUsers = overviewFromIntegration?.totalUsers ?? 0;
+            const shouldUseFallback = fallbackData && fallbackTotalUsers > integratedTotalUsers;
+
+            finalizeData(
+              shouldUseFallback ? fallbackData.processedData : processedFromIntegration,
+              shouldUseFallback ? fallbackData.overview : overviewFromIntegration
+            );
             return;
           }
 
-          // 2) Fallback local (CSVs públicos)
-          const fallbackData = await buildFallbackData();
+          // 2) Fallback local (CSVs publicos)
+          fallbackData = fallbackPromise ? await fallbackPromise : null;
           if (fallbackData) {
             finalizeData(fallbackData.processedData, fallbackData.overview);
             return;
@@ -392,40 +412,14 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           console.error("Failed to load official data:", error);
           // Tentar fallback em caso de erro inesperado
           try {
-            const fallbackData = await buildFallbackData();
+            if (!fallbackData && fallbackPromise) {
+              fallbackData = await fallbackPromise;
+            }
+            if (!fallbackData) {
+              fallbackData = await buildFallbackData();
+            }
             if (fallbackData) {
-              const licenseLimit = getMaxLicensesPerSchool();
-              const convertedSchools: School[] = fallbackData.processedData.map(
-                (data) => ({
-                  id: data.school.id,
-              name: data.school.name,
-              status: data.school.status,
-              city: data.school.city,
-              safManager: data.school.safManager,
-              cluster: data.school.cluster as any,
-              contactEmail: data.school.email?.toLowerCase(),
-                  totalLicenses:
-                    data.school.id === "no-school"
-                      ? Math.max(data.estimatedLicenses, 1)
-                      : licenseLimit,
-                  usedLicenses: data.totalUsers,
-                  users: data.users.map((user) => ({
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role as any,
-                    isCompliant: user.isCompliant,
-                    createdAt: resolveUserCreatedAt(user),
-                  })),
-                  hasRecentJustifications: false,
-                })
-              );
-              set({
-                officialData: fallbackData.processedData,
-                overviewData: fallbackData.overview,
-                schools: ensureCentralSchool(convertedSchools),
-                loading: false,
-              });
+              finalizeData(fallbackData.processedData, fallbackData.overview);
             } else {
               set({ loading: false });
             }
@@ -491,7 +485,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           schoolName: school.name,
           action: "ADD_USER",
           details: `Novo usuario adicionado: ${user.name} (${user.email}). ${originDetails} Solicitado por: ${meta.solicitadoPorNome} (${meta.solicitadoPorEmail}). Motivo: ${meta.observacao}.`,
-          performedBy: meta.performedBy || "Sistema/Usuario",
+          performedBy: meta.performedBy || "Sistema/Usuário",
           changeSet: {
             type: "ADD_USER",
             user: newUser,
@@ -499,7 +493,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         });
 
         const justificationText =
-          justificationParts.join(" | ") || "Justificativa nao informada";
+          justificationParts.join(" | ") || "Justificativa não informada";
 
         recordLicenseAction({
           schoolId: school.id,
@@ -509,7 +503,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           userName: newUser.name,
           userEmail: newUser.email,
           justification: justificationText,
-          performedBy: meta.performedBy || "Sistema/Usuario",
+          performedBy: meta.performedBy || "Sistema/Usuário",
         });
 
         set((state) => ({
@@ -534,7 +528,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         if (!school || !oldUser) return;
 
         const actionMeta: ActionMeta = meta ?? {
-          performedBy: "Sistema/Usuario",
+          performedBy: "Sistema/Usuário",
         };
         const previousUser = { ...oldUser };
         const updatedUser: SchoolUser = {
@@ -549,12 +543,12 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           schoolId: school.id,
           schoolName: school.name,
           action: "UPDATE_USER",
-          details: `Usuario ${oldUser.name} (${
+          details: `Usuário ${oldUser.name} (${
             oldUser.email
           }) atualizado. Alteracoes: ${Object.keys(updates).join(", ")}.${
             actionMeta.reason ? ` Motivo: ${actionMeta.reason}` : ""
           }`,
-          performedBy: actionMeta.performedBy || "Sistema/Usuario",
+          performedBy: actionMeta.performedBy || "Sistema/Usuário",
           changeSet: {
             type: "UPDATE_USER",
             before: previousUser,
@@ -570,8 +564,8 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           userName: updatedUser.name,
           userEmail: updatedUser.email,
           justification:
-            actionMeta.reason?.trim() || "Justificativa nao informada",
-          performedBy: actionMeta.performedBy || "Sistema/Usuario",
+            actionMeta.reason?.trim() || "Justificativa não informada",
+          performedBy: actionMeta.performedBy || "Sistema/Usuário",
         });
 
         set((state) => ({
@@ -595,19 +589,19 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         if (!school || !userToRemove) return;
 
         const actionMeta: ActionMeta = meta ?? {
-          performedBy: "Sistema/Usuario",
+          performedBy: "Sistema/Usuário",
         };
 
         state.addHistoryEntry({
           schoolId: school.id,
           schoolName: school.name,
           action: "REMOVE_USER",
-          details: `Usuario ${userToRemove.name} (${
+          details: `Usuário ${userToRemove.name} (${
             userToRemove.email
-          }) removido. Licenca liberada.${
+          }) removido. Licença liberada.${
             actionMeta.reason ? ` Motivo: ${actionMeta.reason}` : ""
           }`,
-          performedBy: actionMeta.performedBy || "Sistema/Usuario",
+          performedBy: actionMeta.performedBy || "Sistema/Usuário",
           changeSet: {
             type: "REMOVE_USER",
             user: userToRemove,
@@ -622,8 +616,8 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           userName: userToRemove.name,
           userEmail: userToRemove.email,
           justification:
-            actionMeta.reason?.trim() || "Justificativa nao informada",
-          performedBy: actionMeta.performedBy || "Sistema/Usuario",
+            actionMeta.reason?.trim() || "Justificativa não informada",
+          performedBy: actionMeta.performedBy || "Sistema/Usuário",
         });
 
         set((state) => ({
@@ -675,8 +669,8 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           schoolId: school.id,
           schoolName: school.name,
           action: "TRANSFER_LICENSE",
-          details: `Licenca transferida de ${oldUser.name} (${oldUser.email}) para ${newUser.name} (${newUser.email}). Motivo: ${justificationData.reason}.`,
-          performedBy: justificationData.performedBy || "Sistema/Usuario",
+          details: `Licença transferida de ${oldUser.name} (${oldUser.email}) para ${newUser.name} (${newUser.email}). Motivo: ${justificationData.reason}.`,
+          performedBy: justificationData.performedBy || "Sistema/Usuário",
           changeSet: {
             type: "TRANSFER_LICENSE",
             sourceSchool: {
@@ -700,8 +694,8 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           userEmail: updatedUserData.email,
           justification:
             justificationData.reason?.trim() ||
-            "Justificativa nao informada",
-          performedBy: justificationData.performedBy || "Sistema/Usuario",
+            "Justificativa não informada",
+          performedBy: justificationData.performedBy || "Sistema/Usuário",
         });
 
         // 3. Atualizar o usuÃ¡rio na store
@@ -803,8 +797,8 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           targetSchoolId: targetSchool.id,
           targetSchoolName: targetSchool.name,
           justification:
-            justification.reason?.trim() || "Justificativa nao informada",
-          performedBy: justification.performedBy || "Sistema/Usuario",
+            justification.reason?.trim() || "Justificativa não informada",
+          performedBy: justification.performedBy || "Sistema/Usuário",
         });
 
         // 3. Atualizar as escolas
@@ -858,7 +852,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       addHistoryEntry: (entry) => {
         const newEntry: HistoryEntry = {
           ...entry,
-          performedBy: entry.performedBy || "Sistema/Usuario",
+          performedBy: entry.performedBy || "Sistema/Usuário",
           id: Date.now().toString(),
           timestamp: new Date().toISOString(),
           reverted: false,
@@ -874,8 +868,8 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         if (!entry || entry.reverted) return false;
 
         const revertMeta = meta || {
-          reason: "Reversao nao informada",
-          performedBy: "Sistema/Usuario",
+          reason: "Reversão não informada",
+          performedBy: "Sistema/Usuário",
         };
         const cs = entry.changeSet;
 

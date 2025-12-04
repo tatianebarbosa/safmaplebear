@@ -45,7 +45,7 @@ export interface Justification {
   performedBy: string;
 }
 
-export type UsagePeriod = '30d' | '3m' | '6m' | '12m' | 'nov2025';
+export type UsagePeriod = '7d' | '30d' | '3m' | '6m' | '12m' | 'nov2025';
 
 export interface CanvaUsageData {
   schoolId: string;
@@ -65,6 +65,7 @@ export interface CanvaUsageData {
     schoolName?: string;
     schoolId?: string;
     cluster?: string;
+    lastActivity?: string;
   }>;
 }
 

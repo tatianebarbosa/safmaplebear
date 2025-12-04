@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Ticket, TicketStatus, Agente, TicketNote, TicketPriority, TicketHistoryEntry } from "@/types/tickets";
 import { addDays, subDays, format } from "date-fns";
+import { useAuthStore } from "@/stores/authStore";
 
 interface TicketFilters {
   status?: TicketStatus;
@@ -20,7 +21,7 @@ interface TicketStore {
   setFilters: (filters: TicketFilters) => void;
   createTicket: (ticket: Omit<Ticket, "createdAt" | "updatedAt" | "resolvedAt">) => void;
   updateTicket: (id: string, updates: Partial<Ticket>) => void;
-  moveTicket: (id: string, newStatus: TicketStatus) => void;
+  moveTicket: (id: string, newStatus: TicketStatus, options?: { reason?: string; author?: string }) => void;
   removeTicket: (id: string) => void;
   addNoteToTicket: (id: string, note: TicketNote) => void;
   addHistoryEntry: (id: string, entry: TicketHistoryEntry) => void;
@@ -278,19 +279,51 @@ export const useTicketStore = create<TicketStore>()(
         }));
       },
 
-      moveTicket: (id, newStatus) => {
-        set((state) => ({
-          tickets: state.tickets.map((ticket) =>
-            ticket.id === id
-              ? {
-                  ...ticket,
-                  status: newStatus,
-                  resolvedAt: newStatus === "Resolvido" ? new Date().toISOString() : null,
-                  updatedAt: new Date().toISOString(),
-                }
-              : ticket
-          ),
-        }));
+      moveTicket: (id, newStatus, options) => {
+        set((state) => {
+          const now = new Date().toISOString();
+          const auth = useAuthStore.getState();
+          const author =
+            options?.author ||
+            auth.currentUser?.name ||
+            auth.currentUser?.agente ||
+            "Sistema";
+          const reason = options?.reason?.trim();
+
+          const updatedTickets = state.tickets.map((ticket) => {
+            if (ticket.id !== id) return ticket;
+
+            const previousStatus = ticket.status;
+            const resolvedAt = newStatus === "Resolvido" ? now : null;
+
+            const historyEntry: TicketHistoryEntry = {
+              id: `${id}-hist-${Date.now()}`,
+              author,
+              action: `Status: ${previousStatus} -> ${newStatus}${reason ? ` | Motivo: ${reason}` : ""}`,
+              timestamp: now,
+              before: { status: previousStatus, resolvedAt: ticket.resolvedAt },
+              after: { status: newStatus, resolvedAt },
+            };
+
+            const note: TicketNote = {
+              id: `${id}-status-${Date.now()}`,
+              author,
+              content: `Status alterado de ${previousStatus} para ${newStatus}${reason ? `. Motivo: ${reason}` : ""}`,
+              createdAt: now,
+            };
+
+            return {
+              ...ticket,
+              status: newStatus,
+              resolvedAt,
+              updatedAt: now,
+              history: [historyEntry, ...(ticket.history || [])],
+              notes: [note, ...(ticket.notes || [])],
+            };
+          });
+
+          return { tickets: updatedTickets };
+        });
       },
 
       removeTicket: (id) => {

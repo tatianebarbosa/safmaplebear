@@ -1,0 +1,5886 @@
+{
+  "periodo_filtro": "N/A",
+  "data_atualizacao": "2025-12-02T15:52:40.599873Z",
+  "canva_metrics": {
+    "total_pessoas": 395,
+    "alunos": 0,
+    "alunos_crescimento": 0,
+    "professores": 0,
+    "professores_crescimento": 0,
+    "administradores": 0,
+    "designs_criados": 0,
+    "designs_criados_crescimento": 0,
+    "total_publicado": 0,
+    "total_publicado_crescimento": 0,
+    "total_compartilhado": 0,
+    "total_compartilhado_crescimento": 0,
+    "total_kits": 0,
+    "kits": []
+  },
+  "schools_allocation": [
+    {
+      "school_id": "69.0",
+      "school_name": "Maple Bear Porto Velho - Olaria II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "870.0",
+      "school_name": "Maple Bear Sinop - Recanto Suíço II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "877.0",
+      "school_name": "Maple Bear Rio de Janeiro - Freguesia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "875.0",
+      "school_name": "Maple Bear Marabá - Belo Horizonte I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Clara",
+          "email": "clara@maraba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Comercial Maple Bear",
+          "email": "comercial@maraba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "871.0",
+      "school_name": "Maple Bear Catanduva - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "867.0",
+      "school_name": "Maple Bear Curitiba - Batel",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "CoordenaÃ§Ã£o Batel",
+          "email": "coordenacao.batel@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "864.0",
+      "school_name": "Maple Bear Vila Velha - Praia Da Costa I",
+      "total_users": 5,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "LuÃ­sa Cristina Siqueira MagalhÃ£es",
+          "email": "coordenacao@vilavelha.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Juliana Costa",
+          "email": "juliana.costa@maplebearilha.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Roseli Marques Costa",
+          "email": "roseli.costa@maplebearvno.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Suayne Costa",
+          "email": "suaynecosta67766@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "THAIZ RECIOLINO DE MELO",
+          "email": "thaiz.reciolino@vilavelha.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "802.0",
+      "school_name": "Maple Bear Balsas",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "868.0",
+      "school_name": "Maple Bear Rio das Ostras - Alphaville",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing Rio das Ostras",
+          "email": "mkt.riodasostras@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "876.0",
+      "school_name": "Maple Bear Campina Grande - Mirante I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "760.0",
+      "school_name": "Maple Bear Niterói - Santa Rosa",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "793",
+      "school_name": "Maple Bear Arcoverde",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "790",
+      "school_name": "Maple Bear Pindamonhangaba",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "802",
+      "school_name": "Maple Bear Balsas",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "679",
+      "school_name": "Maple Bear Paracatu - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "742",
+      "school_name": "Maple Bear Conselheiro Lafaiete - Areal I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "688",
+      "school_name": "Maple Bear Araguaína - Alaska II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "859",
+      "school_name": "Maple Bear Mossoró",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "784",
+      "school_name": "Maple Bear Sete Lagoas",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "805",
+      "school_name": "Maple Bear São Paulo - Parque São Jorge",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "856",
+      "school_name": "Maple Bear Itumbiara - Centro",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "865",
+      "school_name": "Maple Bear Teixeira De Freitas",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "848",
+      "school_name": "Maple Bear Goiás - Mineiros",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "873",
+      "school_name": "Maple Bear Rio de Janeiro - Campo Grande - Itaguaí",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "830",
+      "school_name": "Maple Bear Goiânia - Marista II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "299",
+      "school_name": "Maple Bear São Roque",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "707",
+      "school_name": "Maple Bear Petrolina - Vila Eduardo I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "673",
+      "school_name": "Maple Bear Primavera Do Leste",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "663",
+      "school_name": "Maple Bear São José Dos Pinhais",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "698",
+      "school_name": "Maple Bear Guarapari - Muquiçaba",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "295",
+      "school_name": "Maple Bear Limeira - Bairro da Graminha",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "44",
+      "school_name": "Maple Bear João Pessoa - Bessa I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "618",
+      "school_name": "Maple Bear João Pessoa - Bessa II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "716",
+      "school_name": "Maple Bear Assis - Jardim Morumbi I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "272",
+      "school_name": "Maple Bear Jaguariúna - Chácara Primavera I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "6",
+      "school_name": "Maple Bear Rio Branco - Aviário I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "821",
+      "school_name": "Maple Bear São Paulo - Pacaembu II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "748",
+      "school_name": "Maple Bear Vitória - Bento Ferreira I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "733",
+      "school_name": "Maple Bear Aracaju - Atalaia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "28",
+      "school_name": "Maple Bear Belo Horizonte - Santa Lúcia II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "639",
+      "school_name": "Maple Bear Brasilia - Águas Claras  Sul I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "290",
+      "school_name": "Maple Bear Campinas - Hípica I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "87",
+      "school_name": "Maple Bear Franca - Residencial Paraíso I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "91",
+      "school_name": "Maple Bear Indaiatuba - Jardim Esplanada I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "757",
+      "school_name": "Maple Bear João Pessoa - Altiplano I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "824",
+      "school_name": "Maple Bear Manaus - Flores I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "775",
+      "school_name": "Maple Bear Petrópolis - Itaipava I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "257",
+      "school_name": "Maple Bear Santa Maria - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "285",
+      "school_name": "Maple Bear São Paulo - Alto De Pinheiros II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "291",
+      "school_name": "Maple Bear São Paulo - Freguesia Do Ó I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "138",
+      "school_name": "Maple Bear Sertãozinho - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "76",
+      "school_name": "Maple Bear Aracaju - Treze De Julho I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "29",
+      "school_name": "Maple Bear Contagem - Três Barras I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "151",
+      "school_name": "Maple Bear Imperatriz - Três Poderes I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "71",
+      "school_name": "Maple Bear Porto Alegre - Iguatemi",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "56",
+      "school_name": "Maple Bear Rio De Janeiro - Barra Da Tijuca I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "255",
+      "school_name": "Maple Bear Rio De Janeiro - Gávea I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "60",
+      "school_name": "Maple Bear Rio De Janeiro - Ilha Do Governador I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "63",
+      "school_name": "Maple Bear Rio De Janeiro - Vila Valqueire I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "108",
+      "school_name": "Maple Bear Santo André - Campestre I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "651",
+      "school_name": "Maple Bear São Carlos I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "122",
+      "school_name": "Maple Bear São Paulo - Jardins I ",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "65",
+      "school_name": "Maple Bear Teresópolis - Bom Retiro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "144",
+      "school_name": "Maple Bear Vinhedo - Bosque I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "82",
+      "school_name": "Maple Bear Bauru - Vila Aviação I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "70",
+      "school_name": "Maple Bear Boa Vista - Caçari I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "265",
+      "school_name": "Maple Bear Feira De Santana - Subaé I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "31",
+      "school_name": "Maple Bear Itabira - Quatorze De Fevereiro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "259",
+      "school_name": "Maple Bear Itatiaia - Penedo",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "694",
+      "school_name": "Maple Bear Jaraguá Do Sul - Vila Baependi I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "49",
+      "school_name": "Maple Bear Londrina - Nikko I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "279",
+      "school_name": "Maple Bear Macaé - Vale Encantado II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "112",
+      "school_name": "Maple Bear São José Do Rio Preto - Jardim Francisco Fernandes I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "289",
+      "school_name": "Maple Bear São Paulo - Tatuapé I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "133",
+      "school_name": "Maple Bear São Paulo - Vila Madalena I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "301",
+      "school_name": "Maple Bear Sorocaba - Boa Vista II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "37",
+      "school_name": "Maple Bear Uberlândia - Vigilato Pereira I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "147",
+      "school_name": "Maple Bear Araras - Jardim Piratininga I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "38",
+      "school_name": "Maple Bear Campo Grande - Jardim São Bento I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "24",
+      "school_name": "Maple Bear Goiânia - Marista I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "120",
+      "school_name": "Maple Bear Granja Viana - Cotia Jardim Lambreta I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "92",
+      "school_name": "Maple Bear Itatiba - Residencial Fazenda Rosa I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "615",
+      "school_name": "Maple Bear Ji-Paraná - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "94",
+      "school_name": "Maple Bear Jundiaí - Jardim Santa Teresa I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "33",
+      "school_name": "Maple Bear Montes Claros - Ibituruna I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "52",
+      "school_name": "Maple Bear Ponta Grossa - Estrela I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "57",
+      "school_name": "Maple Bear Rio De Janeiro - Botafogo I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "284",
+      "school_name": "Maple Bear São Luis - Jardim Renascença II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "124",
+      "school_name": "Maple Bear São Paulo - Mooca II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "157",
+      "school_name": "Maple Bear Valparaíso De Goiás - Parque São Bernardo I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "148",
+      "school_name": "Maple Bear Barreiras - Parque Da Cidade I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "164",
+      "school_name": "Maple Bear Chapecó - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "90",
+      "school_name": "Maple Bear Guarulhos - Centro",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "309",
+      "school_name": "Maple Bear Ipatinga - Cidade Nobre",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "305",
+      "school_name": "Maple Bear Jacareí - Jardim Paraíba I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "152",
+      "school_name": "Maple Bear Mauá - Bocaina I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "297",
+      "school_name": "Maple Bear Osasco",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "205",
+      "school_name": "Maple Bear Rio De Janeiro - Tijuca I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "25",
+      "school_name": "Maple Bear Rio Verde - Setor Central I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "660",
+      "school_name": "Maple Bear São Paulo - Belenzinho I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "137",
+      "school_name": "Maple Bear São Paulo - Panamby I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "132",
+      "school_name": "Maple Bear São Paulo - São Miguel Paulista I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "40",
+      "school_name": "Maple Bear Sinop - Recanto Suíço I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "300",
+      "school_name": "Maple Bear Aracaju - Treze De Julho II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "73",
+      "school_name": "Maple Bear Balneário Camboriú - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "83",
+      "school_name": "Maple Bear Botucatu - Vila Nogueira I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "86",
+      "school_name": "Maple Bear Catanduva - Centro II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "75",
+      "school_name": "Maple Bear Joinville - Atiradores I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "34",
+      "school_name": "Maple Bear Nova Lima - Alphaville Lagoa Dos Ingleses I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "145",
+      "school_name": "Maple Bear Palmas - Plano Diretor Sul I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "648",
+      "school_name": "Maple Bear São Paulo - Penha De França I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "69",
+      "school_name": "Maple Bear Porto Velho - Olaria II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "59",
+      "school_name": "Maple Bear Rio De Janeiro - Freguesia II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "153",
+      "school_name": "Maple Bear Rio De Janeiro - Méier I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "128",
+      "school_name": "Maple Bear São Paulo - Pompéia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "308",
+      "school_name": "Maple Bear Araxá - Villagio Jardim",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "856.0",
+      "school_name": "Maple Bear Itumbiara - Centro",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Diretoria Itumbiara",
+          "email": "diretoria@itumbiara.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Itumbiara",
+          "email": "marketing@itumbiara.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "745",
+      "school_name": "Maple Bear Blumenau - Velha I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "150",
+      "school_name": "Maple Bear Campos Dos Goytacazes - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "268",
+      "school_name": "Maple Bear Dourados - Jardim Das Palmeiras I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "833",
+      "school_name": "Maple Bear Goiânia - Marista III",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "676",
+      "school_name": "Maple Bear Lagoa Santa - Vila Joana D'Arc I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "270",
+      "school_name": "Maple Bear Linhares - Três Barras I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "66",
+      "school_name": "Maple Bear Natal - Tirol I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "67",
+      "school_name": "Maple Bear Parnamirim - Nova Parnamirim I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "111",
+      "school_name": "Maple Bear São Caetano Do Sul - Santa Paula I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "155",
+      "school_name": "Maple Bear São Leopoldo - Cristo Rei I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "135",
+      "school_name": "Maple Bear São Paulo - Vila Nova Conceição I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "78",
+      "school_name": "Maple Bear Araçatuba - Higienópolis I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "685",
+      "school_name": "Maple Bear Campinas - Barão Geraldo I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "722",
+      "school_name": "Maple Bear Duque De Caxias - Jardim 25 De Agosto I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "32",
+      "school_name": "Maple Bear Juiz De Fora - Santa Luzia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "710",
+      "school_name": "Maple Bear Macapá - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "51",
+      "school_name": "Maple Bear Maringá",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "273",
+      "school_name": "Maple Bear Nova Mutum - Parque Dos Ingas I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "117",
+      "school_name": "Maple Bear São Paulo - Cantareira I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "343",
+      "school_name": "Maple Bear São Paulo - Chácara Klabin I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "818",
+      "school_name": "Maple Bear São Paulo - Pacaembu I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "853",
+      "school_name": "Maple Bear São Paulo - Panamby II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "142",
+      "school_name": "Maple Bear Valinhos - Joapiranga I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "80",
+      "school_name": "Maple Bear Atibaia - Ressaca I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "267",
+      "school_name": "Maple Bear Caruaru - Universitário I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "713",
+      "school_name": "Maple Bear Cascavel - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "14",
+      "school_name": "Maple Bear Fortaleza - José De Alencar I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "89",
+      "school_name": "Maple Bear Guarujá - Enseada I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "98",
+      "school_name": "Maple Bear Mogi Das Cruzes - Vila Oliveira I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "35",
+      "school_name": "Maple Bear Pouso Alegre - Fátima I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "104",
+      "school_name": "Maple Bear Ribeirão Preto - Bonfim Paulista I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "146",
+      "school_name": "Maple Bear São Paulo - Alto De Pinheiros I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "642",
+      "school_name": "Maple Bear São Paulo - Casa Verde I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "739",
+      "school_name": "Maple Bear São Paulo - Pompéia II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "131",
+      "school_name": "Maple Bear São Paulo - Tatuapé II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "695",
+      "school_name": "Maple Bear São Paulo - Vila Mascote I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "149",
+      "school_name": "Maple Bear Belo Horizonte - Sagrada Família I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "163",
+      "school_name": "Maple Bear Bragança Paulista I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "269",
+      "school_name": "Maple Bear Lavras - Cidade Da Serra I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "691",
+      "school_name": "Maple Bear Lucas Do Rio Verde - Alvorada I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "812",
+      "school_name": "Maple Bear Maceió - Jatiúca I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "55",
+      "school_name": "Maple Bear Niterói - São Francisco I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "296",
+      "school_name": "Maple Bear Nova Iguaçu - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "304",
+      "school_name": "Maple Bear Passo Fundo - Vila Luiza I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "68",
+      "school_name": "Maple Bear Porto Velho - Olaria I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "162",
+      "school_name": "Maple Bear Rio Claro - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "13",
+      "school_name": "Maple Bear Salvador - Canela I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "107",
+      "school_name": "Maple Bear Santa Bárbara D'Oeste - Jardim Mollon I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "115",
+      "school_name": "Maple Bear Santana De Parnaíba - Alphaville I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "160",
+      "school_name": "Maple Bear São Luis - Jardim Renascença I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "165",
+      "school_name": "Maple Bear São Paulo - Granja Julieta II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "47",
+      "school_name": "Maple Bear Teresina - Morada Do Sol I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "156",
+      "school_name": "Maple Bear Três Lagoas - Quinta Da Lagoa I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "719",
+      "school_name": "Maple Bear Barretos - Campos Do Conde I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "645",
+      "school_name": "Maple Bear Caxias Do Sul - Santa Catarina I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "293",
+      "school_name": "Maple Bear Divinópolis - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "88",
+      "school_name": "Maple Bear Guaratinguetá - Alberto Byington I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "53",
+      "school_name": "Maple Bear Macaé - Vale Encantado I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "728",
+      "school_name": "Maple Bear Passos - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "657",
+      "school_name": "Maple Bear Porto Alegre - Zona Sul I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "778",
+      "school_name": "Maple Bear Rondonópolis - Parque Sagrada Familia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "121",
+      "school_name": "Maple Bear São Paulo - Jaguaré I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "406",
+      "school_name": "Maple Bear Sorocaba - Jardim São Carlos I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "41",
+      "school_name": "Maple Bear Sorriso - Residencial Copenhagen I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "140",
+      "school_name": "Maple Bear Taboão Da Serra - Parque Assunção",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "141",
+      "school_name": "Maple Bear Taubaté - Jardim Das Nações I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "77",
+      "school_name": "Maple Bear Aldeia Da Serra - Morada Dos Lagos I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "21",
+      "school_name": "Maple Bear Anápolis - City I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "79",
+      "school_name": "Maple Bear Araraquara - Vila Harmonia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "669",
+      "school_name": "Maple Bear Brasília - Asa Norte",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "17",
+      "school_name": "Maple Bear Cachoeiro Do Itapemirim - São Geraldo I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "271",
+      "school_name": "Maple Bear Hortolândia - Parque Gabriel I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "275",
+      "school_name": "Maple Bear Itapetininga - Jardim Colombo I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "9",
+      "school_name": "Maple Bear Manaus - Ponta Negra II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "100",
+      "school_name": "Maple Bear Paulínia - Morumbi I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "102",
+      "school_name": "Maple Bear Praia Grande - Canto Do Forte I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "103",
+      "school_name": "Maple Bear Presidente Prudente - Parque Residencial Dahma I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "621",
+      "school_name": "Maple Bear Rio De Janeiro - Barra Da Tijuca II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "110",
+      "school_name": "Maple Bear São Bernardo Do Campo - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "113",
+      "school_name": "Maple Bear São José Do Rio Preto - Redentora II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "130",
+      "school_name": "Maple Bear São Paulo - Santana II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "136",
+      "school_name": "Maple Bear São Paulo - Vila Olímpia",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "74",
+      "school_name": "Maple Bear Florianópolis - Continente I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "294",
+      "school_name": "Maple Bear Governador Valadares - Alto Esplanada I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "736",
+      "school_name": "Maple Bear Gramado - Planalto I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "97",
+      "school_name": "Maple Bear Marília - Parque Das Esmeraldas I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "815",
+      "school_name": "Maple Bear Piracicaba - Vila Rezende II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "654",
+      "school_name": "Maple Bear Poços De Caldas - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "12",
+      "school_name": "Maple Bear Salvador - Pituba I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "114",
+      "school_name": "Maple Bear São José Dos Campos - Serimbura I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "36",
+      "school_name": "Maple Bear Uberaba - São Sebastião I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "682",
+      "school_name": "Maple Bear Araguari - Miranda I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "42",
+      "school_name": "Maple Bear Belém - Reduto I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "10",
+      "school_name": "Maple Bear Camaçari - Busca Vida I ",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "490",
+      "school_name": "Maple Bear Florianópolis - Ilha I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "258",
+      "school_name": "Maple Bear Formosa - Jardim Califórnia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "119",
+      "school_name": "Maple Bear São Paulo - Granja Julieta I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "129",
+      "school_name": "Maple Bear São Paulo - Santana I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "123",
+      "school_name": "Maple Bear São Paulo - Mooca I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "701",
+      "school_name": "Maple Bear Santos - Campo Grande",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "282",
+      "school_name": "Maple Bear Rio De Janeiro - Botafogo II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "27",
+      "school_name": "Maple Bear Belo Horizonte - Gutierrez I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "46",
+      "school_name": "Maple Bear Recife - Aflitos I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "62",
+      "school_name": "Maple Bear Rio De Janeiro - Recreio Dos Bandeirantes",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "751",
+      "school_name": "Maple Bear Contagem - Três Barras II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "769",
+      "school_name": "Maple Bear Cabo Frio - Palmeiras",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "286",
+      "school_name": "Maple Bear São Paulo - Jardins II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "125",
+      "school_name": "Maple Bear São Paulo - Morumbi Paineiras I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "633",
+      "school_name": "Maple Bear Goiânia - Plateau D'Or",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "808",
+      "school_name": "Maple Bear Boa Viagem",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "809",
+      "school_name": "Maple Bear Bento Gonçalves",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "869",
+      "school_name": "Maple Bear São Paulo - Morumbi Paineiras II (Clube)",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "860",
+      "school_name": "Maple Bear Valinhos - Joapiranga II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "23",
+      "school_name": "Maple Bear Goiânia - Alphaville",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "672",
+      "school_name": "Maple Bear Brasília - Sudoeste",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "796",
+      "school_name": "Maple Bear Guarapuava",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "760",
+      "school_name": "Maple Bear Niterói - Santa Rosa",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "39",
+      "school_name": "Maple Bear Cuiabá - Ribeirão Do Lipa",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "725",
+      "school_name": "Maple Bear Cuiabá - Jardim Itália",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "842",
+      "school_name": "Maple Bear Campo Grande - Chácara Cachoeira II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "845",
+      "school_name": "Maple Bear São Vicente",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "763",
+      "school_name": "Maple Bear Florianópolis Norte",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "862",
+      "school_name": "Maple Bear Itu",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "861",
+      "school_name": "Maple Bear Mogiana - Mogi Mirim - Mogi Guaçu",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "874",
+      "school_name": "Maple Bear São Paulo - Parque dos Príncipes I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "870",
+      "school_name": "Maple Bear Sinop - Recanto Suíço II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "101",
+      "school_name": "Maple Bear Piracicaba - Vila Rezende I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "877",
+      "school_name": "Maple Bear Rio de Janeiro - Freguesia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "875",
+      "school_name": "Maple Bear Marabá - Belo Horizonte I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "871",
+      "school_name": "Maple Bear Catanduva - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "867",
+      "school_name": "Maple Bear Curitiba - Batel",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "864",
+      "school_name": "Maple Bear Vila Velha - Praia Da Costa I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "868",
+      "school_name": "Maple Bear Rio das Ostras - Alphaville",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "876",
+      "school_name": "Maple Bear Campina Grande - Mirante I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "793.0",
+      "school_name": "Maple Bear Arcoverde",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Eduarda Helena Leandro do Nascimento Roa",
+          "email": "administracao@arcoverde.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "790.0",
+      "school_name": "Maple Bear Pindamonhangaba",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "679.0",
+      "school_name": "Maple Bear Paracatu - Centro I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Luana Cristina",
+          "email": "lumaparacatu@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "742.0",
+      "school_name": "Maple Bear Conselheiro Lafaiete - Areal I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "688.0",
+      "school_name": "Maple Bear Araguaína - Alaska II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "859.0",
+      "school_name": "Maple Bear Mossoró",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "784.0",
+      "school_name": "Maple Bear Sete Lagoas",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Aline Costa",
+          "email": "aline.costa@setelagoas.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Roseane Vinte",
+          "email": "roseane.vinte@setelagoas.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "805.0",
+      "school_name": "Maple Bear São Paulo - Parque São Jorge",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Paulo Henrique Alves",
+          "email": "paulo.alves@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Paulo Leitao",
+          "email": "paulo@casaverde.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "865.0",
+      "school_name": "Maple Bear Teixeira De Freitas",
+      "total_users": 6,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Paulo Sergio Rodrigues de Freitas",
+          "email": "paulos.freitas@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Allan Teixeira",
+          "email": "allan.teixeira@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Carla Teixeira",
+          "email": "carlat.teixeira@te.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Julyana Freitas",
+          "email": "julyana.freitas@maplebearnatal.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Mariana Freitas",
+          "email": "mariana.freitas@maplebearbotafogo.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Vinicius Teixeira de BraganÃ§a",
+          "email": "viniteixeirab@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "848.0",
+      "school_name": "Maple Bear Goiás - Mineiros",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "873.0",
+      "school_name": "Maple Bear Rio de Janeiro - Campo Grande - Itaguaí",
+      "total_users": 6,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "JÃ©rele Cristina Pereira de Campos",
+          "email": "jerele.campos@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Comunicacao Campos",
+          "email": "comunicacao.campos@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Debora Mangold Campos",
+          "email": "debora.campos@maplebeargranjajulieta.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear",
+          "email": "marketing.campogrande@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Campina Grande",
+          "email": "campinagrande@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Rogerio Campos",
+          "email": "romagnolicampos@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "830.0",
+      "school_name": "Maple Bear Goiânia - Marista II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "299.0",
+      "school_name": "Maple Bear São Roque",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "707.0",
+      "school_name": "Maple Bear Petrolina - Vila Eduardo I",
+      "total_users": 6,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Beatriz Vila Flor",
+          "email": "beatrizvilafloros@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Cassia Vilasboas",
+          "email": "cassia.vilasboas@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Eduardo Borges",
+          "email": "borges.eduardo6521@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "maplesorocaba",
+          "email": "eduardo@maplebearsorocaba.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Petrolina",
+          "email": "marketing.petrolina@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Matheus Victor Vila Nova Barbosa da Silva",
+          "email": "matheusvila@abaweb.org",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "673.0",
+      "school_name": "Maple Bear Primavera Do Leste",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Clara Manfio",
+          "email": "clara.manfio@primavera.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Luana de Souza Santiago Castro",
+          "email": "luanasantiago@primavera.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Primavera",
+          "email": "marketing@primavera.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Secretaria",
+          "email": "secretaria@primavera.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "663.0",
+      "school_name": "Maple Bear São José Dos Pinhais",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "JosÃ© AlcÃ¢ntara",
+          "email": "jose@alcanttara.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "698.0",
+      "school_name": "Maple Bear Guarapari - Muquiçaba",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "VIVIAN EVERS DE ARRUDA NASCIMENTO",
+          "email": "vivianevers@guarapari.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "295.0",
+      "school_name": "Maple Bear Limeira - Bairro da Graminha",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Limeira | AdministraÃ§Ã£o",
+          "email": "administracao@limeira.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Joyce Fantuchi Lopes Siqueira",
+          "email": "coordenacao@limeira.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Limeira | Comercial",
+          "email": "comercial@limeira.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Pietra Beckman",
+          "email": "pietra.beckman@limeira.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "44.0",
+      "school_name": "Maple Bear João Pessoa - Bessa I",
+      "total_users": 7,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "JoÃ£o Pedro dos Santos Luciano",
+          "email": "joaopedro.trammit@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "JoÃ£o Victor Minicelli",
+          "email": "joao.minicelli@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "joÃ£o vÃ­tor de paula cruz",
+          "email": "joaovitordepaulacruz@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear JoÃ£o Pessoa",
+          "email": "joaopessoa@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Ilana De Carvalho Bentes Pessoa",
+          "email": "ilana.pessoa@co.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Joao Victor",
+          "email": "joaov.martins@sebsa.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maria JoÃ£o Leser",
+          "email": "mariajoao.leser@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "618.0",
+      "school_name": "Maple Bear João Pessoa - Bessa II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "716.0",
+      "school_name": "Maple Bear Assis - Jardim Morumbi I",
+      "total_users": 7,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maria CÃ©lia dos Santos",
+          "email": "m_celiasantos@assis.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Carla Procopio",
+          "email": "assistenteescolar.pacaembu@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Caroline Buratti David",
+          "email": "caroline@assis.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "joshua assis",
+          "email": "joshuaassis342@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marcus Vinicius Assis da Silva",
+          "email": "mvassis.311@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Mariana Barion Elias Marques",
+          "email": "mariana.barion@assis.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "MKT - MB Morumbi",
+          "email": "atendimento.morumbi@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "272.0",
+      "school_name": "Maple Bear Jaguariúna - Chácara Primavera I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Jaguariuna MB",
+          "email": "mbjaguariuna@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "6.0",
+      "school_name": "Maple Bear Rio Branco - Aviário I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "adm riobranco",
+          "email": "adm.riobranco@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Rio Branco",
+          "email": "secretaria.riobranco@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "821.0",
+      "school_name": "Maple Bear São Paulo - Pacaembu II",
+      "total_users": 5,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Gustavo JosÃ© Silva Melo",
+          "email": "gustavovfx@pacaembu.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Amanda Moreira Torres da Silva",
+          "email": "amanda.torres@pacaembu.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "DP MBP",
+          "email": "dp.pacaembu@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gustavo G. Ribeiro",
+          "email": "mkt.pacaembu@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Isabela Peternelli Abrell",
+          "email": "pacaembu@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "748.0",
+      "school_name": "Maple Bear Vitória - Bento Ferreira I",
+      "total_users": 10,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "ANNA KAROLYNE PROCOPIO FERREIRA",
+          "email": "annak.ferreira@seb.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Caroline Falco Fernandes Valpassos",
+          "email": "teacherspecialist@vitoria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Kelen A S Laurindo",
+          "email": "rh@vitoria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Lucas Ferreira",
+          "email": "lucasferreiraunb@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Lucas Ferreira",
+          "email": "lucasferreira@bsb.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marcella Gryschek",
+          "email": "atendimento@vitoria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marianne de Medeiros Grativol",
+          "email": "coordenacao.port@vitoria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marina Noda Zanotti",
+          "email": "marina.zanotti@vitoria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Secretaria Maple Bear",
+          "email": "secretaria@vitoria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Sr. Madruga",
+          "email": "vini.ferreirafm@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "733.0",
+      "school_name": "Maple Bear Aracaju - Atalaia I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "JosÃ© Lauro Menezes Neto",
+          "email": "lauro@atalaia.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Aracaju",
+          "email": "aracaju@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Victoria Sousa",
+          "email": "victoria@atalaia.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "28.0",
+      "school_name": "Maple Bear Belo Horizonte - Santa Lúcia II",
+      "total_users": 8,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP - Santana RecepÃ§Ã£o",
+          "email": "recepcao.mbsantana@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Victor",
+          "email": "victor.santana@sebsa.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Administrativo Santana",
+          "email": "administrativo.santana@co.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "GUSTAVO SILVA DE SANTANA",
+          "email": "gustavo.santana@seb.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Lucia Wolmer",
+          "email": "lucia.wolmer@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Luciana & Victor",
+          "email": "lucianamagnabosco@icloud.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Luciana Simbara",
+          "email": "luciana.simbara@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Feira de Santana BA Marketing",
+          "email": "marketing.feiradesantana@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "639.0",
+      "school_name": "Maple Bear Brasilia - Águas Claras  Sul I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "290.0",
+      "school_name": "Maple Bear Campinas - Hípica I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Campinas - HÃ­pica",
+          "email": "contato.hipica@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Campinas - HÃ­pica | CoordenaÃ§Ã£o",
+          "email": "coordenacao.hipica@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Katia",
+          "email": "mkt.hipica@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "87.0",
+      "school_name": "Maple Bear Franca - Residencial Paraíso I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Franca",
+          "email": "franca@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Taise Kelly Gomes Silva",
+          "email": "secretaria.franca@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Viviane de Almeida FranÃ§a",
+          "email": "vivianefranca.co@vilavalqueire.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "91.0",
+      "school_name": "Maple Bear Indaiatuba - Jardim Esplanada I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Daniele Sidoti",
+          "email": "daniele.sidoti@maplebearindaiatuba.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Viviane Rabesco",
+          "email": "atendimento@maplebearindaiatuba.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "757.0",
+      "school_name": "Maple Bear João Pessoa - Altiplano I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "824.0",
+      "school_name": "Maple Bear Manaus - Flores I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Eliadna Xavier dos Santos",
+          "email": "eliadna.xavier@manaus.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Manaus",
+          "email": "marketing.manaus@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "775.0",
+      "school_name": "Maple Bear Petrópolis - Itaipava I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Atendimento Maple Bear",
+          "email": "atendimento@petropolis.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Petropolis",
+          "email": "marketing@petropolis.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "257.0",
+      "school_name": "Maple Bear Santa Maria - Centro I",
+      "total_users": 11,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "JoÃ£o LÃ¼dtke",
+          "email": "ludtke@santamaria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Andressa Menezes",
+          "email": "andressa.menezes@santamaria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "CLARIANE DA SILVA SOARES",
+          "email": "clariane.soares@santamaria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Hayannne Cesar",
+          "email": "hayannecbs@santamaria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maria Carolina Martins Oliveira",
+          "email": "maria.carolina@sagradafamiliabh.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maria Eduarda Morais Camargo",
+          "email": "maria.camargo@floripailha.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "MARIA FERNANDA SILVA DE FARIA",
+          "email": "maria.faria@seb.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maria Tereza Gorga Cancelliero Montragio",
+          "email": "maria.montragio@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Mariana Vargas",
+          "email": "mariana.vargas@acad.ufsm.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Mariane Caroline Ribeiro",
+          "email": "mariane.caroline@pocosdecaldas.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Matheus Santos Graciano",
+          "email": "matheus.santos@santamaria.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "285.0",
+      "school_name": "Maple Bear São Paulo - Alto De Pinheiros II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "291.0",
+      "school_name": "Maple Bear São Paulo - Freguesia Do Ó I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Rio Freguesia",
+          "email": "freguesia@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear RJ - Freguesia | Administrativo",
+          "email": "adm.freguesia@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "MB freguesia",
+          "email": "marketing@freguesiasp.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "138.0",
+      "school_name": "Maple Bear Sertãozinho - Centro I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Larissa Gabrieli LourenÃ§o de Oliveira",
+          "email": "larissaoliveira@sertaozinho.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Stella Arengheri Lindolpho",
+          "email": "stella.arengheri@sertaozinho.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "76.0",
+      "school_name": "Maple Bear Aracaju - Treze De Julho I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "29.0",
+      "school_name": "Maple Bear Contagem - Três Barras I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Atendimento Contagem",
+          "email": "atendimento@contagem.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "151.0",
+      "school_name": "Maple Bear Imperatriz - Três Poderes I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "71.0",
+      "school_name": "Maple Bear Porto Alegre - Iguatemi",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing PortoAlegre",
+          "email": "marketing.portoalegre@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Monna Holanda",
+          "email": "portovelho@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "secretaria pousoalegre",
+          "email": "secretaria.pousoalegre@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "SecretÃ¡ria Porto Alegre",
+          "email": "secretaria.portoalegre@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "56.0",
+      "school_name": "Maple Bear Rio De Janeiro - Barra Da Tijuca I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing Tijuca",
+          "email": "marketing.tijuca@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "255.0",
+      "school_name": "Maple Bear Rio De Janeiro - Gávea I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear RJ - GÃ¡vea",
+          "email": "gavea@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Cristiane Libardi",
+          "email": "cristiane.libardi@maplebeargavea.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "60.0",
+      "school_name": "Maple Bear Rio De Janeiro - Ilha Do Governador I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Alexandre Paim",
+          "email": "relacionamento.floripailha@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Leonardo Padilha de Liz",
+          "email": "leolizpadilha015@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "63.0",
+      "school_name": "Maple Bear Rio De Janeiro - Vila Valqueire I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "108.0",
+      "school_name": "Maple Bear Santo André - Campestre I",
+      "total_users": 13,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "AndrÃ© Costa",
+          "email": "andre.trammit@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "AndrÃ©ia Cajueiro",
+          "email": "andreianeuropedagoga@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Andre Cefali",
+          "email": "cefali.andre@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Alexandre Paim da Silva",
+          "email": "alexandre.silva@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Andre Possati Silva",
+          "email": "andrepo.silva@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Andrea Chimenti",
+          "email": "andrea.chimenti@maplebearvno.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Andrea Ferraz",
+          "email": "andrea.ferraz@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "andrea romio",
+          "email": "andrea@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Andreia Aguirre",
+          "email": "andreia.aguirre@pr.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Andreia Caroline do Nascimento Favretto",
+          "email": "andreia.favretto@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Andreia Caroline Favretto",
+          "email": "andreia.favretto@hotmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gabriela Santos",
+          "email": "gabriela.santos@dnx.tec.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Liliane Fatima dos Santos (Externo)",
+          "email": "liliane.santos@sebsa.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "651.0",
+      "school_name": "Maple Bear São Carlos I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Carlos Resende",
+          "email": "carlos.resende@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "122.0",
+      "school_name": "Maple Bear São Paulo - Jardins I ",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "65.0",
+      "school_name": "Maple Bear Teresópolis - Bom Retiro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "144.0",
+      "school_name": "Maple Bear Vinhedo - Bosque I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "82.0",
+      "school_name": "Maple Bear Bauru - Vila Aviação I",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Patricia Cestari",
+          "email": "patricia.cestari@bauru.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear SP - Bauru | Atendimento",
+          "email": "atendimento.bauru@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear SP - Bauru | Financeiro",
+          "email": "financeiro.bauru@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "ThaÃ­na Leticia Rodrigues",
+          "email": "thaina.rodrigues@bauru.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "70.0",
+      "school_name": "Maple Bear Boa Vista - Caçari I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "265.0",
+      "school_name": "Maple Bear Feira De Santana - Subaé I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Luciene Rosemeire GuimarÃ£es Chaves",
+          "email": "luciene.chaves@santana.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "31.0",
+      "school_name": "Maple Bear Itabira - Quatorze De Fevereiro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "259.0",
+      "school_name": "Maple Bear Itatiaia - Penedo",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Rafaella Basilio",
+          "email": "rafaella.basilio@penedo.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "694.0",
+      "school_name": "Maple Bear Jaraguá Do Sul - Vila Baependi I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing JaraguÃ¡ do Sul",
+          "email": "marketing.jaraguadosul@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "49.0",
+      "school_name": "Maple Bear Londrina - Nikko I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Atendimento Londrina",
+          "email": "atendimento.londrina@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "londrina386",
+          "email": "londrina@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "279.0",
+      "school_name": "Maple Bear Macaé - Vale Encantado II",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear MacaÃ©",
+          "email": "macae@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "112.0",
+      "school_name": "Maple Bear São José Do Rio Preto - Jardim Francisco Fernandes I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "administrativo ribeiraopreto",
+          "email": "administrativo.ribeiraopreto@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Administrativo Rio Preto",
+          "email": "administrativo.riopreto@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Rio Preto",
+          "email": "marketing.riopreto@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "289.0",
+      "school_name": "Maple Bear São Paulo - Tatuapé I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Palmira Regina Ferraz Silva",
+          "email": "palmira.silva@tatuape.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Carolina Gualberto de Jesus",
+          "email": "carolina.jesus@tatuape.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "133.0",
+      "school_name": "Maple Bear São Paulo - Vila Madalena I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "301.0",
+      "school_name": "Maple Bear Sorocaba - Boa Vista II",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Comunica MBS",
+          "email": "comunica@sorocaba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Kristine Shiwa",
+          "email": "kristine.shiwa@sorocaba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Maple Bear",
+          "email": "mkt@sorocaba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "37.0",
+      "school_name": "Maple Bear Uberlândia - Vigilato Pereira I",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Ana Claudia Pereira de Oliveira",
+          "email": "claudia.pereira@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Ana Gabriela Pereira",
+          "email": "ana.pereira@maplebearvno.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Eder Machado da Silva",
+          "email": "eder@uberlandia.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Eder Machado da Silva",
+          "email": "administrativo@maplebearuberlandia.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "147.0",
+      "school_name": "Maple Bear Araras - Jardim Piratininga I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Araras Comercial",
+          "email": "araras.comercial@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Vanessa Margiotti",
+          "email": "araras@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "38.0",
+      "school_name": "Maple Bear Campo Grande - Jardim São Bento I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Roberta Cristina de Amorim Alves",
+          "email": "roberta.alves@campogranderj.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "24.0",
+      "school_name": "Maple Bear Goiânia - Marista I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "120.0",
+      "school_name": "Maple Bear Granja Viana - Cotia Jardim Lambreta I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "RosilÃ¢ne Viana Rosa de Jesus",
+          "email": "diretorarosyviana@campogranderj.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Beatriz Viana",
+          "email": "beatriz.viana@maplebearilha.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Clarissa Viana",
+          "email": "clarissa.viana@approach.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "92.0",
+      "school_name": "Maple Bear Itatiba - Residencial Fazenda Rosa I",
+      "total_users": 5,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Dominiky Rosado",
+          "email": "dominikycbrosado@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Karla Rosa Polo",
+          "email": "karla.rosa@co.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Leticia Salmazo",
+          "email": "leticia.salmazo@itatiba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear SP - Itatiba | Contato",
+          "email": "contato.itatiba@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Rosa Maria dos Anjos Cabral",
+          "email": "rosa.anjos@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "615.0",
+      "school_name": "Maple Bear Ji-Paraná - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "94.0",
+      "school_name": "Maple Bear Jundiaí - Jardim Santa Teresa I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "33.0",
+      "school_name": "Maple Bear Montes Claros - Ibituruna I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "secretaria montes claros",
+          "email": "secretaria.claros@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "52.0",
+      "school_name": "Maple Bear Ponta Grossa - Estrela I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Ariadne Roberto Karnopp",
+          "email": "ariadne.karnopp@pontagrossa.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "pontagrossa grossa",
+          "email": "pontagrossa@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "57.0",
+      "school_name": "Maple Bear Rio De Janeiro - Botafogo I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear RJ - Botafogo | Marketing",
+          "email": "marketing.botafogo@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "284.0",
+      "school_name": "Maple Bear São Luis - Jardim Renascença II",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "LuÃ­sa Barbosa",
+          "email": "luisa.barbosa.psicologia@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Luisa Souza",
+          "email": "luisasouza@riodasostras.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "LUISA STOFEL PRAMPOLIM",
+          "email": "luisa.stofel@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "124.0",
+      "school_name": "Maple Bear São Paulo - Mooca II",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "NatÃ¡lia Fontana Fernandes",
+          "email": "direcao.mooca@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Michele Picali Maruyama",
+          "email": "michele.picali@mooca.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "157.0",
+      "school_name": "Maple Bear Valparaíso De Goiás - Parque São Bernardo I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Andreia Pedrosa Cajueiro de Lacerda",
+          "email": "andreiacajueiro@valparaiso.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "impressao valparaiso",
+          "email": "impressao.valparaiso@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "148.0",
+      "school_name": "Maple Bear Barreiras - Parque Da Cidade I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Fernanda Belo de AraÃºjo",
+          "email": "nandabelo@barreiras.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Livia Samara GuimarÃ£es de Oliveira Silva",
+          "email": "livia.guimaraes@barreiras.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Annietamashiro",
+          "email": "annietamashiro@barreiras.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "164.0",
+      "school_name": "Maple Bear Chapecó - Centro I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Joane Marcon",
+          "email": "joane.marcon@chapeco.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Nathielly Miranda de Andrade",
+          "email": "nathielly.miranda@chapeco.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "90.0",
+      "school_name": "Maple Bear Guarulhos - Centro",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Comercial Guarulhos",
+          "email": "comercial@mbguarulhos.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Maple Bear",
+          "email": "marketing@mbguarulhos.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "309.0",
+      "school_name": "Maple Bear Ipatinga - Cidade Nobre",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "305.0",
+      "school_name": "Maple Bear Jacareí - Jardim Paraíba I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Comercial Jacarei",
+          "email": "comercial.jacarei@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear",
+          "email": "maplebearjacarei@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Jacarei",
+          "email": "marketing.jacarei@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "152.0",
+      "school_name": "Maple Bear Mauá - Bocaina I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "297.0",
+      "school_name": "Maple Bear Osasco",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Vanessa Gomes Silva",
+          "email": "vanessagomes@osasco.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "205.0",
+      "school_name": "Maple Bear Rio De Janeiro - Tijuca I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "25.0",
+      "school_name": "Maple Bear Rio Verde - Setor Central I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "660.0",
+      "school_name": "Maple Bear São Paulo - Belenzinho I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing Maple Bear",
+          "email": "marketing@belenzinho.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "137.0",
+      "school_name": "Maple Bear São Paulo - Panamby I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP - Panamby | SecretÃ¡ria",
+          "email": "secretaria.panamby@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Fernanda Santos",
+          "email": "fernanda.santos@panamby.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Panamby",
+          "email": "marketing@panamby.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "132.0",
+      "school_name": "Maple Bear São Paulo - São Miguel Paulista I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "CoordenaÃ§Ã£o SÃ£o Miguel Paulista",
+          "email": "coordenacao.saomiguel@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "40.0",
+      "school_name": "Maple Bear Sinop - Recanto Suíço I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Sinop",
+          "email": "sinop@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "300.0",
+      "school_name": "Maple Bear Aracaju - Treze De Julho II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "73.0",
+      "school_name": "Maple Bear Balneário Camboriú - Centro I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SC - BalneÃ¡rio CamboriÃº | Atendimento",
+          "email": "atendimento.camboriu@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Aline Fernanda Mibach",
+          "email": "alinemibach@balneariocamboriu.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gabriela Abentroth Seidel",
+          "email": "ms.seidel@balneariocamboriu.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "83.0",
+      "school_name": "Maple Bear Botucatu - Vila Nogueira I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Carla Maria Lima de Andrade",
+          "email": "carla.lima@botucatu.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Jessica Laras Ferreira",
+          "email": "jessicalaras@botucatu.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "RENATA ORTUNHO MARTINS NOGUEIRA",
+          "email": "renata.nogueira@seb.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "86.0",
+      "school_name": "Maple Bear Catanduva - Centro II",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Heverton MendonÃ§a Tortorello",
+          "email": "ti@catanduva.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Carla Fonseca Ferreira",
+          "email": "carlaferreira@catanduva.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Fabiana Dusso Perossi Aspasio",
+          "email": "catanduva@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "75.0",
+      "school_name": "Maple Bear Joinville - Atiradores I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Joinville - Atiradores/SC | Consultoria",
+          "email": "consultoriajoinville@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Regina Ramalho",
+          "email": "diretoriajoinville@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "34.0",
+      "school_name": "Maple Bear Nova Lima - Alphaville Lagoa Dos Ingleses I",
+      "total_users": 9,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Bruno MagalhÃ£es Lima",
+          "email": "bruno.lima@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "DanÃºbia Prado - Atendimento MB Mogi",
+          "email": "danubia.lima@maplebearmogi.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Ana Beatriz Rocha Lima",
+          "email": "anabea.lima@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Bianca Lima",
+          "email": "bianca.lima@maplebearjardins.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gabrielle Lagoa",
+          "email": "gabrielleclagoa@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Juliana Lima",
+          "email": "juliana.lima@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Luiz Lima",
+          "email": "luiz.lima@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Mayara de Lima Fagundes",
+          "email": "mayara.lima@co.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Silvia Luiza do Cabo Lima",
+          "email": "silvia.lima@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "145.0",
+      "school_name": "Maple Bear Palmas - Plano Diretor Sul I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Diretoria Duque de Caxias",
+          "email": "diretoria@duquedecaxias.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear TO - Palmas | Marketing",
+          "email": "marketing.palmas@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Thayna Karoline Silva Sousa",
+          "email": "thayna.karoline@palmas.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "648.0",
+      "school_name": "Maple Bear São Paulo - Penha De França I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Hanays Neves",
+          "email": "hanays@penha.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Penha",
+          "email": "penha@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "59.0",
+      "school_name": "Maple Bear Rio De Janeiro - Freguesia II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "153.0",
+      "school_name": "Maple Bear Rio De Janeiro - Méier I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear RJ - Meier",
+          "email": "meier@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear RJ - Meier | Marketing",
+          "email": "marketingmeier@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "128.0",
+      "school_name": "Maple Bear São Paulo - Pompéia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "308.0",
+      "school_name": "Maple Bear Araxá - Villagio Jardim",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing Araxa",
+          "email": "marketing@araxa.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "745.0",
+      "school_name": "Maple Bear Blumenau - Velha I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "JÃ©ssica Legnari",
+          "email": "jessica.legnari@blumenau.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Camila Salvi",
+          "email": "camila.salvi@blumenau.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Ana JÃºlia Tomio",
+          "email": "anajutomio@blumenau.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "150.0",
+      "school_name": "Maple Bear Campos Dos Goytacazes - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "268.0",
+      "school_name": "Maple Bear Dourados - Jardim Das Palmeiras I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing Dourados",
+          "email": "marketing@dourados.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Sansara de Oliveira Monteiro Lopes",
+          "email": "sansara.lopes@dourados.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "833.0",
+      "school_name": "Maple Bear Goiânia - Marista III",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "676.0",
+      "school_name": "Maple Bear Lagoa Santa - Vila Joana D'Arc I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Roberto Mauro de Souza TristÃ£o",
+          "email": "roberto.tristao@lagoasanta.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gabrieli Ribeiro",
+          "email": "gabrieli.ribeiro@lagoasanta.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Lagoa Santa",
+          "email": "marketing@lagoasanta.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "270.0",
+      "school_name": "Maple Bear Linhares - Três Barras I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Fellipe Vidal",
+          "email": "fellipe.vidal@linhares.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Juliana Padilha Fernandes de Aquino",
+          "email": "juliana.padilha@linhares.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Mkt Linhares",
+          "email": "atendimento@linhares.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "66.0",
+      "school_name": "Maple Bear Natal - Tirol I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Natalia Rocha da Fonseca e Silva",
+          "email": "natalia.silva@bsb.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "67.0",
+      "school_name": "Maple Bear Parnamirim - Nova Parnamirim I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "FlÃ¡via Laise Freitas Duarte",
+          "email": "flaviaduarte@parnamirim.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "111.0",
+      "school_name": "Maple Bear São Caetano Do Sul - Santa Paula I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Paula Heleno Kopczynski",
+          "email": "paula.hmck@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Paula Kopczynski",
+          "email": "paula.kopczynski@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "JOZELY RAMOS DE PAULA",
+          "email": "jozely.paula@seb.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "155.0",
+      "school_name": "Maple Bear São Leopoldo - Cristo Rei I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "135.0",
+      "school_name": "Maple Bear São Paulo - Vila Nova Conceição I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "78.0",
+      "school_name": "Maple Bear Araçatuba - Higienópolis I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP - AraÃ§atuba",
+          "email": "aracatuba@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Paulinne",
+          "email": "paulinne@aracatuba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Davi Modanes Fernandes",
+          "email": "davi.modanes@aracatuba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "685.0",
+      "school_name": "Maple Bear Campinas - Barão Geraldo I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Comercial Barao Geraldo",
+          "email": "comerical.baraogeraldo@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "722.0",
+      "school_name": "Maple Bear Duque De Caxias - Jardim 25 De Agosto I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Caxias | Atendimento",
+          "email": "atendimento@caxias.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "32.0",
+      "school_name": "Maple Bear Juiz De Fora - Santa Luzia I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "710.0",
+      "school_name": "Maple Bear Macapá - Centro I",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "CoordenaÃ§Ã£o Maple Bear",
+          "email": "coordenacao@macapa.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Paola Fernanda Barros do Nascimento",
+          "email": "paola.barros@maplebearmacapa.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "LUCAS DOS SANTOS DA MATA REZENDE",
+          "email": "macapa@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Raissa Bernardo Soares Carralas Rezende",
+          "email": "raissa.rezende@macapa.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "51.0",
+      "school_name": "Maple Bear Maringá",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Giovanna MagalhÃ£es Silva Meneguetti",
+          "email": "giovanna@maplebearmaringa.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Beatriz MagalhÃ£es Silva Meneguetti",
+          "email": "beatriz@maplebearmaringa.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Tamy Quadra Vieria",
+          "email": "tamy.q@maplebearmaringa.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "273.0",
+      "school_name": "Maple Bear Nova Mutum - Parque Dos Ingas I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "117.0",
+      "school_name": "Maple Bear São Paulo - Cantareira I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Pamela de Oliveira Ferreira",
+          "email": "pamela.ferreira@cantareira.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "cantareira secretaria",
+          "email": "cantareira.secretaria@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear SP - Cantareira | Comercial",
+          "email": "comercial.cantareira@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "343.0",
+      "school_name": "Maple Bear São Paulo - Chácara Klabin I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP ChÃ¡cara Klabin",
+          "email": "klabin@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "818.0",
+      "school_name": "Maple Bear São Paulo - Pacaembu I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "853.0",
+      "school_name": "Maple Bear São Paulo - Panamby II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "142.0",
+      "school_name": "Maple Bear Valinhos - Joapiranga I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "80.0",
+      "school_name": "Maple Bear Atibaia - Ressaca I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Ingrid Castelhano",
+          "email": "ingrid@atibaia.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "267.0",
+      "school_name": "Maple Bear Caruaru - Universitário I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Adrielly GonÃ§alves Sales Sampaio",
+          "email": "adrielly.sampaio@caruaru.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Caruaru",
+          "email": "marketing@caruaru.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "713.0",
+      "school_name": "Maple Bear Cascavel - Centro I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Kalyma Toretta",
+          "email": "kalymatoretta@cascavel.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "14.0",
+      "school_name": "Maple Bear Fortaleza - José De Alencar I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "ClÃ¡udia Feitosa",
+          "email": "direcao.fortaleza@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "infantil fortaleza",
+          "email": "infantil.fortaleza@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Fortaleza",
+          "email": "maplebear.fortaleza@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "89.0",
+      "school_name": "Maple Bear Guarujá - Enseada I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP - GuarujÃ¡ | Financeiro",
+          "email": "financeiro.guaruja@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "98.0",
+      "school_name": "Maple Bear Mogi Das Cruzes - Vila Oliveira I",
+      "total_users": 9,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "LetÃ­cia Manancero de Oliveira",
+          "email": "leticia.oliveira@maplebearjdi.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Ms DÃ©bora",
+          "email": "debora.oliveira@maplebearrecreio.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Amanda Oliveira",
+          "email": "amandaoliveira@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Ana Paula Oliveira de Andrade",
+          "email": "anaoliveirargl@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Camila",
+          "email": "camila.oliveira@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Diego Raymundo de Oliveira",
+          "email": "diego.oliveira@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "MBMogiana MKTing",
+          "email": "mkt.mbmogiana@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Rafael Oliveira",
+          "email": "rafael.oliveira@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Rafaela de Oliveira",
+          "email": "rafaela.oliveira@maplebearpvh.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "35.0",
+      "school_name": "Maple Bear Pouso Alegre - Fátima I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "104.0",
+      "school_name": "Maple Bear Ribeirão Preto - Bonfim Paulista I",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "LÃ­via Maple Bear",
+          "email": "livia.komar@ribeiraopreto.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Esther Gafo Massuia",
+          "email": "esther.massuia@ribeiraopreto.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Keile Cristina Lima Ribeiro",
+          "email": "kribeiro@niltonlins.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Servidor PhÃ¡brica de ideas",
+          "email": "servidorphribeirao@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "146.0",
+      "school_name": "Maple Bear São Paulo - Alto De Pinheiros I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "642.0",
+      "school_name": "Maple Bear São Paulo - Casa Verde I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "739.0",
+      "school_name": "Maple Bear São Paulo - Pompéia II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "131.0",
+      "school_name": "Maple Bear São Paulo - Tatuapé II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "695.0",
+      "school_name": "Maple Bear São Paulo - Vila Mascote I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "149.0",
+      "school_name": "Maple Bear Belo Horizonte - Sagrada Família I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "163.0",
+      "school_name": "Maple Bear Bragança Paulista I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP - BraganÃ§a | Secretaria",
+          "email": "secretaria.braganca@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Consultoredu Braganca",
+          "email": "consultoredu.braganca@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "269.0",
+      "school_name": "Maple Bear Lavras - Cidade Da Serra I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP - Aldeira da Serra | Secretaria",
+          "email": "secretaria.aldeiadaserra@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Priscila Bruce de Souza Braga Batista",
+          "email": "priscilabruce@lavras.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "691.0",
+      "school_name": "Maple Bear Lucas Do Rio Verde - Alvorada I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "812.0",
+      "school_name": "Maple Bear Maceió - Jatiúca I",
+      "total_users": 5,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Recrutamento MaceiÃ³",
+          "email": "recrutamento@maplebearmaceio.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Arthur Aristeu GonÃ§alves Felisdorio",
+          "email": "arthuraristeu@maceio.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Alessandro Gerhard Bilia Queiroz",
+          "email": "maceio@maplebearmaceio.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Alessandro Queiroz",
+          "email": "maceio@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Mariana Monteiro Cabral de Melo Luz",
+          "email": "mariana.luz@maplebearmaceio.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "55.0",
+      "school_name": "Maple Bear Niterói - São Francisco I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Criarte SF",
+          "email": "criarte_sf@niteroi.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Dreiffus Cordeiro Neto",
+          "email": "dreiffus.cordeiro@niteroi.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marina Taveira Lopasso",
+          "email": "marina.lopasso@niteroi.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "296.0",
+      "school_name": "Maple Bear Nova Iguaçu - Centro I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing Maple Bear Nova IguaÃ§u",
+          "email": "marketing@novaiguacu.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "304.0",
+      "school_name": "Maple Bear Passo Fundo - Vila Luiza I",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Passo Fundo Marketing",
+          "email": "marketing.passofundo@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Amanda Variani Zatti",
+          "email": "amanda.zatti@passofundo.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Valqueire",
+          "email": "luiza.bonavita@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Passos",
+          "email": "marketing.passosmg@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "68.0",
+      "school_name": "Maple Bear Porto Velho - Olaria I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "162.0",
+      "school_name": "Maple Bear Rio Claro - Centro I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Aiquinis Kellen",
+          "email": "aiquinis.kellen@rioclaro.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Laiany Tavares Janas",
+          "email": "laiany.tavares@rioclaro.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "13.0",
+      "school_name": "Maple Bear Salvador - Canela I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear BA - Canela | PedagÃ³gico",
+          "email": "pedagogico.canela@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "107.0",
+      "school_name": "Maple Bear Santa Bárbara D'Oeste - Jardim Mollon I",
+      "total_users": 6,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "MatrÃ­culas - Maple Bear MatrÃ­culas Sudoeste",
+          "email": "matriculas.sudoeste@bsb.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Barbara Lais F. S. CaÃ§Ã£o",
+          "email": "barbara.cacao@te.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "BÃ¡rbara Beatriz De Oliveira Fava Rondello",
+          "email": "barbara.rondello@te.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "BÃ¡rbara Lehmkuhl Coelho Stoltenberg",
+          "email": "barbaralc@jgs.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "BÃ¡rbara Mandira",
+          "email": "barbara.mandira@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "barbara Monteiro",
+          "email": "barbaramanuceluta@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "115.0",
+      "school_name": "Maple Bear Santana De Parnaíba - Alphaville I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "160.0",
+      "school_name": "Maple Bear São Luis - Jardim Renascença I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "165.0",
+      "school_name": "Maple Bear São Paulo - Granja Julieta II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "47.0",
+      "school_name": "Maple Bear Teresina - Morada Do Sol I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Carmen Milena",
+          "email": "teresina@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Psicologia MapleBear - Teresina",
+          "email": "psicologiambteresina@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "156.0",
+      "school_name": "Maple Bear Três Lagoas - Quinta Da Lagoa I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing Maple Bear",
+          "email": "marketing@treslagoas.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "719.0",
+      "school_name": "Maple Bear Barretos - Campos Do Conde I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maria Clara Galleti de Oliveira BarÃ£o",
+          "email": "claragalleti@barretos.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "645.0",
+      "school_name": "Maple Bear Caxias Do Sul - Santa Catarina I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "293.0",
+      "school_name": "Maple Bear Divinópolis - Centro I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Divinopolis",
+          "email": "divinopolis@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "88.0",
+      "school_name": "Maple Bear Guaratinguetá - Alberto Byington I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP - GuaratinguetÃ¡ | Marketing",
+          "email": "marketing.guaratingueta@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Alberto Razuk Filho",
+          "email": "alberto.razuk@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "53.0",
+      "school_name": "Maple Bear Macaé - Vale Encantado I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "728.0",
+      "school_name": "Maple Bear Passos - Centro I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Creide Pereira de Souza Poncansini",
+          "email": "mantenedora@passos.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "657.0",
+      "school_name": "Maple Bear Porto Alegre - Zona Sul I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "778.0",
+      "school_name": "Maple Bear Rondonópolis - Parque Sagrada Familia I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing RondonÃ³polis",
+          "email": "marketing@rondonopolis.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Fernando Bertoni",
+          "email": "fernando@rondonopolis.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "121.0",
+      "school_name": "Maple Bear São Paulo - Jaguaré I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Jaguare",
+          "email": "jaguare@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "406.0",
+      "school_name": "Maple Bear Sorocaba - Jardim São Carlos I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "41.0",
+      "school_name": "Maple Bear Sorriso - Residencial Copenhagen I",
+      "total_users": 6,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "LuÃ­s Felipe Novaes de Barros",
+          "email": "luis.novaes@sorriso.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Erica Oliveira",
+          "email": "erica.s.oliveira@sorriso.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Fernanda Olivera",
+          "email": "coordenacao.sorriso@co.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Karoline Barbosa",
+          "email": "karoline.regiane@sorriso.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Luciana Correa",
+          "email": "direcao.pedagogica@sorriso.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "RH Maple Bear Sorriso",
+          "email": "katiane@sorriso.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "140.0",
+      "school_name": "Maple Bear Taboão Da Serra - Parque Assunção",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Secretaria MB TaboÃ£o",
+          "email": "secretaria.taboao@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "141.0",
+      "school_name": "Maple Bear Taubaté - Jardim Das Nações I",
+      "total_users": 6,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "NatÃ¡lia Cruz",
+          "email": "ncruz@maplebeartaubate.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "PatrÃ­cia Dias",
+          "email": "pdias@maplebeartaubate.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Jose Elias Cavalcanti Netto",
+          "email": "administracao@maplebeartaubate.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Naiara Rodrigues",
+          "email": "nrodrigues@maplebeartaubate.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Tiago Fernandes",
+          "email": "tfernandes@maplebeartaubate.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Victoria Silva",
+          "email": "vssilva@maplebeartaubate.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "77.0",
+      "school_name": "Maple Bear Aldeia Da Serra - Morada Dos Lagos I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "21.0",
+      "school_name": "Maple Bear Anápolis - City I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "79.0",
+      "school_name": "Maple Bear Araraquara - Vila Harmonia I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Cibele Cristina Mazzarelli Trebilcock",
+          "email": "araraquara@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "17.0",
+      "school_name": "Maple Bear Cachoeiro Do Itapemirim - São Geraldo I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Amanda Passabon",
+          "email": "amanda.passabon@maplebearcachoeiro.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Design Maple Bear Cachoeiro",
+          "email": "design.maplebc@maplebearcachoeiro.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Sandra Coelho",
+          "email": "sandra.coelho@maplebearcachoeiro.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "271.0",
+      "school_name": "Maple Bear Hortolândia - Parque Gabriel I",
+      "total_users": 10,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Comercial Maple Bear",
+          "email": "comercial@hortolandia.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Daiane Aquino Novais",
+          "email": "daiane.novais@hortolandia.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "gabriel alamo",
+          "email": "gabrielhilario@icloud.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "gabriel oppa",
+          "email": "gabrieloppa55@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gabriel Souza",
+          "email": "gabriel.souza@maplebearpvh.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "gabriela",
+          "email": "gabriela.bigarella@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "GABRIELA FERRARO DE SOUZA",
+          "email": "gabriela.souza@maplebearbarra.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gabriela Pinsdorf",
+          "email": "gabriela.pinsdorf@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gabriela Pinsdorf",
+          "email": "gabrielapinsdorf@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gabriele Malagutti",
+          "email": "gabrielemaiamalagutti@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "275.0",
+      "school_name": "Maple Bear Itapetininga - Jardim Colombo I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Itapetininga",
+          "email": "contato.itapetininga@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "9.0",
+      "school_name": "Maple Bear Manaus - Ponta Negra II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "100.0",
+      "school_name": "Maple Bear Paulínia - Morumbi I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "102.0",
+      "school_name": "Maple Bear Praia Grande - Canto Do Forte I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Mayara Oliveira",
+          "email": "mayara.oliveira@praiagrande.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "103.0",
+      "school_name": "Maple Bear Presidente Prudente - Parque Residencial Dahma I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "621.0",
+      "school_name": "Maple Bear Rio De Janeiro - Barra Da Tijuca II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "110.0",
+      "school_name": "Maple Bear São Bernardo Do Campo - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "113.0",
+      "school_name": "Maple Bear São José Do Rio Preto - Redentora II",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "CoordenaÃ§Ã£o Redentora",
+          "email": "coordenacao.redentora@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "130.0",
+      "school_name": "Maple Bear São Paulo - Santana II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "136.0",
+      "school_name": "Maple Bear São Paulo - Vila Olímpia",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "74.0",
+      "school_name": "Maple Bear Florianópolis - Continente I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Edilane Siqueira",
+          "email": "florianopolis@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "294.0",
+      "school_name": "Maple Bear Governador Valadares - Alto Esplanada I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Dhyenifer Karyn safra Almeida",
+          "email": "dhyenifer@governadorvaladares.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "ERENILTON PEIXOTO ARAUJO",
+          "email": "eparaujo@governadorvaladares.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "736.0",
+      "school_name": "Maple Bear Gramado - Planalto I",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Comercial Maple Bear",
+          "email": "comercial@gramado.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Maple Bear",
+          "email": "marketing@gramado.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "97.0",
+      "school_name": "Maple Bear Marília - Parque Das Esmeraldas I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear MarÃ­lia",
+          "email": "marilia@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Cesar Sampaio",
+          "email": "cesar.sampaio@maplebearmarilia.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Cleber Oliveira",
+          "email": "cleber.oliveira@maplebearmarilia.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "815.0",
+      "school_name": "Maple Bear Piracicaba - Vila Rezende II",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Veronica Luise Malaspina",
+          "email": "veronica.malaspina@piracicaba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "654.0",
+      "school_name": "Maple Bear Poços De Caldas - Centro I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "12.0",
+      "school_name": "Maple Bear Salvador - Pituba I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "114.0",
+      "school_name": "Maple Bear São José Dos Campos - Serimbura I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "36.0",
+      "school_name": "Maple Bear Uberaba - São Sebastião I",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Fernanda",
+          "email": "financeiro@uberaba.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Jeisielle Laet Martins Lacerda",
+          "email": "administrativo.uberaba@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear MG - Uberaba",
+          "email": "uberaba@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Uberaba",
+          "email": "maplebearuberaba@gmail.com",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "682.0",
+      "school_name": "Maple Bear Araguari - Miranda I",
+      "total_users": 6,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "atendimento araguari",
+          "email": "atendimentoaraguari@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Isabel Miranda",
+          "email": "isabel.miranda@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Juliana Figueiredo Rodrigues Miranda",
+          "email": "juliana.miranda@maplebeargranjajulieta.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maira Miranda",
+          "email": "maira.miranda@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Araguari",
+          "email": "marketing@araguari.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Valeria Alves da Silva Rosa",
+          "email": "valeria.silva@araguari.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "42.0",
+      "school_name": "Maple Bear Belém - Reduto I",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "RONISON WESLLEY DOS SANTOS GONÃALVES",
+          "email": "ronison.goncalves@maplebearbelem.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gibran Tuma",
+          "email": "gibran.tuma@maplebearbelem.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Marketing Maple Bear",
+          "email": "marketing@maplebearbelem.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "10.0",
+      "school_name": "Maple Bear Camaçari - Busca Vida I ",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Daniele Vidal",
+          "email": "daniele.vidal@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "490.0",
+      "school_name": "Maple Bear Florianópolis - Ilha I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "258.0",
+      "school_name": "Maple Bear Formosa - Jardim Califórnia I",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "secretaria formosa",
+          "email": "secretaria.formosa@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "119.0",
+      "school_name": "Maple Bear São Paulo - Granja Julieta I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "129.0",
+      "school_name": "Maple Bear São Paulo - Santana I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "123.0",
+      "school_name": "Maple Bear São Paulo - Mooca I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "701.0",
+      "school_name": "Maple Bear Santos - Campo Grande",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Daiane Aparecida Santos",
+          "email": "daiane.santos@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Santos",
+          "email": "marketing.santos@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "MARJORY APARECIDA SANTOS",
+          "email": "marjory.santos@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Washington Luis Oliveira Santos",
+          "email": "washington.santos@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "282.0",
+      "school_name": "Maple Bear Rio De Janeiro - Botafogo II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "27.0",
+      "school_name": "Maple Bear Belo Horizonte - Gutierrez I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "46.0",
+      "school_name": "Maple Bear Recife - Aflitos I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "62.0",
+      "school_name": "Maple Bear Rio De Janeiro - Recreio Dos Bandeirantes",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear Recreio",
+          "email": "recreio@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "751.0",
+      "school_name": "Maple Bear Contagem - Três Barras II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "669.0",
+      "school_name": "Maple Bear Brasília - Asa Norte",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "CoordenaÃ§Ã£o Maple Bear",
+          "email": "coordenacao.floripanorte@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "769.0",
+      "school_name": "Maple Bear Cabo Frio - Palmeiras",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Marketing Maple",
+          "email": "marketing@cabofrio.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "286.0",
+      "school_name": "Maple Bear São Paulo - Jardins II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "125.0",
+      "school_name": "Maple Bear São Paulo - Morumbi Paineiras I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "633.0",
+      "school_name": "Maple Bear Goiânia - Plateau D'Or",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "808.0",
+      "school_name": "Maple Bear Boa Viagem",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "809.0",
+      "school_name": "Maple Bear Bento Gonçalves",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "DANIELA GONCALVES",
+          "email": "daniela.goncalves@seb.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "869.0",
+      "school_name": "Maple Bear São Paulo - Morumbi Paineiras II (Clube)",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "860.0",
+      "school_name": "Maple Bear Valinhos - Joapiranga II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "23.0",
+      "school_name": "Maple Bear Goiânia - Alphaville",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "672.0",
+      "school_name": "Maple Bear Brasília - Sudoeste",
+      "total_users": 4,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "AMANDA VIEGAS DE OLIVEIRA",
+          "email": "amandav.oliveira@sudoeste.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "LUANA CRISTINA RODRIGUES LOPES",
+          "email": "luana.lopes@sudoeste.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "LUCAS FERREIRA DA SILVA",
+          "email": "lucasfe.silva@sudoeste.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Luciana Fontinele",
+          "email": "luciana.fontinele@sudoeste.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "796.0",
+      "school_name": "Maple Bear Guarapuava",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Atendimento",
+          "email": "atendimento@guarapuava.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Gestao",
+          "email": "gestao@guarapuava.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "39.0",
+      "school_name": "Maple Bear Cuiabá - Ribeirão Do Lipa",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "725.0",
+      "school_name": "Maple Bear Cuiabá - Jardim Itália",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "842.0",
+      "school_name": "Maple Bear Campo Grande - Chácara Cachoeira II",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "845.0",
+      "school_name": "Maple Bear São Vicente",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "PedagÃ³gico SÃ£o Vicente",
+          "email": "pedagogico@saovicente.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Simone Nogueira da Silva",
+          "email": "simone@saovicente.maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "763.0",
+      "school_name": "Maple Bear Florianópolis Norte",
+      "total_users": 2,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Fernanda Simon Machado",
+          "email": "fernanda.simon@maplebearflorianopolis.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Secretaria Maple Bear FlorianÃ³polis Continente",
+          "email": "secretaria@maplebearflorianopolis.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "862.0",
+      "school_name": "Maple Bear Itu",
+      "total_users": 1,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Maple Bear SP - Itu",
+          "email": "itu@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "861.0",
+      "school_name": "Maple Bear Mogiana - Mogi Mirim - Mogi Guaçu",
+      "total_users": 3,
+      "total_licenses": 2,
+      "users": [
+        {
+          "nome": "Denise Lucinaro",
+          "email": "mogiana@maplebear.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Maple Bear Mogiana",
+          "email": "atendimento@maplebearmogiana.com.br",
+          "funcao": "",
+          "has_canva": true
+        },
+        {
+          "nome": "Thais Teodoro - Maple Bear Mogiana",
+          "email": "thais.teodoro@maplebearmogiana.com.br",
+          "funcao": "",
+          "has_canva": true
+        }
+      ]
+    },
+    {
+      "school_id": "874.0",
+      "school_name": "Maple Bear São Paulo - Parque dos Príncipes I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    },
+    {
+      "school_id": "101.0",
+      "school_name": "Maple Bear Piracicaba - Vila Rezende I",
+      "total_users": 0,
+      "total_licenses": 2,
+      "users": []
+    }
+  ],
+  "unallocated_users_count": 0,
+  "unallocated_users_list": [],
+  "licencas_utilizadas": 395
+}

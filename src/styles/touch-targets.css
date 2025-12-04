@@ -74,7 +74,7 @@
 }
 
 /* Garantir que elementos interativos tenham tamanho adequado */
-/* Nao force min-height em controles que usam <button> (checkbox/radio/switch do Radix) */
+/* Não force min-height em controles que usam <button> (checkbox/radio/switch do Radix) */
 button:not(.no-touch-target):not([role="checkbox"]):not([role="radio"]):not([role="switch"]),
 a.button:not(.no-touch-target),
 [role="button"]:not(.no-touch-target) {

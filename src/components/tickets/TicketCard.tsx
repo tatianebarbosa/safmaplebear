@@ -9,6 +9,7 @@ import { format, differenceInDays } from 'date-fns';
 import { MoreVertical, Edit, CheckCircle, Tag as TagIcon } from 'lucide-react';
 import { getAgentDisplayName } from '@/data/teamMembers';
 import { useTicketStore } from '@/stores/ticketStore';
+import { normalizeTicketId } from '@/lib/stringUtils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +35,11 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: Tick
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: ticket.id, resizeObserverConfig: { disabled: true } });
+  } = useSortable({
+    id: ticket.id,
+    data: { type: "ticket", status: ticket.status },
+    resizeObserverConfig: { disabled: true },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -63,6 +68,7 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: Tick
   };
 
   const agentLabel = getAgentDisplayName(ticket.agente);
+  const displayId = normalizeTicketId(ticket.id);
 
   useEffect(() => {
     setDescDraft(ticket.observacao || "");
@@ -105,7 +111,7 @@ export const TicketCard = ({ ticket, canManage, onOpenDetails, onResolve }: Tick
       <div className="flex items-start justify-between mb-2">
         <span className="inline-flex items-center gap-1.5 font-mono text-sm font-semibold px-3 py-1 rounded-full bg-destructive/10 text-destructive border border-destructive/60 shadow-inner">
           <TagIcon className="h-3.5 w-3.5" />
-          #{ticket.id}
+          {displayId}
         </span>
         <div className="flex items-center gap-1">
           {getSLABadge()}

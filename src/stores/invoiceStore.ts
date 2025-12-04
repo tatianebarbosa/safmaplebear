@@ -72,7 +72,7 @@ export const useInvoiceStore = create<InvoiceState>()(
   persist(
     (set, get) => ({
       invoices: seedInvoices,
-      annualBudget: 10000, // R$ 10.000 de oramento anual
+      annualBudget: 10000, // R$ 10.000 de orçamento anual
 
       addInvoice: (invoice) => set(state => ({
         invoices: [...state.invoices, { ...invoice, id: Date.now().toString() }]
@@ -151,12 +151,12 @@ export const useInvoiceStore = create<InvoiceState>()(
 
         const alerts: BudgetAlert[] = [];
 
-        // Alerta de oramento ultrapassado
+        // Alerta de orçamento ultrapassado
         if (yearSpending > annualBudget) {
           alerts.push({
             id: 'over_budget',
             type: 'over_budget',
-            message: `Oramento anual ultrapassado em R$ ${(yearSpending - annualBudget).toFixed(2)}`,
+            message: `Orçamento anual ultrapassado em R$ ${(yearSpending - annualBudget).toFixed(2)}`,
             severity: 'high',
             amount: yearSpending,
             threshold: annualBudget
@@ -167,7 +167,7 @@ export const useInvoiceStore = create<InvoiceState>()(
           alerts.push({
             id: 'approaching_limit',
             type: 'approaching_limit',
-            message: `Usando ${((yearSpending / annualBudget) * 100).toFixed(1)}% do oramento anual`,
+            message: `Usando ${((yearSpending / annualBudget) * 100).toFixed(1)}% do orçamento anual`,
             severity: 'medium',
             amount: yearSpending,
             threshold: annualBudget

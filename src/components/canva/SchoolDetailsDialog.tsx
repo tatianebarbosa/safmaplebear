@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { getNonComplianceReason as getComplianceReason } from '@/lib/validators';
+import { getNãoNãomplianceReason as getComplianceReason } from '@/lib/validators';
 import {
   Dialog,
   DialogContent,
@@ -35,22 +35,22 @@ import { UserDialog } from './UserDialog';
 import { SwapUserDialog } from './SwapUserDialog';
 import { School, HistoryEntry } from '@/types/schoolLicense';
 import { useSchoolLicenseStore } from '@/stores/schoolLicenseStore';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNãow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { showCanvaSyncReminder } from '@/lib/canvaReminder';
 import { dialogLayouts } from './dialogLayouts';
-import { normalizeTicketId } from '@/lib/stringUtils';
+import { NãormalizeTicketId } from '@/lib/stringUtils';
 
 interface SchoolDetailsDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  oNãopenChange: (open: boolean) => void;
   school: School | null;
 }
 
 export const SchoolDetailsDialog = ({ 
   open, 
-  onOpenChange, 
+  oNãopenChange, 
   school 
 }: SchoolDetailsDialogProps) => {
   const currentUser = useAuthStore((s) => s.currentUser);
@@ -61,7 +61,7 @@ export const SchoolDetailsDialog = ({
     'Portal SAF';
 
   const { 
-    getHistoryBySchool, // Adicionar a nova funcao
+    getHistoryBySchool, // Adicionar a Nãova funcao
     getLicenseStatus,
     revertHistoryEntry,
     updateUser,
@@ -103,7 +103,7 @@ export const SchoolDetailsDialog = ({
     if (!revertReason.trim()) {
       toast({
         title: 'Campos obrigatorios',
-        description: 'Informe o motivo/observacao da reversao.',
+        description: 'INãorme o motivo/Observação da reversao.',
         variant: 'destructive'
       });
       return;
@@ -113,9 +113,9 @@ export const SchoolDetailsDialog = ({
       performedBy: revertPerformedBy.trim() || actorName
     });
     toast({
-      title: success ? 'Reversao registrada' : 'Nao foi possivel reverter',
+      title: success ? 'Reversao registrada' : 'Não foi possivel reverter',
       description: success
-        ? 'Os dados foram atualizados e o historico anotado.'
+        ? 'Os dados foram atualizados e o Histórico aNãotado.'
         : 'Verifique se o registro ja foi revertido ou removido.',
       variant: success ? 'default' : 'destructive'
     });
@@ -182,21 +182,21 @@ export const SchoolDetailsDialog = ({
     return "Equipe SAF";
   })();
 
-  const history = getHistoryBySchool(school.id); // Obter o Historico
+  const history = getHistoryBySchool(school.id); // Obter o Histórico
   const licenseStatus = getLicenseStatus(school);
-  const nonCompliantUsers = school.users.filter(u => !u.isCompliant);
-  const normalizedUserSearch = userSearchTerm.trim().toLowerCase();
+  const NãoNãompliantUsers = school.users.filter(u => !u.isCompliant);
+  const NãormalizedUserSearch = userSearchTerm.trim().toLowerCase();
   const filteredUsers = school.users.filter((user) =>
-    !normalizedUserSearch
+    !NãormalizedUserSearch
       ? true
-      : user.name.toLowerCase().includes(normalizedUserSearch) ||
-        user.email.toLowerCase().includes(normalizedUserSearch)
+      : user.name.toLowerCase().includes(NãormalizedUserSearch) ||
+        user.email.toLowerCase().includes(NãormalizedUserSearch)
   );
 
   const clusterLabel = resolvedCluster?.trim();
   const showCluster = clusterLabel && !clusterLabel.toLowerCase().startsWith('outros');
 
-  const getNonComplianceReason = getComplianceReason;
+  const getNãoNãomplianceReason = getComplianceReason;
 
   const handleEditUser = (userId: string) => {
     const user = school.users.find(u => u.id === userId);
@@ -223,7 +223,7 @@ export const SchoolDetailsDialog = ({
 
   return (
     <>
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} oNãopenChange={oNãopenChange}>
       <DialogContent className={`${dialogLayouts.lg} flex flex-col`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -241,13 +241,13 @@ export const SchoolDetailsDialog = ({
               value="overview"
               className="w-full h-12 text-base font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm"
             >
-              Visao Geral
+              Visão Geral
             </TabsTrigger>
             <TabsTrigger
               value="users"
               className="w-full h-12 text-base font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm"
             >
-              Usuarios
+              Usuários
             </TabsTrigger>
             <TabsTrigger
               value="history"
@@ -258,10 +258,10 @@ export const SchoolDetailsDialog = ({
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6 md:space-y-7 min-h-[55vh] sm:min-h-[60vh]">
-            {/* School Information */}
+            {/* School INãormation */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Informacoes da Escola</CardTitle>
+                <CardTitle className="text-lg">INãormações da Escola</CardTitle>
               </CardHeader>
               <CardContent className="space-y-5">
                 <div className="grid grid-cols-1 gap-4 lg:gap-6 md:grid-cols-2">
@@ -279,20 +279,20 @@ export const SchoolDetailsDialog = ({
                       )}
                       <div className="flex items-center gap-2 text-sm">
                         <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Responsavel do cluster:</span>
-                        <span className="text-foreground whitespace-nowrap">{resolvedSafManager || 'Nao informado'}</span>
+                        <span className="font-medium">Responsável do cluster:</span>
+                        <span className="text-foreground whitespace-Nãowrap">{resolvedSafManager || 'Não iNãormado'}</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="rounded-2xl border border-border/60 bg-amber-50/70 p-4 space-y-3 flex flex-col h-full">
                     <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                      Licencas e conformidade
+                      Licenças e coNãormidade
                     </p>
                     <div className="space-y-3 flex-1">
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Licencas:</span>
+                        <span className="font-medium">Licenças:</span>
                         <span>{school.usedLicenses}/{school.totalLicenses}</span>
                         <Badge
                           variant={
@@ -310,9 +310,9 @@ export const SchoolDetailsDialog = ({
                       </div>
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Nao conformes:</span>
-                        <span className={nonCompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
-                          {nonCompliantUsers.length}
+                        <span className="font-medium">Não coNãormes:</span>
+                        <span className={NãoNãompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
+                          {NãoNãompliantUsers.length}
                         </span>
                       </div>
                     </div>
@@ -325,21 +325,21 @@ export const SchoolDetailsDialog = ({
                       onClick={() => {
                         const emails = school.users.map((u) => u.email).filter(Boolean);
                         const body = [
-                          `A Escola ${school.name} ja possui ${school.usedLicenses} licencas ativas na plataforma, vinculadas aos seguintes e-mails:`,
+                          `A Escola ${school.name} ja possui ${school.usedLicenses} Licenças ativas na plataforma, vinculadas aos seguintes e-mails:`,
                           '',
                           ...emails.map((email) => `- ${email}`),
                           '',
-                          'Cada escola tem direito a duas licencas para uso da plataforma de marketing (Canva). Para que possamos conceder uma nova licenca, e necessario transferir ou remover um dos usuarios existentes. Lembramos que a remocao so pode ser realizada mediante autorizacao do responsavel pelo e-mail vinculado a licenca.',
+                          'Cada escola tem direito a duas Licenças para uso da plataforma de marketing (Canva). Para que possamos conceder uma Nãova licença, é necessário transferir ou remover um dos Usuários existentes. Lembramos que a remoção só pode ser realizada mediante autorização do Responsável pelo e-mail vinculado à licença.',
                         ].join('\n');
                         navigator.clipboard?.writeText(body);
                         toast({
                           title: 'Mensagem copiada',
-                          description: 'Cole no e-mail ou chat com o responsavel do cluster.',
+                          description: 'Cole Não e-mail ou chat com o Responsável do cluster.',
                         });
                       }}
                     >
                       <AlertTriangle className="h-4 w-4 text-white" />
-                      <span className="text-white">Copiar aviso de licencas</span>
+                      <span className="text-white">Copiar aVisão de Licenças</span>
                     </Button>
                   </div>
                 </div>
@@ -355,15 +355,15 @@ export const SchoolDetailsDialog = ({
               <CardHeader className="space-y-2">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <CardTitle className="text-lg">Usuarios da Escola</CardTitle>
+                    <CardTitle className="text-lg">Usuários da Escola</CardTitle>
                     <DialogDescription>
-                      Lista completa de Usuarios com suas Informacoes e status de conformidade
+                      Lista completa de Usuários com suas INãormações e status de coNãormidade
                     </DialogDescription>
                   </div>
                   <div className="relative w-full sm:w-72">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Buscar por nome ou email..."
+                      placeholder="Buscar por Nãome ou email..."
                       value={userSearchTerm}
                       onChange={(e) => setUserSearchTerm(e.target.value)}
                       className="pl-9"
@@ -377,12 +377,12 @@ export const SchoolDetailsDialog = ({
                     <div className="text-center py-8">
                       <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-muted-foreground">
-                        Nenhum usuario cadastrado nesta escola.
+                        Nenhum usuário cadastrado nesta escola.
                       </p>
                     </div>
                   ) : filteredUsers.length === 0 ? (
                     <div className="text-center py-6 text-sm text-muted-foreground border rounded-md">
-                      Nenhum usuario encontrado para esta busca.
+                      Nenhum usuário eNãontrado para esta busca.
                     </div>
                   ) : (
                     filteredUsers.map((user) => (
@@ -402,7 +402,7 @@ export const SchoolDetailsDialog = ({
                             <div className="w-2 h-2 bg-destructive rounded-full"></div>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>{getNonComplianceReason(user.email)}</p>
+                            <p>{getNãoNãomplianceReason(user.email)}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -415,7 +415,7 @@ export const SchoolDetailsDialog = ({
                           {user.createdAt && (
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <Calendar className="h-3 w-3" />
-                              Adicionado {formatDistanceToNow(new Date(user.createdAt), {
+                              Adicionado {formatDistanceToNãow(new Date(user.createdAt), {
                                 addSuffix: true,
                                 locale: ptBR,
                               })}
@@ -425,7 +425,7 @@ export const SchoolDetailsDialog = ({
                         <div className="flex items-center gap-2">
                           {!user.isCompliant && (
                             <Badge variant="destructive">
-                              Nao Conforme
+                              Não CoNãorme
                             </Badge>
                           )}
                           <TooltipProvider>
@@ -455,7 +455,7 @@ export const SchoolDetailsDialog = ({
                                   <RefreshCw className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Transferir licenca</TooltipContent>
+                              <TooltipContent>Transferir licença</TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                           <TooltipProvider>
@@ -511,7 +511,7 @@ export const SchoolDetailsDialog = ({
 	                                <div className="flex items-center gap-2">
 	                                  <Calendar className="h-4 w-4 text-muted-foreground" />
 	                                  <span className="text-sm text-muted-foreground">
-	                                    {formatDistanceToNow(new Date(entry.timestamp), {
+	                                    {formatDistanceToNãow(new Date(entry.timestamp), {
 	                                      addSuffix: true,
 	                                      locale: ptBR,
 	                                    })}
@@ -540,20 +540,20 @@ export const SchoolDetailsDialog = ({
 
                             {/* Details */}
                             <div className="space-y-2">
-                              <h4 className="text-sm font-medium">Detalhes da Acao:</h4>
+                              <h4 className="text-sm font-medium">Detalhes da Ação:</h4>
                               <p className="text-sm text-muted-foreground bg-muted p-3 rounded">
                                 {entry.details}
                               </p>
                               {entry.reverted && (
                                 <div className="text-xs text-muted-foreground bg-muted/60 p-2 rounded">
-                                  Revertido por {entry.revertedBy || 'Nao informado'}{' '}
+                                  Revertido por {entry.revertedBy || 'Não iNãormado'}{' '}
                                   {entry.revertTimestamp
-                                    ? formatDistanceToNow(new Date(entry.revertTimestamp), {
+                                    ? formatDistanceToNãow(new Date(entry.revertTimestamp), {
                                         addSuffix: true,
                                         locale: ptBR,
                                       })
                                     : ''}
-                                  . Motivo: {entry.revertReason || 'Nao informado'}.
+                                  . Motivo: {entry.revertReason || 'Não iNãormado'}.
                                 </div>
                               )}
                             </div>
@@ -570,24 +570,24 @@ export const SchoolDetailsDialog = ({
       </DialogContent>
     </Dialog>
 
-    <Dialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
+    <Dialog open={revertDialogOpen} oNãopenChange={setRevertDialogOpen}>
       <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
         <DialogHeader>
-          <DialogTitle>Reverter alteracao</DialogTitle>
+          <DialogTitle>Reverter alteração</DialogTitle>
           <DialogDescription>
-            Informe o motivo/observacao. O responsavel sera o usuario logado.
+            INãorme o motivo/observação. O Responsável será o usuário logado.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="text-sm text-muted-foreground">
-            Responsavel: <span className="font-medium text-foreground">{actorName}</span>
+            Responsável: <span className="font-medium text-foreground">{actorName}</span>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="revertReason">Motivo / Observacao *</Label>
+            <Label htmlFor="revertReason">Motivo / Observação *</Label>
             <Textarea
               id="revertReason"
               rows={3}
-              placeholder="Descreva o motivo e a referencia (ticket/e-mail)"
+              placeholder="Descreva o motivo e a referência (ticket/e-mail)"
               value={revertReason}
               onChange={(event) => setRevertReason(event.target.value)}
               className={!revertReason.trim() ? "border-destructive" : ""}
@@ -598,17 +598,17 @@ export const SchoolDetailsDialog = ({
           <Button variant="outline" onClick={() => setRevertDialogOpen(false)}>
             Cancelar
           </Button>
-          <Button onClick={handleConfirmRevert}>
+          <ButtoNãonClick={handleConfirmRevert}>
             Confirmar
           </Button>
         </div>
     </DialogContent>
     </Dialog>
 
-    {/* Dialogs de acao em "Gerenciar Usuarios" */}
+    {/* Dialogs de acao em "Gerenciar Usuários" */}
     <UserDialog
       open={showEditDialog}
-      onOpenChange={setShowEditDialog}
+      oNãopenChange={setShowEditDialog}
       onSave={(payload) => {
         if (!editingUser) return;
         const userData =
@@ -625,8 +625,8 @@ export const SchoolDetailsDialog = ({
 
     <SwapUserDialog
       open={showSwapDialog}
-      onOpenChange={setShowSwapDialog}
-      onConfirm={(payload: any) => {
+      oNãopenChange={setShowSwapDialog}
+      oNãonfirm={(payload: any) => {
         if (!swappingUserId) return;
         const reason = `${payload.reason} | Ticket: ${payload.ticketNumber}`;
         const performedByUser = actorName;
@@ -634,7 +634,7 @@ export const SchoolDetailsDialog = ({
         if (payload.mode === "cross-school" && payload.targetSchoolId) {
           let targetUserId = payload.targetUserId;
 
-          // Se a escola destino nao tiver usuarios, criamos automaticamente baseado em quem libera a licenca
+          // Se a escola destiNão Não tiver Usuários, criamos automaticamente baseado em quem libera a licenca
           if (!targetUserId && payload.createTargetFromOutgoing) {
             const sourceUser = school.users.find((u) => u.id === swappingUserId);
             if (sourceUser) {
@@ -648,9 +648,9 @@ export const SchoolDetailsDialog = ({
                 },
                 {
                   origemSolicitacao: "E-mail",
-                  solicitadoPorNome: payload.performedBy || performedByUser,
+                  solicitadoPorNãome: payload.performedBy || performedByUser,
                   solicitadoPorEmail: payload.performedBy || performedByUser,
-                  observacao: `Criado automaticamente ao transferir licenca de ${school.name}`,
+                  Observação: `Criado automaticamente ao transferir licenca de ${school.name}`,
                   performedBy: performedByUser,
                 }
               );
@@ -671,8 +671,8 @@ export const SchoolDetailsDialog = ({
             );
           } else {
             toast({
-              title: "Nao foi possivel transferir",
-              description: "Escolha uma escola com usuarios ou cadastre um usuario antes de transferir.",
+              title: "Não foi possivel transferir",
+              description: "Escolha uma escola com Usuários ou cadastre um usuario antes de transferir.",
               variant: "destructive",
             });
           }
@@ -684,7 +684,7 @@ export const SchoolDetailsDialog = ({
             { 
               reason,
               performedBy: performedByUser,
-              notes: payload.notes,
+              Nãotes: payload.Nãotes,
             } as any
           );
         }
@@ -700,11 +700,11 @@ export const SchoolDetailsDialog = ({
     />
 
     {/* Dialog de justificativa para edicao */}
-    <Dialog open={showEditJustify} onOpenChange={setShowEditJustify}>
+    <Dialog open={showEditJustify} oNãopenChange={setShowEditJustify}>
       <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>Justificar edicao</DialogTitle>
-          <DialogDescription>Informe o ticket para registrar no historico.</DialogDescription>
+          <DialogDescription>INãorme o ticket para registrar Não Histórico.</DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="text-sm text-muted-foreground">
@@ -715,12 +715,12 @@ export const SchoolDetailsDialog = ({
               <Input
                 id="editTicket"
                 value={editTicket}
-                onChange={(e) => setEditTicket(normalizeTicketId(e.target.value))}
+                onChange={(e) => setEditTicket(NãormalizeTicketId(e.target.value))}
                 className={!editTicket.trim() ? "border-destructive" : ""}
               />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="editObs">Observacao</Label>
+            <Label htmlFor="editObs">Observação</Label>
             <Textarea
               id="editObs"
               placeholder="Observacoes adicionais (opcional)"
@@ -763,13 +763,13 @@ export const SchoolDetailsDialog = ({
       </DialogContent>
     </Dialog>
 
-    {/* Dialog de remocao com ticket/observacao */}
-    <Dialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+    {/* Dialog de remocao com ticket/Observação */}
+    <Dialog open={showRemoveDialog} oNãopenChange={setShowRemoveDialog}>
       <DialogContent className={`${dialogLayouts.sm} flex flex-col user-dialog-compact`}>
         <DialogHeader>
           <DialogTitle>Remover usuario</DialogTitle>
           <DialogDescription>
-            Informe o ticket como justificativa. Observacao e responsavel sao opcionais, mas recomendados.
+            INãorme o ticket como justificativa. Observação e Responsável sao opcionais, mas recomendados.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
@@ -782,12 +782,12 @@ export const SchoolDetailsDialog = ({
               <Input
                 id="removeTicket"
                 value={removeTicket}
-                onChange={(e) => setRemoveTicket(normalizeTicketId(e.target.value))}
+                onChange={(e) => setRemoveTicket(NãormalizeTicketId(e.target.value))}
                 className={!removeTicket ? "border-destructive" : ""}
               />
             </div>
           <div className="space-y-2">
-            <Label htmlFor="removeObs">Observacao</Label>
+            <Label htmlFor="removeObs">Observação</Label>
             <Textarea
               id="removeObs"
               placeholder="Observacoes adicionais"
@@ -825,6 +825,9 @@ export const SchoolDetailsDialog = ({
     </>
   );
 };
+
+
+
 
 
 

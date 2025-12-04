@@ -230,6 +230,16 @@
 /* ===================================================================== */
 
 @layer components {
+  /* Garante contraste em superfícies vermelhas (bg-primary ou bg-[#c1121f]) */
+  [class*="bg-primary"],
+  [class*="bg-[#c1121f]"] {
+    color: #ffffff;
+  }
+  [class*="bg-primary"] *,
+  [class*="bg-[#c1121f]"] * {
+    color: #ffffff;
+  }
+
   /* Linha vermelha consistente para itens ativos de navegacao e abas */
   .menu-underline {
     position: relative;

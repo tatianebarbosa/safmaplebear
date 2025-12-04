@@ -42,6 +42,7 @@ import {
   Upload,
   Search,
   Download,
+  ArrowUpDown,
 } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { UsageFilters, CanvaUsageData, UsagePeriod } from "@/types/schoolLicense";
@@ -56,6 +57,7 @@ import {
   ModelUsage,
   TimeSeriesPoint,
 } from "@/lib/canvaUsageService";
+import { readFileAsUtf8 } from "@/lib/fileUtils";
 import { filterRecentTimeSeries } from "@/lib/chartUtils";
 import { toast } from "sonner";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
@@ -72,6 +74,7 @@ interface CanvaUsageDashboardProps {
 
 const periodLabel = (period: UsageFilters["period"]) => {
   const labels: Record<UsageFilters["period"], string> = {
+    "7d": "Ultimos 7 dias",
     "30d": "Ultimos 30 dias",
     "3m": "Ultimos 3 meses",
     "6m": "Ultimos 6 meses",
@@ -91,11 +94,13 @@ export const CanvaUsageDashboard = ({
   const { schools } = useSchoolLicenseStore();
   type MetricKey = "designsCreated" | "designsPublished" | "designsShared" | "designsViewed";
   type CreatorMetric = "designs" | "published" | "shared" | "viewed";
+  type ModelSortKey = "modelName" | "owner" | "uses" | "published" | "shared";
+  type MemberSortKey = "name" | "lastActivity" | "designs" | "published" | "shared" | "viewed";
   const [activeTab, setActiveTab] = useState<"models" | "members" | "kits">("models");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOwner, setSelectedOwner] = useState<string | "all">("all");
   const [filters, setFilters] = useState<UsageFilters>({
-    period: "12m",
+    period: "7d",
     cluster: undefined,
     school: undefined,
   });
@@ -106,8 +111,12 @@ export const CanvaUsageDashboard = ({
   const [rankLimit, setRankLimit] = useState(3);
   const [schoolSort, setSchoolSort] = useState<MetricKey>("designsCreated");
   const [creatorSort, setCreatorSort] = useState<CreatorMetric>("designs");
-  const [memberUploadPeriod, setMemberUploadPeriod] = useState<UsagePeriod>("30d");
-  const [modelUploadPeriod, setModelUploadPeriod] = useState<UsagePeriod>("30d");
+  const [modelSort, setModelSort] = useState<ModelSortKey>("uses");
+  const [modelSortDirection, setModelSortDirection] = useState<"asc" | "desc">("desc");
+  const [memberSort, setMemberSort] = useState<MemberSortKey>("designs");
+  const [memberSortDirection, setMemberSortDirection] = useState<"asc" | "desc">("desc");
+  const [memberUploadPeriod, setMemberUploadPeriod] = useState<UsagePeriod>("7d");
+  const [modelUploadPeriod, setModelUploadPeriod] = useState<UsagePeriod>("7d");
   const [applyMembersToAll, setApplyMembersToAll] = useState(false);
   const [applyModelsToAll, setApplyModelsToAll] = useState(false);
   const [memberDateRange, setMemberDateRange] = useState<DateRange | undefined>();
@@ -141,12 +150,12 @@ export const CanvaUsageDashboard = ({
   };
 
   const clusterOptions = [
-    { value: "Implantação", label: "Implantação" },
+    { value: "Implantacao", label: "Implantacao" },
     { value: "Alta Performance", label: "Alta Performance" },
     { value: "Potente", label: "Potente" },
     { value: "Desenvolvimento", label: "Desenvolvimento" },
     { value: "Alerta", label: "Alerta" },
-    { value: "Outros/Implantação", label: "Outros/Implantação" },
+    { value: "Outros/Implantacao", label: "Outros/Implantacao" },
   ];
 
   const refreshUploadInfo = useCallback(() => {
@@ -300,27 +309,37 @@ export const CanvaUsageDashboard = ({
     return map;
   }, [schools]);
 
-  const allCreators = filteredUsage
-    .flatMap((school) =>
-      school.topCreators.map((creator) => ({
-        ...creator,
-        schoolName: creator.schoolName ?? school.schoolName,
-        schoolCluster: school.cluster ?? "Sem cluster",
-      }))
-    )
-    .filter((creator) => !excludedEmails.has(creator.email?.toLowerCase?.() ?? ""))
-    .map((creator) => ({
-      ...creator,
-      metricValue:
-        creatorSort === "designs"
-          ? creator.designs
-          : creatorSort === "published"
-          ? creator.published ?? 0
-          : creatorSort === "shared"
-          ? creator.shared ?? 0
-          : creator.viewed ?? 0,
-    }))
-    .sort((a, b) => b.metricValue - a.metricValue);
+  const creatorEntries = useMemo(
+    () =>
+      filteredUsage
+        .flatMap((school) =>
+          school.topCreators.map((creator) => ({
+            ...creator,
+            schoolName: creator.schoolName ?? school.schoolName,
+            schoolCluster: creator.cluster ?? school.cluster ?? "Sem cluster",
+          }))
+        )
+        .filter((creator) => !excludedEmails.has(creator.email?.toLowerCase?.() ?? "")),
+    [excludedEmails, filteredUsage]
+  );
+
+  const allCreators = useMemo(
+    () =>
+      creatorEntries
+        .map((creator) => ({
+          ...creator,
+          metricValue:
+            creatorSort === "designs"
+              ? creator.designs
+              : creatorSort === "published"
+              ? creator.published ?? 0
+              : creatorSort === "shared"
+              ? creator.shared ?? 0
+              : creator.viewed ?? 0,
+        }))
+        .sort((a, b) => b.metricValue - a.metricValue),
+    [creatorEntries, creatorSort]
+  );
 
   const rankedCreators = allCreators.slice(0, rankLimit);
   const missingSlots = Math.max(0, rankLimit - rankedCreators.length);
@@ -339,7 +358,7 @@ export const CanvaUsageDashboard = ({
     navigator.clipboard
       ?.writeText(email)
       .then(() => toast.success("Email copiado para comunicar o destaque."))
-      .catch(() => toast.error("Nao foi possivel copiar o email agora."));
+      .catch(() => toast.error("Nao foi possivel copiar o e-mail agora."));
   };
 
   const ownerOptions = useMemo(() => {
@@ -360,6 +379,100 @@ export const CanvaUsageDashboard = ({
       return matchesOwner && matchesSearch;
     });
   }, [modelRanking, searchTerm, selectedOwner]);
+
+  const sortedModels = useMemo(() => {
+    const direction = modelSortDirection === "asc" ? 1 : -1;
+    const getValue = (model: ModelUsage) => {
+      switch (modelSort) {
+        case "modelName":
+          return model.modelName?.toLowerCase?.() ?? "";
+        case "owner":
+          return model.owner?.toLowerCase?.() ?? "";
+        case "published":
+          return model.published ?? 0;
+        case "shared":
+          return model.shared ?? 0;
+        case "uses":
+        default:
+          return model.uses ?? 0;
+      }
+    };
+    return [...filteredModels].sort((a, b) => {
+      const aVal = getValue(a);
+      const bVal = getValue(b);
+      if (typeof aVal === "string" || typeof bVal === "string") {
+        return (String(aVal)).localeCompare(String(bVal), "pt-BR") * direction;
+      }
+      return ((aVal as number) - (bVal as number)) * direction;
+    });
+  }, [filteredModels, modelSort, modelSortDirection]);
+
+  const parseActivityDate = (value?: string | null) => {
+    if (!value) return null;
+    const direct = new Date(value);
+    if (!Number.isNaN(direct.getTime())) return direct.getTime();
+    const match = value.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+    if (match) {
+      const day = Number(match[1]);
+      const month = Number(match[2]) - 1;
+      let year = Number(match[3]);
+      if (year < 100) year += 2000;
+      const parsed = new Date(year, month, day);
+      if (!Number.isNaN(parsed.getTime())) return parsed.getTime();
+    }
+    return null;
+  };
+
+  const sortedMembers = useMemo(() => {
+    const direction = memberSortDirection === "asc" ? 1 : -1;
+    const getValue = (creator: (typeof creatorEntries)[number]) => {
+      switch (memberSort) {
+        case "name":
+          return creator.name?.toLowerCase?.() ?? "";
+        case "lastActivity":
+          return parseActivityDate(creator.lastActivity) ?? 0;
+        case "published":
+          return creator.published ?? 0;
+        case "shared":
+          return creator.shared ?? 0;
+        case "viewed":
+          return creator.viewed ?? 0;
+        case "designs":
+        default:
+          return creator.designs ?? 0;
+      }
+    };
+    return [...creatorEntries].sort((a, b) => {
+      const aVal = getValue(a);
+      const bVal = getValue(b);
+      if (typeof aVal === "string" || typeof bVal === "string") {
+        return String(aVal).localeCompare(String(bVal), "pt-BR") * direction;
+      }
+      return ((aVal as number) - (bVal as number)) * direction;
+    });
+  }, [creatorEntries, memberSort, memberSortDirection]);
+
+  const handleModelSort = (key: ModelSortKey) => {
+    setModelSort((current) => {
+      if (current === key) {
+        setModelSortDirection((dir) => (dir === "asc" ? "desc" : "asc"));
+        return current;
+      }
+      setModelSortDirection("desc");
+      return key;
+    });
+  };
+
+  const handleMemberSort = (key: MemberSortKey) => {
+    setMemberSort((current) => {
+      if (current === key) {
+        setMemberSortDirection((dir) => (dir === "asc" ? "desc" : "asc"));
+        return current;
+      }
+      setMemberSortDirection("desc");
+      return key;
+    });
+  };
 
   const overrideCount = useMemo(() => {
     const memberCount = memberOverrides.filter((o) => o.filename).length;
@@ -405,7 +518,7 @@ export const CanvaUsageDashboard = ({
     if (!file) return;
     setUploadingMembers(true);
     try {
-      const text = await file.text();
+      const text = await readFileAsUtf8(file);
       const label = memberLabel.trim() || formatRangeLabel(memberDateRange) || undefined;
       await uploadMemberReport(file, applyMembersToAll ? "all" : memberUploadPeriod, text, label);
       const summary = await canvaCollector.summarizeCsvContent(text);
@@ -433,7 +546,7 @@ export const CanvaUsageDashboard = ({
     if (!file) return;
     setUploadingModels(true);
     try {
-      const text = await file.text();
+      const text = await readFileAsUtf8(file);
       const label = modelLabel.trim() || formatRangeLabel(modelDateRange) || undefined;
       await uploadModelReport(file, applyModelsToAll ? "all" : modelUploadPeriod, text, label);
       const summary = await canvaCollector.summarizeCsvContent(text);
@@ -493,6 +606,7 @@ export const CanvaUsageDashboard = ({
                   <SelectValue placeholder="Periodo" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="7d">Ultimos 7 dias</SelectItem>
                   <SelectItem value="30d">Ultimos 30 dias</SelectItem>
                   <SelectItem value="3m">Ultimos 3 meses</SelectItem>
                   <SelectItem value="6m">Ultimos 6 meses</SelectItem>
@@ -687,7 +801,7 @@ export const CanvaUsageDashboard = ({
                 onChange={handleModelUpload}
               />
               <p className="text-xs text-muted-foreground">
-                Ultimo upload de modelos: {lastModelUpload ?? "Nenhum"}
+              Ultimo upload de modelos: {lastModelUpload ?? "Nenhum"}
               </p>
               {modelOverrides.some((o) => o.filename) && (
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -701,30 +815,66 @@ export const CanvaUsageDashboard = ({
                   ))}
                 </div>
               )}
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredModels.length === 0 ? (
-                  <div className="col-span-full rounded-lg border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
-                    Nenhum modelo encontrado para os filtros atuais.
-                  </div>
-                ) : (
-                  filteredModels.map((model) => (
-                    <Card key={`${model.modelName}-${model.owner}`} className="border-border/60 shadow-sm">
-                      <CardContent className="p-4 space-y-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-medium text-foreground">{model.modelName}</p>
-                            <p className="text-xs text-muted-foreground">Titular: {model.owner}</p>
-                          </div>
-                          <Badge variant="secondary">{model.uses} usos</Badge>
-                        </div>
-                        <div className="flex gap-3 text-xs text-muted-foreground">
-                          <span>Publicados: {model.published}</span>
-                          <span>Compartilhados: {model.shared}</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
+              <div className="overflow-x-auto rounded-lg border border-border/60 bg-card">
+                <table className="w-full min-w-[720px] text-sm">
+                  <thead className="bg-muted/40 text-muted-foreground">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-medium text-foreground">Modelo</th>
+                      <th className="px-3 py-2 text-left font-medium text-foreground">Titular</th>
+                      <th className="px-3 py-2 text-left font-medium">
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 text-xs font-medium text-foreground"
+                          onClick={() => handleModelSort("uses")}
+                        >
+                          Usadas
+                          <ArrowUpDown className={`h-3.5 w-3.5 ${modelSort === "uses" ? "text-primary" : "text-muted-foreground"}`} />
+                        </button>
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium">
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 text-xs font-medium text-foreground"
+                          onClick={() => handleModelSort("published")}
+                        >
+                          Publicado
+                          <ArrowUpDown className={`h-3.5 w-3.5 ${modelSort === "published" ? "text-primary" : "text-muted-foreground"}`} />
+                        </button>
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium">
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 text-xs font-medium text-foreground"
+                          onClick={() => handleModelSort("shared")}
+                        >
+                          Compartilhado
+                          <ArrowUpDown className={`h-3.5 w-3.5 ${modelSort === "shared" ? "text-primary" : "text-muted-foreground"}`} />
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedModels.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-3 py-4 text-center text-muted-foreground text-sm">
+                          Nenhum modelo encontrado para os filtros atuais.
+                        </td>
+                      </tr>
+                    ) : (
+                      sortedModels.map((model) => (
+                        <tr key={`${model.modelName}-${model.owner}`} className="border-t border-border/40">
+                          <td className="px-3 py-2">
+                            <div className="font-medium text-foreground">{model.modelName}</div>
+                          </td>
+                          <td className="px-3 py-2 text-muted-foreground">{model.owner || "Sem titular"}</td>
+                          <td className="px-3 py-2 font-semibold text-foreground">{Number(model.uses ?? 0).toLocaleString()}</td>
+                          <td className="px-3 py-2">{Number(model.published ?? 0).toLocaleString()}</td>
+                          <td className="px-3 py-2">{Number(model.shared ?? 0).toLocaleString()}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </TabsContent>
 
@@ -755,12 +905,13 @@ export const CanvaUsageDashboard = ({
                   <SelectTrigger className="h-9 w-32">
                     <SelectValue placeholder="Periodo" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30d">30 dias</SelectItem>
-                    <SelectItem value="3m">3 meses</SelectItem>
-                    <SelectItem value="6m">6 meses</SelectItem>
-                    <SelectItem value="12m">12 meses</SelectItem>
-                  </SelectContent>
+                <SelectContent>
+                  <SelectItem value="7d">7 dias</SelectItem>
+                  <SelectItem value="30d">30 dias</SelectItem>
+                  <SelectItem value="3m">3 meses</SelectItem>
+                  <SelectItem value="6m">6 meses</SelectItem>
+                  <SelectItem value="12m">12 meses</SelectItem>
+                </SelectContent>
                 </Select>
                 <Button onClick={() => memberFileRef.current?.click()} disabled={uploadingMembers} className="gap-2">
                   <Upload className="h-4 w-4" />
@@ -775,7 +926,7 @@ export const CanvaUsageDashboard = ({
                 onChange={handleMemberUpload}
               />
               <p className="text-xs text-muted-foreground">
-                Ultimo upload de membros: {lastMemberUpload ?? "Nenhum"}
+              Ultimo upload de membros: {lastMemberUpload ?? "Nenhum"}
               </p>
               {memberOverrides.some((o) => o.filename) && (
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -792,7 +943,7 @@ export const CanvaUsageDashboard = ({
               <div className="grid gap-3 sm:grid-cols-3">
                 <Card className="border-border/60 shadow-sm">
                   <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground">Licencas em uso</p>
+                    <p className="text-sm text-muted-foreground">Licen?as em uso</p>
                     <div className="text-2xl font-semibold">{memberTotals.total.toLocaleString()}</div>
                   </CardContent>
                 </Card>
@@ -809,6 +960,106 @@ export const CanvaUsageDashboard = ({
                   </CardContent>
                 </Card>
               </div>
+
+              <Card className="border-border/60 shadow-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-medium">Membros importados</CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground">
+                    Cabecalho de filtros sempre visivel para ordenar atividade e engajamento.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="overflow-x-auto rounded-lg border border-border/60 bg-card">
+                    <table className="w-full min-w-[900px] text-sm">
+                      <thead className="bg-muted/40 text-muted-foreground">
+                        <tr>
+                          <th className="px-3 py-2 text-left font-medium text-foreground">Membro</th>
+                          <th className="px-3 py-2 text-left font-medium text-foreground">Escola</th>
+                          <th className="px-3 py-2 text-left font-medium">
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-xs font-medium text-foreground"
+                              onClick={() => handleMemberSort("lastActivity")}
+                            >
+                              Ultima atividade
+                              <ArrowUpDown className={`h-3.5 w-3.5 ${memberSort === "lastActivity" ? "text-primary" : "text-muted-foreground"}`} />
+                            </button>
+                          </th>
+                          <th className="px-3 py-2 text-left font-medium">
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-xs font-medium text-foreground"
+                              onClick={() => handleMemberSort("designs")}
+                            >
+                              Designs criados
+                              <ArrowUpDown className={`h-3.5 w-3.5 ${memberSort === "designs" ? "text-primary" : "text-muted-foreground"}`} />
+                            </button>
+                          </th>
+                          <th className="px-3 py-2 text-left font-medium">
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-xs font-medium text-foreground"
+                              onClick={() => handleMemberSort("published")}
+                            >
+                              Designs publicados
+                              <ArrowUpDown className={`h-3.5 w-3.5 ${memberSort === "published" ? "text-primary" : "text-muted-foreground"}`} />
+                            </button>
+                          </th>
+                          <th className="px-3 py-2 text-left font-medium">
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-xs font-medium text-foreground"
+                              onClick={() => handleMemberSort("shared")}
+                            >
+                              Links compartilhados
+                              <ArrowUpDown className={`h-3.5 w-3.5 ${memberSort === "shared" ? "text-primary" : "text-muted-foreground"}`} />
+                            </button>
+                          </th>
+                          <th className="px-3 py-2 text-left font-medium">
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-xs font-medium text-foreground"
+                              onClick={() => handleMemberSort("viewed")}
+                            >
+                              Designs visualizados
+                              <ArrowUpDown className={`h-3.5 w-3.5 ${memberSort === "viewed" ? "text-primary" : "text-muted-foreground"}`} />
+                            </button>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedMembers.length === 0 ? (
+                          <tr>
+                            <td colSpan={7} className="px-3 py-4 text-center text-sm text-muted-foreground">
+                              Nenhum membro encontrado para os filtros atuais.
+                            </td>
+                          </tr>
+                        ) : (
+                          sortedMembers.slice(0, 25).map((creator, index) => (
+                            <tr key={`${creator.email}-${index}`} className="border-t border-border/40">
+                              <td className="px-3 py-2">
+                                <div className="font-medium text-foreground">{creator.name || "Sem nome"}</div>
+                                <div className="text-xs text-muted-foreground">{creator.email || "Sem email"}</div>
+                              </td>
+                              <td className="px-3 py-2">
+                                <div className="text-sm text-foreground">{creator.schoolName || "Sem escola"}</div>
+                                <div className="text-xs text-muted-foreground">Cluster: {creator.schoolCluster ?? "Sem cluster"}</div>
+                              </td>
+                              <td className="px-3 py-2 text-sm text-muted-foreground">
+                                {creator.lastActivity || "-"}
+                              </td>
+                              <td className="px-3 py-2 font-semibold text-foreground">{Number(creator.designs ?? 0).toLocaleString()}</td>
+                              <td className="px-3 py-2">{Number(creator.published ?? 0).toLocaleString()}</td>
+                              <td className="px-3 py-2">{Number(creator.shared ?? 0).toLocaleString()}</td>
+                              <td className="px-3 py-2">{Number(creator.viewed ?? 0).toLocaleString()}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="kits" className="space-y-3">
@@ -1118,7 +1369,7 @@ export const CanvaUsageDashboard = ({
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">—</div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground"></div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">Aguardando dado</div>
                     </div>
                   );

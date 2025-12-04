@@ -79,11 +79,6 @@ const Header = () => {
                   className="h-11 w-auto object-contain"
                 />
               </div>
-              <div className="pl-0.5">
-                <span className="text-2xl md:text-3xl font-bold leading-tight tracking-tight text-[#c1121f]">
-                  Maple Bear
-                </span>
-              </div>
             </div>
             <nav className="hidden md:flex items-center gap-2">
               {navItems.map((item) => {

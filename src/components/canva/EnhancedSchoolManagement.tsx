@@ -142,7 +142,7 @@ export const EnhancedSchoolManagement = ({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status das Licenças</label>
+              <label className="text-sm font-medium">Status das Licen?as</label>
               <Select value={licenseFilter} onValueChange={setLicenseFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos os status" />
@@ -254,7 +254,7 @@ export const EnhancedSchoolManagement = ({
                   {/* License Usage Progress */}
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Uso de Licenças</span>
+                      <span>Uso de Licen?as</span>
                       <span>{Math.round(school.utilizationRate)}%</span>
                     </div>
                     <Progress 

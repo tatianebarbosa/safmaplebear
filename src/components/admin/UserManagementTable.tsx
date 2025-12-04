@@ -183,7 +183,7 @@ const UserManagementTable = () => {
         toast({ title: 'Erro', description: result.message, variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Erro de Conexo', description: error.message || 'No foi possvel criar o usu?rio.', variant: 'destructive' });
+      toast({ title: 'Erro de Conex?o', description: error.message || 'No foi possvel criar o usu?rio.', variant: 'destructive' });
     }
   };
 
@@ -204,7 +204,7 @@ const UserManagementTable = () => {
         toast({ title: 'Erro', description: result.message, variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Erro de Conexo', description: error.message || 'No foi possvel atualizar a senha.', variant: 'destructive' });
+      toast({ title: 'Erro de Conex?o', description: error.message || 'No foi possvel atualizar a senha.', variant: 'destructive' });
     }
   };
 
@@ -226,7 +226,7 @@ const UserManagementTable = () => {
         toast({ title: 'Erro', description: result.message, variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Erro de Conexo', description: error.message || 'No foi possvel atualizar o perfil.', variant: 'destructive' });
+      toast({ title: 'Erro de Conex?o', description: error.message || 'No foi possvel atualizar o perfil.', variant: 'destructive' });
     }
   };
 
@@ -246,7 +246,7 @@ const UserManagementTable = () => {
       setUsers((current) => current.filter((u) => u.id !== user.id));
       toast({ title: 'Usurio removido', description: result.message || 'Acesso revogado com sucesso.' });
     } catch (error: any) {
-      toast({ title: 'Erro de Conexo', description: error.message || 'No foi possvel deletar o usu?rio.', variant: 'destructive' });
+      toast({ title: 'Erro de Conex?o', description: error.message || 'No foi possvel deletar o usu?rio.', variant: 'destructive' });
     }
   };
 

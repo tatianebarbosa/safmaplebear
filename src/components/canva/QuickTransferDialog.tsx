@@ -262,7 +262,7 @@ export const QuickTransferDialog = ({
                 disabled={!userOptions.length}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione um usuário do site" />
+                  <SelectValue placeholder="Selecione um usuario do site" />
                 </SelectTrigger>
                 <SelectContent>
                   {userOptions.map((opt) => (

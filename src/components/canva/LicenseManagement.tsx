@@ -38,12 +38,12 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
     }
 
     if ((action === 'remove' || action === 'delete') && !selectedUser) {
-      toast.error('Selecione um usuário para remover ou excluir');
+      toast.error('Selecione um usuario para remover ou excluir');
       return;
     }
 
     if (action === 'transfer' && (!selectedUser || !targetSchoolId)) {
-      toast.error('Selecione usuário e escola de destino para transferir');
+      toast.error('Selecione usuario e escola de destino para transferir');
       return;
     }
 
@@ -67,19 +67,19 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
 
   const getActionLabel = () => {
     switch (action) {
-      case 'add': return 'Adicionar Licença';
-      case 'remove': return 'Remover Licença';
-      case 'transfer': return 'Transferir Usurio';
-      case 'delete': return 'Excluir Usurio';
+      case 'add': return 'Adicionar Licenca';
+      case 'remove': return 'Remover Licenca';
+      case 'transfer': return 'Transferir Usuario';
+      case 'delete': return 'Excluir Usuario';
     }
   };
 
   const getActionDescription = () => {
     switch (action) {
-      case 'add': return 'Aumentar o limite de licenças da escola';
-      case 'remove': return 'Remover licença de um usuário específico';
-      case 'transfer': return 'Transferir usuário para outra escola';
-      case 'delete': return 'Excluir usuário permanentemente';
+      case 'add': return 'Aumentar o limite de licencas da escola';
+      case 'remove': return 'Remover licenca de um usuario especifico';
+      case 'transfer': return 'Transferir usuario para outra escola';
+      case 'delete': return 'Excluir usuario permanentemente';
     }
   };
 
@@ -97,7 +97,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
               <Building2 className="h-4 w-4 text-muted-foreground" />
               <div>
                 <div className="text-2xl font-bold">{totalLicenses}</div>
-                <div className="text-sm text-muted-foreground">Total de Licenças</div>
+                <div className="text-sm text-muted-foreground">Total de Licencas</div>
               </div>
             </div>
           </CardContent>
@@ -109,7 +109,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
               <User className="h-4 w-4 text-muted-foreground" />
               <div>
                 <div className="text-2xl font-bold">{usedLicenses}</div>
-                <div className="text-sm text-muted-foreground">Licenças Ativas</div>
+                <div className="text-sm text-muted-foreground">Licencas Ativas</div>
               </div>
             </div>
           </CardContent>
@@ -133,7 +133,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
               <AlertTriangle className="h-4 w-4 text-destructive" />
               <div>
                 <div className="text-2xl font-bold text-destructive">{nonCompliantUsers.length}</div>
-                <div className="text-sm text-muted-foreground">Fora da Política</div>
+                <div className="text-sm text-muted-foreground">Fora da Politica</div>
               </div>
             </div>
           </CardContent>
@@ -146,10 +146,10 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
-              Usuários Fora da Política ({nonCompliantUsers.length})
+              Usuarios Fora da Politica ({nonCompliantUsers.length})
             </CardTitle>
             <CardDescription>
-              Usuários sem domínio autorizado (@maplebear.com.br, @mbcentral.com.br, @sebsa.com.br, @seb.com.br)
+              Usuarios sem dominio autorizado (@maplebear.com.br, @mbcentral.com.br, @sebsa.com.br, @seb.com.br)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -182,9 +182,9 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
       {/* License Management */}
       <Card>
         <CardHeader>
-          <CardTitle>Gerenciamento de Licenças por Escola</CardTitle>
+          <CardTitle>Gerenciamento de Licencas por Escola</CardTitle>
           <CardDescription>
-            {`Cada escola tem direito a ${licenseLimit} licenças. Use as ações abaixo para gerenciar licenças e usuários.`}
+            {`Cada escola tem direito a ${licenseLimit} licencas. Use as acoes abaixo para gerenciar licencas e usuarios.`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -225,7 +225,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                           )}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {school.usedLicenses}/{school.maxLicenses} licenças utilizadas  {school.users.length} usuários totais
+                          {school.usedLicenses}/{school.maxLicenses} licencas utilizadas  {school.users.length} usuarios totais
                         </div>
                         <div className="flex gap-1">
                           {school.users.slice(0, 3).map((user, index) => (
@@ -267,10 +267,10 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="add">Adicionar Licença</SelectItem>
-                                    <SelectItem value="remove">Remover Licença</SelectItem>
-                                    <SelectItem value="transfer">Transferir Usurio</SelectItem>
-                                    <SelectItem value="delete">Excluir Usurio</SelectItem>
+                                    <SelectItem value="add">Adicionar Licenca</SelectItem>
+                                    <SelectItem value="remove">Remover Licenca</SelectItem>
+                                    <SelectItem value="transfer">Transferir Usuario</SelectItem>
+                                    <SelectItem value="delete">Excluir Usuario</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -283,7 +283,7 @@ export const LicenseManagement = ({ schoolsData, onUpdateLicenses }: LicenseMana
                                     setSelectedUser(user || null);
                                   }}>
                                     <SelectTrigger>
-                                      <SelectValue placeholder="Selecione um usuário" />
+                                      <SelectValue placeholder="Selecione um usuario" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {selectedSchool.users.map((user) => (

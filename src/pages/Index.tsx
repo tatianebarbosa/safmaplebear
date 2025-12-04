@@ -168,7 +168,7 @@ const Index = () => {
             <Card className="rounded-xl border shadow-[var(--shadow-card)]">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-semibold">Visao rapida do Canva</CardTitle>
+                  <CardTitle className="text-xl font-semibold">Visão rápida do Canva</CardTitle>
                   <Badge variant="secondary" className="bg-primary/10 text-primary border-none">
                     Atualizado
                   </Badge>
@@ -182,7 +182,7 @@ const Index = () => {
                   <div className="rounded-lg border bg-primary/5 p-4">
                     <p className="text-xs text-muted-foreground">Alertas ativos</p>
                     <p className="text-2xl font-semibold text-primary mt-1">12</p>
-                    <p className="text-xs text-primary mt-1">Dominios n?o conformes</p>
+                    <p className="text-xs text-primary mt-1">Domínios não conformes</p>
                   </div>
                   <div className="rounded-lg border bg-success-bg p-4">
                     <p className="text-xs text-muted-foreground">Escolas sincronizadas</p>

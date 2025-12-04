@@ -29,16 +29,16 @@ const StatsCard = ({
   const content = (
     <Card
       className={cn(
-        "rounded-[var(--radius)] shadow-sm border-border/40 hover:shadow-md transition-all",
+        "rounded-[var(--radius)] shadow-sm border-border/40 hover:shadow-md transition-all h-full",
         variant === "destructive"
           ? "border-destructive/20 bg-destructive/5"
           : "border-border/40 bg-card",
         className
       )}
     >
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
+      <CardContent className="p-6 flex flex-col gap-4 justify-between min-h-[220px]">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-2 flex-1">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
               {title}
             </p>
@@ -69,14 +69,15 @@ const StatsCard = ({
           {icon && (
             <div
               className={cn(
-                "p-2 rounded-full",
-                variant === "destructive" ? "bg-destructive/10" : "bg-primary/10"
+                "p-2.5 rounded-full shadow-sm",
+                variant === "destructive"
+                  ? "bg-destructive/20 text-destructive"
+                  : "bg-primary/20 text-primary"
               )}
             >
               <div
                 className={cn(
-                  "w-5 h-5",
-                  variant === "destructive" ? "text-destructive" : "text-primary-dark"
+                  "w-5 h-5 text-inherit opacity-90"
                 )}
               >
                 {icon}

@@ -53,7 +53,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
           </Badge>
         </div>
         <CardDescription>
-          {nonCompliantUsers.length} usuários estão usando domínios fora da política corporativa
+          {nonCompliantUsers.length} usuarios estao usando dominios fora da politica corporativa
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -74,7 +74,7 @@ export const ComplianceAlert = ({ nonCompliantUsers, totalUsers, onViewDetails }
           </div>
           
           <div className="space-y-2">
-            <p className="text-sm font-medium">Principais domínios não conformes:</p>
+            <p className="text-sm font-medium">Principais dominios nao conformes:</p>
             <div className="flex flex-wrap gap-1">
               {Object.entries(
                 nonCompliantUsers.reduce((acc, user) => {

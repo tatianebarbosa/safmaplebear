@@ -43,7 +43,7 @@ export const CanvaAdvancedInsights = () => {
         setModelRanking(models.slice(0, 5));
         setHistory(historyData ?? []);
       } catch (err) {
-        setError('Não foi possível carregar os dados avançados no momento.');
+        setError('Nao foi possivel carregar os dados avancados no momento.');
       } finally {
         setLoading(false);
       }
@@ -71,7 +71,7 @@ export const CanvaAdvancedInsights = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
-        <p className="text-sm text-muted-foreground">Carregando análises avançadas...</p>
+        <p className="text-sm text-muted-foreground">Carregando analises avancadas...</p>
       </div>
     );
   }
@@ -94,27 +94,27 @@ export const CanvaAdvancedInsights = () => {
     <div className="space-y-6">
       <div className="grid gap-4 lg:grid-cols-4">
         <StatsCard
-          title="Total no período"
+          title="Total no periodo"
           value={numberFormatter.format(timelineInsights.total)}
           description="Designs em 12 meses"
           icon={<Activity className="h-4 w-4" />}
         />
         <StatsCard
-          title="Média mensal"
+          title="Media mensal"
           value={timelineInsights.average.toFixed(0)}
-          description="Designs / mês"
+          description="Designs / mes"
           icon={<Sparkles className="h-4 w-4" />}
         />
         <StatsCard
-          title="Melhor período"
-          value={timelineInsights.bestPeriod?.period ?? '—'}
+          title="Melhor periodo"
+          value={timelineInsights.bestPeriod?.period ?? ''}
           description={`${numberFormatter.format(timelineInsights.bestPeriod?.designs ?? 0)} designs`}
           icon={<Database className="h-4 w-4" />}
         />
         <StatsCard
           title="Momentum"
           value={`${timelineInsights.momentum.toFixed(1)}%`}
-          description="Variação último vs. anterior"
+          description="Variacao ultimo vs. anterior"
           icon={<Activity className="h-4 w-4" />}
           variant={timelineInsights.momentum >= 0 ? 'default' : 'destructive'}
         />
@@ -127,7 +127,7 @@ export const CanvaAdvancedInsights = () => {
         </CardHeader>
         <CardContent>
           {timeData.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sem registros para gerar a série histórica.</p>
+            <p className="text-sm text-muted-foreground">Sem registros para gerar a serie historica.</p>
           ) : (
             <ResponsiveContainer width="100%" height={320}>
               <LineChart data={timeData}>
@@ -139,7 +139,7 @@ export const CanvaAdvancedInsights = () => {
                   y={timelineInsights.average}
                   stroke="hsl(var(--muted-foreground))"
                   strokeDasharray="4 4"
-                  label={{ position: 'right', value: 'Média', fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                  label={{ position: 'right', value: 'Media', fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                 />
                 <Line type="monotone" dataKey="designs" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
               </LineChart>
@@ -151,7 +151,7 @@ export const CanvaAdvancedInsights = () => {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="rounded-xl shadow-sm border-border/40">
           <CardHeader>
-            <CardTitle>Histórico de Coletas & Automação</CardTitle>
+            <CardTitle>Historico de Coletas & Automacao</CardTitle>
             <CardDescription>Monitore quando os dados foram atualizados e por quem</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -167,7 +167,7 @@ export const CanvaAdvancedInsights = () => {
                   <p className="text-sm text-muted-foreground mt-1">{event.descricao}</p>
                   {event.metadados?.periodo && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Período: {event.metadados.periodo} • Usuários: {event.metadados.usuarios_afetados}
+                      Periodo: {event.metadados.periodo}  Usuarios: {event.metadados.usuarios_afetados}
                     </p>
                   )}
                 </div>
@@ -178,12 +178,12 @@ export const CanvaAdvancedInsights = () => {
 
         <Card className="rounded-xl shadow-sm border-border/40">
           <CardHeader>
-            <CardTitle>Modelos Estratégicos</CardTitle>
+            <CardTitle>Modelos Estrategicos</CardTitle>
             <CardDescription>Top 5 modelos que concentraram maior uso anual</CardDescription>
           </CardHeader>
           <CardContent>
             {modelRanking.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum modelo disponível.</p>
+              <p className="text-sm text-muted-foreground">Nenhum modelo disponivel.</p>
             ) : (
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={modelRanking}>
@@ -201,15 +201,15 @@ export const CanvaAdvancedInsights = () => {
 
       <Card className="rounded-xl shadow-sm border-border/40">
         <CardHeader>
-          <CardTitle>Recomendações Automatizadas</CardTitle>
-          <CardDescription>Ideias práticas para o time SAF agir sobre os dados</CardDescription>
+          <CardTitle>Recomendacoes Automatizadas</CardTitle>
+          <CardDescription>Ideias praticas para o time SAF agir sobre os dados</CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-            <li>Reforçar campanhas nos clusters com menor participação, usando o comparativo da distribuição.</li>
+            <li>Reforcar campanhas nos clusters com menor participacao, usando o comparativo da distribuicao.</li>
             <li>Oferecer reconhecimento aos criadores e escolas com melhor momentum para manter o ritmo.</li>
             <li>Planejar novas artes com base nos modelos mais consumidos, garantindo variedade por cluster.</li>
-            <li>Monitorar eventos do histórico de coletas para identificar lacunas de atualização.</li>
+            <li>Monitorar eventos do historico de coletas para identificar lacunas de atualizacao.</li>
           </ul>
         </CardContent>
       </Card>

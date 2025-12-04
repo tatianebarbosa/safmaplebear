@@ -496,15 +496,15 @@ const VoucherDashboard = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Elegivel</Label>
+              <Label>Elegível</Label>
               <Select value={voucherEligible} onValueChange={setVoucherEligible}>
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Elegivel" />
+                  <SelectValue placeholder="Elegível" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="true">Elegiveis</SelectItem>
-                  <SelectItem value="false">Nao Elegiveis</SelectItem>
+                  <SelectItem value="true">Elegíveis</SelectItem>
+                  <SelectItem value="false">Não Elegíveis</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -517,7 +517,7 @@ const VoucherDashboard = () => {
                 <SelectContent>
                   <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="true">Enviados</SelectItem>
-                  <SelectItem value="false">Nao Enviados</SelectItem>
+                  <SelectItem value="false">Não Enviados</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -545,9 +545,9 @@ const VoucherDashboard = () => {
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Elegivel</span>
+                      <span className="text-muted-foreground">Elegível</span>
                       <Badge variant={school.voucherEligible ? "default" : "secondary"}>
-                        {school.voucherEligible ? "Sim" : "Nao"}
+                        {school.voucherEligible ? "Sim" : "Não"}
                       </Badge>
                     </div>
                     <div className="space-y-1">
@@ -583,16 +583,16 @@ const VoucherDashboard = () => {
                       </div>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Codigo</span>
+                      <span className="text-muted-foreground">Código</span>
                       <span>{school.voucherCode}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Enviado</span>
                       <Badge variant={school.voucherSent ? "default" : "secondary"}>
-                        {school.voucherSent ? "Sim" : "Nao"}
+                        {school.voucherSent ? "Sim" : "Não"}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">{school.observations || "Sem observacoes"}</p>
+                    <p className="text-xs text-muted-foreground">{school.observations || "Sem observações"}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -605,9 +605,9 @@ const VoucherDashboard = () => {
                     <TableHead>Escola</TableHead>
                     <TableHead>Cluster</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Codigo</TableHead>
+                    <TableHead>Código</TableHead>
                     <TableHead className="w-48 text-right">Qtd. Vouchers</TableHead>
-                    <TableHead className="text-right">Elegivel</TableHead>
+                    <TableHead className="text-right">Elegível</TableHead>
                     <TableHead className="text-right">Enviado</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -654,12 +654,12 @@ const VoucherDashboard = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <Badge variant={school.voucherEligible ? "default" : "secondary"}>
-                          {school.voucherEligible ? "Sim" : "Nao"}
+                          {school.voucherEligible ? "Sim" : "Não"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <Badge variant={school.voucherSent ? "default" : "secondary"}>
-                          {school.voucherSent ? "Sim" : "Nao"}
+                          {school.voucherSent ? "Sim" : "Não"}
                         </Badge>
                       </TableCell>
                     </TableRow>

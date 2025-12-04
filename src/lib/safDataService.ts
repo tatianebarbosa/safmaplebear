@@ -8,7 +8,7 @@ import {
 } from '@/types/safData';
 
 const FRANCHISING_CSV_PATH = '/data/Franchising.csv';
-const LICENCAS_CSV_PATH = '/data/licencas_canva.csv';
+const LICENSE_CSV_PATHS = ['/data/usuarios_public.csv', '/data/licencas_canva.csv'];
 
 const CSV_OPTIONS = {
   header: true,
@@ -166,6 +166,19 @@ const fetchCsvText = async (path: string): Promise<string> => {
   return text.replace(/^\uFEFF/, '');
 };
 
+const fetchCsvTextWithFallback = async (paths: string[]): Promise<{ text: string; path: string }> => {
+  let lastError: Error | null = null;
+  for (const path of paths) {
+    try {
+      const text = await fetchCsvText(path);
+      return { text, path };
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+    }
+  }
+  throw lastError ?? new Error(`Failed to load CSV from ${paths.join(', ')}`);
+};
+
 export const isEmailCompliant = (email: string): boolean => {
   const normalized = email.trim().toLowerCase();
   if (!normalized.includes('@')) return false;
@@ -245,7 +258,7 @@ export const loadFranchisingSchools = async (): Promise<School[]> => {
 };
 
 export const loadLicenseUsers = async (): Promise<LicenseUser[]> => {
-  const text = await fetchCsvText(LICENCAS_CSV_PATH);
+  const { text, path: resolvedPath } = await fetchCsvTextWithFallback(LICENSE_CSV_PATHS);
   const lines = text
     .split(/\r?\n/)
     .map(line => line.replace(/"/g, '').trim())
@@ -256,6 +269,11 @@ export const loadLicenseUsers = async (): Promise<LicenseUser[]> => {
   }
 
   const dataRows = lines.slice(1); // skip header
+
+  const normalizedPath = resolvedPath.toLowerCase();
+  if (import.meta.env?.DEV) {
+    console.debug('[safDataService] Licencas carregadas de', normalizedPath);
+  }
 
   return dataRows
     .map(line => {

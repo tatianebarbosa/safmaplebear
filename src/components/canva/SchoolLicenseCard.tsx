@@ -22,6 +22,7 @@ interface SchoolLicenseCardProps {
 export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLicenseCardProps) => {
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [focusedUserId, setFocusedUserId] = useState<string | null>(null);
   const { getLicenseStatus, addUser } = useSchoolLicenseStore();
   const currentUser = useAuthStore((s) => s.currentUser);
 
@@ -51,9 +52,10 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
     return 'bg-success';
   };
 
-  const handleManageSchool = () => {
+  const handleManageSchool = (userId?: string) => {
     onViewDetails(school);
     onManage(school);
+    setFocusedUserId(userId || null);
     setShowDetailsDialog(true);
   };
 
@@ -66,11 +68,11 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
     });
 
     if (!newUserId) {
-      toast.error('Nao foi possivel adicionar a licenca. Tente novamente.');
+      toast.error('Não foi possível adicionar a licença. Tente novamente.');
       return;
     }
 
-    toast.success(`${payload.user.name} adicionado(a) com licenca desta escola.`);
+    toast.success(`${payload.user.name} adicionado(a) com licença desta escola.`);
     showCanvaSyncReminder();
     setShowAddUserDialog(false);
   };
@@ -79,7 +81,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
     <>
       {/* Borda igual ao container de Filtros (Card padrao = rounded-lg) */}
       <Card className="w-full rounded-xl overflow-hidden shadow border border-border/30 h-full min-h-[400px] flex flex-col bg-white">
-        <CardHeader className="px-4 pt-4 pb-2 space-y-2 border-b border-border/50 bg-gradient-to-br from-white via-white to-slate-50/80">
+        <CardHeader className="px-4 pt-4 pb-2 space-y-2 bg-gradient-to-br from-white via-white to-slate-50/80">
           <div className="flex items-start justify-between gap-3">
             <CardTitle className="text-lg font-black leading-snug text-slate-900 break-words max-w-full">
               {school.name}
@@ -146,7 +148,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
               <div className="flex items-center gap-1 text-[7px] text-muted-foreground max-w-full overflow-hidden">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background border text-primary text-[9px] leading-none">
                   <Paperclip className="h-3 w-3" />
-                  Referencias
+                  Referências
                 </span>
               </div>
             )}
@@ -154,11 +156,11 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
 
           {/* Users List */}
           <div className="space-y-1.5 max-h-44 overflow-y-auto rounded-lg border border-border/30 bg-slate-50/80 px-3 py-2 flex-1 shadow-inner">
-            {school.users.slice(0, 3).map((user) => (
+            {school.users.slice(0, 4).map((user) => (
               <button
                 key={user.id}
                 className="w-full text-left"
-                onClick={handleManageSchool}
+                onClick={() => handleManageSchool(user.id)}
               >
                 <div className="flex items-center justify-between gap-3 py-1.5 px-2.5 rounded-[14px] hover:bg-white/80 transition border border-transparent hover:border-border/50">
                   <div className="flex-1 min-w-0">
@@ -171,7 +173,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                     <div className="flex items-center gap-2 shrink-0">
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger>
+                          <TooltipTrigger asChild>
                             <div className="w-2 h-2 bg-destructive rounded-full" />
                           </TooltipTrigger>
                           <TooltipContent>
@@ -184,12 +186,12 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                 </div>
               </button>
             ))}
-            {school.users.length > 3 && (
+            {school.users.length > 4 && (
               <button
                 className="w-full text-center text-xs text-primary hover:underline py-1"
-                onClick={handleManageSchool}
+                onClick={() => handleManageSchool()}
               >
-                +{school.users.length - 3} usuários adicionais
+                +{school.users.length - 4} usuarios adicionais
               </button>
             )}
           </div>
@@ -205,13 +207,13 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                   className="w-full justify-center rounded-full border-border/60 shadow-sm font-semibold text-foreground bg-muted hover:bg-muted/80"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Licença
+                  Adicionar licença
                 </Button>
               )}
               <Button
                 size="sm"
                 variant="default"
-                onClick={handleManageSchool}
+                onClick={() => handleManageSchool()}
                 className="w-full justify-center rounded-full border-border/60 shadow-sm font-semibold hover:border-foreground/40 hover:bg-foreground/5"
               >
                 <Settings className="h-4 w-4 mr-2" />
@@ -225,14 +227,18 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
       {/* Dialog */}
       <SchoolDetailsDialog
         open={showDetailsDialog}
-        onOpenChange={setShowDetailsDialog}
+        onOpenChange={(isOpen) => {
+          setShowDetailsDialog(isOpen);
+          if (!isOpen) setFocusedUserId(null);
+        }}
         school={school}
+        initialUserId={focusedUserId}
       />
       <UserDialog
         open={showAddUserDialog}
         onOpenChange={setShowAddUserDialog}
         onSave={handleAddNewUser}
-        title="Adicionar Licença"
+        title="Adicionar licença"
       />
     </>
   );

@@ -3,7 +3,7 @@ import { canvaCollector, CanvaData, CanvaHistorico } from '@/lib/canvaDataCollec
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 
 /**
- * Componente para exibir os dados do Canva e o histórico de alterações
+ * Componente para exibir os dados do Canva e o historico de alteracoes
  */
 export const CanvaDataDisplay = () => {
   const [canvaData, setCanvaData] = useState<CanvaData | null>(null);
@@ -42,7 +42,7 @@ export const CanvaDataDisplay = () => {
     try {
       const novosDados = await canvaCollector.coletarDadosCanva();
       setCanvaData(novosDados);
-      // Recarrega o histórico
+      // Recarrega o historico
       const hist = await canvaCollector.obterHistorico();
       setHistorico(hist);
     } catch (err) {
@@ -58,14 +58,14 @@ export const CanvaDataDisplay = () => {
       // Recarrega os dados
       await carregarDados();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao reverter alteração');
+      setError(err instanceof Error ? err.message : 'Erro ao reverter alteracao');
     }
   };
 
   return (
     <div className="canva-data-display">
       <div className="canva-header">
-        <h2>Gestão Canva</h2>
+        <h2>Gestao Canva</h2>
         <button onClick={coletarDadosAgora} disabled={loading} className="btn-primary">
           {loading ? 'Coletando...' : 'Coletar Dados Agora'}
         </button>
@@ -79,16 +79,16 @@ export const CanvaDataDisplay = () => {
             <h3>Total de Pessoas</h3>
             <p className="big-number">{canvaData.totalPessoas}</p>
             <p className="info-text">
-              Última atualização: {canvaData.dataAtualizacao} às {canvaData.horaAtualizacao}
+              Ultima atualizacao: {canvaData.dataAtualizacao} as {canvaData.horaAtualizacao}
             </p>
           </div>
         </div>
       )}
 
       <div className="historico-section">
-        <h3>Histórico de Alterações</h3>
+        <h3>Historico de Alteracoes</h3>
         {historico.length === 0 ? (
-          <p>Nenhuma alteração registrada para esta escola</p>
+          <p>Nenhuma alteracao registrada para esta escola</p>
         ) : (
           <table className="historico-table">
             <thead>
@@ -96,10 +96,10 @@ export const CanvaDataDisplay = () => {
                 <th>Data</th>
                 <th>Hora</th>
                 <th>Pessoas</th>
-                <th>Mudança</th>
-                <th>Usuário</th>
-                <th>Descrição</th>
-                <th>Ação</th>
+                <th>Mudanca</th>
+                <th>Usuario</th>
+                <th>Descricao</th>
+                <th>Acao</th>
               </tr>
             </thead>
         <tbody>
@@ -121,7 +121,7 @@ export const CanvaDataDisplay = () => {
                   <button
                     onClick={() => reverterAlteracao(item.id)}
                     className="btn-revert"
-                    title="Reverter esta alteração"
+                    title="Reverter esta alteracao"
                   >
                     Reverter
                   </button>

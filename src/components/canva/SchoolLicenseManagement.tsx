@@ -18,8 +18,6 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
-  ChevronDown,
 } from "lucide-react";
 import { SchoolLicenseCard } from "./SchoolLicenseCard";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
@@ -163,6 +161,7 @@ export const SchoolLicenseManagement = ({
 
   const totalPages = Math.max(1, Math.ceil(filteredSchools.length / pageSize));
   const currentPage = Math.min(page, totalPages);
+  const hasMultiplePages = totalPages > 1;
   const visibleSchools = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
@@ -312,11 +311,11 @@ export const SchoolLicenseManagement = ({
         "Status",
         "Cluster",
         "Cidade",
-        "LicenÃ§as Totais",
-        "LicenÃ§as Usadas",
-        "Status LicenÃ§as",
-        "Total UsuÃ¡rios",
-        "UsuÃ¡rios NÃ£o Conformes",
+        "LicenAas Totais",
+        "LicenAas Usadas",
+        "Status LicenAas",
+        "Total UsuArios",
+        "UsuArios NAo Conformes",
       ],
       ...filteredSchools.map((school) => [
         formatCell(school.name),
@@ -337,7 +336,7 @@ export const SchoolLicenseManagement = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "escolas-licenças.csv";
+    link.download = "escolas-licencas.csv";
     link.click();
     URL.revokeObjectURL(url);
     toast.success("Dados exportados com sucesso");
@@ -362,10 +361,10 @@ export const SchoolLicenseManagement = ({
           value={totalSchools.toString()}
           description={`${activeSchools} com licenças ativas`}
           icon={<Building2 className="h-4 w-4" />}
-          tooltip="Número de escolas oficiais carregadas; considera todas as escolas sincronizadas."
+          tooltip="Numero de escolas oficiais carregadas; considera todas as escolas sincronizadas."
         />
         <StatsCard
-          title="licenças Utilizadas"
+          title="Licenças utilizadas"
           value={`${usedLicenses}/${totalLicenses}`}
           description={
             totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupação` : "Sem dados de licença"
@@ -376,10 +375,10 @@ export const SchoolLicenseManagement = ({
         <StatsCard
           title="Licenças fora da política"
           value={nonCompliantUsersAll.toString()}
-          description="Emails não conformes"
+          description="E-mails não conformes"
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={nonCompliantUsersAll > 0 ? "destructive" : "default"}
-          tooltip="Total de usuários com e-mail fora da politica. Emails validos: dominios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereco contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
+          tooltip="Total de usuários com e-mail fora da política. E-mails válidos: domínios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereço contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
         />
         <StatsCard
           title="Escolas em Excesso"
@@ -390,11 +389,11 @@ export const SchoolLicenseManagement = ({
           tooltip="Escolas acima do limite de licenças definido. Reveja estas unidades para redistribuir ou remover acessos."
         />
         <StatsCard
-          title="usuários sem escola"
+          title="Usuários sem escola"
           value={(unassignedUsers ?? 0).toString()}
           description="Licenças sem vínculo"
           icon={<Users className="h-4 w-4" />}
-          tooltip="Licenças ativas sem vínculo à escola. Vincule ou remova para evitar consumo indevido."
+          tooltip="Licenças ativas sem vínculo a escola. Vincule ou remova para evitar consumo indevido."
         />
       </div>
 
@@ -430,11 +429,11 @@ export const SchoolLicenseManagement = ({
                   "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
                 )}
               >
-                <SelectValue placeholder="Cluster/Regio" />
+                <SelectValue placeholder="Cluster/Região" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Implantao">Implantao</SelectItem>
+                <SelectItem value="Implantacao">Implantação</SelectItem>
                 <SelectItem value="Alta Performance">Alta Performance</SelectItem>
                 <SelectItem value="Potente">Potente</SelectItem>
                 <SelectItem value="Desenvolvimento">Desenvolvimento</SelectItem>
@@ -459,9 +458,9 @@ export const SchoolLicenseManagement = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Disponvel">Disponvel</SelectItem>
-                <SelectItem value="Completo">Completa</SelectItem>
-                <SelectItem value="Excedido">Excedida</SelectItem>
+                <SelectItem value="Disponível">Disponível</SelectItem>
+                <SelectItem value="Completo">Completo</SelectItem>
+                <SelectItem value="Excedido">Excedido</SelectItem>
               </SelectContent>
             </Select>
 
@@ -478,7 +477,7 @@ export const SchoolLicenseManagement = ({
                   "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
                 )}
               >
-                <SelectValue placeholder="Perfil do Usurio" />
+                <SelectValue placeholder="Perfil do Usuário" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os perfis</SelectItem>
@@ -527,27 +526,26 @@ export const SchoolLicenseManagement = ({
             Nenhuma escola encontrada com os filtros aplicados.
           </div>
         )}
-        <div className="rounded-2xl border border-border/50 bg-gradient-to-r from-white via-slate-50 to-white shadow-sm px-3 py-4 sm:px-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <Button
-              variant="outline"
-              disabled={currentPage === 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="rounded-full px-4 sm:px-5 bg-white/80 border-border/60 shadow-sm hover:bg-white"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="ml-2 hidden sm:inline">Anterior</span>
-              <span className="ml-2 sm:hidden">Voltar</span>
-            </Button>
-
-            <div className="flex flex-1 flex-col items-center gap-2 text-center sm:min-w-[200px]">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <div className="flex items-center gap-1.5 rounded-full border-2 border-primary bg-white px-2 py-1 shadow-[0_6px_16px_-12px_rgba(0,0,0,0.35)]">
+        {hasMultiplePages && (
+          <div className="rounded-2xl border border-border/50 bg-gradient-to-r from-white via-slate-50 to-white shadow-sm px-3 py-4 sm:px-5">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-white px-3 py-2 shadow-sm">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  disabled={currentPage === 1}
+                  onClick={() => goToPage(currentPage - 1)}
+                  className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-muted/70"
+                  aria-label="Voltar página"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <div className="flex items-center gap-2">
                   <Input
-                    type="number"
-                    min={1}
-                    max={totalPages}
+                    type="text"
                     inputMode="numeric"
+                    pattern="[0-9]*"
                     value={pageInput}
                     onChange={(e) => handlePageInputChange(e.target.value)}
                     onBlur={handlePageSubmit}
@@ -557,35 +555,22 @@ export const SchoolLicenseManagement = ({
                         handlePageSubmit();
                       }
                     }}
-                    className="w-12 h-8 border border-slate-200 text-center text-sm font-semibold px-0 py-0 rounded-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 focus-visible:border-primary"
+                    className="w-14 h-9 rounded-lg border border-border/70 bg-slate-50 text-center text-sm font-semibold tracking-tight px-2 py-1 appearance-none [appearance:textfield] [-moz-appearance:textfield] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-transparent"
                   />
-                  <div className="flex flex-col gap-0.5">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      disabled={currentPage === 1}
-                      onClick={() => goToPage(currentPage - 1)}
-                      className="h-4 w-7 p-0 text-muted-foreground hover:text-primary"
-                    >
-                      <ChevronUp className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      disabled={currentPage === totalPages}
-                      onClick={() => goToPage(currentPage + 1)}
-                      className="h-4 w-7 p-0 text-muted-foreground hover:text-primary"
-                    >
-                      <ChevronDown className="h-3 w-3" />
-                    </Button>
-                  </div>
+                  <span className="text-sm text-muted-foreground">/</span>
+                  <span className="text-base font-semibold text-slate-900">{totalPages}</span>
                 </div>
-                <div className="flex items-center gap-1 text-sm text-slate-700">
-                  <span className="text-muted-foreground text-base">/</span>
-                  <span className="text-base font-semibold">{totalPages}</span>
-                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  disabled={currentPage === totalPages}
+                  onClick={() => goToPage(currentPage + 1)}
+                  className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-muted/70"
+                  aria-label="Avançar página"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
               </div>
               <div className="w-full max-w-md h-2 rounded-full bg-muted/70 overflow-hidden shadow-inner">
                 <div
@@ -594,19 +579,8 @@ export const SchoolLicenseManagement = ({
                 />
               </div>
             </div>
-
-            <Button
-              variant="outline"
-              disabled={currentPage === totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="rounded-full px-4 sm:px-5 bg-white/80 border-border/60 shadow-sm hover:bg-white"
-            >
-              <span className="mr-2 hidden sm:inline">Proxima</span>
-              <span className="mr-2 sm:hidden">Avancar</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </div>
-        </div>
+        )}
       </div>
 
     </div>

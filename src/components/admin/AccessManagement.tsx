@@ -60,8 +60,8 @@ export default function AccessManagement() {
   const handleCreate = () => {
     if (!canManageAccess) {
       toast({
-        title: "Sem permissao",
-        description: "Somente Coordenadores e Admin podem criar usuarios.",
+        title: "Sem permissão",
+        description: "Somente Coordenadores e Admin podem criar usuários.",
         variant: "destructive",
       });
       return;
@@ -70,8 +70,8 @@ export default function AccessManagement() {
     try {
       if (!username || !password || !fullName.trim()) {
         toast({
-          title: "Campos obrigatorios",
-          description: "Preencha usuario, nome completo e senha",
+          title: "Campos obrigatórios",
+          description: "Preencha usuário, nome completo e senha",
           variant: "destructive",
         });
         return;
@@ -93,7 +93,7 @@ export default function AccessManagement() {
         actorRole
       );
       toast({
-        title: "Usuario criado",
+        title: "Usuário criado",
         description: `${username} criado com sucesso`,
       });
       setUsername("");
@@ -105,7 +105,7 @@ export default function AccessManagement() {
     } catch (e: any) {
       toast({
         title: "Erro",
-        description: e?.message || "Erro ao criar usu?rio",
+        description: e?.message || "Erro ao criar usuário",
         variant: "destructive",
       });
     }
@@ -114,25 +114,25 @@ export default function AccessManagement() {
   const handleDelete = (id: string) => {
     if (!canManageAccess) {
       toast({
-        title: "Sem permissao",
-        description: "Somente Coordenadores e Admin podem excluir usuarios.",
+        title: "Sem permissão",
+        description: "Somente Coordenadores e Admin podem excluir usuários.",
         variant: "destructive",
       });
       return;
     }
-    if (!confirm("Confirma exclusao deste usuario?")) return;
+    if (!confirm("Confirma exclusão deste usuário?")) return;
     try {
       const target = users.find((u) => u.id === id);
       if (target?.role === "admin") {
         toast({
-          title: "Nao permitido",
-          description: "Perfis de admin nao podem ser apagados.",
+          title: "Não permitido",
+          description: "Perfis de admin não podem ser apagados.",
           variant: "destructive",
         });
         return;
       }
       userService.deleteUser(id, actorFullName, actorRole);
-      toast({ title: "Usuario excluido" });
+      toast({ title: "Usuário excluído" });
       reload();
     } catch (e: any) {
       toast({
@@ -146,7 +146,7 @@ export default function AccessManagement() {
   const handleChangePassword = (id: string) => {
     if (!canManageAccess) {
       toast({
-        title: "Sem permissao",
+        title: "Sem permissão",
         description: "Somente Coordenadores e Admin podem trocar senhas.",
         variant: "destructive",
       });
@@ -183,18 +183,18 @@ export default function AccessManagement() {
   return (
     <div className="space-y-6">
       <div className="flex w-full items-center justify-end gap-3 py-2">
-        <Button onClick={() => setIsCreateOpen(true)}>Criar usuario</Button>
+        <Button onClick={() => setIsCreateOpen(true)}>Criar usuário</Button>
       </div>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Novo usuario</DialogTitle>
+            <DialogTitle>Novo usuário</DialogTitle>
           </DialogHeader>
           <div className="space-y-5 pt-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <Input
-                placeholder="Usuario (login)"
+                placeholder="Usuário (login)"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -214,13 +214,13 @@ export default function AccessManagement() {
                 value={role}
                 onChange={(e) => setRole(e.target.value as any)}
               >
-                <option value="user">Usu?rio</option>
-                <option value="coord">Coordenacao</option>
+                <option value="user">Usuário</option>
+                <option value="coord">Coordenação</option>
                 <option value="admin">Administrador</option>
               </select>
             </div>
             <p className="text-xs text-muted-foreground">
-              Dica: use o usu?rio (ex: joao.felipe) em vez de email e crie senhas fortes apenas para quem precisa de acesso administrativo.
+              Dica: use o usuário (ex: joao.felipe) em vez de email e crie senhas fortes apenas para quem precisa de acesso administrativo.
             </p>
           </div>
           <DialogFooter className="gap-2 pt-2">
@@ -235,17 +235,17 @@ export default function AccessManagement() {
             >
               Limpar
             </Button>
-            <Button onClick={handleCreate}>Criar Usu?rio</Button>
+            <Button onClick={handleCreate}>Criar Usuário</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <div>
         <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
-          <h3 className="font-semibold">Usu?rios</h3>
+          <h3 className="font-semibold">Usuários</h3>
           <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
             <span className="rounded-full bg-primary/10 text-primary px-3 py-1">
-              {stats.total} usu?rios
+              {stats.total} usuários
             </span>
             <span className="rounded-full bg-muted px-3 py-1">
               {stats.admins} admins
@@ -254,7 +254,7 @@ export default function AccessManagement() {
               {stats.coords} coord
             </span>
             <span className="rounded-full bg-muted px-3 py-1">
-              {stats.standard} usu?rios
+              {stats.standard} usuários
             </span>
           </div>
         </div>
@@ -262,18 +262,18 @@ export default function AccessManagement() {
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="bg-muted/50">
-                <th className="py-3 px-3 font-semibold">Responsvel (nome completo)</th>
-                <th className="px-3 font-semibold">Usu?rio</th>
+                <th className="py-3 px-3 font-semibold">Responsável (nome completo)</th>
+                <th className="px-3 font-semibold">Usuário</th>
                 <th className="px-3 font-semibold">Perfil</th>
                 <th className="px-3 font-semibold">Criado</th>
-                <th className="px-3 text-right font-semibold">Aes</th>
+                <th className="px-3 text-right font-semibold">Ações</th>
               </tr>
             </thead>
             <tbody>
               {users.length === 0 && (
                 <tr>
                   <td className="py-6 px-3 text-muted-foreground" colSpan={5}>
-                    Nenhum usu?rio cadastrado ainda.
+                    Nenhum usuário cadastrado ainda.
                   </td>
                 </tr>
               )}

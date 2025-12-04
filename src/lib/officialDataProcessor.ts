@@ -393,7 +393,7 @@ export const buildFallbackData = async (): Promise<{
     processedData.push({
       school: {
         id: 'no-school',
-        name: 'Usuarios sem escola',
+        name: 'Usuários sem escola',
         status: 'Ativa',
         cluster: 'Outros',
         city: '',

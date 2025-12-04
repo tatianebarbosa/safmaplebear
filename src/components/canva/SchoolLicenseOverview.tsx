@@ -15,24 +15,24 @@ export const SchoolLicenseOverview = ({ schoolsData, onSchoolClick }: SchoolLice
   const licenseLimit = useLicenseLimit();
   const getSchoolStatus = (school: SchoolCanvaData) => {
     if (school.usedLicenses > school.maxLicenses) {
-      return { 
-        status: 'Excesso', 
-        color: 'destructive' as const, 
+      return {
+        status: 'Excesso',
+        color: 'destructive' as const,
         icon: AlertCircle,
         description: `${school.usedLicenses - school.maxLicenses} licença(s) em excesso`
       };
     }
     if (school.usedLicenses === school.maxLicenses) {
-      return { 
-        status: 'Completo', 
-        color: 'success' as const, 
+      return {
+        status: 'Completo',
+        color: 'success' as const,
         icon: CheckCircle,
         description: 'Utilizando todas as licenças'
       };
     }
-    return { 
-      status: 'Disponível', 
-      color: 'secondary' as const, 
+    return {
+      status: 'Disponivel',
+      color: 'secondary' as const,
       icon: Clock,
       description: `${school.availableLicenses} licença(s) disponível(is)`
     };
@@ -41,13 +41,13 @@ export const SchoolLicenseOverview = ({ schoolsData, onSchoolClick }: SchoolLice
   const getPerformanceBadge = (performance: string) => {
     switch (performance) {
       case 'high': return <Badge variant="default">Alta Performance</Badge>;
-      case 'medium': return <Badge variant="secondary">Mdia Performance</Badge>;
+      case 'medium': return <Badge variant="secondary">Média Performance</Badge>;
       default: return <Badge variant="outline">Baixa Performance</Badge>;
     }
   };
 
   const sortedSchools = [...schoolsData].sort((a, b) => {
-    // Priorizar escolas com problemas de licença
+    // Priorizar escolas com problemas de licenca
     if (a.usedLicenses > a.maxLicenses && b.usedLicenses <= b.maxLicenses) return -1;
     if (b.usedLicenses > b.maxLicenses && a.usedLicenses <= a.maxLicenses) return 1;
     // Depois por atividade
@@ -99,7 +99,7 @@ export const SchoolLicenseOverview = ({ schoolsData, onSchoolClick }: SchoolLice
                           <div className="text-xs text-muted-foreground">
                             {school.nonCompliantUsers.length > 0 && (
                               <Badge variant="outline" className="text-xs">
-                                {school.nonCompliantUsers.length} no conforme(s)
+                                {school.nonCompliantUsers.length} não conforme(s)
                               </Badge>
                             )}
                           </div>

@@ -139,6 +139,15 @@ const CoordinatorAgentMonitoringTab = () => {
   const [pendingMove, setPendingMove] = useState<{ ticket: Ticket; status: TicketStatus } | null>(null);
   const [moveJustification, setMoveJustification] = useState("");
 
+  // Mantem o ticket aberto em sincronia com o store (necessario para ver reversoes na hora)
+  useEffect(() => {
+    if (!selectedTicket) return;
+    const latest = tickets.find((t) => t.id === selectedTicket.id);
+    if (latest && latest !== selectedTicket) {
+      setSelectedTicket(latest);
+    }
+  }, [tickets, selectedTicket]);
+
   useEffect(() => {
     const stored = localStorage.getItem(ALERT_PREFS_KEY);
     if (stored) {

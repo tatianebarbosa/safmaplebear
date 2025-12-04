@@ -1,5 +1,6 @@
 // @ts-nocheck
 import Papa from 'papaparse';
+import { readFileAsUtf8 } from './fileUtils';
 
 export interface KitMarca {
   nome: string;
@@ -465,7 +466,7 @@ export class CanvaDataCollector {
   }
 
   async aplicarUploadCsv(file: File, usuario: string = 'Upload local'): Promise<{ data: CanvaData; previous?: CanvaData | null }> {
-    const text = await file.text();
+    const text = await readFileAsUtf8(file);
     const rows = await this.parseCsvText(text);
     const data = this.buildCanvaData(rows);
     if (!data) {

@@ -74,6 +74,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
   const handleSave = () => {
     if (!ticket || !canEdit || !hasChanges) return;
 
+    const statusChanged = form.status !== ticket.status;
     const updates: Partial<Ticket> = {
       priority: form.priority as any,
       agente: form.agente as any,
@@ -82,6 +83,11 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       observacao: form.observacao,
       status: form.status as TicketStatus,
     };
+
+    if (statusChanged) {
+      // Status e tratado pelo fluxo com justificativa + historico centralizado no moveTicket
+      delete updates.status;
+    }
 
     const changes: string[] = [];
     const before: Partial<Ticket> = {};
@@ -111,11 +117,6 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       before.observacao = ticket.observacao;
       after.observacao = form.observacao;
     }
-    if (form.status !== ticket.status) {
-      changes.push(`Status: ${ticket.status} -> ${form.status}`);
-      before.status = ticket.status;
-      after.status = form.status as TicketStatus;
-    }
 
     const historyAction = changes.join(" | ") || "Atualizacao no ticket";
     const registerHistory = () => {
@@ -123,7 +124,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       const timestamp = new Date().toISOString();
       addHistoryEntry(ticket.id, {
         id: `${ticket.id}-hist-${Date.now()}`,
-        author: currentUser?.name || currentUser?.agente || "Usuario",
+        author: currentUser?.name || currentUser?.agente || "Usuário",
         action: historyAction,
         timestamp,
         before,
@@ -144,16 +145,9 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       registerHistory();
     };
 
-    if (form.status !== ticket.status) {
+    if (statusChanged) {
       requestStatusChange(ticket, form.status as TicketStatus, () => {
         applyFieldUpdates();
-        registerHistory();
-        addNoteToTicket(ticket.id, {
-          id: `${ticket.id}-status-${Date.now()}`,
-          author: currentUser?.name || currentUser?.agente || "Usu?rio",
-          content: `Status alterado para ${form.status} por ${currentUser?.name || currentUser?.agente || "Usu?rio"}. Dono do ticket: ${ticket.agente}`,
-          createdAt: new Date().toISOString(),
-        });
       });
       return;
     }
@@ -174,7 +168,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
 
   const handleRevert = (entryId: string) => {
     if (!ticket) return;
-    revertHistoryEntry(ticket.id, entryId, currentUser?.name || currentUser?.agente || "Usuario");
+    revertHistoryEntry(ticket.id, entryId, currentUser?.name || currentUser?.agente || "Usuário");
   };
 
   if (!ticket) return null;
@@ -197,7 +191,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
               #{ticket.id}
             </Badge>
             <span className="leading-tight text-base sm:text-lg">
-              {ticket.observacao.slice(0, 80) || "Ticket SAF"}
+              {ticket.observacao.slice(0, 80) || "Ticket"}
             </span>
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">

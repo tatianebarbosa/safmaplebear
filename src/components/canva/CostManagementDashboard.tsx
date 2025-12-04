@@ -37,8 +37,10 @@ import { toast } from "@/components/ui/sonner";
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#8dd1e1'];
 
 export const CostManagementDashboard = () => {
+  const currentYear = new Date().getFullYear();
+  const availableYears = Array.from(new Set([currentYear, 2026])).sort((a, b) => b - a);
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   
   const { 
     invoices, 
@@ -58,7 +60,7 @@ export const CostManagementDashboard = () => {
 
   const handleExportInvoices = () => {
     const csvData = [
-      ['Data', 'Nmero', 'Descrio', 'Equipe', 'Valor', 'Status'],
+      ['Data', 'Numero', 'Descricao', 'Equipe', 'Valor', 'Status'],
       ...invoices.map(inv => [
         formatDateBR(inv.date),
         inv.invoiceNumber,
@@ -78,9 +80,9 @@ export const CostManagementDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Gest?o de Custos Canva</h2>
+          <h2 className="text-2xl font-bold">Gestao de Custos Canva</h2>
           <p className="text-muted-foreground">
-            Controle financeiro e análise de gastos com licenças
+            Controle financeiro e analise de gastos com licencas
           </p>
         </div>
         <div className="flex gap-2">
@@ -92,9 +94,11 @@ export const CostManagementDashboard = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2022">2022</SelectItem>
+              {availableYears.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Button onClick={() => setShowInvoiceDialog(true)} className="gap-2">
@@ -137,26 +141,26 @@ export const CostManagementDashboard = () => {
           icon={<DollarSign className="h-4 w-4" />}
         />
         <StatsCard
-          title="Mdia Mensal"
+          title="Media Mensal"
           value={formatCurrency(analytics.averageMonthly)}
-          description="Gasto mdio por ms"
+          description="Gasto medio por mes"
           icon={<Calendar className="h-4 w-4" />}
         />
         <StatsCard
           title="Custo por Licen?a"
           value={formatCurrency(analytics.costPerLicense)}
-          description="Baseado em licenças ativas"
+          description="Baseado em licencas ativas"
           icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatsCard
-          title="Oramento Utilizado"
+          title="Orcamento Utilizado"
           value={formatPercentage(budgetUsagePercent)}
           description={`${formatCurrency(remainingBudget)} restante`}
           icon={<Target className="h-4 w-4" />}
           variant={budgetUsagePercent > 100 ? "destructive" : "default"}
         />
         <StatsCard
-          title="Oramento Anual"
+          title="Orcamento Anual"
           value={formatCurrency(annualBudget)}
           description="Meta estabelecida"
           icon={<Target className="h-4 w-4" />}
@@ -166,13 +170,13 @@ export const CostManagementDashboard = () => {
       {/* Budget Configuration */}
       <Card>
         <CardHeader>
-          <CardTitle>Configurao de Oramento</CardTitle>
-          <CardDescription>Defina o oramento anual para controle de gastos</CardDescription>
+          <CardTitle>Configuracao de Orcamento</CardTitle>
+          <CardDescription>Defina o orcamento anual para controle de gastos</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
             <div className="flex-1">
-              <Label htmlFor="budget">Oramento Anual (R$)</Label>
+              <Label htmlFor="budget">Orcamento Anual (R$)</Label>
               <Input
                 id="budget"
                 type="number"
@@ -182,7 +186,7 @@ export const CostManagementDashboard = () => {
               />
             </div>
             <div className="pt-6">
-              <Button onClick={() => toast.success('Oramento atualizado')}>
+              <Button onClick={() => toast.success('Orcamento atualizado')}>
                 Salvar
               </Button>
             </div>
@@ -196,7 +200,7 @@ export const CostManagementDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>Gastos Mensais</CardTitle>
-            <CardDescription>Evoluo dos custos ao longo do ano</CardDescription>
+            <CardDescription>Evolucao dos custos ao longo do ano</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -222,7 +226,7 @@ export const CostManagementDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>Gastos por Equipe</CardTitle>
-            <CardDescription>Distribuio de custos entre equipes</CardDescription>
+            <CardDescription>Distribuicao de custos entre equipes</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -252,7 +256,7 @@ export const CostManagementDashboard = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Faturas Canva</CardTitle>
-            <CardDescription>Histrico de pagamentos e pendncias</CardDescription>
+            <CardDescription>Historico de pagamentos e pendencias</CardDescription>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleExportInvoices}>

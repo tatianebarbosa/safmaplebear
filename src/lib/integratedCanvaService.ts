@@ -75,7 +75,7 @@ const buildOfficialUser = (
   const email = (user.email ?? '').trim().toLowerCase();
   if (!email || !email.includes('@')) return null;
   const nameCandidate = user.nome?.trim() || '';
-  const name = nameCandidate || email.split('@')[0] || 'Usuario';
+  const name = nameCandidate || email.split('@')[0] || 'Usuário';
 
   return {
     id: `${schoolId ?? 0}-${email}`,
@@ -186,7 +186,7 @@ export function buildProcessedSchoolsFromIntegration(
   if (!allocations.some((allocation) => allocation.school_id === 0) && data.unallocated_users_list?.length) {
     allocations.push({
       school_id: 0,
-      school_name: 'Usuarios Sem Escola Definida',
+      school_name: 'Usuários Sem Escola Definida',
       users: data.unallocated_users_list,
       total_users: data.unallocated_users_list.length,
       total_licenses: data.unallocated_users_list.length,

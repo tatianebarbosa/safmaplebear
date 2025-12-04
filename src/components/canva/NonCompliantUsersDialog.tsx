@@ -174,7 +174,7 @@ export const NonCompliantUsersDialog = ({
             Usurios No Conformes
           </DialogTitle>
           <DialogDescription>
-            Lista detalhada dos usuários com domínios fora da política corporativa
+            Lista detalhada dos usuarios com dominios fora da politica corporativa
           </DialogDescription>
         </DialogHeader>
 

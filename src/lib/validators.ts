@@ -152,22 +152,22 @@ export function isCompliantEmail(email: string): boolean {
  */
 export function getNonComplianceReason(email: string): string {
   if (!email || typeof email !== 'string') {
-    return 'Email n?o fornecido';
+    return 'Email não fornecido';
   }
   
   if (!validateEmail(email)) {
-    return 'Formato de email invalido';
+    return 'Formato de email inválido';
   }
   
   const domain = getEmailDomain(email);
   const localPart = getEmailUsername(email);
   
   if (!domain) {
-    return 'Email invalido';
+    return 'Email inválido';
   }
   
   if (!isCorporateDomain(domain)) {
-    return `Dominio n?o autorizado: ${domain}`;
+    return `Domínio não autorizado: ${domain}`;
   }
 
   if (isMapleBearDomain(domain) && !hasMapleBearSchoolIdentifier(localPart)) {
@@ -178,7 +178,7 @@ export function getNonComplianceReason(email: string): string {
     return 'Email em compliance';
   }
   
-  return 'Email fora da politica';
+  return 'Email fora da política';
 }
 
 /**
