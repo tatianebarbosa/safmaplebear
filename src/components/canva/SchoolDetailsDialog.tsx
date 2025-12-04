@@ -239,11 +239,6 @@ export const SchoolDetailsDialog = ({
                     </p>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Nome:</span>
-                        <span className="text-foreground">{school.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
                         {showClusterBadge && (
                           <div className="flex items-center gap-2 text-sm text-foreground">
                             <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -283,11 +278,18 @@ export const SchoolDetailsDialog = ({
                           {licenseStatus}
                         </Badge>
                       </div>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Não Conformes:</span>
+                        <span className={nonCompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
+                          {nonCompliantUsers.length}
+                        </span>
+                      </div>
                       <Button
                         type="button"
                         variant={licenseStatus === 'Excedido' ? 'destructive' : 'secondary'}
                         size="sm"
-                        className="gap-2 self-center min-w-[360px] px-8 py-3 justify-center !text-white [&_*]:!text-white"
+                        className="gap-2 w-full px-8 py-3 justify-center !text-white [&_*]:!text-white"
                         style={{ color: 'white' }}
                         onClick={() => {
                           const emails = school.users.map((u) => u.email).filter(Boolean);
@@ -308,18 +310,13 @@ export const SchoolDetailsDialog = ({
                         <AlertTriangle className="h-4 w-4 text-white" />
                         <span className="text-white">Copiar aviso de licencas</span>
                       </Button>
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Não Conformes:</span>
-                        <span className={nonCompliantUsers.length > 0 ? 'text-destructive' : 'text-success'}>
-                          {nonCompliantUsers.length}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            
 
           </TabsContent>
 
@@ -364,9 +361,6 @@ export const SchoolDetailsDialog = ({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{user.name}</span>
-                    <Badge variant={user.isCompliant ? "muted" : "destructive"} size="sm">
-                      {user.role}
-                            </Badge>
                             {!user.isCompliant && (
                               <TooltipProvider>
                                 <Tooltip>
@@ -543,7 +537,7 @@ export const SchoolDetailsDialog = ({
     </Dialog>
 
     <Dialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
-      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
+      <DialogContent className={`${dialogLayouts.xs} flex flex-col`}>
         <DialogHeader>
           <DialogTitle>Reverter alteracao</DialogTitle>
           <DialogDescription>
@@ -735,13 +729,13 @@ export const SchoolDetailsDialog = ({
       </DialogContent>
     </Dialog>
 
-    {/* Dialog de remocao com ticket/observacao */}
+    {/* Dialog de remoção com ticket/observação */}
     <Dialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
-      <DialogContent className={`${dialogLayouts.sm} flex flex-col`}>
+      <DialogContent className={`${dialogLayouts.xs} flex flex-col`}>
         <DialogHeader>
-          <DialogTitle>Remover usuario</DialogTitle>
+          <DialogTitle>Remover usuário</DialogTitle>
           <DialogDescription>
-            Informe o ticket como justificativa. Observacao e responsavel sao opcionais, mas recomendados.
+            Informe o ticket como justificativa. Observação e responsável são opcionais, mas recomendados.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
@@ -759,10 +753,10 @@ export const SchoolDetailsDialog = ({
               />
             </div>
           <div className="space-y-2">
-            <Label htmlFor="removeObs">Observacao</Label>
+            <Label htmlFor="removeObs">Observação</Label>
             <Textarea
               id="removeObs"
-              placeholder="Observacoes adicionais"
+              placeholder="Observações adicionais"
               value={removeObservation}
               onChange={(e) => setRemoveObservation(e.target.value)}
             />
@@ -789,7 +783,7 @@ export const SchoolDetailsDialog = ({
               setRemoveObservation("");
             }}
           >
-            Confirmar remocao
+            Confirmar remoção
           </Button>
         </div>
       </DialogContent>
