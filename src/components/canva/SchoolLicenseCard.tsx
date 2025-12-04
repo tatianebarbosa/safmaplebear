@@ -156,7 +156,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
 
           {/* Users List */}
           <div className="space-y-1.5 max-h-44 overflow-y-auto rounded-lg border border-border/30 bg-slate-50/80 px-3 py-2 flex-1 shadow-inner">
-            {school.users.slice(0, 4).map((user) => (
+            {school.users.slice(0, 3).map((user) => (
               <button
                 key={user.id}
                 className="w-full text-left"
@@ -186,12 +186,12 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
                 </div>
               </button>
             ))}
-            {school.users.length > 4 && (
+            {school.users.length > 3 && (
               <button
                 className="w-full text-center text-xs text-primary hover:underline py-1"
                 onClick={() => handleManageSchool()}
               >
-                +{school.users.length - 4} usuarios adicionais
+                +{school.users.length - 3} usuarios adicionais
               </button>
             )}
           </div>

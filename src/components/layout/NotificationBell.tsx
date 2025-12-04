@@ -168,9 +168,9 @@ const NotificationBell = () => {
       <PopoverContent
         align="end"
         side="bottom"
-        sideOffset={6}
-        alignOffset={10}
-        collisionPadding={6}
+        sideOffset={4}
+        alignOffset={-6}
+        collisionPadding={4}
         style={{
           maxHeight: "72vh",
           width: "380px",
