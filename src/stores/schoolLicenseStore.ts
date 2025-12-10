@@ -266,6 +266,82 @@ const ensureCentralSchool = (schools: School[]): School[] => {
 
 const seedSchools: School[] = [centralSchool];
 
+type OverviewDelta = {
+  deltaUsers: number;
+  deltaUsedLicenses?: number;
+  deltaTotalLicenses?: number;
+  deltaNonCompliant?: number;
+  becameActive?: boolean;
+};
+
+const applyOverviewDelta = (
+  overview: CanvaOverviewData | null,
+  delta: OverviewDelta
+): CanvaOverviewData | null => {
+  if (!overview) return overview;
+  const deltaUsers = delta.deltaUsers ?? 0;
+  const deltaNonCompliant = delta.deltaNonCompliant ?? 0;
+  const totalUsers = Math.max(0, (overview.totalUsers ?? 0) + deltaUsers);
+  const nonCompliantUsers = Math.max(
+    0,
+    (overview.nonCompliantUsers ?? 0) + deltaNonCompliant
+  );
+  const usedLicenses = Math.max(
+    0,
+    (overview.usedLicenses ?? overview.totalUsers ?? 0) +
+      (delta.deltaUsedLicenses ?? 0)
+  );
+  const totalLicenses = Math.max(
+    0,
+    (overview.totalLicenses ?? overview.totalUsers ?? 0) +
+      (delta.deltaTotalLicenses ?? 0)
+  );
+  const compliantUsers = Math.max(0, totalUsers - nonCompliantUsers);
+  const schoolsWithUsers =
+    delta.becameActive && overview.schoolsWithUsers !== undefined
+      ? Math.max(0, (overview.schoolsWithUsers ?? 0) + 1)
+      : overview.schoolsWithUsers;
+
+  return {
+    ...overview,
+    totalUsers,
+    nonCompliantUsers,
+    compliantUsers,
+    complianceRate: totalUsers > 0 ? (compliantUsers / totalUsers) * 100 : 0,
+    usedLicenses,
+    totalLicenses,
+    availableLicenses: Math.max(0, totalLicenses - usedLicenses),
+    schoolsWithUsers,
+  };
+};
+
+const loadPersistedSnapshot = (): {
+  schools?: School[];
+  justifications?: Justification[];
+  history?: HistoryEntry[];
+} => {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem("school-license-storage-v2");
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    const state = parsed?.state ?? parsed;
+    return {
+      schools: Array.isArray(state?.schools) ? state.schools : undefined,
+      justifications: Array.isArray(state?.justifications) ? state.justifications : undefined,
+      history: Array.isArray(state?.history) ? state.history : undefined,
+    };
+  } catch {
+    return {};
+  }
+};
+
+const persistedSnapshot = loadPersistedSnapshot();
+const initialSchools =
+  persistedSnapshot.schools?.length ? ensureCentralSchool(persistedSnapshot.schools) : seedSchools;
+const initialJustifications = persistedSnapshot.justifications ?? [];
+const initialHistory = persistedSnapshot.history ?? [];
+
 const recordLicenseAction = (
   action: Omit<LicenseAction, "id" | "timestamp">
 ) => {
@@ -287,6 +363,14 @@ const recordLicenseAction = (
 export const useSchoolLicenseStore = create<SchoolLicenseState>()(
   persist(
     (set, get) => {
+      // Garante que a hidrataÃ§Ã£o do localStorage termine antes de mesclar dados oficiais
+      let resolveHydration: () => void;
+      const hydrationReady = new Promise<void>((resolve) => {
+        resolveHydration = resolve;
+      });
+      // Fallback: se por algum motivo o persist nÃ£o hidratar (ex.: ambiente sem storage), libera apÃ³s curto prazo.
+      setTimeout(() => resolveHydration && resolveHydration(), 500);
+
       const syncLicenseLimit = (limit: number) => {
         const safeLimit = Math.max(1, Math.floor(limit));
         set((state) => {
@@ -308,20 +392,71 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         });
       };
 
+      // Mescla dados oficiais com alteraÃ§Ãµes locais para manter licenÃ§as inseridas manualmente apÃ³s recarregar
+      const mergeSchoolsWithLocal = (incomingSchools: School[]): School[] => {
+        const previousSchools = get().schools || [];
+        if (!previousSchools.length) {
+          return incomingSchools;
+        }
+
+        const incomingIds = new Set(incomingSchools.map((school) => school.id));
+        const normalizeUserKey = (user: SchoolUser) =>
+          normalizeEmail(user.email) || user.id;
+
+        const merged = incomingSchools.map((school) => {
+          const previous = previousSchools.find((item) => item.id === school.id);
+          if (!previous) return school;
+
+          const userMap = new Map<string, SchoolUser>();
+
+          (previous.users || []).forEach((user) => {
+            const key = normalizeUserKey(user) || user.id;
+            userMap.set(key, user);
+          });
+
+          (school.users || []).forEach((user) => {
+            const key = normalizeUserKey(user) || user.id;
+            const existing = userMap.get(key);
+            userMap.set(key, { ...existing, ...user });
+          });
+
+          const mergedUsers = Array.from(userMap.values());
+          const usedLicenses = Math.max(school.usedLicenses ?? 0, mergedUsers.length);
+
+          return {
+            ...school,
+            users: mergedUsers,
+            usedLicenses,
+            totalLicenses: previous.totalLicenses ?? school.totalLicenses,
+            hasRecentJustifications:
+              previous.hasRecentJustifications ?? school.hasRecentJustifications,
+          };
+        });
+
+        previousSchools.forEach((school) => {
+          if (!incomingIds.has(school.id)) {
+            merged.push(school);
+          }
+        });
+
+        return merged;
+      };
+
       // Reage a mudanças externas no limite (localStorage/env) e aplica ao iniciar
       subscribeToLicenseLimit(() => syncLicenseLimit(getMaxLicensesPerSchool()));
       syncLicenseLimit(getMaxLicensesPerSchool());
 
       return {
-      schools: seedSchools,
-      justifications: [],
-      history: [], // InicializaÃ§Ã£o do novo estado
+      schools: initialSchools,
+      justifications: initialJustifications,
+      history: initialHistory, // InicializaÃ§Ã£o do novo estado
       usageData: [],
       officialData: [],
       overviewData: null,
       loading: false,
 
       loadOfficialData: async () => {
+        await hydrationReady.catch(() => undefined);
         set({ loading: true });
 
         const finalizeData = (
@@ -353,10 +488,12 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             hasRecentJustifications: false,
           }));
 
+          const mergedSchools = mergeSchoolsWithLocal(convertedSchools);
+
           set({
             officialData: processedData,
             overviewData: overview,
-            schools: ensureCentralSchool(convertedSchools),
+            schools: ensureCentralSchool(mergedSchools),
             loading: false,
           });
           // Garante que o limite global seja aplicado aos dados carregados
@@ -454,6 +591,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         const school = state.schools.find((s) => s.id === schoolId);
         if (!school) return null;
 
+        const wasEmpty = (school.users?.length ?? 0) === 0;
         const newUser: SchoolUser = {
           ...user,
           id: Date.now().toString(),
@@ -516,6 +654,12 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
                 }
               : s
           ),
+          overviewData: applyOverviewDelta(state.overviewData, {
+            deltaUsers: 1,
+            deltaUsedLicenses: 1,
+            deltaNonCompliant: newUser.isCompliant ? 0 : 1,
+            becameActive: wasEmpty,
+          }),
         }));
 
         return newUser.id;
@@ -1015,15 +1159,25 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       },
       isEmailValid: (email: string) => isEmailCompliantSaf(email),
       };
-    },
-    {
-      name: "school-license-storage-v2",
-      version: 2,
-      onRehydrateStorage: () => (state) => {
-        // Reaplica o limite salvo ao hidratar para atualizar totais das escolas persistidas
-        if (state?.applyLicenseLimit) {
-          const limit = getMaxLicensesPerSchool();
-          state.applyLicenseLimit(limit);
+  },
+  {
+    name: "school-license-storage-v2",
+    version: 2,
+    // Persist only o que precisa sobreviver ao refresh para evitar estouro de quota no localStorage
+    partialize: (state) => ({
+      schools: state.schools,
+      justifications: state.justifications,
+      history: state.history,
+    }),
+    onRehydrateStorage: () => (state) => {
+      // Reaplica o limite salvo ao hidratar para atualizar totais das escolas persistidas
+      if (state?.applyLicenseLimit) {
+        const limit = getMaxLicensesPerSchool();
+        state.applyLicenseLimit(limit);
+        }
+        // Libera quem depende da hidrataÃ§Ã£o (ex.: merge com dados oficiais)
+        if (resolveHydration) {
+          resolveHydration();
         }
       },
     }

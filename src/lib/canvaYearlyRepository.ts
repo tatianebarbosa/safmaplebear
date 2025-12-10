@@ -878,6 +878,18 @@ const viewTypesForFilter = (view: YearlyFilters["view"]): Set<CanvaDataType> => 
   return new Set<CanvaDataType>(["models", "creators", "general"]);
 };
 
+const normalizeText = (value?: string | null) =>
+  (value ?? "")
+    .toString()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+const normalizeSchool = (value?: string | null) => normalizeText(value);
+const normalizeCluster = (value?: string | null) => normalizeText(value);
+
 const filterRecords = (
   records: CanvaYearlyRecord[],
   year: number,
@@ -885,11 +897,21 @@ const filterRecords = (
 ): CanvaYearlyRecord[] => {
   const range = periodRangeFromFilter(filters.period);
   const allowedTypes = viewTypesForFilter(filters.view);
+  const selectedSchool = filters.school ? normalizeSchool(filters.school) : null;
+  const selectedCluster = filters.cluster ? normalizeCluster(filters.cluster) : null;
   return records.filter((record) => {
     if (record.year !== year) return false;
     if (!allowedTypes.has(record.dataType)) return false;
-    if (filters.cluster && (record.cluster ?? "Sem cluster") !== filters.cluster) return false;
-    if (filters.school && (record.schoolName ?? "Sem escola") !== filters.school) return false;
+    if (
+      selectedCluster &&
+      normalizeCluster(record.cluster ?? "Sem cluster") !== selectedCluster
+    )
+      return false;
+    if (
+      selectedSchool &&
+      normalizeSchool(record.schoolName ?? "Sem escola") !== selectedSchool
+    )
+      return false;
     return isWithinRange(record.month, range);
   });
 };

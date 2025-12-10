@@ -66,6 +66,8 @@ export interface CanvaUsageData {
     schoolId?: string;
     cluster?: string;
     lastActivity?: string;
+    role?: string;
+    category?: string;
   }>;
 }
 

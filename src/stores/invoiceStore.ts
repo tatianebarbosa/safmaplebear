@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { CanvaInvoice, CostAnalytics, BudgetAlert } from '@/types/invoicing';
+import { CanvaInvoice, CostAnalytics, BudgetAlert, InvoiceDeletion } from '@/types/invoicing';
 
 interface InvoiceState {
   invoices: CanvaInvoice[];
   annualBudget: number;
+  deletionHistory: InvoiceDeletion[];
   
   // Actions
   addInvoice: (invoice: Omit<CanvaInvoice, 'id'>) => void;
@@ -72,6 +73,7 @@ export const useInvoiceStore = create<InvoiceState>()(
   persist(
     (set, get) => ({
       invoices: seedInvoices,
+      deletionHistory: [],
       annualBudget: 10000, // R$ 10.000 de orçamento anual
 
       addInvoice: (invoice) => set(state => ({
@@ -84,9 +86,28 @@ export const useInvoiceStore = create<InvoiceState>()(
         )
       })),
 
-      removeInvoice: (id) => set(state => ({
-        invoices: state.invoices.filter(invoice => invoice.id !== id)
-      })),
+      removeInvoice: (id) => set(state => {
+        const target = state.invoices.find(invoice => invoice.id === id);
+        if (!target) return state;
+
+        const deletionEntry: InvoiceDeletion = {
+          id: `${id}-${Date.now()}`,
+          invoiceId: target.id,
+          invoiceNumber: target.invoiceNumber,
+          description: target.description,
+          amount: target.amount,
+          currency: target.currency,
+          status: target.status,
+          team: target.team,
+          date: target.date,
+          deletedAt: new Date().toISOString(),
+        };
+
+        return {
+          invoices: state.invoices.filter(invoice => invoice.id !== id),
+          deletionHistory: [deletionEntry, ...state.deletionHistory],
+        };
+      }),
 
       setAnnualBudget: (budget) => set({ annualBudget: budget }),
 

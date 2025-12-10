@@ -11,5 +11,18 @@ export const filterRecentTimeSeries = (series: TimeSeriesPoint[]): TimeSeriesPoi
     return year === undefined || year >= 2025;
   });
 
-  return filtered.length > 0 ? filtered : series;
+  const recent = filtered.length > 0 ? filtered : series;
+
+  // Remove meses vazios no inicio/fim para evitar eixos cheios de zeros.
+  let firstNonZero = -1;
+  let lastNonZero = -1;
+
+  recent.forEach((point, index) => {
+    const hasData = (point.designs ?? 0) > 0;
+    if (hasData && firstNonZero === -1) firstNonZero = index;
+    if (hasData) lastNonZero = index;
+  });
+
+  if (firstNonZero === -1) return recent;
+  return recent.slice(firstNonZero, lastNonZero + 1);
 };

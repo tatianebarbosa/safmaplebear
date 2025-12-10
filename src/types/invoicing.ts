@@ -14,6 +14,19 @@ export interface CanvaInvoice {
   };
 }
 
+export interface InvoiceDeletion {
+  id: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  description: string;
+  amount: number;
+  currency: string;
+  status: CanvaInvoice['status'];
+  team?: string;
+  date?: string;
+  deletedAt: string;
+}
+
 export interface CostAnalytics {
   totalYearCost: number;
   averageMonthly: number;

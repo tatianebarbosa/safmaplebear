@@ -216,24 +216,6 @@ export const CanvaMetricsDisplay = () => {
       .finally(() => setModelsLoading(false));
   }, [modelsLoading, topModels.length]);
 
-  const usageTotals = useMemo(() => {
-    if (!usageData.length) return null;
-    return usageData.reduce(
-      (acc, item) => {
-        acc.designsCreated += item.designsCreated ?? 0;
-        acc.designsPublished += item.designsPublished ?? 0;
-        acc.designsShared += item.designsShared ?? 0;
-        return acc;
-      },
-      { designsCreated: 0, designsPublished: 0, designsShared: 0 }
-    );
-  }, [usageData]);
-
-  const shareRate = useMemo(() => {
-    if (!usageTotals?.designsCreated) return null;
-    return (usageTotals.designsShared / usageTotals.designsCreated) * 100;
-  }, [usageTotals]);
-
   const topSharedModel = useMemo(() => {
     if (!topModels.length) return null;
     const byShared = [...topModels].sort((a, b) => (b.shared ?? 0) - (a.shared ?? 0));
@@ -303,72 +285,6 @@ export const CanvaMetricsDisplay = () => {
               icon={<Building2 className="h-4 w-4" />}
               variant={overviewSummary.schoolsAtCapacity > 0 ? "destructive" : "default"}
               tooltip={topCreatorsTooltip}
-            />
-          </div>
-        </div>
-      )}
-
-      {(usageTotals || usageLoading) && (
-        <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Share2 className="h-5 w-5 text-muted-foreground" />
-              Uso do Canva
-            </h3>
-            <p className="text-xs text-muted-foreground">Cards resumidos com dados de uso e destaques</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <StatsCard
-              title="Designs criados"
-              value={usageTotals ? formatNumber(usageTotals.designsCreated) : "Carregando..."}
-              description="Soma dos relatórios mais recentes"
-              icon={<Palette className="h-4 w-4" />}
-              tooltip={topCreatorsTooltip}
-              className="min-h-[240px]"
-            />
-            <StatsCard
-              title="Links compartilhados"
-              value={usageTotals ? formatNumber(usageTotals.designsShared) : "Carregando..."}
-              description={
-                usageTotals && shareRate !== null
-                  ? `${formatNumber(shareRate)}% em relacao aos criados`
-                  : "Sem base para percentual"
-              }
-              icon={<Link className="h-4 w-4" />}
-              tooltip={topCreatorsTooltip}
-              className="min-h-[240px]"
-            />
-            <StatsCard
-              title="Destaques de criadores"
-              value={topCreators.length ? topCreators[0].name || "Top criador" : "Sem criadores"}
-              description={
-                topCreators.length
-                  ? `Top 3: ${topCreatorNames}`
-                  : "Nenhum criador disponivel nas coletas"
-              }
-              tooltip={
-                topCreatorsTooltip
-              }
-              icon={<Users className="h-4 w-4" />}
-              className="min-h-[240px]"
-            />
-            <StatsCard
-              title="Arte mais compartilhada"
-              value={
-                modelsLoading
-                  ? "Carregando..."
-                  : topSharedModel?.modelName || "Sem dados de artes"
-              }
-              description={
-                modelsLoading
-                  ? ""
-                  : topSharedModel
-                  ? `${formatNumber(topSharedModel.shared ?? 0)} compartilhamentos`
-                  : "Nenhum registro de compartilhamento"
-              }
-              icon={<Palette className="h-4 w-4" />}
-              tooltip={topCreatorsTooltip}
-              className="min-h-[240px]"
             />
           </div>
         </div>

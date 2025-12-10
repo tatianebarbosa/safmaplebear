@@ -7,14 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -52,8 +44,9 @@ import {
   Download,
   ArrowUpDown,
   CalendarRange,
+  ChevronDown,
   Check,
-  ChevronRight,
+  Loader2,
 } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { UsageFilters, CanvaUsageData, UsagePeriod } from "@/types/schoolLicense";
@@ -70,7 +63,7 @@ import {
 } from "@/lib/canvaUsageService";
 import { readFileAsUtf8 } from "@/lib/fileUtils";
 import { filterRecentTimeSeries } from "@/lib/chartUtils";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
@@ -78,6 +71,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as DatePicker } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { canvaCollector } from "@/lib/canvaDataCollector";
+import { differenceInCalendarDays, format } from "date-fns";
 
 interface CanvaUsageDashboardProps {
   onNavigateToUsers: (searchEmail?: string) => void;
@@ -85,11 +79,11 @@ interface CanvaUsageDashboardProps {
 
 const periodLabel = (period: UsageFilters["period"]) => {
   const labels: Record<UsageFilters["period"], string> = {
-    "7d": "Ultimos 7 dias",
-    "30d": "Ultimos 30 dias",
-    "3m": "Ultimos 3 meses",
-    "6m": "Ultimos 6 meses",
-    "12m": "Ultimos 12 meses",
+    "7d": "Últimos 7 dias",
+    "30d": "Últimos 30 dias",
+    "3m": "Últimos 3 meses",
+    "6m": "Últimos 6 meses",
+    "12m": "Últimos 12 meses",
     nov2025: "Novembro 2025",
   };
   return labels[period] ?? period;
@@ -98,6 +92,66 @@ const periodLabel = (period: UsageFilters["period"]) => {
 const chartStroke = "hsl(var(--border))";
 const chartText = "hsl(var(--muted-foreground))";
 const primaryColor = "hsl(var(--primary))";
+const mascotLoadingStyles = `
+@keyframes mascotRide {
+  0% { transform: translateX(-14px) rotate(-1.5deg); }
+  50% { transform: translateX(0) rotate(0deg); }
+  100% { transform: translateX(14px) rotate(1.5deg); }
+}
+
+@keyframes mascotShadow {
+  0% { transform: translateX(-14px) scaleX(0.88); opacity: 0.3; }
+  50% { transform: translateX(0) scaleX(1); opacity: 0.45; }
+  100% { transform: translateX(14px) scaleX(0.88); opacity: 0.3; }
+}
+`;
+
+const calcRangeFromPeriod = (period: UsagePeriod): DateRange => {
+  const today = new Date();
+  const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const start = new Date(end);
+
+  const setDaysAgo = (days: number) => {
+    start.setDate(end.getDate() - (days - 1));
+  };
+
+  if (period === "7d") setDaysAgo(7);
+  else if (period === "30d") setDaysAgo(30);
+  else if (period === "3m") start.setMonth(end.getMonth() - 3);
+  else if (period === "6m") start.setMonth(end.getMonth() - 6);
+  else if (period === "12m") start.setMonth(end.getMonth() - 12);
+  else if (period === "nov2025") {
+    return {
+      from: new Date(2025, 10, 1),
+      to: new Date(2025, 10, 30),
+    };
+  }
+
+  return { from: start, to: end };
+};
+
+const formatDate = (date?: Date) => (date ? format(date, "dd/MM/yyyy") : "");
+
+const MascotLoading = () => (
+  <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
+    <div className="relative h-48 w-48 sm:h-56 sm:w-56">
+      <div
+        className="absolute inset-x-6 bottom-6 h-3 rounded-full bg-primary/20 blur-[2px]"
+        style={{ animation: "mascotShadow 1.6s ease-in-out infinite alternate" }}
+      />
+      <img
+        src="/chinook-bike.png"
+        alt="Mascote pedalando enquanto carregamos o painel"
+        className="h-full w-full object-contain drop-shadow-lg"
+        style={{ animation: "mascotRide 1.6s ease-in-out infinite alternate" }}
+      />
+    </div>
+    <div className="space-y-1">
+      <p className="text-base font-semibold text-foreground">Carregando painel do Canva...</p>
+      <p className="text-sm text-muted-foreground">O mascote esta pedalando enquanto buscamos os dados.</p>
+    </div>
+  </div>
+);
 
 export const CanvaUsageDashboard = ({
   onNavigateToUsers,
@@ -106,7 +160,7 @@ export const CanvaUsageDashboard = ({
   type MetricKey = "designsCreated" | "designsPublished" | "designsShared" | "designsViewed";
   type CreatorMetric = "designs" | "published" | "shared" | "viewed";
   type ModelSortKey = "modelName" | "owner" | "uses" | "published" | "shared";
-  type MemberSortKey = "name" | "lastActivity" | "designs" | "published" | "shared" | "viewed";
+  type MemberSortKey = "name" | "category" | "lastActivity" | "designs" | "published" | "shared" | "viewed";
   const [activeTab, setActiveTab] = useState<"models" | "members" | "kits">("models");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOwner, setSelectedOwner] = useState<string | "all">("all");
@@ -115,13 +169,31 @@ export const CanvaUsageDashboard = ({
     cluster: undefined,
     school: undefined,
   });
+  const periodPresets: Array<{ key: UsagePeriod; label: string; subtitle?: string }> = [
+    { key: "12m", label: "12 meses", subtitle: "Últimos 12 meses" },
+    { key: "6m", label: "6 meses", subtitle: "Últimos 6 meses" },
+    { key: "3m", label: "3 meses", subtitle: "Últimos 3 meses" },
+    { key: "30d", label: "Últimos 30 dias", subtitle: "Janela rolante" },
+    { key: "7d", label: "Últimos 7 dias", subtitle: "7 dias corridos" },
+    { key: "nov2025", label: "Novembro 2025", subtitle: "Recorte fixo" },
+  ];
+  const [periodPreset, setPeriodPreset] = useState<UsagePeriod>(filters.period);
+  const [periodDropdownOpen, setPeriodDropdownOpen] = useState(false);
+  const activeRange = useMemo(() => calcRangeFromPeriod(filters.period), [filters.period]);
+  const [customRange, setCustomRange] = useState<DateRange | undefined>(activeRange);
+  const [customRangeHint, setCustomRangeHint] = useState<string | null>(null);
+  const currentPresetLabel =
+    periodPresets.find((p) => p.key === periodPreset)?.label ?? periodLabel(filters.period);
   const [usageData, setUsageData] = useState<CanvaUsageData[]>([]);
   const [timeData, setTimeData] = useState<TimeSeriesPoint[]>([]);
   const [annualTimeData, setAnnualTimeData] = useState<TimeSeriesPoint[]>([]);
   const [modelRanking, setModelRanking] = useState<ModelUsage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [rankLimit, setRankLimit] = useState(3);
   const [schoolSort, setSchoolSort] = useState<MetricKey>("designsCreated");
   const [creatorSort, setCreatorSort] = useState<CreatorMetric>("designs");
+  const [creatorCategory, setCreatorCategory] = useState<string>("all");
   const [modelSort, setModelSort] = useState<ModelSortKey>("uses");
   const [modelSortDirection, setModelSortDirection] = useState<"asc" | "desc">("desc");
   const [memberSort, setMemberSort] = useState<MemberSortKey>("designs");
@@ -136,6 +208,8 @@ export const CanvaUsageDashboard = ({
   const [modelLabel, setModelLabel] = useState("");
   const memberFileRef = useRef<HTMLInputElement | null>(null);
   const modelFileRef = useRef<HTMLInputElement | null>(null);
+  const loadingRequestId = useRef(0);
+  const hasLoadedOnce = useRef(false);
   const [uploadingMembers, setUploadingMembers] = useState(false);
   const [uploadingModels, setUploadingModels] = useState(false);
   const [lastMemberUpload, setLastMemberUpload] = useState<string | null>(null);
@@ -146,7 +220,6 @@ export const CanvaUsageDashboard = ({
   const [modelOverrides, setModelOverrides] = useState<
     Array<{ period: UsagePeriod; filename: string | null; uploadedAt: string | null; rows: number; label?: string | null }>
   >([]);
-  const [periodDialogOpen, setPeriodDialogOpen] = useState(false);
 
   const metricLabels: Record<MetricKey, string> = {
     designsCreated: "Designs criados",
@@ -162,12 +235,12 @@ export const CanvaUsageDashboard = ({
   };
 
   const clusterOptions = [
-    { value: "Implantacao", label: "Implantacao" },
+    { value: "Implantacao", label: "Implantação" },
     { value: "Alta Performance", label: "Alta Performance" },
     { value: "Potente", label: "Potente" },
     { value: "Desenvolvimento", label: "Desenvolvimento" },
     { value: "Alerta", label: "Alerta" },
-    { value: "Outros/Implantacao", label: "Outros/Implantacao" },
+    { value: "Outros/Implantacao", label: "Outros/Implantação" },
   ];
 
   const refreshUploadInfo = useCallback(() => {
@@ -192,15 +265,33 @@ export const CanvaUsageDashboard = ({
   }, []);
 
   const loadDashboardData = useCallback(async () => {
-    const [{ usageData, timeSeries }, models] = await Promise.all([
-      loadUsageReport(filters.period),
-      loadModelUsageRanking(filters.period),
-    ]);
-    setUsageData(usageData);
-    const cleanedSeries = filterRecentTimeSeries(timeSeries);
-    setTimeData(cleanedSeries);
-    setModelRanking(models);
-    refreshUploadInfo();
+    const requestId = ++loadingRequestId.current;
+    const isFirstLoad = !hasLoadedOnce.current;
+    if (isFirstLoad) {
+      setIsLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
+    try {
+      const [{ usageData, timeSeries }, models] = await Promise.all([
+        loadUsageReport(filters.period),
+        loadModelUsageRanking(filters.period),
+      ]);
+      setUsageData(usageData);
+      const cleanedSeries = filterRecentTimeSeries(timeSeries);
+      setTimeData(cleanedSeries);
+      setModelRanking(models);
+      refreshUploadInfo();
+    } catch (error) {
+      console.error("Erro ao carregar os dados do Canva", error);
+      toast.error("Nao foi possivel carregar os dados do Canva agora.");
+    } finally {
+      if (requestId === loadingRequestId.current) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+        hasLoadedOnce.current = true;
+      }
+    }
   }, [filters.period, refreshUploadInfo]);
 
   useEffect(() => {
@@ -213,11 +304,37 @@ export const CanvaUsageDashboard = ({
     return () => window.removeEventListener("canva-upload-refresh", handler);
   }, [loadDashboardData]);
 
-  const activePeriod = filters.period;
-  const handlePeriodChange = (value: UsageFilters["period"]) => {
-    setFilters((prev) => ({ ...prev, period: value }));
-    setPeriodDialogOpen(false);
+  useEffect(() => {
+    setPeriodPreset(filters.period);
+    setCustomRange(calcRangeFromPeriod(filters.period));
+  }, [filters.period]);
+
+  const applyPresetPeriod = (preset: UsagePeriod) => {
+    setPeriodPreset(preset);
+    setFilters((prev) => ({ ...prev, period: preset }));
+    setCustomRange(calcRangeFromPeriod(preset));
+    setCustomRangeHint(null);
+    setPeriodDropdownOpen(false);
   };
+
+  const applyCustomRange = () => {
+    if (!customRange?.from || !customRange?.to) {
+      setCustomRangeHint("Selecione datas de início e fim para aplicar.");
+      return;
+    }
+    const diffDays = differenceInCalendarDays(customRange.to, customRange.from) + 1;
+    const mappedPreset: UsagePeriod =
+      diffDays <= 7 ? "7d" : diffDays <= 30 ? "30d" : diffDays <= 90 ? "3m" : diffDays <= 180 ? "6m" : "12m";
+    setCustomRangeHint(`Aplicando ${periodLabel(mappedPreset)} (recorte mais próximo disponível).`);
+    applyPresetPeriod(mappedPreset);
+  };
+
+  useEffect(() => {
+    if (periodDropdownOpen) {
+      setCustomRange(activeRange);
+      setCustomRangeHint(null);
+    }
+  }, [periodDropdownOpen, activeRange]);
 
   useEffect(() => {
     const handleVisibility = () => {
@@ -240,7 +357,7 @@ export const CanvaUsageDashboard = ({
         const cleanedSeries = filterRecentTimeSeries(timeSeries);
         setAnnualTimeData(cleanedSeries);
       } catch (error) {
-        console.error("Erro ao carregar a serie anual do Canva", error);
+        console.error("Erro ao carregar a série anual do Canva", error);
       }
     };
     loadAnnualTrend();
@@ -292,7 +409,8 @@ export const CanvaUsageDashboard = ({
 
   const publicationRate = totals.designs ? (totals.published / totals.designs) * 100 : 0;
   const shareRate = totals.published ? (totals.shared / totals.published) * 100 : 0;
-  const viewsPerDesign = totals.published ? totals.viewed / totals.published : 0;
+  // Engajamento: visualizações por link compartilhado (evita diluir em todos publicados)
+  const viewsPerDesign = totals.shared ? totals.viewed / totals.shared : 0;
   const designsPerSchool = filteredUsage.length ? totals.designs / filteredUsage.length : 0;
 
   const clusterBreakdown = useMemo(() => {
@@ -341,9 +459,37 @@ export const CanvaUsageDashboard = ({
     [excludedEmails, filteredUsage]
   );
 
+  const creatorCategories = useMemo(() => {
+    const unique = new Set<string>();
+    creatorEntries.forEach((creator) => {
+      const category = creator.role || creator.category;
+      if (category) unique.add(category);
+    });
+    if (creatorEntries.some((creator) => !creator.role && !creator.category)) {
+      unique.add("Sem categoria");
+    }
+    return Array.from(unique).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [creatorEntries]);
+
+  const filteredCreators = useMemo(
+    () =>
+      creatorEntries.filter((creator) => {
+        if (creatorCategory === "all") return true;
+        const category = creator.role || creator.category || "Sem categoria";
+        return category === creatorCategory;
+      }),
+    [creatorCategory, creatorEntries]
+  );
+
+  useEffect(() => {
+    if (creatorCategory !== "all" && !creatorCategories.includes(creatorCategory)) {
+      setCreatorCategory("all");
+    }
+  }, [creatorCategories, creatorCategory]);
+
   const allCreators = useMemo(
     () =>
-      creatorEntries
+      filteredCreators
         .map((creator) => ({
           ...creator,
           metricValue:
@@ -356,17 +502,17 @@ export const CanvaUsageDashboard = ({
               : creator.viewed ?? 0,
         }))
         .sort((a, b) => b.metricValue - a.metricValue),
-    [creatorEntries, creatorSort]
+    [creatorSort, filteredCreators]
   );
 
   const rankedCreators = allCreators.slice(0, rankLimit);
   const missingSlots = Math.max(0, rankLimit - rankedCreators.length);
 
   const resolveSchoolInfo = (email?: string, fallbackName?: string, fallbackCluster?: string) => {
-    if (!email) return { name: fallbackName ?? "Sem Escola", cluster: fallbackCluster ?? "Sem cluster" };
+    if (!email) return { name: fallbackName ?? "Sem escola", cluster: fallbackCluster ?? "Sem cluster" };
     const info = schoolLookup.get(email.toLowerCase());
     return {
-      name: info?.name ?? fallbackName ?? "Sem Escola",
+      name: info?.name ?? fallbackName ?? "Sem escola",
       cluster: info?.cluster ?? fallbackCluster ?? "Sem cluster",
     };
   };
@@ -375,8 +521,8 @@ export const CanvaUsageDashboard = ({
     if (!email) return;
     navigator.clipboard
       ?.writeText(email)
-      .then(() => toast.success("Email copiado para comunicar o destaque."))
-      .catch(() => toast.error("Nao foi possivel copiar o e-mail agora."));
+      .then(() => toast.success("E-mail copiado para comunicar o destaque."))
+      .catch(() => toast.error("Não foi possível copiar o e-mail agora."));
   };
 
   const ownerOptions = useMemo(() => {
@@ -419,7 +565,7 @@ export const CanvaUsageDashboard = ({
       const aVal = getValue(a);
       const bVal = getValue(b);
       if (typeof aVal === "string" || typeof bVal === "string") {
-        return (String(aVal)).localeCompare(String(bVal), "pt-BR") * direction;
+        return String(aVal).localeCompare(String(bVal), "pt-BR") * direction;
       }
       return ((aVal as number) - (bVal as number)) * direction;
     });
@@ -443,12 +589,14 @@ export const CanvaUsageDashboard = ({
 
   const sortedMembers = useMemo(() => {
     const direction = memberSortDirection === "asc" ? 1 : -1;
-    const getValue = (creator: (typeof creatorEntries)[number]) => {
+    const getValue = (creator: (typeof filteredCreators)[number]) => {
       switch (memberSort) {
         case "name":
           return creator.name?.toLowerCase?.() ?? "";
         case "lastActivity":
           return parseActivityDate(creator.lastActivity) ?? 0;
+        case "category":
+          return (creator.role ?? creator.category ?? "").toLowerCase();
         case "published":
           return creator.published ?? 0;
         case "shared":
@@ -460,7 +608,7 @@ export const CanvaUsageDashboard = ({
           return creator.designs ?? 0;
       }
     };
-    return [...creatorEntries].sort((a, b) => {
+    return [...filteredCreators].sort((a, b) => {
       const aVal = getValue(a);
       const bVal = getValue(b);
       if (typeof aVal === "string" || typeof bVal === "string") {
@@ -468,7 +616,7 @@ export const CanvaUsageDashboard = ({
       }
       return ((aVal as number) - (bVal as number)) * direction;
     });
-  }, [creatorEntries, memberSort, memberSortDirection]);
+  }, [filteredCreators, memberSort, memberSortDirection]);
 
   const handleModelSort = (key: ModelSortKey) => {
     setModelSort((current) => {
@@ -514,6 +662,12 @@ export const CanvaUsageDashboard = ({
     const computedTotal = total || admins + teachers + students;
     return { total: computedTotal, admins, teachers, students };
   }, [schools]);
+
+  const uploadRowsTotals = useMemo(() => {
+    const memberRows = memberOverrides.reduce((sum, o) => sum + (o.rows || 0), 0);
+    const modelRows = modelOverrides.reduce((sum, o) => sum + (o.rows || 0), 0);
+    return { members: memberRows, models: modelRows, total: memberRows + modelRows };
+  }, [memberOverrides, modelOverrides]);
 
   const latestDesigns =
     condensedTimeData.length > 0 ? condensedTimeData[condensedTimeData.length - 1].designs : totals.designs;
@@ -602,86 +756,195 @@ export const CanvaUsageDashboard = ({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="relative">
+      <style>{mascotLoadingStyles}</style>
+      {isLoading ? (
+        <MascotLoading />
+      ) : (
+        <div className="space-y-8">
       <Card className="rounded-2xl border-border/60 shadow-sm">
         <CardHeader className="space-y-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
               <CardTitle className="text-2xl font-semibold">Uso do Canva</CardTitle>
               <CardDescription className="text-sm text-muted-foreground">
-                Importe os CSVs exportados do Canva para atualizar modelos e pessoas todo mes.
+                Importe os CSVs exportados do Canva para atualizar modelos e pessoas todo mês.
               </CardDescription>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant="secondary">Atualizacao mensal</Badge>
-              <Dialog open={periodDialogOpen} onOpenChange={setPeriodDialogOpen}>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground text-left">Periodo</p>
-                  <DialogTrigger asChild>
+              <Badge variant="secondary">Atualização mensal</Badge>
+              {isRefreshing && (
+                <Badge variant="outline" className="gap-1 text-xs">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Atualizando dados
+                </Badge>
+              )}
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground text-left">Período</p>
+                <Popover open={periodDropdownOpen} onOpenChange={setPeriodDropdownOpen}>
+                  <PopoverTrigger asChild>
                     <Button className="flex h-auto w-full min-w-[220px] items-center gap-3 rounded-2xl border border-border/60 bg-white px-3 py-2 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md">
                       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <CalendarRange className="h-4 w-4" />
                       </div>
                       <div className="flex-1">
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                          Periodo ativo
+                          Período ativo
                         </p>
                         <p className="text-sm font-semibold leading-tight text-foreground">
-                          {periodLabel(filters.period)}
+                          {currentPresetLabel}
                         </p>
-                        <p className="text-[11px] text-muted-foreground">Aplicado em cards e graficos</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {`${formatDate(activeRange.from)} - ${formatDate(activeRange.to)}`}
+                        </p>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
                     </Button>
-                  </DialogTrigger>
-                </div>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="end"
+                    className="w-[min(920px,calc(100vw-32px))] space-y-4 rounded-2xl border border-border/60 bg-white p-4 shadow-xl"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-base font-semibold text-foreground">Selecionar um intervalo de datas</p>
+                        <p className="text-xs text-muted-foreground">
+                          Ajuste o período para sincronizar cartões e gráficos do painel.
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        Período ativo: {currentPresetLabel}
+                      </Badge>
+                    </div>
 
-                <DialogContent className="max-w-md overflow-hidden p-0">
-                  <div className="border-b border-border/70 bg-white px-4 py-3">
-                    <DialogHeader className="space-y-1">
-                      <DialogTitle className="text-lg font-semibold">Periodo da busca</DialogTitle>
-                      <DialogDescription className="text-xs text-muted-foreground">
-                        Escolha um recorte rapido igual ao seletor do Canva.
-                      </DialogDescription>
-                    </DialogHeader>
-                  </div>
-                  <div className="space-y-2 p-2">
-                    {[
-                      { key: "12m", label: "12 meses", description: "Ultimos 12 meses" },
-                      { key: "6m", label: "6 meses", description: "Ultimos 6 meses" },
-                      { key: "3m", label: "3 meses", description: "Ultimos 3 meses" },
-                      { key: "30d", label: "Ultimos 30 dias", description: "Periodo padrao" },
-                      { key: "7d", label: "Ultimos 7 dias", description: "Semana atual" },
-                    ].map((option) => (
-                      <Button
-                        key={option.key}
-                        variant="ghost"
-                        className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition ${
-                          activePeriod === option.key ? "bg-white shadow-sm ring-1 ring-primary/20" : "hover:bg-white"
-                        }`}
-                        onClick={() => handlePeriodChange(option.key as UsageFilters["period"])}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`flex h-6 w-6 items-center justify-center rounded-full border ${
-                              activePeriod === option.key
-                                ? "border-primary bg-primary/10 text-primary"
-                                : "border-border text-muted-foreground"
-                            }`}
-                          >
-                            {activePeriod === option.key && <Check className="h-3 w-3" />}
-                          </span>
-                          <div className="flex flex-col text-sm">
-                            <span className="font-medium">{option.label}</span>
-                            <span className="text-xs text-muted-foreground">{option.description}</span>
+                    <div className="grid gap-6 lg:grid-cols-[1.3fr,1fr]">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Períodos rápidos</p>
+                          <div className="grid gap-2 rounded-xl border border-border/70 bg-muted/30 p-2">
+                            {periodPresets
+                              .filter((preset) => preset.key !== "nov2025")
+                              .map((item) => {
+                                const isActive = periodPreset === item.key;
+                                return (
+                                  <button
+                                    key={item.key}
+                                    type="button"
+                                    onClick={() => applyPresetPeriod(item.key)}
+                                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-left transition hover:bg-background ${
+                                      isActive ? "border border-primary/40 bg-background font-semibold" : "border border-transparent text-muted-foreground"
+                                    }`}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span>{item.label}</span>
+                                      {item.subtitle && (
+                                        <span className="text-[11px] text-muted-foreground">{item.subtitle}</span>
+                                      )}
+                                    </div>
+                                    {isActive && <Check className="h-4 w-4 text-primary" />}
+                                  </button>
+                                );
+                              })}
                           </div>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground/70" />
-                      </Button>
-                    ))}
-                  </div>
-                </DialogContent>
-              </Dialog>
+
+                        <div className="space-y-3 rounded-xl border border-border/60 bg-muted/20 p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-foreground">Datas personalizadas</p>
+                              <p className="text-xs text-muted-foreground">
+                                Usamos o recorte disponível mais próximo (7d, 30d, 3m, 6m ou 12m).
+                              </p>
+                            </div>
+                          </div>
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <Input
+                              readOnly
+                              value={customRange?.from ? format(customRange.from, "dd/MM/yyyy") : ""}
+                              placeholder="dd/mm/aaaa"
+                              className="bg-background"
+                            />
+                            <Input
+                              readOnly
+                              value={customRange?.to ? format(customRange.to, "dd/MM/yyyy") : ""}
+                              placeholder="dd/mm/aaaa"
+                              className="bg-background"
+                            />
+                          </div>
+                          <div className="rounded-lg border bg-background p-3">
+                            <DatePicker
+                              mode="range"
+                              selected={customRange}
+                              onSelect={(range) => {
+                                setCustomRange(range);
+                                setCustomRangeHint(null);
+                              }}
+                              numberOfMonths={2}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <p className="text-xs text-muted-foreground">
+                              {customRangeHint ?? "Selecione um intervalo para aplicar."}
+                            </p>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setCustomRange(undefined);
+                                  setCustomRangeHint(null);
+                                }}
+                              >
+                                Limpar
+                              </Button>
+                              <Button size="sm" onClick={applyCustomRange}>
+                                Pronto
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Recorte especial</p>
+                          {periodPresets
+                            .filter((preset) => preset.key === "nov2025")
+                            .map((item) => (
+                              <button
+                                key={item.key}
+                                type="button"
+                                onClick={() => applyPresetPeriod(item.key)}
+                                className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left transition hover:bg-background ${
+                                  periodPreset === item.key ? "border-primary/40 bg-background font-semibold" : "border-border/60 text-muted-foreground"
+                                }`}
+                              >
+                                <div className="flex flex-col">
+                                  <span>{item.label}</span>
+                                  {item.subtitle && (
+                                    <span className="text-[11px] text-muted-foreground">{item.subtitle}</span>
+                                  )}
+                                </div>
+                                {periodPreset === item.key && <Check className="h-4 w-4 text-primary" />}
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 rounded-xl border border-border/60 bg-muted/20 p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Resumo</p>
+                        <div className="rounded-lg border bg-background p-3">
+                          <p className="text-sm font-semibold text-foreground">{currentPresetLabel}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {`${formatDate(activeRange.from)} - ${formatDate(activeRange.to)}`}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border bg-background p-3 text-xs text-muted-foreground">
+                          Se você escolher um intervalo diferente, aplicaremos o recorte disponível mais próximo para manter os dados consistentes.
+                        </div>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
 
@@ -692,10 +955,12 @@ export const CanvaUsageDashboard = ({
                   <p className="text-sm text-muted-foreground">Designs criados</p>
                   <div className="text-3xl font-semibold">{totals.designs.toLocaleString()}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {designDelta >= 0 ? "+" : "-"} {Math.abs(designDeltaPct).toFixed(1)}% vs periodo anterior
+                    {designDelta >= 0 ? "+" : "-"} {Math.abs(designDeltaPct).toFixed(1)}% vs período anterior
                   </p>
                 </div>
-                <Badge variant="outline" className="rounded-full">{periodLabel(filters.period)}</Badge>
+                <Badge variant="outline" className="rounded-full">
+                  {periodLabel(filters.period)}
+                </Badge>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                 <div className="rounded-lg border bg-white/70 p-3">
@@ -799,7 +1064,7 @@ export const CanvaUsageDashboard = ({
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="space-y-4">
             <TabsList className="w-fit rounded-full bg-muted/60 p-1">
               <TabsTrigger value="models" className="rounded-full px-3 py-1 text-sm">Modelos</TabsTrigger>
-              <TabsTrigger value="members" className="rounded-full px-3 py-1 text-sm">Membros</TabsTrigger>
+              <TabsTrigger value="members" className="rounded-full px-3 py-1 text-sm">Criadores</TabsTrigger>
               <TabsTrigger value="kits" className="rounded-full px-3 py-1 text-sm">Kits de marca</TabsTrigger>
             </TabsList>
 
@@ -846,7 +1111,7 @@ export const CanvaUsageDashboard = ({
                 />
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Switch id="models-all" checked={applyModelsToAll} onCheckedChange={setApplyModelsToAll} />
-                  <label htmlFor="models-all">Aplicar em todos os periodos</label>
+                  <label htmlFor="models-all">Aplicar em todos os períodos</label>
                 </div>
                 <Button onClick={() => modelFileRef.current?.click()} disabled={uploadingModels} className="gap-2">
                   <Upload className="h-4 w-4" />
@@ -870,7 +1135,7 @@ export const CanvaUsageDashboard = ({
                 onChange={handleModelUpload}
               />
               <p className="text-xs text-muted-foreground">
-              Ultimo upload de modelos: {lastModelUpload ?? "Nenhum"}
+                Último upload de modelos: {lastModelUpload ?? "Nenhum"}
               </p>
               {modelOverrides.some((o) => o.filename) && (
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -968,23 +1233,23 @@ export const CanvaUsageDashboard = ({
                 />
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Switch id="members-all" checked={applyMembersToAll} onCheckedChange={setApplyMembersToAll} />
-                  <label htmlFor="members-all">Aplicar em todos os periodos</label>
+                  <label htmlFor="members-all">Aplicar em todos os períodos</label>
                 </div>
                 <Select value={memberUploadPeriod} onValueChange={(value: UsagePeriod) => setMemberUploadPeriod(value)}>
                   <SelectTrigger className="h-9 w-32">
-                    <SelectValue placeholder="Periodo" />
+                    <SelectValue placeholder="Período" />
                   </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7d">7 dias</SelectItem>
-                  <SelectItem value="30d">30 dias</SelectItem>
-                  <SelectItem value="3m">3 meses</SelectItem>
-                  <SelectItem value="6m">6 meses</SelectItem>
-                  <SelectItem value="12m">12 meses</SelectItem>
-                </SelectContent>
+                  <SelectContent>
+                    <SelectItem value="7d">7 dias</SelectItem>
+                    <SelectItem value="30d">30 dias</SelectItem>
+                    <SelectItem value="3m">3 meses</SelectItem>
+                    <SelectItem value="6m">6 meses</SelectItem>
+                    <SelectItem value="12m">12 meses</SelectItem>
+                  </SelectContent>
                 </Select>
                 <Button onClick={() => memberFileRef.current?.click()} disabled={uploadingMembers} className="gap-2">
                   <Upload className="h-4 w-4" />
-                  {uploadingMembers ? "Importando..." : "Importar membros CSV"}
+                  {uploadingMembers ? "Importando..." : "Importar criadores CSV"}
                 </Button>
               </div>
               <input
@@ -995,7 +1260,7 @@ export const CanvaUsageDashboard = ({
                 onChange={handleMemberUpload}
               />
               <p className="text-xs text-muted-foreground">
-              Ultimo upload de membros: {lastMemberUpload ?? "Nenhum"}
+                Último upload de criadores: {lastMemberUpload ?? "Nenhum"}
               </p>
               {memberOverrides.some((o) => o.filename) && (
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -1012,7 +1277,7 @@ export const CanvaUsageDashboard = ({
               <div className="grid gap-3 sm:grid-cols-3">
                 <Card className="border-border/60 shadow-sm">
                   <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground">Licen?as em uso</p>
+                    <p className="text-sm text-muted-foreground">Licenças em uso</p>
                     <div className="text-2xl font-semibold">{memberTotals.total.toLocaleString()}</div>
                   </CardContent>
                 </Card>
@@ -1032,17 +1297,27 @@ export const CanvaUsageDashboard = ({
 
               <Card className="border-border/60 shadow-sm">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-medium">Membros importados</CardTitle>
+                  <CardTitle className="text-lg font-medium">Criadores importados</CardTitle>
                   <CardDescription className="text-sm text-muted-foreground">
-                    Cabecalho de filtros sempre visivel para ordenar atividade e engajamento.
+                    Cabeçalho de filtros sempre visível para ordenar atividade e engajamento.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="overflow-x-auto rounded-lg border border-border/60 bg-card">
-                    <table className="w-full min-w-[900px] text-sm">
+                    <table className="w-full min-w-[1024px] text-sm">
                       <thead className="bg-muted/40 text-muted-foreground">
                         <tr>
                           <th className="px-3 py-2 text-left font-medium text-foreground">Membro</th>
+                          <th className="px-3 py-2 text-left font-medium">
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-xs font-medium text-foreground"
+                              onClick={() => handleMemberSort("category")}
+                            >
+                              Categoria
+                              <ArrowUpDown className={`h-3.5 w-3.5 ${memberSort === "category" ? "text-primary" : "text-muted-foreground"}`} />
+                            </button>
+                          </th>
                           <th className="px-3 py-2 text-left font-medium text-foreground">Escola</th>
                           <th className="px-3 py-2 text-left font-medium">
                             <button
@@ -1050,7 +1325,7 @@ export const CanvaUsageDashboard = ({
                               className="flex items-center gap-1 text-xs font-medium text-foreground"
                               onClick={() => handleMemberSort("lastActivity")}
                             >
-                              Ultima atividade
+                              Última atividade
                               <ArrowUpDown className={`h-3.5 w-3.5 ${memberSort === "lastActivity" ? "text-primary" : "text-muted-foreground"}`} />
                             </button>
                           </th>
@@ -1099,7 +1374,7 @@ export const CanvaUsageDashboard = ({
                       <tbody>
                         {sortedMembers.length === 0 ? (
                           <tr>
-                            <td colSpan={7} className="px-3 py-4 text-center text-sm text-muted-foreground">
+                            <td colSpan={8} className="px-3 py-4 text-center text-sm text-muted-foreground">
                               Nenhum membro encontrado para os filtros atuais.
                             </td>
                           </tr>
@@ -1108,7 +1383,10 @@ export const CanvaUsageDashboard = ({
                             <tr key={`${creator.email}-${index}`} className="border-t border-border/40">
                               <td className="px-3 py-2">
                                 <div className="font-medium text-foreground">{creator.name || "Sem nome"}</div>
-                                <div className="text-xs text-muted-foreground">{creator.email || "Sem email"}</div>
+                                <div className="text-xs text-muted-foreground">{creator.email || "Sem e-mail"}</div>
+                              </td>
+                              <td className="px-3 py-2 text-sm text-foreground">
+                                {creator.role || creator.category || "Sem categoria"}
                               </td>
                               <td className="px-3 py-2">
                                 <div className="text-sm text-foreground">{creator.schoolName || "Sem escola"}</div>
@@ -1133,7 +1411,7 @@ export const CanvaUsageDashboard = ({
 
             <TabsContent value="kits" className="space-y-3">
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                Kits de marca usam os mesmos uploads. Mantenha os CSVs atualizados para refletir compartilhamentos e publicacoes.
+                Kits de marca usam os mesmos uploads. Mantenha os CSVs atualizados para refletir compartilhamentos e publicações.
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <Card className="border-border/60 shadow-sm">
@@ -1150,8 +1428,17 @@ export const CanvaUsageDashboard = ({
                 </Card>
                 <Card className="border-border/60 shadow-sm">
                   <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground">Engajamento medio</p>
+                    <p className="text-sm text-muted-foreground">Engajamento médio</p>
                     <div className="text-2xl font-semibold">{viewsPerDesign.toFixed(1)}x</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border/60 shadow-sm">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">Uploads manuais</p>
+                    <div className="text-2xl font-semibold">{uploadRowsTotals.total.toLocaleString()}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Membros: {uploadRowsTotals.members.toLocaleString()} | Modelos: {uploadRowsTotals.models.toLocaleString()}
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -1170,7 +1457,7 @@ export const CanvaUsageDashboard = ({
         <StatsCard
           title="Publicado"
           value={totals.published.toLocaleString()}
-          description={`${publicationRate.toFixed(1)}% taxa de publicacao`}
+          description={`${publicationRate.toFixed(1)}% taxa de publicação`}
           icon={<Share2 className="h-4 w-4" />}
         />
         <StatsCard
@@ -1180,9 +1467,9 @@ export const CanvaUsageDashboard = ({
           icon={<Share2 className="h-4 w-4" />}
         />
         <StatsCard
-          title="Engajamento medio"
+          title="Engajamento médio"
           value={viewsPerDesign.toFixed(1)}
-          description="Media de engajamento"
+          description="Visualizações por link compartilhado"
           icon={<Eye className="h-4 w-4" />}
         />
         <StatsCard
@@ -1196,13 +1483,13 @@ export const CanvaUsageDashboard = ({
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="rounded-xl shadow-sm border-border/40">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-medium">Designs criados por periodo</CardTitle>
+            <CardTitle className="text-xl font-medium">Designs criados por período</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
-              Evolucao temporal dos designs registrados
+              Evolução temporal dos designs registrados
             </CardDescription>
           </CardHeader>
           <CardContent>
-                        <ResponsiveContainer width="100%" height={320}>
+            <ResponsiveContainer width="100%" height={320}>
               <AreaChart data={condensedTimeData} margin={{ top: 16, right: 16, left: 0, bottom: 8 }}>
                 <defs>
                   <linearGradient id="usageArea" x1="0" y1="0" x2="0" y2="1">
@@ -1214,7 +1501,7 @@ export const CanvaUsageDashboard = ({
                 <XAxis dataKey="period" tick={{ fill: chartText, fontSize: 12 }} />
                 <YAxis tick={{ fill: chartText, fontSize: 12 }} allowDecimals={false} domain={timeDomain} />
                 <Tooltip
-                  labelFormatter={(label) => `Periodo: ${label}`}
+                  labelFormatter={(label) => `Período: ${label}`}
                   formatter={(value) => [value, "Designs"]}
                   contentStyle={{ borderRadius: 12, borderColor: "hsl(var(--border))" }}
                 />
@@ -1236,13 +1523,13 @@ export const CanvaUsageDashboard = ({
           <CardHeader className="pb-3">
             <CardTitle className="text-xl font-medium">Top 10 escolas mais ativas</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
-              Ranking por designs registrados no periodo
+              Ranking por designs registrados no período
             </CardDescription>
             <div className="flex gap-2 items-center">
               <Label className="text-xs text-muted-foreground">Ordenar por</Label>
               <Select value={schoolSort} onValueChange={(value: MetricKey) => setSchoolSort(value)}>
                 <SelectTrigger className="h-9 w-48">
-                  <SelectValue placeholder="Metrica" />
+                  <SelectValue placeholder="Métrica" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="designsCreated">Designs criados</SelectItem>
@@ -1283,12 +1570,12 @@ export const CanvaUsageDashboard = ({
         <CardHeader className="pb-3">
           <CardTitle className="text-xl font-medium">Trend anual de designs (12 meses)</CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
-            Visao consolidada para acompanhar o ritmo geral ao longo do ano
+            Visão consolidada para acompanhar o ritmo geral ao longo do ano
           </CardDescription>
         </CardHeader>
         <CardContent>
           {annualTimeData.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sem dados anuais disponiveis.</p>
+            <p className="text-sm text-muted-foreground">Sem dados anuais disponíveis.</p>
           ) : (
             <ResponsiveContainer width="100%" height={320}>
               <LineChart data={annualTimeData} margin={{ top: 16, right: 16, left: 0, bottom: 8 }}>
@@ -1296,7 +1583,7 @@ export const CanvaUsageDashboard = ({
                 <XAxis dataKey="period" tick={{ fill: chartText, fontSize: 12 }} />
                 <YAxis tick={{ fill: chartText, fontSize: 12 }} allowDecimals={false} />
                 <Tooltip
-                  labelFormatter={(label) => `Periodo: ${label}`}
+                  labelFormatter={(label) => `Período: ${label}`}
                   formatter={(value) => [value, "Designs"]}
                   contentStyle={{ borderRadius: 12, borderColor: "hsl(var(--border))" }}
                 />
@@ -1304,7 +1591,7 @@ export const CanvaUsageDashboard = ({
                   y={annualAverage}
                   stroke="hsl(var(--muted-foreground))"
                   strokeDasharray="4 4"
-                  label={{ position: "right", value: "Media anual", fill: chartText, fontSize: 11 }}
+                  label={{ position: "right", value: "Média anual", fill: chartText, fontSize: 11 }}
                 />
                 <Line
                   type="monotone"
@@ -1320,15 +1607,16 @@ export const CanvaUsageDashboard = ({
         </CardContent>
       </Card>
 
+      {activeTab === "members" && (
       <Card className="rounded-xl shadow-sm border-border/40">
         <CardHeader className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
             <CardTitle className="text-xl font-medium">Ranking de criadores</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
-              Ranking priorizado para comunicados de reconhecimento (marketing central excluido)
+              Ranking priorizado para comunicados de reconhecimento (marketing central excluído). Use a categoria e as métricas dos CSVs importados para filtrar.
             </CardDescription>
             <p className="text-xs text-muted-foreground mt-1">
-              Mostrando {rankedCreators.length} de {rankLimit} posicoes com os filtros atuais.
+              Mostrando {rankedCreators.length} de {rankLimit} posições com os filtros atuais.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 justify-end">
@@ -1344,10 +1632,26 @@ export const CanvaUsageDashboard = ({
               </SelectContent>
             </Select>
             <div className="flex items-center gap-2">
+              <Label className="text-xs text-muted-foreground">Categoria</Label>
+              <Select value={creatorCategory} onValueChange={(value) => setCreatorCategory(value)}>
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="Todas as categorias" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {creatorCategories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
               <Label className="text-xs text-muted-foreground">Ordenar por</Label>
               <Select value={creatorSort} onValueChange={(value: CreatorMetric) => setCreatorSort(value)}>
                 <SelectTrigger className="w-44">
-                  <SelectValue placeholder="Metrica" />
+                  <SelectValue placeholder="Métrica" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="designs">Designs criados</SelectItem>
@@ -1359,7 +1663,7 @@ export const CanvaUsageDashboard = ({
             </div>
             <Button variant="outline" onClick={() => onNavigateToUsers()} className="gap-2">
               <Users className="h-4 w-4" />
-              Ver usuarios
+              Ver usuários
               <ExternalLink className="h-3 w-3" />
             </Button>
           </div>
@@ -1368,7 +1672,7 @@ export const CanvaUsageDashboard = ({
           {rankedCreators.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">
-                Nenhum criador encontrado no periodo selecionado.
+                Nenhum criador encontrado no período selecionado.
               </p>
             </div>
           ) : (
@@ -1376,48 +1680,69 @@ export const CanvaUsageDashboard = ({
               {rankedCreators.map((creator, index) => {
                 const schoolInfo = resolveSchoolInfo(creator.email, creator.schoolName, creator.schoolCluster);
                 return (
-                <div
-                  key={`${creator.email}-${index}`}
-                  className={`flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-3 border rounded-xl hover:shadow-sm transition-colors ${rankStyle(index)}`}
-                >
-                  <div className="flex flex-1 items-start gap-3">
-                    <Badge variant="secondary" className="min-w-8 justify-center text-xs font-medium bg-red-500 text-white">
-                      #{index + 1}
-                    </Badge>
-                    <div>
-                      <div className="font-medium">{creator.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {creator.email} - {schoolInfo.name}
+                  <div
+                    key={`${creator.email}-${index}`}
+                    className={`flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-3 border rounded-xl hover:shadow-sm transition-colors ${rankStyle(index)}`}
+                  >
+                    <div className="flex flex-1 items-start gap-3">
+                      <Badge variant="secondary" className="min-w-8 justify-center text-xs font-medium bg-red-500 text-white">
+                        #{index + 1}
+                      </Badge>
+                      <div>
+                        <div className="font-medium">{creator.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {creator.email} - {schoolInfo.name}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <span>Cluster: {schoolInfo.cluster}</span>
+                          {creator.role && (
+                            <Badge variant="outline" className="border-primary/30 bg-primary/5 text-[11px] font-semibold">
+                              {creator.role}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        Cluster: {schoolInfo.cluster}
+                    </div>
+                    <div className="flex flex-col gap-2 w-full md:w-auto md:items-end">
+                      <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4 md:w-[440px]">
+                        <div className="rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-right">
+                          <p className="text-[11px] uppercase text-muted-foreground">Criados</p>
+                          <p className="font-semibold text-foreground">{Number(creator.designs ?? 0).toLocaleString()}</p>
+                        </div>
+                        <div className="rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-right">
+                          <p className="text-[11px] uppercase text-muted-foreground">Publicados</p>
+                          <p className="font-semibold text-foreground">{Number(creator.published ?? 0).toLocaleString()}</p>
+                        </div>
+                        <div className="rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-right">
+                          <p className="text-[11px] uppercase text-muted-foreground">Links</p>
+                          <p className="font-semibold text-foreground">{Number(creator.shared ?? 0).toLocaleString()}</p>
+                        </div>
+                        <div className="rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-right">
+                          <p className="text-[11px] uppercase text-muted-foreground">Visualizacoes</p>
+                          <p className="font-semibold text-foreground">{Number(creator.viewed ?? 0).toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                        <Button size="sm" variant="ghost" className="whitespace-nowrap" onClick={() => handleCopyEmail(creator.email)}>
+                          Copiar e-mail
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          asChild
+                          className="gap-1"
+                        >
+                          <a href={`mailto:${creator.email}?subject=Parabens pelo destaque no Canva`}>
+                            Parabenizar
+                          </a>
+                        </Button>
+                        <Button size="sm" variant="ghost" className="whitespace-nowrap" onClick={() => onNavigateToUsers(creator.email)}>
+                          Ver escola
+                        </Button>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-right min-w-[96px] md:justify-end">
-                    <div className="font-medium">{creator.designs}</div>
-                    <div className="text-sm text-muted-foreground">designs</div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                    <Button size="sm" variant="ghost" className="whitespace-nowrap" onClick={() => handleCopyEmail(creator.email)}>
-                      Copiar email
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      asChild
-                      className="gap-1"
-                    >
-                      <a href={`mailto:${creator.email}?subject=Parabens pelo destaque no Canva`}>
-                        Parabenizar
-                      </a>
-                    </Button>
-                    <Button size="sm" variant="ghost" className="whitespace-nowrap" onClick={() => onNavigateToUsers(creator.email)}>
-                      Ver escola
-                    </Button>
-                  </div>
-                </div>
-              );
+                );
               })}
               {missingSlots > 0 &&
                 Array.from({ length: missingSlots }).map((_, idx) => {
@@ -1432,9 +1757,9 @@ export const CanvaUsageDashboard = ({
                           #{position}
                         </Badge>
                         <div>
-                          <div className="font-medium text-muted-foreground">Sem criador disponivel</div>
+                          <div className="font-medium text-muted-foreground">Sem criador disponível</div>
                           <div className="text-sm text-muted-foreground">
-                            Ajuste filtros ou periodo para preencher esta posicao.
+                            Ajuste filtros ou período para preencher esta posição.
                           </div>
                         </div>
                       </div>
@@ -1447,6 +1772,7 @@ export const CanvaUsageDashboard = ({
           )}
         </CardContent>
       </Card>
+      )}
 
       {activeTab === "models" && (
         <Card className="rounded-xl shadow-sm border-border/40">
@@ -1485,15 +1811,15 @@ export const CanvaUsageDashboard = ({
 
       <Card className="rounded-xl shadow-sm border-border/40">
         <CardHeader>
-          <CardTitle className="text-xl font-medium">Distribuicao por cluster</CardTitle>
+          <CardTitle className="text-xl font-medium">Distribuição por cluster</CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
-            Entenda onde o engajamento esta concentrado
+            Entenda onde o engajamento está concentrado
           </CardDescription>
         </CardHeader>
         <CardContent>
           {clusterBreakdown.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nenhuma escola disponivel para os filtros escolhidos.
+              Nenhuma escola disponível para os filtros escolhidos.
             </p>
           ) : (
             <div className="space-y-2">
@@ -1518,6 +1844,8 @@ export const CanvaUsageDashboard = ({
           )}
         </CardContent>
       </Card>
+        </div>
+      )}
     </div>
   );
 };

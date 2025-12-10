@@ -110,6 +110,41 @@ export const SchoolLicenseManagement = ({
       .normalize("NFD")
       .replace(/\p{Diacritic}/gu, "");
   const normalizedSearch = normalizeValue(searchTerm.trim());
+  const userMatches = useMemo(() => {
+    if (!normalizedSearch) return [];
+    const matches: Array<{
+      schoolId: string;
+      schoolName: string;
+      cluster?: string;
+      userName: string;
+      email: string;
+      role?: string;
+      isCompliant?: boolean;
+    }> = [];
+    uniqueSchools.forEach((school) => {
+      school.users.forEach((user) => {
+        const nameNorm = normalizeValue(user.name);
+        const emailNorm = normalizeValue(user.email);
+        const roleNorm = normalizeValue(user.role);
+        if (
+          nameNorm.includes(normalizedSearch) ||
+          emailNorm.includes(normalizedSearch) ||
+          roleNorm.includes(normalizedSearch)
+        ) {
+          matches.push({
+            schoolId: school.id,
+            schoolName: school.name,
+            cluster: school.cluster,
+            userName: user.name,
+            email: user.email,
+            role: user.role,
+            isCompliant: user.isCompliant,
+          });
+        }
+      });
+    });
+    return matches.slice(0, 12);
+  }, [normalizedSearch, uniqueSchools]);
 
   const filteredSchools = useMemo(() => {
     const priorityRank = (school: School) => {
@@ -509,6 +544,54 @@ export const SchoolLicenseManagement = ({
           </div>
         </CardContent>
       </Card>
+
+      {userMatches.length > 0 && (
+        <Card className="border border-border/50 shadow-sm">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Usuários encontrados</CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Mostrando {userMatches.length} resultados pelo filtro atual
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {userMatches.map((match) => (
+              <div
+                key={`${match.email}-${match.schoolId}`}
+                className="rounded-lg border border-border/60 bg-slate-50/70 p-3 shadow-inner"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm font-semibold text-foreground truncate">{match.userName}</div>
+                  {!match.isCompliant && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-destructive/10 text-destructive border border-destructive/40">
+                      Não conforme
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">{match.email}</div>
+                <div className="text-xs text-foreground mt-1 flex flex-col gap-0.5">
+                  <span className="font-medium truncate">{match.schoolName}</span>
+                  <span className="text-muted-foreground">
+                    {match.cluster || "Sem cluster"} {match.role ? `• ${match.role}` : ""}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2 text-xs px-2"
+                  onClick={() => {
+                    setSelectedSchool(match.schoolId);
+                    setPage(1);
+                  }}
+                >
+                  Ir para escola
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="space-y-4">
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 [grid-auto-rows:minmax(360px,1fr)]">

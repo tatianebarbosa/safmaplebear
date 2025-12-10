@@ -112,9 +112,8 @@ export const showCanvaSyncReminder = () => {
 
   const closeButton = wrapper.querySelector<HTMLButtonElement>("[data-canva-close]");
   closeButton?.addEventListener("click", () => {
+    // Apenas fecha; nÃ£o redireciona para evitar perder o estado da tela.
     closeModal();
-    // Volta para o painel de escolas/licen?as aps o usu?rio confirmar que vai ajustar.
-    window.location.href = CANVA_DASHBOARD_PATH;
   });
 
   const openButton = wrapper.querySelector<HTMLButtonElement>("[data-canva-open]");
@@ -126,6 +125,5 @@ export const showCanvaSyncReminder = () => {
   document.addEventListener("keydown", onEsc);
   document.body.appendChild(wrapper);
 
-  // Abre a nova guia imediatamente aps a ao do usu?rio
-  window.open(CANVA_PEOPLE_URL, "_blank", "noopener,noreferrer");
+  // SÃ³ abre quando o usuÃ¡rio clicar em "Abrir Canva" (evita quebra de contexto/refresh).
 };

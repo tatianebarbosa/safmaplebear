@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -50,10 +51,12 @@ import {
   BarChart,
   Bar,
   LabelList,
+  AreaChart,
+  Area,
 } from "recharts";
 import { Calendar } from "@/components/ui/calendar";
 import type { DateRange } from "react-day-picker";
-import { CalendarRange, Check, ChevronRight, PenSquare, UploadCloud, Share2, TrendingUp, Trash2 } from "lucide-react";
+import { CalendarRange, Check, ChevronRight, PenSquare, UploadCloud, TrendingUp, Trash2 } from "lucide-react";
 import {
   loadYearlyDataset,
   computeYearlyAnalytics,
@@ -70,7 +73,7 @@ import {
 } from "@/lib/canvaYearlyRepository";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import { readFileAsUtf8 } from "@/lib/fileUtils";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 
 const numberFormat = new Intl.NumberFormat("pt-BR");
 const percent = (value: number) =>
@@ -80,6 +83,14 @@ const chartColors = {
   primary: "hsl(var(--primary))",
   muted: "hsl(var(--muted-foreground))",
   accent: "hsl(var(--secondary))",
+};
+const lineColors = {
+  createdBase: "hsl(var(--primary))",
+  sharedBase: "#0ea5e9", // azul para diferenciar de created
+  publishedBase: "#10b981", // verde
+  createdComparison: "#94a3b8",
+  sharedComparison: "#c084fc",
+  publishedComparison: "#f97316",
 };
 const showLegacyCharts = false;
 const monthLabels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -102,6 +113,15 @@ const allowedTypesForView = (view: YearlyFilters["view"]) => {
   return new Set<CanvaYearlyRecord["dataType"]>(["models", "creators", "general"]);
 };
 
+const normalizeValue = (value?: string | null) =>
+  (value ?? "")
+    .toString()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
 // Remove contas da comunicação central dos rankings de criadores
 const shouldHideCreatorFromRanking = (name?: string | null) => {
   if (!name) return false;
@@ -119,6 +139,8 @@ const CanvaYearlyComparison = () => {
   const [dataset, setDataset] = useState(loadYearlyDataset());
   const [filters, setFilters] = useState<YearlyFilters | null>(null);
   const [view, setView] = useState<YearlyFilters["view"]>("models");
+  const navigate = useNavigate();
+  const location = useLocation();
   const [creatorRankLimit, setCreatorRankLimit] = useState<number | "all">(3); // Top 3 por padrÃ£o
   const [creatorCardLimit, setCreatorCardLimit] = useState<number | "all">(5);
   const [creatorView, setCreatorView] = useState<"list" | "chart">("list");
@@ -181,11 +203,9 @@ const CanvaYearlyComparison = () => {
 
     const years = listYears(data.records);
     const baseYear = years[0];
-    const comparisonYear = years[1] ?? years[0] - 1;
-
     setFilters({
       baseYear,
-      comparisonYear,
+      comparisonYear: null,
       period: { type: "year" },
       view: "models",
     });
@@ -209,9 +229,7 @@ const CanvaYearlyComparison = () => {
       if (!prev) return prev;
       const baseYear = years.includes(prev.baseYear) ? prev.baseYear : years[0];
       const comparisonYear =
-        prev.comparisonYear && years.includes(prev.comparisonYear)
-          ? prev.comparisonYear
-          : years.find((y) => y !== baseYear) ?? null;
+        prev.comparisonYear && years.includes(prev.comparisonYear) ? prev.comparisonYear : null;
       return { ...prev, baseYear, comparisonYear };
     });
   }, [dataset.records]);
@@ -220,6 +238,48 @@ const CanvaYearlyComparison = () => {
     () => dataset.history.filter((h) => !h.deletedAt),
     [dataset.history]
   );
+
+  const uploadTimelineStacked = useMemo(() => {
+    if (activeHistory.length === 0) return [];
+
+    const bucketByDay = new Map<
+      number,
+      {
+        timestamp: number;
+        label: string;
+        models: number;
+        creators: number;
+        general: number;
+        total: number;
+      }
+    >();
+
+    activeHistory.forEach((entry) => {
+      const uploadedAt = new Date(entry.uploadedAt);
+      const day = new Date(uploadedAt.getFullYear(), uploadedAt.getMonth(), uploadedAt.getDate());
+      const key = day.getTime();
+
+      const current =
+        bucketByDay.get(key) ?? {
+          timestamp: key,
+          label: day.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }),
+          models: 0,
+          creators: 0,
+          general: 0,
+          total: 0,
+        };
+
+      const rows = entry.rows ?? 0;
+      if (entry.dataType === "models") current.models += rows;
+      else if (entry.dataType === "creators") current.creators += rows;
+      else current.general += rows;
+      current.total += rows;
+
+      bucketByDay.set(key, current);
+    });
+
+    return Array.from(bucketByDay.values()).sort((a, b) => a.timestamp - b.timestamp);
+  }, [activeHistory]);
 
   const formatDisplayDate = (value: string) => {
     if (!value) return "";
@@ -303,6 +363,36 @@ const CanvaYearlyComparison = () => {
     [enrichedRecords, filters]
   );
 
+  const viewToPath = (v: YearlyFilters["view"]) => {
+    if (v === "creators") return "/dashboard/canva/criadores";
+    if (v === "schools") return "/dashboard/canva/usos/escolas";
+    return "/dashboard/canva/modelos";
+  };
+
+  const pathToView = (path: string): YearlyFilters["view"] => {
+    if (path.includes("/canva/criadores")) return "creators";
+    if (path.includes("/canva/usos/escolas")) return "schools";
+    if (path.includes("/canva/modelos")) return "models";
+    if (path.includes("/canva/usos")) return "models";
+    return view;
+  };
+
+  useEffect(() => {
+    const resolved = pathToView(location.pathname);
+    if (resolved !== view) {
+      setView(resolved);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  const handleViewChange = (v: YearlyFilters["view"]) => {
+    setView(v);
+    const target = viewToPath(v);
+    if (location.pathname !== target) {
+      navigate(target, { replace: true });
+    }
+  };
+
   const availableYears = useMemo(
     () => listYears(enrichedRecords),
     [enrichedRecords]
@@ -316,55 +406,102 @@ const CanvaYearlyComparison = () => {
     [enrichedRecords]
   );
 
+  const creatorSchoolLookup = useMemo(() => {
+    const map = new Map<string, { schoolName?: string; cluster?: string }>();
+
+    enrichedRecords.forEach((record) => {
+      const email = record.creatorEmail?.toLowerCase();
+      if (!email) return;
+      const current = map.get(email) ?? {};
+      if (!current.schoolName && record.schoolName) current.schoolName = record.schoolName;
+      if (!current.cluster && record.cluster) current.cluster = record.cluster;
+      map.set(email, current);
+    });
+
+    schools.forEach((school) => {
+      school.users?.forEach((user) => {
+        const email = user.email?.toLowerCase();
+        if (!email) return;
+        const current = map.get(email) ?? {};
+        if (!current.schoolName && school.name) current.schoolName = school.name;
+        if (!current.cluster && school.cluster) current.cluster = school.cluster;
+        map.set(email, current);
+      });
+    });
+
+    return map;
+  }, [enrichedRecords, schools]);
+
   const hasComparison = !!filters?.comparisonYear;
 
   const summaryCards = useMemo(() => {
-    if (!analytics) return [];
-    const cards = [
+    const source = view === "creators" ? creatorAnalytics : analytics;
+    if (!source) return [];
+    return [
       {
         key: "created",
         title: "Designs criados",
-        value: analytics.baseTotals.created,
-        prev: analytics.comparisonTotals.created,
+        value: source.baseTotals.created,
+        prev: source.comparisonTotals.created,
       },
       {
         key: "published",
         title: "Publicados",
-        value: analytics.baseTotals.published,
-        prev: analytics.comparisonTotals.published,
+        value: source.baseTotals.published,
+        prev: source.comparisonTotals.published,
       },
       {
         key: "shared",
         title: "Compartilhados",
-        value: analytics.baseTotals.shared,
-        prev: analytics.comparisonTotals.shared,
+        value: source.baseTotals.shared,
+        prev: source.comparisonTotals.shared,
       },
       {
         key: "engagement",
-        title: "Engajamento mÃ©dio",
-        value: analytics.baseTotals.engagement,
-        prev: analytics.comparisonTotals.engagement,
+        title: "Engajamento m?dio",
+        value: source.baseTotals.engagement,
+        prev: source.comparisonTotals.engagement,
         isRatio: true,
       },
     ] as const;
-    return cards;
-  }, [analytics]);
+  }, [analytics, creatorAnalytics, view]);
 
+  const schoolSeries = useMemo(() => analytics?.monthlySeries ?? [], [analytics]);
 
   // Lista completa de criadores
   const topCreatorsFull = useMemo(
     () =>
       creatorAnalytics
         ? ((creatorAnalytics as any).topCreators ?? [])
-            .map((c: any) => ({
-              name: c.name ?? c.creatorName ?? c.email,
-              value: c.base ?? c.value,
-              delta: c.deltaPct,
-            }))
+            .map((c: any) => {
+              const email = (c.email || c.creatorEmail || "").toLowerCase();
+              const schoolInfo = email ? creatorSchoolLookup.get(email) : undefined;
+              return {
+                name: c.name ?? c.creatorName ?? c.email,
+                value: c.base ?? c.value,
+                delta: c.deltaPct,
+                email: c.email ?? c.creatorEmail,
+                schoolName: c.schoolName ?? schoolInfo?.schoolName,
+                cluster: c.cluster ?? schoolInfo?.cluster,
+              };
+            })
             .filter((creator: any) => !shouldHideCreatorFromRanking(creator.name))
         : [],
-    [creatorAnalytics]
+    [creatorAnalytics, creatorSchoolLookup]
   );
+
+  const creatorHighlights = useMemo(() => {
+    if (!creatorAnalytics) return null;
+    const totalCreators = topCreatorsFull.length;
+    const activeCreators = topCreatorsFull.filter((c) => (c.value ?? 0) > 0).length;
+    const totalDesigns = creatorAnalytics.baseTotals.created;
+    const avgDesigns = totalCreators ? totalDesigns / totalCreators : 0;
+    const shareRate =
+      creatorAnalytics.baseTotals.published > 0
+        ? (creatorAnalytics.baseTotals.shared / creatorAnalytics.baseTotals.published) * 100
+        : 0;
+    return { totalCreators, activeCreators, totalDesigns, avgDesigns, shareRate };
+  }, [creatorAnalytics, topCreatorsFull]);
 
   // Lista cortada pelo limite escolhido (3, 5, 10, 15 ou todos)
   const topCreatorsChart = useMemo(
@@ -392,8 +529,8 @@ const CanvaYearlyComparison = () => {
     return enrichedRecords.filter((record) => {
       if (record.year !== filters.baseYear) return false;
       if (!allowed.has(record.dataType)) return false;
-      if (filters.cluster && (record.cluster ?? "Sem cluster") !== filters.cluster) return false;
-      if (filters.school && (record.schoolName ?? "Sem escola") !== filters.school) return false;
+      if (filters.cluster && normalizeValue(record.cluster ?? "Sem cluster") !== normalizeValue(filters.cluster)) return false;
+      if (filters.school && normalizeValue(record.schoolName ?? "Sem escola") !== normalizeValue(filters.school)) return false;
       return isWithinRange(record.month, range);
     });
   }, [enrichedRecords, filters, view]);
@@ -405,11 +542,75 @@ const CanvaYearlyComparison = () => {
     return enrichedRecords.filter((record) => {
       if (record.year !== filters.comparisonYear) return false;
       if (!allowed.has(record.dataType)) return false;
-      if (filters.cluster && (record.cluster ?? "Sem cluster") !== filters.cluster) return false;
-      if (filters.school && (record.schoolName ?? "Sem escola") !== filters.school) return false;
+      if (filters.cluster && normalizeValue(record.cluster ?? "Sem cluster") !== normalizeValue(filters.cluster)) return false;
+      if (filters.school && normalizeValue(record.schoolName ?? "Sem escola") !== normalizeValue(filters.school)) return false;
       return isWithinRange(record.month, range);
     });
   }, [enrichedRecords, filters, view]);
+
+  const hasComparisonYear = typeof filters?.comparisonYear === "number";
+  const baseYearLabel = filters?.baseYear?.toString() ?? "Ano base";
+  const comparisonYearLabel = hasComparisonYear ? filters!.comparisonYear!.toString() : "";
+
+  const schoolLineSeries = useMemo(() => {
+    if (!filters) return [];
+    const periodRange = periodRangeFromFilter(filters.period);
+    const monthsFromAnalytics =
+      analytics?.monthlySeries?.map((item) => ({
+        month: item.month,
+        label: item.label,
+        createdBase: item.base,
+        createdComparison: item.comparison,
+      })) ?? [];
+
+    const baseMap = new Map<number, { created: number; shared: number; published: number }>();
+    filteredRecords.forEach((record) => {
+      const monthKey = record.month ?? periodRange.startMonth;
+      const current = baseMap.get(monthKey) ?? { created: 0, shared: 0, published: 0 };
+      current.created += record.designsCreated ?? 0;
+      current.shared += record.designsShared ?? 0;
+      current.published += record.designsPublished ?? 0;
+      baseMap.set(monthKey, current);
+    });
+
+    const compMap = new Map<number, { created: number; shared: number; published: number }>();
+    comparisonFilteredRecords.forEach((record) => {
+      const monthKey = record.month ?? periodRange.startMonth;
+      const current = compMap.get(monthKey) ?? { created: 0, shared: 0, published: 0 };
+      current.created += record.designsCreated ?? 0;
+      current.shared += record.designsShared ?? 0;
+      current.published += record.designsPublished ?? 0;
+      compMap.set(monthKey, current);
+    });
+
+    const monthsSet = new Set<number>();
+    monthsFromAnalytics.forEach((m) => monthsSet.add(m.month));
+    baseMap.forEach((_, month) => monthsSet.add(month));
+    compMap.forEach((_, month) => monthsSet.add(month));
+
+    const monthEntries = Array.from(monthsSet)
+      .sort((a, b) => a - b)
+      .map((month) => {
+        const analyticsMonth = monthsFromAnalytics.find((m) => m.month === month);
+        return {
+          month,
+          label: analyticsMonth?.label ?? monthLabels[month - 1] ?? String(month),
+          createdBase: analyticsMonth?.createdBase ?? baseMap.get(month)?.created ?? 0,
+          createdComparison: compMap.get(month)?.created ?? analyticsMonth?.createdComparison ?? 0,
+        };
+      });
+
+    return monthEntries.map(({ month, label, createdBase, createdComparison }) => ({
+      month,
+      label,
+      createdBase,
+      sharedBase: baseMap.get(month)?.shared ?? 0,
+      publishedBase: baseMap.get(month)?.published ?? 0,
+      createdComparison,
+      sharedComparison: compMap.get(month)?.shared ?? 0,
+      publishedComparison: compMap.get(month)?.published ?? 0,
+    }));
+  }, [filters, analytics, filteredRecords, comparisonFilteredRecords]);
 
   const baseAllRecords = useMemo(() => {
     if (!filters) return [];
@@ -553,22 +754,6 @@ const CanvaYearlyComparison = () => {
     }>;
   }, [filters, historyByMonth]);
 
-  const usageHighlights = useMemo(() => {
-    if (!analytics) return null;
-    const { created, published, shared } = analytics.baseTotals;
-    const shareRate = created ? (shared / created) * 100 : 0;
-    const publishRate = created ? (published / created) * 100 : 0;
-
-    return {
-      year: filters?.baseYear,
-      created,
-      published,
-      shared,
-      shareRate,
-      publishRate,
-    };
-  }, [analytics, filters?.baseYear]);
-
   const topSharedTemplates = useMemo(() => {
     if (!baseAllRecords.length) return [];
     const allowed = new Set<CanvaYearlyRecord["dataType"]>(["models", "general"]);
@@ -704,7 +889,6 @@ const CanvaYearlyComparison = () => {
       startDate.getFullYear() !== filters.baseYear ||
       endDate.getFullYear() !== filters.baseYear
     ) {
-      toast.error(`Use datas dentro do ano base ${filters.baseYear}.`);
       return false;
     }
     const startMonth = startDate.getMonth() + 1;
@@ -823,12 +1007,6 @@ const CanvaYearlyComparison = () => {
     setImportEndDate(toInputDate(end));
   };
 
-  const topCreatorNames = topCreatorsCards
-    .slice(0, 3)
-    .map((creator) => creator.name)
-    .filter(Boolean)
-    .join(", ");
-
   const handleImport = async () => {
     if (!filters) {
       toast.error("Defina um ano base antes de importar.");
@@ -852,7 +1030,6 @@ const CanvaYearlyComparison = () => {
       startDate.getFullYear() !== filters.baseYear ||
       endDate.getFullYear() !== filters.baseYear
     ) {
-      toast.error(`Use datas dentro do ano base ${filters.baseYear}.`);
       return;
     }
     setUploading(true);
@@ -1005,20 +1182,20 @@ const CanvaYearlyComparison = () => {
               <p className="text-xs text-muted-foreground">Comparar com</p>
               <Select
                 value={filters.comparisonYear?.toString() ?? "none"}
-                onValueChange={(v) =>
-                  handleYearChange("comparisonYear", v === "none" ? "0" : v)
-                }
+                onValueChange={(v) => handleYearChange("comparisonYear", v)}
               >
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Selecione" />
+                  <SelectValue placeholder="Sem comparacao" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Sem comparacao</SelectItem>
-                  {availableYears.map((y) => (
-                    <SelectItem key={y} value={y.toString()}>
-                      {y}
-                    </SelectItem>
-                  ))}
+                  {availableYears
+                    .filter((y) => y !== filters.baseYear)
+                    .map((y) => (
+                      <SelectItem key={y} value={y.toString()}>
+                        {y}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
@@ -1098,8 +1275,8 @@ const CanvaYearlyComparison = () => {
                   </Button>
                 </DialogTrigger>
 
-                <DialogContent className="max-w-4xl gap-0 overflow-hidden p-0">
-                  <div className="flex items-center justify-between border-b border-border/70 px-4 py-3">
+                <DialogContent className="w-full max-w-3xl gap-0 overflow-hidden rounded-2xl border border-border/60 p-0 shadow-2xl">
+                  <div className="flex items-center justify-between border-b border-border/70 bg-white/90 px-4 py-3 backdrop-blur-sm">
                     <div>
                       <DialogTitle className="text-lg font-semibold">
                         Selecionar um intervalo de datas
@@ -1108,17 +1285,17 @@ const CanvaYearlyComparison = () => {
                         Ajuste o periodo para sincronizar os cards e graficos do painel.
                       </DialogDescription>
                     </div>
-                    <Badge variant="outline" className="rounded-full">
+                    <Badge variant="outline" className="rounded-full bg-primary/5 text-primary border-primary/30">
                       Ano base {filters.baseYear}
                     </Badge>
                   </div>
 
-                  <div className="grid md:grid-cols-[240px_1fr]">
-                    <div className="border-b border-border/60 bg-muted/40 md:border-b-0 md:border-r">
+                  <div className="grid md:grid-cols-[210px_1fr]">
+                    <div className="border-b border-border/60 bg-gradient-to-b from-muted/50 via-white to-muted/30 md:border-b-0 md:border-r">
                       <p className="px-4 pt-3 text-[11px] font-semibold uppercase text-muted-foreground">
                         Periodos rapidos
                       </p>
-                      <div className="space-y-1 p-2">
+                      <div className="space-y-1.5 p-3">
                         {[
                           {
                             key: "year",
@@ -1176,19 +1353,19 @@ const CanvaYearlyComparison = () => {
                           <Button
                             key={option.key}
                             variant="ghost"
-                            className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition ${
+                            className={`group flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left text-sm transition ${
                               activePeriodKey === option.key
-                                ? "bg-white shadow-sm ring-1 ring-primary/20"
-                                : "hover:bg-white"
+                                ? "border-primary/30 bg-white shadow-md ring-2 ring-primary/10"
+                                : "border-transparent bg-white/50 hover:border-border/60 hover:bg-white"
                             }`}
                             onClick={option.action}
                           >
                             <div className="flex items-center gap-3">
                               <span
-                                className={`flex h-6 w-6 items-center justify-center rounded-full border ${
+                                className={`flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition ${
                                   activePeriodKey === option.key
                                     ? "border-primary bg-primary/10 text-primary"
-                                    : "border-border text-muted-foreground"
+                                    : "border-border/70 bg-white text-muted-foreground"
                                 }`}
                               >
                                 {activePeriodKey === option.key && <Check className="h-3 w-3" />}
@@ -1204,37 +1381,39 @@ const CanvaYearlyComparison = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-4 p-4">
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Iniciar</Label>
-                          <Input
-                            type="date"
-                            value={customStartDateFilter}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setCustomStartDateFilter(value);
-                              setLastDaysPreset(null);
-                            }}
-                            className="h-10"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Finalizar</Label>
-                          <Input
-                            type="date"
-                            value={customEndDateFilter}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setCustomEndDateFilter(value);
-                              setLastDaysPreset(null);
-                            }}
-                            className="h-10"
-                          />
+                    <div className="space-y-3 p-4">
+                      <div className="rounded-xl border border-border/60 bg-white/70 p-3 shadow-sm">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div className="space-y-1">
+                            <Label className="text-[11px] font-semibold uppercase text-muted-foreground">Iniciar</Label>
+                            <Input
+                              type="date"
+                              value={customStartDateFilter}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setCustomStartDateFilter(value);
+                                setLastDaysPreset(null);
+                              }}
+                              className="h-10 rounded-lg border-border/60 bg-background"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-[11px] font-semibold uppercase text-muted-foreground">Finalizar</Label>
+                            <Input
+                              type="date"
+                              value={customEndDateFilter}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setCustomEndDateFilter(value);
+                                setLastDaysPreset(null);
+                              }}
+                              className="h-10 rounded-lg border-border/60 bg-background"
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-border/70 bg-background p-3 shadow-inner">
+                      <div className="rounded-xl border border-border/60 bg-white/80 p-3 shadow-sm">
                         <Calendar
                           mode="range"
                           numberOfMonths={2}
@@ -1246,7 +1425,7 @@ const CanvaYearlyComparison = () => {
                         />
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/60 bg-white/80 p-3 shadow-sm">
                         <Button variant="ghost" size="sm" onClick={handleResetPeriod}>
                           Limpar
                         </Button>
@@ -1265,7 +1444,7 @@ const CanvaYearlyComparison = () => {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Tabs value={view} onValueChange={(v) => setView(v as any)}>
+            <Tabs value={view} onValueChange={(v) => handleViewChange(v as YearlyFilters["view"])}>
               <TabsList>
                 <TabsTrigger value="models">Modelos</TabsTrigger>
                 <TabsTrigger value="creators">Criadores</TabsTrigger>
@@ -1315,83 +1494,135 @@ const CanvaYearlyComparison = () => {
                         {percent(delta)}
                       </Badge>
                     )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {filters.comparisonYear
-                      ? `vs ${filters.comparisonYear}`
-                      : "Sem comparacao"}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {filters.comparisonYear ? `vs ${filters.comparisonYear}` : ""}
+              </p>
+            </CardContent>
+          </Card>
+        );
+      })}
         </div>
       )}
 
-      {usageHighlights && (
-        <div className="space-y-6 pb-8">
-          <div className="space-y-4 rounded-2xl border border-border/60 bg-card/70 p-4 shadow-sm glass-effect">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Share2 className="h-5 w-5 text-primary" />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Uso do Canva</p>
-                  <p className="text-xs text-muted-foreground">Ano base {usageHighlights.year}</p>
+      {view === "creators" && (
+      <div className="space-y-6 pb-8">
+          {creatorHighlights && (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Card className="border-border/60 shadow-sm">
+                <CardContent className="p-4">
+                  <p className="text-sm text-muted-foreground">Criadores importados</p>
+                  <div className="text-2xl font-semibold">
+                    {numberFormat.format(creatorHighlights.totalCreators)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {numberFormat.format(creatorHighlights.activeCreators)} ativos no período
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-border/60 shadow-sm">
+                <CardContent className="p-4">
+                  <p className="text-sm text-muted-foreground">Designs (total)</p>
+                  <div className="text-2xl font-semibold">
+                    {numberFormat.format(creatorHighlights.totalDesigns)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Base oficial do período</p>
+                </CardContent>
+              </Card>
+              <Card className="border-border/60 shadow-sm">
+                <CardContent className="p-4">
+                  <p className="text-sm text-muted-foreground">Média por criador</p>
+                  <div className="text-2xl font-semibold">
+                    {creatorHighlights.avgDesigns.toFixed(1)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Distribuição dos designs</p>
+                </CardContent>
+              </Card>
+              <Card className="border-border/60 shadow-sm">
+                <CardContent className="p-4">
+                  <p className="text-sm text-muted-foreground">Taxa de compartilhamento</p>
+                  <div className="text-2xl font-semibold">
+                    {creatorHighlights.shareRate.toFixed(1)}%
+                  </div>
+                  <p className="text-xs text-muted-foreground">Links sobre publicados</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle>Linha do tempo dos uploads</CardTitle>
+              <CardDescription>
+                Evolucao dos CSVs aplicados (templates, membros e base geral)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-[260px]">
+              {uploadTimelineStacked.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Nenhum upload encontrado no historico.
+                </p>
+              ) : (
+                <div className="h-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={uploadTimelineStacked} margin={{ top: 8, right: 16, bottom: 8, left: -4 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fontSize: 12 }}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis
+                        tickFormatter={(value) => numberFormat.format(value as number)}
+                        allowDecimals={false}
+                        width={80}
+                      />
+                      <RechartsTooltip
+                        formatter={(value, name) => [`${numberFormat.format(value as number)} linhas`, name as string]}
+                        labelFormatter={(label) => `Upload em ${label}`}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="creators"
+                        name="Membros"
+                        stroke={chartColors.primary}
+                        fill={chartColors.primary}
+                        fillOpacity={0.18}
+                        stackId="uploads"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="models"
+                        name="Templates"
+                        stroke={chartColors.muted}
+                        fill={chartColors.muted}
+                        fillOpacity={0.14}
+                        stackId="uploads"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="general"
+                        name="Base geral"
+                        stroke={chartColors.accent}
+                        fill={chartColors.accent}
+                        fillOpacity={0.14}
+                        stackId="uploads"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="total"
+                        name="Total"
+                        stroke={chartColors.primary}
+                        strokeWidth={3}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Cards resumidos com dados de uso e destaques
-              </p>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <div className="dashboard-card stat-card hover-lift rounded-xl border border-border/60 bg-card p-4 shadow-sm">
-                <p className="metric-label text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Designs criados
-                </p>
-                <p className="metric-value text-3xl font-semibold text-foreground">
-                  {numberFormat.format(usageHighlights.created)}
-                </p>
-                <p className="text-xs text-muted-foreground">Soma dos relatorios mais recentes</p>
-              </div>
-
-              <div className="dashboard-card stat-card hover-lift rounded-xl border border-border/60 bg-card p-4 shadow-sm">
-                <p className="metric-label text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Links compartilhados
-                </p>
-                <p className="metric-value text-3xl font-semibold text-foreground">
-                  {numberFormat.format(usageHighlights.shared)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {usageHighlights.shareRate.toFixed(1)}% em relacao aos criados
-                </p>
-              </div>
-
-              <div className="dashboard-card stat-card hover-lift rounded-xl border border-border/60 bg-card p-4 shadow-sm">
-                <p className="metric-label text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Destaques de criadores
-                </p>
-                <p className="metric-value text-lg font-semibold text-foreground">
-                  {topCreatorsCards[0]?.name || "Sem criadores"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {topCreatorNames ? `Top 3: ${topCreatorNames}` : "Nenhum destaque no periodo"}
-                </p>
-              </div>
-
-              <div className="dashboard-card stat-card hover-lift rounded-xl border border-border/60 bg-card p-4 shadow-sm">
-                <p className="metric-label text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Arte mais compartilhada
-                </p>
-                <p className="metric-value text-lg font-semibold text-foreground">
-                  {topSharedTemplates[0]?.name || "Sem artes registradas"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {numberFormat.format(topSharedTemplates[0]?.shared ?? 0)} compartilhamentos
-                </p>
-              </div>
-            </div>
-          </div>
+              )}
+            </CardContent>
+          </Card>
 
           <Card className="border-border/60 shadow-sm">
             <CardHeader className="pb-2 space-y-3">
@@ -1466,19 +1697,28 @@ const CanvaYearlyComparison = () => {
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-3 text-xs text-muted-foreground">
-                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                <div
+                  className="flex flex-col rounded-md border border-dashed px-3 py-2 cursor-help"
+                  title="Soma de designs criados pelos criadores exibidos no ranking atual."
+                >
                   <span>Designs do topo</span>
                   <span className="text-base font-semibold text-foreground">
                     {numberFormat.format(topCreatorsInsight.totalDesigns)}
                   </span>
                 </div>
-                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                <div
+                  className="flex flex-col rounded-md border border-dashed px-3 py-2 cursor-help"
+                  title="Percentual que o ranking representa do total de designs criados no periodo."
+                >
                   <span>Participacao no total</span>
                   <span className="text-base font-semibold text-foreground">
                     {topCreatorsInsight.participation.toFixed(1)}%
                   </span>
                 </div>
-                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                <div
+                  className="flex flex-col rounded-md border border-dashed px-3 py-2 cursor-help"
+                  title="Media das variacoes percentuais dos criadores listados versus o periodo de comparacao."
+                >
                   <span>Variacao media</span>
                   <span
                     className={`text-base font-semibold ${
@@ -1519,13 +1759,22 @@ const CanvaYearlyComparison = () => {
                           <span className="text-xs text-muted-foreground">
                             {numberFormat.format(creator.value ?? 0)} designs
                           </span>
+                          <span className="text-[11px] text-muted-foreground">
+                            Escola: {creator.schoolName ?? "Sem escola"}
+                            {creator.cluster ? ` • ${creator.cluster}` : ""}
+                          </span>
                         </div>
                       </div>
                       {typeof creator.delta === "number" && (
                         <span
-                          className={`text-xs font-semibold ${
+                          className={`text-xs font-semibold cursor-help ${
                             creator.delta >= 0 ? "text-emerald-600" : "text-red-600"
                           }`}
+                          title={
+                            filters?.comparisonYear
+                              ? `VariaÇõÇœo dos designs desse criador versus ${filters.comparisonYear}.`
+                              : "VariaÇõÇœo dos designs desse criador; defina um ano de comparaÇõÇœo para contextualizar."
+                          }
                         >
                           {percent(creator.delta)}
                         </span>
@@ -1573,7 +1822,11 @@ const CanvaYearlyComparison = () => {
               )}
             </CardContent>
           </Card>
+        </div>
+      )}
 
+      {view === "models" && (
+        <div className="space-y-6 pb-8">
           <Card className="border-border/60 shadow-sm">
             <CardHeader className="pb-2 space-y-3">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
@@ -1641,19 +1894,28 @@ const CanvaYearlyComparison = () => {
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-3 text-xs text-muted-foreground">
-                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                <div
+                  className="flex flex-col rounded-md border border-dashed px-3 py-2 cursor-help"
+                  title="Total de compartilhamentos no periodo filtrado."
+                >
                   <span>Compartilhamentos totais</span>
                   <span className="text-base font-semibold text-foreground">
                     {numberFormat.format(sharedTotals.totalShared)}
                   </span>
                 </div>
-                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                <div
+                  className="flex flex-col rounded-md border border-dashed px-3 py-2 cursor-help"
+                  title="Soma de compartilhamentos apenas dos itens exibidos no ranking."
+                >
                   <span>Volume do ranking</span>
                   <span className="text-base font-semibold text-foreground">
                     {numberFormat.format(sharedTotals.topSharedTotal)}
                   </span>
                 </div>
-                <div className="flex flex-col rounded-md border border-dashed px-3 py-2">
+                <div
+                  className="flex flex-col rounded-md border border-dashed px-3 py-2 cursor-help"
+                  title="Percentual dos compartilhamentos do ranking em relacao ao total do periodo."
+                >
                   <span>Participacao do ranking</span>
                   <span className="text-base font-semibold text-foreground">
                     {sharedTotals.totalShared
@@ -1765,6 +2027,92 @@ const CanvaYearlyComparison = () => {
           </Card>
         </div>
       )}
+
+      {view === "schools" && analytics && (
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle>Linha do tempo da escola</CardTitle>
+            <CardDescription>Evolução mensal de criados e compartilhados</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[320px]">
+            {schoolLineSeries.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Nenhum dado disponível para os filtros atuais.
+              </p>
+            ) : (
+              <div className="h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={schoolLineSeries} margin={{ top: 12, right: 16, bottom: 8, left: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="label" />
+                    <YAxis tickFormatter={(v) => numberFormat.format(v)} allowDecimals={false} />
+                    <RechartsTooltip
+                      formatter={(v: number, name) => [numberFormat.format(v), name]}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="createdBase"
+                      name={`Criados (${baseYearLabel})`}
+                      stroke={lineColors.createdBase}
+                      strokeWidth={3}
+                      dot={{ r: 4 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="sharedBase"
+                      name={`Compartilhados (${baseYearLabel})`}
+                      stroke={lineColors.sharedBase}
+                      strokeWidth={3}
+                      dot={{ r: 4 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="publishedBase"
+                      name={`Publicados (${baseYearLabel})`}
+                      stroke={lineColors.publishedBase}
+                      strokeWidth={3}
+                      dot={{ r: 4 }}
+                    />
+                    {hasComparisonYear && (
+                      <>
+                        <Line
+                          type="monotone"
+                          dataKey="createdComparison"
+                          name={`Criados (${comparisonYearLabel})`}
+                          stroke={lineColors.createdComparison}
+                          strokeWidth={2}
+                          strokeDasharray="4 4"
+                          dot={{ r: 3 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="sharedComparison"
+                          name={`Compartilhados (${comparisonYearLabel})`}
+                          stroke={lineColors.sharedComparison}
+                          strokeWidth={2}
+                          strokeDasharray="2 6"
+                          dot={{ r: 3 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="publishedComparison"
+                          name={`Publicados (${comparisonYearLabel})`}
+                          stroke={lineColors.publishedComparison}
+                          strokeWidth={2}
+                          strokeDasharray="6 3"
+                          dot={{ r: 3 }}
+                        />
+                      </>
+                    )}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* SÃ©rie mensal base vs comparaÃ§Ã£o */}
       {showLegacyCharts && designsPerMonthData.length > 0 && (
         <Card className="border-border/60 shadow-sm">

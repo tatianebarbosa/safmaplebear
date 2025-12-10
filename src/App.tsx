@@ -71,6 +71,9 @@ const App = () => (
               <Route path="/dashboard/canva" element={<CanvaDashboard />} />
               <Route path="/dashboard/canva/escolas" element={<CanvaDashboard />} />
               <Route path="/dashboard/canva/usos" element={<CanvaDashboard />} />
+              <Route path="/dashboard/canva/modelos" element={<CanvaDashboard />} />
+              <Route path="/dashboard/canva/criadores" element={<CanvaDashboard />} />
+              <Route path="/dashboard/canva/usos/escolas" element={<CanvaDashboard />} />
               <Route path="/dashboard/canva/custos" element={<CanvaDashboard />} />
               <Route
                 path="/dashboard/vouchers"

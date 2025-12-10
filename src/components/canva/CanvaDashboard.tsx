@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { SchoolLicenseManagement } from "./SchoolLicenseManagement";
 import CanvaYearlyComparison from "./CanvaYearlyComparison";
 import { CanvaMetricsDisplay } from "./CanvaMetricsDisplay";
@@ -17,19 +17,42 @@ import { NonCompliantUsersDialog } from "./NonCompliantUsersDialog";
 const CanvaDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const TAB_STORAGE_KEY = "canva-dashboard-active-tab";
   const tabRoutes: Record<string, string> = {
     overview: "/dashboard/canva",
     schools: "/dashboard/canva/escolas",
     usage: "/dashboard/canva/usos",
+    usageModels: "/dashboard/canva/modelos",
+    usageCreators: "/dashboard/canva/criadores",
+    usageSchools: "/dashboard/canva/usos/escolas",
     costs: "/dashboard/canva/custos",
   };
 
-  const resolveTabFromPath = (path: string): string => {
-    const entry = Object.entries(tabRoutes).find(([, route]) => route === path);
-    return entry ? entry[0] : "overview";
+  const resolveTabFromPath = (path: string, fallback?: string): string => {
+    const lower = path.toLowerCase();
+    if (
+      lower.includes("/canva/usos") ||
+      lower.includes("/canva/modelos") ||
+      lower.includes("/canva/criadores") ||
+      lower.includes("/canva/escolas-usos") ||
+      lower.includes("/canva/usos/escolas")
+    ) {
+      return "usage";
+    }
+    const entry = Object.entries(tabRoutes).find(([, route]) => {
+      if (route === path) return true;
+      if (path.startsWith(`${route}/`)) return true;
+      if (path.startsWith(`${route}?`)) return true;
+      return false;
+    });
+    return entry ? entry[0] : fallback ?? "overview";
   };
 
-  const [activeTab, setActiveTab] = useState<string>(resolveTabFromPath(location.pathname));
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    const stored =
+      typeof window !== "undefined" ? window.sessionStorage?.getItem(TAB_STORAGE_KEY) ?? undefined : undefined;
+    return resolveTabFromPath(location.pathname, stored);
+  });
   const [schoolSearch, setSchoolSearch] = useState("");
   const {
     overviewData,
@@ -92,11 +115,17 @@ const CanvaDashboard = () => {
   }, [nonCompliantUserDetails.length]);
 
   useEffect(() => {
-    const tab = resolveTabFromPath(location.pathname);
-    if (tab !== activeTab) {
-      setActiveTab(tab);
+    setActiveTab((prev) => resolveTabFromPath(location.pathname, prev));
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.sessionStorage?.setItem(TAB_STORAGE_KEY, activeTab);
+    } catch (error) {
+      console.warn("Nao foi possivel salvar a aba ativa no sessionStorage", error);
     }
-  }, [location.pathname, activeTab]);
+  }, [activeTab]);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);

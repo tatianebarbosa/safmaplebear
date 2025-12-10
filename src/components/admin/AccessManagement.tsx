@@ -327,36 +327,38 @@ export default function AccessManagement() {
           {auditEntries.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nenhuma alteração registrada.</p>
           ) : (
-            auditEntries.slice(0, 40).map((entry) => (
-              <div
-                key={entry.id}
-                className="flex items-start justify-between gap-3 rounded-md border px-3 py-2 text-sm"
-              >
-                <div className="space-y-1">
-                  <div className="font-semibold uppercase text-xs tracking-wide text-muted-foreground">
-                    {entry.action.replace(/_/g, " ")}
+            <div className="space-y-3 max-h-[520px] overflow-y-auto rounded-lg border border-border/70 bg-muted/30 p-2 pr-3">
+              {auditEntries.slice(0, 40).map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex items-start justify-between gap-3 rounded-md border px-3 py-2 text-sm"
+                >
+                  <div className="space-y-1">
+                    <div className="font-semibold uppercase text-xs tracking-wide text-muted-foreground">
+                      {entry.action.replace(/_/g, " ")}
+                    </div>
+                    {entry.detail && (
+                      <div className="text-muted-foreground">{entry.detail}</div>
+                    )}
+                    <div className="text-xs text-muted-foreground">
+                      {(() => {
+                        const display =
+                          getAgentDisplayName(entry.actor?.split("@")[0] || "") ||
+                          entry.actor ||
+                          "Desconhecido";
+                        const email = looksLikeEmail(entry.actor) ? entry.actor : "";
+                        return `Por ${display}${email ? ` (${email})` : ""}${
+                          entry.actorRole ? ` - ${entry.actorRole}` : ""
+                        }`;
+                      })()}
+                    </div>
                   </div>
-                  {entry.detail && (
-                    <div className="text-muted-foreground">{entry.detail}</div>
-                  )}
-                  <div className="text-xs text-muted-foreground">
-                    {(() => {
-                      const display =
-                        getAgentDisplayName(entry.actor?.split("@")[0] || "") ||
-                        entry.actor ||
-                        "Desconhecido";
-                      const email = looksLikeEmail(entry.actor) ? entry.actor : "";
-                      return `Por ${display}${email ? ` (${email})` : ""}${
-                        entry.actorRole ? ` - ${entry.actorRole}` : ""
-                      }`;
-                    })()}
+                  <div className="text-xs text-muted-foreground whitespace-nowrap">
+                    {new Date(entry.timestamp).toLocaleString("pt-BR")}
                   </div>
                 </div>
-                <div className="text-xs text-muted-foreground whitespace-nowrap">
-                  {new Date(entry.timestamp).toLocaleString("pt-BR")}
-                </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>

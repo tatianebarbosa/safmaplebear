@@ -8,20 +8,20 @@ const MEMBER_FILE_MAP: Record<UsagePeriod, string> = {
   // Amostragem principal: novembro/2025
   nov2025: '/data/member-novembro2025.csv',
   // Demais períodos (mantidos para histórico/compatibilidade)
-  '7d': '/data/member-ultimos7dias.csv',
-  '30d': '/data/relatoriodeusosdemembros_23_11.csv',
-  '3m': '/data/relatoriomembro canva18_11__3messes.csv',
-  '6m': '/data/relatoriomembro canva18_11__6 messes.csv',
-  '12m': '/data/12messesMembro.csv'
+  '7d': '/data/member-7dias06.csv',
+  '30d': '/data/member-activity_BAE6mf-7t28_1761620400_1764298799_pt-BR.csv',
+  '3m': '/data/member-activity_BAE6mf-7t28_1750561200_1758596399_pt-BR.csv',
+  '6m': '/data/member-activity_BAE6mf-7t28_1742612400_1758596399_pt-BR.csv',
+  '12m': '/data/member-activity_BAE6mf-7t28_1732762800_1764385199_pt-BR.csv'
 };
 
 const MODEL_FILE_MAP: Record<UsagePeriod, string> = {
   nov2025: '/data/template-novembro2025.csv',
-  '7d': '/data/template-ultimos7dias.csv',
-  '30d': '/data/modelos18_11__30dias.csv',
-  '3m': '/data/modelos18_11__3messes.csv',
-  '6m': '/data/modelos18_11__6 messes.csv',
-  '12m': '/data/12messesModelo.csv'
+  '7d': '/data/template-7dias06.csv',
+  '30d': '/data/template-activity_BAE6mf-7t28_1761620400_1764298799_pt-BR.csv',
+  '3m': '/data/template-activity_BAE6mf-7t28_1755054000_1757732399_pt-BR.csv',
+  '6m': '/data/template-janeiro_setembro2025.csv',
+  '12m': '/data/template-activity_BAE6mf-7t28_1732762800_1764385199_pt-BR.csv'
 };
 
 const DEFAULT_USAGE_PERIOD: UsagePeriod = '7d';
@@ -275,6 +275,7 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
   const schoolNameFieldCandidates = ['escola', 'school', 'organizacao', 'organization', 'instituicao', 'institution', 'campus', 'org name', 'organizational unit'];
   const schoolIdFieldCandidates = ['escola id', 'escolaid', 'school id', 'id escola', 'school'];
   const emailFieldCandidates = ['e-mail', 'email', 'usu?rio', 'user email', 'user'];
+  const roleFieldCandidates = ['funcao', 'role', 'categoria', 'category', 'cargo'];
   const designsCreatedFields = ['designs criados', 'designs created', 'created designs', 'total designs'];
   const designsPublishedFields = ['designs publicados', 'designs published', 'publicado', 'publicados', 'published designs'];
   const linksSharedFields = ['links compartilhados', 'compartilhados', 'links shared', 'shared links', 'links compartilhado', 'shared'];
@@ -291,6 +292,7 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
     const shared = parseNumber(findField(row, linksSharedFields));
     const views = parseNumber(findField(row, viewsFields));
     const periodLabel = findField(row, periodFieldCandidates);
+    const role = findField(row, roleFieldCandidates);
 
     const license = licenseMap.get(email.toLowerCase());
     const fallbackSchoolName = findField(row, schoolNameFieldCandidates);
@@ -340,6 +342,8 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
       schoolId,
       cluster,
       lastActivity: periodLabel ?? undefined,
+      role: role || undefined,
+      category: role || undefined,
     });
 
     if (periodLabel) {
