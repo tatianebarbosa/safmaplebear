@@ -342,6 +342,10 @@ const initialSchools =
 const initialJustifications = persistedSnapshot.justifications ?? [];
 const initialHistory = persistedSnapshot.history ?? [];
 
+// Controle do ciclo de hidratação (usado pelo persist para liberar merges dependentes)
+let resolveHydration: (() => void) | null = null;
+let hydrationReady: Promise<void> = Promise.resolve();
+
 const recordLicenseAction = (
   action: Omit<LicenseAction, "id" | "timestamp">
 ) => {
@@ -364,8 +368,7 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
   persist(
     (set, get) => {
       // Garante que a hidrataÃ§Ã£o do localStorage termine antes de mesclar dados oficiais
-      let resolveHydration: () => void;
-      const hydrationReady = new Promise<void>((resolve) => {
+      hydrationReady = new Promise<void>((resolve) => {
         resolveHydration = resolve;
       });
       // Fallback: se por algum motivo o persist nÃ£o hidratar (ex.: ambiente sem storage), libera apÃ³s curto prazo.
@@ -1174,12 +1177,10 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       if (state?.applyLicenseLimit) {
         const limit = getMaxLicensesPerSchool();
         state.applyLicenseLimit(limit);
-        }
-        // Libera quem depende da hidrataÃ§Ã£o (ex.: merge com dados oficiais)
-        if (resolveHydration) {
-          resolveHydration();
-        }
-      },
-    }
-  )
+      }
+      // Libera quem depende da hidrata??o (ex.: merge com dados oficiais)
+      resolveHydration?.();
+    },
+  }
+)
 );

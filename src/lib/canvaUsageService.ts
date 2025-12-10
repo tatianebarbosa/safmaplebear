@@ -266,7 +266,20 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
   const schools = new Map<string, {
     info: LicenseInfo;
     stats: CanvaUsageData;
-    creators: Array<{ name: string; email: string; designs: number; published?: number; shared?: number; viewed?: number; schoolName?: string; schoolId?: string; cluster?: string; lastActivity?: string }>;
+    creators: Array<{
+      name: string;
+      email: string;
+      designs: number;
+      published?: number;
+      shared?: number;
+      viewed?: number;
+      schoolName?: string;
+      schoolId?: string;
+      cluster?: string;
+      lastActivity?: string;
+      role?: string;
+      category?: string;
+    }>;
   }>();
 
   const timeSeriesMap = new Map<string, number>();
