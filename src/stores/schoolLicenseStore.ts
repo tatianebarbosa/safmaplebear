@@ -35,6 +35,27 @@ import {
 } from "@/lib/integratedCanvaService";
 import { saveLicenseAction, type LicenseAction } from "@/lib/canvaDataProcessor";
 
+const NETLIFY_BASE =
+  (typeof import.meta !== "undefined" && (import.meta.env as any)?.VITE_NETLIFY_BASE) || "";
+const API_TOKEN =
+  (typeof import.meta !== "undefined" && (import.meta.env as any)?.VITE_API_TOKEN) || "";
+
+const callNetlify = async (path: string, init?: RequestInit) => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(init?.headers as Record<string, string> | undefined),
+  };
+  if (API_TOKEN) {
+    headers.Authorization = `Bearer ${API_TOKEN}`;
+  }
+  const resp = await fetch(`${NETLIFY_BASE}${path}`, { ...init, headers });
+  if (!resp.ok) {
+    const body = await resp.text();
+    throw new Error(`Request failed (${resp.status}): ${body}`);
+  }
+  return resp.json();
+};
+
 const calculateLicenseStatus = (
   usedLicenses: number,
   totalLicenses: number
@@ -462,6 +483,39 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         await hydrationReady.catch(() => undefined);
         set({ loading: true });
 
+        // 0) Tentar carregar direto do banco via Netlify Function
+        try {
+          const data = await callNetlify("/.netlify/functions/list-schools-users");
+          const convertedSchools: School[] = (data?.schools || []).map((s: any) => ({
+            id: String(s.id),
+            name: s.name,
+            status: (s.status as any) || "Ativa",
+            city: s.city,
+            safManager: "",
+            cluster: (s.cluster as any) || "Desenvolvimento",
+            contactEmail: s.contactEmail?.toLowerCase?.() || "",
+            totalLicenses: Number(s.totalLicenses ?? 0),
+            usedLicenses: Number(s.usedLicenses ?? 0),
+            users: (s.users || []).map((u: any) => ({
+              id: String(u.id),
+              name: u.name || "",
+              email: u.email || "",
+              role: "Estudante",
+              isCompliant: Boolean(u.isCompliant ?? true),
+              createdAt: "",
+            })),
+            hasRecentJustifications: false,
+          }));
+
+          set({
+            schools: ensureCentralSchool(convertedSchools),
+            loading: false,
+          });
+          return;
+        } catch (err) {
+          console.warn("Netlify list-schools-users falhou, caindo para fallback local:", err);
+        }
+
         const finalizeData = (
           processedData: ProcessedSchoolData[],
           overview: CanvaOverviewData
@@ -665,6 +719,19 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           }),
         }));
 
+        // Persist no backend (fire-and-forget)
+        callNetlify("/.netlify/functions/upsert-user", {
+          method: "POST",
+          body: JSON.stringify({
+            id: newUser.id,
+            school_id: schoolId,
+            email: newUser.email,
+            name: newUser.name,
+            has_canva: true,
+            is_compliant: newUser.isCompliant,
+          }),
+        }).catch((err) => console.warn("Falha ao persistir usuario:", err));
+
         return newUser.id;
       },
 
@@ -727,6 +794,19 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
               : s
           ),
         }));
+
+        // Persist no backend (fire-and-forget)
+        callNetlify("/.netlify/functions/upsert-user", {
+          method: "POST",
+          body: JSON.stringify({
+            id: updatedUser.id,
+            school_id: schoolId,
+            email: updatedUser.email,
+            name: updatedUser.name,
+            has_canva: true,
+            is_compliant: updatedUser.isCompliant,
+          }),
+        }).catch((err) => console.warn("Falha ao atualizar usuario no backend:", err));
       },
 
       removeUser: (schoolId, userId, meta) => {
