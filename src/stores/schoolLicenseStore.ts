@@ -507,8 +507,46 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             hasRecentJustifications: false,
           }));
 
+          // Monta overview básico a partir dos dados carregados
+          const totalUsers = convertedSchools.reduce(
+            (acc, school) => acc + (school.users?.length ?? 0),
+            0
+          );
+          const nonCompliantUsers = convertedSchools.reduce(
+            (acc, school) => acc + school.users.filter((u) => !u.isCompliant).length,
+            0
+          );
+          const compliantUsers = totalUsers - nonCompliantUsers;
+          const totalLicenses = convertedSchools.reduce(
+            (acc, school) => acc + (school.totalLicenses ?? 0),
+            0
+          );
+          const usedLicenses = convertedSchools.reduce(
+            (acc, school) => acc + (school.usedLicenses ?? 0),
+            0
+          );
+          const schoolsWithUsers = convertedSchools.filter(
+            (school) => (school.users?.length ?? 0) > 0
+          ).length;
+
+          const overviewFromDb: CanvaOverviewData = {
+            totalUsers,
+            totalSchools: convertedSchools.length,
+            compliantUsers,
+            nonCompliantUsers,
+            complianceRate: totalUsers > 0 ? (compliantUsers / totalUsers) * 100 : 100,
+            nonMapleBearDomains: nonCompliantUsers,
+            topNonCompliantDomains: [],
+            schoolsWithUsers,
+            schoolsAtCapacity: 0,
+            totalLicenses,
+            usedLicenses,
+            availableLicenses: Math.max(totalLicenses - usedLicenses, 0),
+          };
+
           set({
             schools: ensureCentralSchool(convertedSchools),
+            overviewData: overviewFromDb,
             loading: false,
           });
           return;
