@@ -211,10 +211,8 @@ const centralSchool: School = {
 };
 
 const ensureCentralSchool = (schools: School[]): School[] => {
-  const findCentralIndex = schools.findIndex((school) => {
-    const normalizedName = school.name?.toLowerCase() ?? "";
-    return school.id === centralSchool.id || normalizedName.includes("central");
-  });
+  // Apenas a escola sintética "Central" (id = "0") deve ser tratada como central.
+  const findCentralIndex = schools.findIndex((school) => school.id === centralSchool.id);
 
   const updated = [...schools];
   let centralIndex = findCentralIndex;
