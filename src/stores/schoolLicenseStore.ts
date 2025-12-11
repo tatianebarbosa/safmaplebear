@@ -554,35 +554,11 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           buildFallbackData()
             .then((fallback) => {
               if (!fallback?.overview) return;
-              set((state) => {
-                const current = state.overviewData || {};
-                const fb = fallback.overview;
-                const merged: CanvaOverviewData = {
-                  totalUsers: current.totalUsers || fb.totalUsers,
-                  totalSchools: current.totalSchools || fb.totalSchools,
-                  compliantUsers: current.compliantUsers || fb.compliantUsers,
-                  nonCompliantUsers: current.nonCompliantUsers || fb.nonCompliantUsers,
-                  complianceRate:
-                    current.complianceRate && current.complianceRate > 0
-                      ? current.complianceRate
-                      : fb.complianceRate,
-                  nonMapleBearDomains:
-                    current.nonMapleBearDomains || fb.nonMapleBearDomains,
-                  topNonCompliantDomains:
-                    current.topNonCompliantDomains?.length
-                      ? current.topNonCompliantDomains
-                      : fb.topNonCompliantDomains,
-                  schoolsWithUsers:
-                    current.schoolsWithUsers || fb.schoolsWithUsers,
-                  schoolsAtCapacity:
-                    current.schoolsAtCapacity || fb.schoolsAtCapacity,
-                  totalLicenses: current.totalLicenses || fb.totalLicenses,
-                  usedLicenses: current.usedLicenses || fb.usedLicenses,
-                  availableLicenses:
-                    current.availableLicenses || fb.availableLicenses,
-                };
-                return { overviewData: merged };
-              });
+              // Se houver overview do fallback integrado/CSV, preferimos ele para os cards,
+              // mantendo escolas/usuarios do banco.
+              set(() => ({
+                overviewData: fallback.overview,
+              }));
             })
             .catch((err) => {
               console.warn("Falha ao complementar overview com fallback:", err);
