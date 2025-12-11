@@ -556,9 +556,50 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
               if (!fallback?.overview) return;
               // Se houver overview do fallback integrado/CSV, preferimos ele para os cards,
               // mantendo escolas/usuarios do banco.
-              set(() => ({
-                overviewData: fallback.overview,
-              }));
+              set((state) => {
+                // Adiciona escola "sem escola" (no-school) do fallback, se existir e não estiver na lista do banco.
+                const extraSchools: School[] = [];
+                if (Array.isArray(fallback.processedData)) {
+                  fallback.processedData.forEach((item) => {
+                    if (item.school?.id === "no-school") {
+                      extraSchools.push({
+                        id: item.school.id,
+                        name: item.school.name,
+                        status: item.school.status as any,
+                        city: item.school.city,
+                        safManager: item.school.safManager,
+                        cluster: (item.school.cluster as any) || "Desenvolvimento",
+                        contactEmail: item.school.email?.toLowerCase(),
+                        totalLicenses: item.estimatedLicenses ?? 0,
+                        usedLicenses: item.totalUsers ?? 0,
+                        users: (item.users || []).map((user) => ({
+                          id: user.id,
+                          name: user.name,
+                          email: user.email,
+                          role: user.role as any,
+                          isCompliant: user.isCompliant,
+                          createdAt: user.updatedAt || "",
+                        })),
+                        hasRecentJustifications: false,
+                      });
+                    }
+                  });
+                }
+
+                const mergedSchools = extraSchools.length
+                  ? ensureCentralSchool([
+                      ...(state.schools || []),
+                      ...extraSchools.filter(
+                        (extra) => !(state.schools || []).some((s) => s.id === extra.id)
+                      ),
+                    ])
+                  : state.schools;
+
+                return {
+                  overviewData: fallback.overview,
+                  schools: mergedSchools,
+                };
+              });
             })
             .catch((err) => {
               console.warn("Falha ao complementar overview com fallback:", err);
