@@ -858,6 +858,12 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
               : s
           ),
         }));
+
+        // Persist no backend (fire-and-forget)
+        callNetlify("/.netlify/functions/delete-user", {
+          method: "POST",
+          body: JSON.stringify({ id: userId }),
+        }).catch((err) => console.warn("Falha ao remover usuario no backend:", err));
       },
 
       swapUser: (schoolId, oldUserId, newUser, justificationData) => {
