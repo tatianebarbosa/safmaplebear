@@ -5,6 +5,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  VITE_API_BASE_URL = "https://ep-still-leaf-ahbff0cx.apirest.c-3.us-east-1.aws.neon.tech/neondb/rest/v1"
 
 [[redirects]]
   from = "/*"
