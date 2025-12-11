@@ -550,18 +550,43 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             loading: false,
           });
 
-          // Tenta complementar overview com dados integrados ou fallback (assíncrono, não bloqueia)
+          // Complementa overview com fallback integrado/CSV, mesclando sem perder os dados do banco.
           buildFallbackData()
             .then((fallback) => {
-              if (fallback?.overview) {
-                set((state) => ({
-                  overviewData: state.overviewData ?? fallback.overview,
-                }));
-              }
+              if (!fallback?.overview) return;
+              set((state) => {
+                const current = state.overviewData || {};
+                const fb = fallback.overview;
+                const merged: CanvaOverviewData = {
+                  totalUsers: current.totalUsers || fb.totalUsers,
+                  totalSchools: current.totalSchools || fb.totalSchools,
+                  compliantUsers: current.compliantUsers || fb.compliantUsers,
+                  nonCompliantUsers: current.nonCompliantUsers || fb.nonCompliantUsers,
+                  complianceRate:
+                    current.complianceRate && current.complianceRate > 0
+                      ? current.complianceRate
+                      : fb.complianceRate,
+                  nonMapleBearDomains:
+                    current.nonMapleBearDomains || fb.nonMapleBearDomains,
+                  topNonCompliantDomains:
+                    current.topNonCompliantDomains?.length
+                      ? current.topNonCompliantDomains
+                      : fb.topNonCompliantDomains,
+                  schoolsWithUsers:
+                    current.schoolsWithUsers || fb.schoolsWithUsers,
+                  schoolsAtCapacity:
+                    current.schoolsAtCapacity || fb.schoolsAtCapacity,
+                  totalLicenses: current.totalLicenses || fb.totalLicenses,
+                  usedLicenses: current.usedLicenses || fb.usedLicenses,
+                  availableLicenses:
+                    current.availableLicenses || fb.availableLicenses,
+                };
+                return { overviewData: merged };
+              });
             })
-            .catch((err) =>
-              console.warn("Falha ao complementar overview com fallback:", err)
-            );
+            .catch((err) => {
+              console.warn("Falha ao complementar overview com fallback:", err);
+            });
 
           return;
         } catch (err) {
