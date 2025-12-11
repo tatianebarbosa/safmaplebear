@@ -549,6 +549,20 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             overviewData: overviewFromDb,
             loading: false,
           });
+
+          // Tenta complementar overview com dados integrados ou fallback (assíncrono, não bloqueia)
+          buildFallbackData()
+            .then((fallback) => {
+              if (fallback?.overview) {
+                set((state) => ({
+                  overviewData: state.overviewData ?? fallback.overview,
+                }));
+              }
+            })
+            .catch((err) =>
+              console.warn("Falha ao complementar overview com fallback:", err)
+            );
+
           return;
         } catch (err) {
           console.warn("Netlify list-schools-users falhou, caindo para fallback local:", err);
