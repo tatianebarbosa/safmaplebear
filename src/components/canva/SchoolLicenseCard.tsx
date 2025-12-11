@@ -29,8 +29,8 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
   const currentUser = useAuthStore((s) => s.currentUser);
 
   const licenseStatus = getLicenseStatus(school) as LicenseStatus;
-  // Apenas a escola sintética "Central" (id = '0') deve ter licenças ilimitadas.
-  const isCentral = school.id === '0';
+  // Apenas a escola sintética "Central" (id = '0' e nome 'Central') deve ter licenças ilimitadas.
+  const isCentral = school.id === '0' && (school.name || '').trim().toLowerCase() === 'central';
   const isNoSchool =
     school.id === 'no-school' ||
     (school.name || '').toLowerCase().includes('sem escola');
