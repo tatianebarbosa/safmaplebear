@@ -483,10 +483,20 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
         await hydrationReady.catch(() => undefined);
         set({ loading: true });
 
-        // 0) Tentar carregar direto do banco via Netlify Function
+        let fallbackData: Awaited<ReturnType<typeof buildFallbackData>> | null = null;
+        let dbSchools: School[] | null = null;
+
+        // 1) Carrega fallback local/integrado (números e escola "no-school")
+        try {
+          fallbackData = await buildFallbackData();
+        } catch (error) {
+          console.warn("Fallback local/integrado indisponivel:", error);
+        }
+
+        // 2) Carrega dados do banco (Netlify Function) - apenas para complementar escolas
         try {
           const data = await callNetlify("/.netlify/functions/list-schools-users");
-          const convertedSchools: School[] = (data?.schools || []).map((s: any) => ({
+          dbSchools = (data?.schools || []).map((s: any) => ({
             id: String(s.id),
             name: s.name,
             status: (s.status as any) || "Ativa",
@@ -506,32 +516,68 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
             })),
             hasRecentJustifications: false,
           }));
+        } catch (error) {
+          console.warn("Falha ao carregar escolas do banco:", error);
+        }
 
-          // Monta overview básico a partir dos dados carregados
-          const totalUsers = convertedSchools.reduce(
-            (acc, school) => acc + (school.users?.length ?? 0),
-            0
-          );
-          const nonCompliantUsers = convertedSchools.reduce(
+        // 3) Se houver fallback, prioriza escolas/overview do fallback; adiciona apenas extras do banco
+        if (fallbackData?.processedData && fallbackData.overview) {
+          const fallbackSchools: School[] = fallbackData.processedData.map((data) => ({
+            id: data.school.id,
+            name: data.school.name,
+            status: data.school.status,
+            city: data.school.city,
+            safManager: data.school.safManager,
+            cluster: data.school.cluster as any,
+            contactEmail: data.school.email?.toLowerCase(),
+            totalLicenses: data.estimatedLicenses ?? 0,
+            usedLicenses: data.totalUsers,
+            users: data.users.map((user) => ({
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role as any,
+              isCompliant: user.isCompliant,
+              createdAt: resolveUserCreatedAt(user),
+            })),
+            hasRecentJustifications: false,
+          }));
+
+          const extras =
+            dbSchools?.filter((db) => !fallbackSchools.some((fb) => fb.id === db.id)) || [];
+
+          const mergedSchools = ensureCentralSchool([...fallbackSchools, ...extras]);
+
+          set({
+            schools: mergedSchools,
+            overviewData: fallbackData.overview,
+            loading: false,
+          });
+          return;
+        }
+
+        // 4) Se não houver fallback, mas houver dados do banco
+        if (dbSchools) {
+          const totalUsers = dbSchools.reduce((acc, school) => acc + (school.users?.length ?? 0), 0);
+          const nonCompliantUsers = dbSchools.reduce(
             (acc, school) => acc + school.users.filter((u) => !u.isCompliant).length,
             0
           );
           const compliantUsers = totalUsers - nonCompliantUsers;
-          const totalLicenses = convertedSchools.reduce(
+          const totalLicenses = dbSchools.reduce(
             (acc, school) => acc + (school.totalLicenses ?? 0),
             0
           );
-          const usedLicenses = convertedSchools.reduce(
+          const usedLicenses = dbSchools.reduce(
             (acc, school) => acc + (school.usedLicenses ?? 0),
             0
           );
-          const schoolsWithUsers = convertedSchools.filter(
-            (school) => (school.users?.length ?? 0) > 0
-          ).length;
+          const schoolsWithUsers = dbSchools.filter((school) => (school.users?.length ?? 0) > 0)
+            .length;
 
           const overviewFromDb: CanvaOverviewData = {
             totalUsers,
-            totalSchools: convertedSchools.length,
+            totalSchools: dbSchools.length,
             compliantUsers,
             nonCompliantUsers,
             complianceRate: totalUsers > 0 ? (compliantUsers / totalUsers) * 100 : 100,
@@ -545,180 +591,17 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           };
 
           set({
-            schools: ensureCentralSchool(convertedSchools),
+            schools: ensureCentralSchool(dbSchools),
             overviewData: overviewFromDb,
             loading: false,
           });
-
-          // Complementa overview com fallback integrado/CSV, mesclando sem perder os dados do banco.
-          buildFallbackData()
-            .then((fallback) => {
-              if (!fallback?.overview) return;
-              // Se houver overview do fallback integrado/CSV, preferimos ele para os cards,
-              // mantendo escolas/usuarios do banco.
-              set((state) => {
-                // Adiciona escola "sem escola" (no-school) do fallback, se existir e não estiver na lista do banco.
-                const extraSchools: School[] = [];
-                if (Array.isArray(fallback.processedData)) {
-                  fallback.processedData.forEach((item) => {
-                    if (item.school?.id === "no-school") {
-                      extraSchools.push({
-                        id: item.school.id,
-                        name: item.school.name,
-                        status: item.school.status as any,
-                        city: item.school.city,
-                        safManager: item.school.safManager,
-                        cluster: (item.school.cluster as any) || "Desenvolvimento",
-                        contactEmail: item.school.email?.toLowerCase(),
-                        totalLicenses: item.estimatedLicenses ?? 0,
-                        usedLicenses: item.totalUsers ?? 0,
-                        users: (item.users || []).map((user) => ({
-                          id: user.id,
-                          name: user.name,
-                          email: user.email,
-                          role: user.role as any,
-                          isCompliant: user.isCompliant,
-                          createdAt: user.updatedAt || "",
-                        })),
-                        hasRecentJustifications: false,
-                      });
-                    }
-                  });
-                }
-
-                const mergedSchools = extraSchools.length
-                  ? ensureCentralSchool([
-                      ...(state.schools || []),
-                      ...extraSchools.filter(
-                        (extra) => !(state.schools || []).some((s) => s.id === extra.id)
-                      ),
-                    ])
-                  : state.schools;
-
-                return {
-                  overviewData: fallback.overview,
-                  schools: mergedSchools,
-                };
-              });
-            })
-            .catch((err) => {
-              console.warn("Falha ao complementar overview com fallback:", err);
-            });
-
           return;
-        } catch (err) {
-          console.warn("Netlify list-schools-users falhou, caindo para fallback local:", err);
         }
 
-        const finalizeData = (
-          processedData: ProcessedSchoolData[],
-          overview: CanvaOverviewData
-        ) => {
-          const licenseLimit = getMaxLicensesPerSchool();
-          const convertedSchools: School[] = processedData.map((data) => ({
-            id: data.school.id,
-            name: data.school.name,
-            status: data.school.status,
-            city: data.school.city,
-            safManager: data.school.safManager,
-            cluster: data.school.cluster as any,
-            contactEmail: data.school.email?.toLowerCase(),
-            totalLicenses:
-              data.school.id === "no-school"
-                ? Math.max(data.estimatedLicenses, 1)
-                : licenseLimit,
-            usedLicenses: data.totalUsers,
-            users: data.users.map((user) => ({
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              role: user.role as any,
-              isCompliant: user.isCompliant,
-              createdAt: resolveUserCreatedAt(user),
-            })),
-            hasRecentJustifications: false,
-          }));
-
-          const mergedSchools = mergeSchoolsWithLocal(convertedSchools);
-
-          set({
-            officialData: processedData,
-            overviewData: overview,
-            schools: ensureCentralSchool(mergedSchools),
-            loading: false,
-          });
-          // Garante que o limite global seja aplicado aos dados carregados
-          syncLicenseLimit(licenseLimit);
-        };
-
-        let fallbackData: Awaited<ReturnType<typeof buildFallbackData>> | null = null;
-        let fallbackPromise: Promise<Awaited<ReturnType<typeof buildFallbackData>> | null> | null =
-          null;
-
-        try {
-          // Sempre prepara o fallback local para poder comparar se o JSON integrado estiver desatualizado
-          fallbackPromise = buildFallbackData().catch((err) => {
-            console.warn("Fallback local de licencas indisponivel:", err);
-            return null;
-          });
-
-          // 1) Tentar carregar dados integrados do backend (/api/canva/dados-recentes)
-          const integratedData = await fetchIntegratedCanvaData();
-          if (integratedData) {
-            const officialSchools = await parseOfficialSchoolsCSV();
-            const processedFromIntegration = buildProcessedSchoolsFromIntegration(
-              integratedData,
-              officialSchools
-            );
-            const overviewFromIntegration = buildOverviewFromIntegration(
-              integratedData,
-              officialSchools,
-              processedFromIntegration
-            );
-
-            fallbackData = fallbackPromise ? await fallbackPromise : null;
-            const fallbackTotalUsers = fallbackData?.overview?.totalUsers ?? 0;
-            const integratedTotalUsers = overviewFromIntegration?.totalUsers ?? 0;
-            const shouldUseFallback = fallbackData && fallbackTotalUsers > integratedTotalUsers;
-
-            finalizeData(
-              shouldUseFallback ? fallbackData.processedData : processedFromIntegration,
-              shouldUseFallback ? fallbackData.overview : overviewFromIntegration
-            );
-            return;
-          }
-
-          // 2) Fallback local (CSVs publicos)
-          fallbackData = fallbackPromise ? await fallbackPromise : null;
-          if (fallbackData) {
-            finalizeData(fallbackData.processedData, fallbackData.overview);
-            return;
-          }
-
-          set({ loading: false });
-        } catch (error) {
-          console.error("Failed to load official data:", error);
-          // Tentar fallback em caso de erro inesperado
-          try {
-            if (!fallbackData && fallbackPromise) {
-              fallbackData = await fallbackPromise;
-            }
-            if (!fallbackData) {
-              fallbackData = await buildFallbackData();
-            }
-            if (fallbackData) {
-              finalizeData(fallbackData.processedData, fallbackData.overview);
-            } else {
-              set({ loading: false });
-            }
-          } catch (fallbackError) {
-            console.error("Fallback data also failed:", fallbackError);
-            set({ loading: false });
-          }
-        }
+        // 5) Nenhum dado disponível
+        set({ loading: false });
       },
-
-      setSchools: (schools) => set({ schools: ensureCentralSchool(schools) }),
+setSchools: (schools) => set({ schools: ensureCentralSchool(schools) }),
       addSchool: (school) => {
         const newSchool: School = {
           ...school,
