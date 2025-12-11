@@ -84,6 +84,11 @@ export async function fetchTicketsFromApi(endpoint?: string): Promise<Ticket[]> 
       const response = await fetch(url, { headers: { Accept: "application/json" } });
       if (!response.ok) continue;
 
+      const ct = response.headers.get("content-type") || "";
+      if (!ct.toLowerCase().includes("application/json")) {
+        continue;
+      }
+
       const data = (await response.json()) as RemoteTicket[] | { tickets: RemoteTicket[] };
       const list = Array.isArray(data) ? data : data.tickets;
       if (!Array.isArray(list)) continue;
