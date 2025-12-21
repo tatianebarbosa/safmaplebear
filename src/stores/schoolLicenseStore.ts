@@ -34,6 +34,11 @@ import {
   buildOverviewFromIntegration,
 } from "@/lib/integratedCanvaService";
 import { saveLicenseAction, type LicenseAction } from "@/lib/canvaDataProcessor";
+import {
+  fetchJustifications,
+  createJustification,
+  migrateJustificationsToBackend,
+} from "@/lib/justificationService";
 
 const NETLIFY_BASE =
   (typeof import.meta !== "undefined" && (import.meta.env as any)?.VITE_NETLIFY_BASE) || "";
@@ -102,6 +107,7 @@ interface SchoolLicenseState {
 
   // Actions
   loadOfficialData: () => Promise<void>;
+  loadJustifications: (schoolId?: string) => Promise<void>;
   setSchools: (schools: School[]) => void;
   addSchool: (school: Omit<School, "id">) => void;
   updateSchool: (id: string, updates: Partial<School>) => void;
@@ -336,18 +342,15 @@ const applyOverviewDelta = (
 
 const loadPersistedSnapshot = (): {
   schools?: School[];
-  justifications?: Justification[];
   history?: HistoryEntry[];
 } => {
   if (typeof window === "undefined") return {};
   try {
     const raw = localStorage.getItem("school-license-storage-v2");
     if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    const state = parsed?.state ?? parsed;
+    const state = JSON.parse(raw)?.state;
     return {
       schools: Array.isArray(state?.schools) ? state.schools : undefined,
-      justifications: Array.isArray(state?.justifications) ? state.justifications : undefined,
       history: Array.isArray(state?.history) ? state.history : undefined,
     };
   } catch {
@@ -358,8 +361,9 @@ const loadPersistedSnapshot = (): {
 const persistedSnapshot = loadPersistedSnapshot();
 const initialSchools =
   persistedSnapshot.schools?.length ? ensureCentralSchool(persistedSnapshot.schools) : seedSchools;
-const initialJustifications = persistedSnapshot.justifications ?? [];
 const initialHistory = persistedSnapshot.history ?? [];
+// Justifications agora são carregadas do backend via loadOfficialData
+const initialJustifications: Justification[] = [];
 
 // Controle do ciclo de hidratação (usado pelo persist para liberar merges dependentes)
 let resolveHydration: (() => void) | null = null;
@@ -476,6 +480,15 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
       officialData: [],
       overviewData: null,
       loading: false,
+
+      loadJustifications: async (schoolId?: string) => {
+        try {
+          const justifications = await fetchJustifications(schoolId);
+          set({ justifications });
+        } catch (error) {
+          console.error("Erro ao carregar justificativas:", error);
+        }
+      },
 
       loadOfficialData: async () => {
         await hydrationReady.catch(() => undefined);
@@ -598,6 +611,26 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
 
         // 5) Nenhum dado disponível
         set({ loading: false });
+        
+        // 6) Carregar justificativas do backend após carregar escolas
+        try {
+          const justifications = await fetchJustifications();
+          set({ justifications });
+          
+          // Migrar justificativas do localStorage se houver
+          const localJustifications = get().justifications;
+          if (localJustifications.length > 0 && justifications.length === 0) {
+            console.log("Migrando justificativas do localStorage para o backend...");
+            const result = await migrateJustificationsToBackend(localJustifications);
+            console.log(`Migração concluída: ${result.success} sucesso, ${result.failed} falhas`);
+            
+            // Recarregar após migração
+            const updatedJustifications = await fetchJustifications();
+            set({ justifications: updatedJustifications });
+          }
+        } catch (error) {
+          console.error("Erro ao carregar justificativas:", error);
+        }
       },
 setSchools: (schools) => set({ schools: ensureCentralSchool(schools) }),
       addSchool: (school) => {
@@ -1041,15 +1074,18 @@ setSchools: (schools) => set({ schools: ensureCentralSchool(schools) }),
         }));
       },
 
-      addJustification: (justification) => {
-        const newJustification: Justification = {
-          ...justification,
-          id: Date.now().toString(),
-          timestamp: new Date().toISOString(),
-        };
-        set((state) => ({
-          justifications: [...state.justifications, newJustification],
-        }));
+      addJustification: async (justification) => {
+        // Save to backend
+        const newJustification = await createJustification(justification);
+        
+        if (newJustification) {
+          // Update local state
+          set((state) => ({
+            justifications: [...state.justifications, newJustification],
+          }));
+        } else {
+          console.error("Falha ao criar justificativa no backend");
+        }
       },
       getJustificationsBySchool: (schoolId) => {
         return get().justifications.filter(
@@ -1228,9 +1264,9 @@ setSchools: (schools) => set({ schools: ensureCentralSchool(schools) }),
     name: "school-license-storage-v2",
     version: 2,
     // Persist only o que precisa sobreviver ao refresh para evitar estouro de quota no localStorage
+    // Justifications agora são carregadas do backend, não precisam mais ser persistidas
     partialize: (state) => ({
       schools: state.schools,
-      justifications: state.justifications,
       history: state.history,
     }),
     onRehydrateStorage: () => (state) => {

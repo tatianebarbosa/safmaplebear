@@ -117,3 +117,32 @@ class AuditLog(Base):
     __table_args__ = (
         Index("idx_audit_logs_school_id_ts", "school_id", ts.desc()),
     )
+
+
+class Justification(Base):
+    """Model for license justifications (license transfers/swaps)."""
+    __tablename__ = "justifications"
+
+    id: Mapped[str] = mapped_column(
+        String, primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    school_id: Mapped[str] = mapped_column(
+        String, ForeignKey("schools.id", ondelete="CASCADE"), nullable=False
+    )
+    school_name: Mapped[str] = mapped_column(String, nullable=False)
+    old_user_name: Mapped[str] = mapped_column(String, nullable=False)
+    old_user_email: Mapped[str] = mapped_column(String, nullable=False)
+    old_user_role: Mapped[str] = mapped_column(String, nullable=False)
+    new_user_name: Mapped[str] = mapped_column(String, nullable=False)
+    new_user_email: Mapped[str] = mapped_column(String, nullable=False)
+    new_user_role: Mapped[str] = mapped_column(String, nullable=False)
+    reason: Mapped[str] = mapped_column(String, nullable=False)
+    performed_by: Mapped[str] = mapped_column(String, nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("idx_justifications_school_id", "school_id"),
+        Index("idx_justifications_timestamp", "timestamp"),
+    )

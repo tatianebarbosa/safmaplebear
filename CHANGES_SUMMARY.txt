@@ -1,0 +1,78 @@
+===========================================
+RESUMO DAS ALTERAÇÕES - MIGRAÇÃO JUSTIFICATIVAS
+===========================================
+
+ARQUIVOS CRIADOS:
+-----------------
+1. api/justifications/__init__.py
+   - Endpoint REST para justificativas (GET/POST)
+   
+2. api/justifications/function.json
+   - Configuração do Azure Function
+   
+3. api/alembic/versions/20251221_2008_00f5dc789b4e_add_justifications_table.py
+   - Migration do Alembic para criar tabela justifications
+   
+4. src/lib/justificationService.ts
+   - Serviço para comunicação com API de justificativas
+   
+5. JUSTIFICATIONS_MIGRATION.md
+   - Documentação completa da implementação
+   
+6. verify_justifications_migration.sql
+   - Script SQL para verificação da migration
+
+ARQUIVOS MODIFICADOS:
+--------------------
+1. api/shared/db_models.py
+   - Adicionado modelo Justification
+   
+2. src/stores/schoolLicenseStore.ts
+   - Adicionada action loadJustifications
+   - Modificada action addJustification (agora async)
+   - Adicionado carregamento automático em loadOfficialData
+   - Removido justifications do persist (localStorage)
+   - Implementada migração automática do localStorage
+
+ESTRUTURA DA TABELA:
+-------------------
+justifications
+  - id (PK, UUID)
+  - school_id (FK -> schools.id, CASCADE DELETE)
+  - school_name
+  - old_user_name
+  - old_user_email
+  - old_user_role
+  - new_user_name
+  - new_user_email
+  - new_user_role
+  - reason
+  - performed_by
+  - timestamp (auto, timezone aware)
+  
+Índices:
+  - idx_justifications_school_id
+  - idx_justifications_timestamp
+
+ENDPOINTS CRIADOS:
+-----------------
+GET  /.netlify/functions/justifications
+     ?school_id=<id> (opcional)
+     
+POST /.netlify/functions/justifications
+     Body: { schoolId, schoolName, oldUser, newUser, reason, performedBy }
+
+PRÓXIMOS PASSOS:
+---------------
+1. Aplicar migration: alembic upgrade head
+2. Deploy do backend (Azure Functions)
+3. Deploy do frontend
+4. Testar criação de justificativa
+5. Verificar migração automática do localStorage
+
+OBSERVAÇÕES:
+-----------
+- Migração automática ocorre na primeira carga após deploy
+- localStorage não é mais usado para justificativas
+- Todas as operações requerem autenticação
+- Dados sincronizados entre dispositivos
