@@ -1,14 +1,35 @@
 import azure.functions as func
 import json
+import logging
 from datetime import datetime
 from typing import Optional
 from ..shared.auth import verify_token, check_permission
 from ..shared.db import get_session
 from ..shared.db_models import Justification, School
 
+# Configure logging
+logger = logging.getLogger(__name__)
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     """Justifications endpoint - GET/POST /api/justifications"""
+    
+    # Health check endpoint
+    if req.params.get('health') == 'true':
+        try:
+            with get_session() as session:
+                session.execute("SELECT 1")
+            return func.HttpResponse(
+                json.dumps({"status": "healthy", "database": "connected"}),
+                status_code=200,
+                headers={"Content-Type": "application/json"}
+            )
+        except Exception as e:
+            logger.error(f"Health check failed: {str(e)}")
+            return func.HttpResponse(
+                json.dumps({"status": "unhealthy", "error": str(e)}),
+                status_code=500,
+                headers={"Content-Type": "application/json"}
+            )
     
     # Handle CORS preflight
     if req.method == 'OPTIONS':
@@ -62,6 +83,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             )
             
     except Exception as e:
+        logger.error(f"Erro no endpoint de justificativas: {str(e)}", exc_info=True)
         return func.HttpResponse(
             json.dumps({"success": False, "message": f"Erro interno: {str(e)}"}),
             status_code=500,

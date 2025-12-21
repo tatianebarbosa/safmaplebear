@@ -63,4 +63,10 @@ curl -X GET "${API_BASE_URL}/justifications" \
   -H "Content-Type: application/json" \
   -w "\nStatus: %{http_code}\n\n"
 
+# Teste 6: Health Check (deve retornar 200 se o banco estiver OK)
+echo "6. Testando Health Check do Banco de Dados"
+curl -X GET "${API_BASE_URL}/justifications?health=true" \
+  -H "Content-Type: application/json" \
+  -w "\nStatus: %{http_code}\n\n"
+
 echo "=== Testes concluídos ==="

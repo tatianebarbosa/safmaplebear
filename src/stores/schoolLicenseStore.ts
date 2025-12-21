@@ -39,6 +39,7 @@ import {
   createJustification,
   migrateJustificationsToBackend,
 } from "@/lib/justificationService";
+import { toast } from "sonner";
 
 const NETLIFY_BASE =
   (typeof import.meta !== "undefined" && (import.meta.env as any)?.VITE_NETLIFY_BASE) || "";
@@ -621,8 +622,17 @@ export const useSchoolLicenseStore = create<SchoolLicenseState>()(
           const localJustifications = get().justifications;
           if (localJustifications.length > 0 && justifications.length === 0) {
             console.log("Migrando justificativas do localStorage para o backend...");
+            toast.info("Migrando justificativas locais para o servidor...");
+            
             const result = await migrateJustificationsToBackend(localJustifications);
             console.log(`Migração concluída: ${result.success} sucesso, ${result.failed} falhas`);
+            
+            if (result.success > 0) {
+              toast.success(`${result.success} justificativas migradas com sucesso!`);
+            }
+            if (result.failed > 0) {
+              toast.error(`Falha ao migrar ${result.failed} justificativas.`);
+            }
             
             // Recarregar após migração
             const updatedJustifications = await fetchJustifications();
