@@ -100,6 +100,33 @@ class SchoolLimit(Base):
     )
 
 
+class Ticket(Base):
+    __tablename__ = "tickets"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    agente: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[str] = mapped_column(String, nullable=False, default="Pendente")
+    observacao: Mapped[Optional[str]] = mapped_column(String, default="")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+    resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    due_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    priority: Mapped[str] = mapped_column(String, default="Media")
+    sla_dias: Mapped[int] = mapped_column(Integer, default=3)
+    assignee_email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    notes: Mapped[dict] = mapped_column(JSONB, default=list)
+    history: Mapped[dict] = mapped_column(JSONB, default=list)
+    
+    __table_args__ = (
+        Index("idx_tickets_status", "status"),
+        Index("idx_tickets_agente", "agente"),
+        Index("idx_tickets_due_date", "due_date"),
+    )
+
 class AuditLog(Base):
     __tablename__ = "audit_logs"
 

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { fetchTicketsFromApi, saveTicketToApi } from "@/lib/ticketService";
 import { Ticket, TicketStatus, Agente, TicketNote, TicketPriority, TicketHistoryEntry } from "@/types/tickets";
 import { addDays, subDays, format } from "date-fns";
 import { useAuthStore } from "@/stores/authStore";
@@ -219,19 +220,25 @@ const seedTickets: Ticket[] = pendingSeedTickets.map((ticket) => {
 export const useTicketStore = create<TicketStore>()(
   persist(
     (set, get) => ({
-      tickets: USE_SEED_TICKETS ? seedTickets : [],
+      tickets: [],
       filters: {},
       dueLog: {},
 
       setTickets: (tickets) => set({ tickets }),
+      
+      fetchTickets: async () => {
+        const tickets = await fetchTicketsFromApi();
+        set({ tickets });
+      },
 
       setFilters: (filters) => set({ filters }),
 
-      createTicket: (ticketData) => {
+      createTicket: async (ticketData) => {
         const now = new Date().toISOString();
         const slaDias = ticketData.slaDias ?? DEFAULT_SLA_DAYS;
         const dueDate = ticketData.dueDate || calculateDueDate(now, slaDias);
-        const newTicket: Ticket = {
+        
+        const newTicketData = {
           ...ticketData,
           id: normalizeTicketId(ticketData.id),
           createdBy: ticketData.createdBy || ticketData.agente,
@@ -249,163 +256,185 @@ export const useTicketStore = create<TicketStore>()(
           history: ticketData.history || [],
         };
 
-        set((state) => ({
-          tickets: [...state.tickets, newTicket],
-        }));
+        const savedTicket = await saveTicketToApi(newTicketData);
+        
+        if (savedTicket) {
+          set((state) => ({
+            tickets: [...state.tickets, savedTicket],
+          }));
+        }
       },
 
-      updateTicket: (id, updates) => {
-        set((state) => ({
-          tickets: state.tickets.map((ticket) =>
-            ticket.id === id
-              ? (() => {
-                  const status = updates.status;
-                  let resolvedAt = updates.resolvedAt ?? ticket.resolvedAt;
-                  if (status === "Resolvido") {
-                    resolvedAt = updates.resolvedAt ?? new Date().toISOString();
-                  } else if (status) {
-                    resolvedAt = null;
-                  }
+      updateTicket: async (id, updates) => {
+        const ticketToUpdate = get().tickets.find(t => t.id === id);
+        if (!ticketToUpdate) return;
 
-                  return {
-                    ...ticket,
-                    ...updates,
-                    resolvedAt,
-                    updatedAt: new Date().toISOString(),
-                  };
-                })()
-              : ticket
-          ),
-        }));
+        const updatedTicketData = {
+          ...ticketToUpdate,
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        };
+
+        const savedTicket = await saveTicketToApi(updatedTicketData);
+
+        if (savedTicket) {
+          set((state) => ({
+            tickets: state.tickets.map((ticket) =>
+              ticket.id === id ? savedTicket : ticket
+            ),
+          }));
+        }
       },
 
-      moveTicket: (id, newStatus, options) => {
-        set((state) => {
-          const now = new Date().toISOString();
-          const auth = useAuthStore.getState();
-          const author =
-            options?.author ||
-            auth.currentUser?.name ||
-            auth.currentUser?.agente ||
-            "Sistema";
-          const reason = options?.reason?.trim();
+      moveTicket: async (id, newStatus, options) => {
+        const ticketToUpdate = get().tickets.find(t => t.id === id);
+        if (!ticketToUpdate) return;
 
-          const updatedTickets = state.tickets.map((ticket) => {
-            if (ticket.id !== id) return ticket;
+        const now = new Date().toISOString();
+        const auth = useAuthStore.getState();
+        const author =
+          options?.author ||
+          auth.currentUser?.name ||
+          auth.currentUser?.agente ||
+          "Sistema";
+        const reason = options?.reason?.trim();
 
-            const previousStatus = ticket.status;
-            const resolvedAt = newStatus === "Resolvido" ? now : null;
+        const previousStatus = ticketToUpdate.status;
+        const resolvedAt = newStatus === "Resolvido" ? now : null;
 
-            const historyEntry: TicketHistoryEntry = {
-              id: `${id}-hist-${Date.now()}`,
-              author,
-              action: `Status: ${previousStatus} -> ${newStatus}${reason ? ` | Motivo: ${reason}` : ""}`,
-              timestamp: now,
-              before: { status: previousStatus, resolvedAt: ticket.resolvedAt },
-              after: { status: newStatus, resolvedAt },
-            };
+        const historyEntry: TicketHistoryEntry = {
+          id: `${id}-hist-${Date.now()}`,
+          author,
+          action: `Status: ${previousStatus} -> ${newStatus}${reason ? ` | Motivo: ${reason}` : ""}`,
+          timestamp: now,
+          before: { status: previousStatus, resolvedAt: ticketToUpdate.resolvedAt },
+          after: { status: newStatus, resolvedAt },
+        };
 
-            const note: TicketNote = {
-              id: `${id}-status-${Date.now()}`,
-              author,
-              content: `Status alterado de ${previousStatus} para ${newStatus}${reason ? `. Motivo: ${reason}` : ""}`,
-              createdAt: now,
-            };
+        const note: TicketNote = {
+          id: `${id}-status-${Date.now()}`,
+          author,
+          content: `Status alterado de ${previousStatus} para ${newStatus}${reason ? `. Motivo: ${reason}` : ""}`,
+          createdAt: now,
+        };
 
-            return {
-              ...ticket,
-              status: newStatus,
-              resolvedAt,
-              updatedAt: now,
-              history: [historyEntry, ...(ticket.history || [])],
-              notes: [note, ...(ticket.notes || [])],
-            };
-          });
+        const updatedTicketData = {
+          ...ticketToUpdate,
+          status: newStatus,
+          resolvedAt,
+          updatedAt: now,
+          history: [historyEntry, ...(ticketToUpdate.history || [])],
+          notes: [note, ...(ticketToUpdate.notes || [])],
+        };
 
-          return { tickets: updatedTickets };
-        });
+        const savedTicket = await saveTicketToApi(updatedTicketData);
+
+        if (savedTicket) {
+          set((state) => ({
+            tickets: state.tickets.map((ticket) =>
+              ticket.id === id ? savedTicket : ticket
+            ),
+          }));
+        }
       },
 
       removeTicket: (id) => {
+        // TODO: Implementar endpoint DELETE na API
         set((state) => ({
           tickets: state.tickets.filter((ticket) => ticket.id !== id),
         }));
       },
 
-      addNoteToTicket: (id, note) => {
-        set((state) => ({
-          tickets: state.tickets.map((ticket) =>
-            ticket.id === id
-              ? {
-                  ...ticket,
-                  notes: [note, ...(ticket.notes || [])],
-                  updatedAt: new Date().toISOString(),
-                }
-              : ticket
-          ),
-        }));
+      addNoteToTicket: async (id, note) => {
+        const ticketToUpdate = get().tickets.find(t => t.id === id);
+        if (!ticketToUpdate) return;
+
+        const updatedTicketData = {
+          ...ticketToUpdate,
+          notes: [note, ...(ticketToUpdate.notes || [])],
+          updatedAt: new Date().toISOString(),
+        };
+
+        const savedTicket = await saveTicketToApi(updatedTicketData);
+
+        if (savedTicket) {
+          set((state) => ({
+            tickets: state.tickets.map((ticket) =>
+              ticket.id === id ? savedTicket : ticket
+            ),
+          }));
+        }
       },
 
-      addHistoryEntry: (id, entry) => {
-        set((state) => ({
-          tickets: state.tickets.map((ticket) =>
-            ticket.id === id
-              ? {
-                  ...ticket,
-                  history: [entry, ...(ticket.history || [])],
-                  updatedAt: new Date().toISOString(),
-                }
-              : ticket
-          ),
-        }));
+      addHistoryEntry: async (id, entry) => {
+        const ticketToUpdate = get().tickets.find(t => t.id === id);
+        if (!ticketToUpdate) return;
+
+        const updatedTicketData = {
+          ...ticketToUpdate,
+          history: [entry, ...(ticketToUpdate.history || [])],
+          updatedAt: new Date().toISOString(),
+        };
+
+        const savedTicket = await saveTicketToApi(updatedTicketData);
+
+        if (savedTicket) {
+          set((state) => ({
+            tickets: state.tickets.map((ticket) =>
+              ticket.id === id ? savedTicket : ticket
+            ),
+          }));
+        }
       },
 
-      revertHistoryEntry: (id, entryId, performedBy) => {
-        set((state) => {
-          const ticket = state.tickets.find((t) => t.id === id);
-          if (!ticket) return state;
-          const target = ticket.history?.find((h) => h.id === entryId);
-          if (!target) return state;
+      revertHistoryEntry: async (id, entryId, performedBy) => {
+        const ticketToUpdate = get().tickets.find(t => t.id === id);
+        if (!ticketToUpdate) return;
+        const target = ticketToUpdate.history?.find((h) => h.id === entryId);
+        if (!target) return;
 
-          const now = new Date().toISOString();
-          const updates = target.before || {};
-          let resolvedAt = ticket.resolvedAt;
+        const now = new Date().toISOString();
+        const updates = target.before || {};
+        let resolvedAt = ticketToUpdate.resolvedAt;
 
-          if (updates.status) {
-            resolvedAt = updates.status === "Resolvido" ? now : null;
-          }
+        if (updates.status) {
+          resolvedAt = updates.status === "Resolvido" ? now : null;
+        }
 
-          const revertedTicket: Ticket = {
-            ...ticket,
-            ...updates,
-            resolvedAt,
-            updatedAt: now,
-            history: [
-              {
-                id: `${id}-revert-${Date.now()}`,
-                author: performedBy,
-                action: `Reverteu: ${target.action}`,
-                timestamp: now,
-                before: target.after,
-                after: updates,
-              },
-              ...(ticket.history || []),
-            ],
-            notes: [
-              {
-                id: `${id}-revert-note-${Date.now()}`,
-                author: performedBy,
-                content: `Revertido: ${target.action}`,
-                createdAt: now,
-              },
-              ...(ticket.notes || []),
-            ],
-          };
+        const revertedTicketData = {
+          ...ticketToUpdate,
+          ...updates,
+          resolvedAt,
+          updatedAt: now,
+          history: [
+            {
+              id: `${id}-revert-${Date.now()}`,
+              author: performedBy,
+              action: `Reverteu: ${target.action}`,
+              timestamp: now,
+              before: target.after,
+              after: updates,
+            },
+            ...(ticketToUpdate.history || []),
+          ],
+          notes: [
+            {
+              id: `${id}-revert-note-${Date.now()}`,
+              author: performedBy,
+              content: `Revertido: ${target.action}`,
+              createdAt: now,
+            },
+            ...(ticketToUpdate.notes || []),
+          ],
+        };
 
-          return {
-            tickets: state.tickets.map((t) => (t.id === id ? revertedTicket : t)),
-          };
-        });
+        const savedTicket = await saveTicketToApi(revertedTicketData);
+
+        if (savedTicket) {
+          set((state) => ({
+            tickets: state.tickets.map((t) => (t.id === id ? savedTicket : t)),
+          }));
+        }
       },
 
       getFilteredTickets: () => {
@@ -458,22 +487,12 @@ export const useTicketStore = create<TicketStore>()(
       name: "saf-tickets-storage",
       onRehydrateStorage: () => (state) => {
         if (state) {
-          if (USE_SEED_TICKETS) {
-            const existingIds = new Set((state.tickets || []).map((t) => t.id));
-            const merged = [...(state.tickets || [])];
-            seedTickets.forEach((ticket) => {
-              if (!existingIds.has(ticket.id)) {
-                merged.push(ticket);
-              }
-            });
-            state.setTickets(merged);
-          } else {
-            // Limpa seeds persistidos ao migrar para fonte remota
-            state.setTickets([]);
-          }
+          // A persistência local não é mais a fonte primária, mas vamos manter a chave
+          // para evitar erros de reidratação e forçar o fetch da API.
+          state.setTickets([]);
           state.setFilters({});
+          // Força o fetch da API na inicialização do store
+          state.fetchTickets();
         }
       },
     }
-  )
-);

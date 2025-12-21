@@ -1,4 +1,5 @@
 import type { Ticket, TicketStatus, TicketPriority, Agente } from "@/types/tickets";
+import { apiCall, apiPost, apiPut } from "./apiClient";
 
 type RemoteTicket = {
   id: string | number;
@@ -71,32 +72,46 @@ const normalizeTicket = (remote: RemoteTicket): Ticket => {
   };
 };
 
-export async function fetchTicketsFromApi(endpoint?: string): Promise<Ticket[]> {
-  const sources = [
-    endpoint,
-    import.meta.env.VITE_TICKETS_ENDPOINT,
-    "/api/tickets",
-    "/data/tickets.json",
-  ].filter(Boolean) as string[];
-
-  for (const url of sources) {
-    try {
-      const response = await fetch(url, { headers: { Accept: "application/json" } });
-      if (!response.ok) continue;
-
-      const ct = response.headers.get("content-type") || "";
-      if (!ct.toLowerCase().includes("application/json")) {
-        continue;
-      }
-
-      const data = (await response.json()) as RemoteTicket[] | { tickets: RemoteTicket[] };
-      const list = Array.isArray(data) ? data : data.tickets;
-      if (!Array.isArray(list)) continue;
-      return list.map(normalizeTicket);
-    } catch (error) {
-      console.error("Falha ao buscar tickets em", url, error);
+export async function fetchTicketsFromApi(): Promise<Ticket[]> {
+  const url = "/api/tickets";
+  try {
+    const response = await apiCall<RemoteTicket[]>(url, { method: "GET" });
+    if (response.ok && response.data) {
+      return response.data.map(normalizeTicket);
     }
+    console.error("Falha ao buscar tickets na API:", response.error);
+    return [];
+  } catch (error) {
+    console.error("Erro de rede ao buscar tickets:", error);
+    return [];
   }
-
-  return [];
 }
+
+export async function saveTicketToApi(ticket: Partial<Ticket>): Promise<Ticket | null> {
+  const url = "/api/tickets";
+  const method = ticket.id ? "PUT" : "POST";
+  
+  // O backend espera o ID para PUT, mas para POST o ID é gerado no frontend
+  const body = {
+    ...ticket,
+    id: ticket.id || `#${Date.now()}`, // Garante um ID para POST
+  };
+
+  try {
+    const response = await apiCall<RemoteTicket>(url, {
+      method,
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.ok && response.data) {
+      return normalizeTicket(response.data);
+    }
+    console.error(`Falha ao salvar ticket (${method}) na API:`, response.error);
+    return null;
+  } catch (error) {
+    console.error("Erro de rede ao salvar ticket:", error);
+    return null;
+  }
+}
+

@@ -33,7 +33,7 @@ import {
   fetchIntegratedCanvaData,
   buildOverviewFromIntegration,
 } from "@/lib/integratedCanvaService";
-import { saveLicenseAction, type LicenseAction } from "@/lib/canvaDataProcessor";
+import { saveLicenseAction, getLicenseHistory, type LicenseAction } from "@/lib/canvaDataProcessor";
 
 const NETLIFY_BASE =
   (typeof import.meta !== "undefined" && (import.meta.env as any)?.VITE_NETLIFY_BASE) || "";
@@ -41,6 +41,7 @@ const API_TOKEN =
   (typeof import.meta !== "undefined" && (import.meta.env as any)?.VITE_API_TOKEN) || "";
 
 const callNetlify = async (path: string, init?: RequestInit) => {
+  // Substituindo a chamada Netlify por apiCall (que usa o proxy do Vite)
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(init?.headers as Record<string, string> | undefined),
@@ -48,7 +49,9 @@ const callNetlify = async (path: string, init?: RequestInit) => {
   if (API_TOKEN) {
     headers.Authorization = `Bearer ${API_TOKEN}`;
   }
-  const resp = await fetch(`${NETLIFY_BASE}${path}`, { ...init, headers });
+  // Se o path começar com /api, usa o proxy do Vite. Caso contrário, usa o NETLIFY_BASE (fallback)
+  const url = path.startsWith("/api") ? path : `${NETLIFY_BASE}${path}`;
+  const resp = await fetch(url, { ...init, headers });
   if (!resp.ok) {
     const body = await resp.text();
     throw new Error(`Request failed (${resp.status}): ${body}`);
@@ -94,7 +97,8 @@ type ActionMeta = {
 interface SchoolLicenseState {
   schools: School[];
   justifications: Justification[];
-  history: HistoryEntry[]; // Novo estado para o histÃ³rico de alteraÃ§Ãµes
+  history: HistoryEntry[]; // Novo estado para o histórico de alterações
+  fetchHistory: () => Promise<void>;µes
   usageData: CanvaUsageData[];
   officialData: ProcessedSchoolData[];
   overviewData: CanvaOverviewData | null;
@@ -334,53 +338,22 @@ const applyOverviewDelta = (
   };
 };
 
-const loadPersistedSnapshot = (): {
-  schools?: School[];
-  justifications?: Justification[];
-  history?: HistoryEntry[];
-} => {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem("school-license-storage-v2");
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    const state = parsed?.state ?? parsed;
-    return {
-      schools: Array.isArray(state?.schools) ? state.schools : undefined,
-      justifications: Array.isArray(state?.justifications) ? state.justifications : undefined,
-      history: Array.isArray(state?.history) ? state.history : undefined,
-    };
-  } catch {
-    return {};
-  }
-};
-
-const persistedSnapshot = loadPersistedSnapshot();
-const initialSchools =
-  persistedSnapshot.schools?.length ? ensureCentralSchool(persistedSnapshot.schools) : seedSchools;
-const initialJustifications = persistedSnapshot.justifications ?? [];
-const initialHistory = persistedSnapshot.history ?? [];
+const initialSchools = seedSchools;
+const initialJustifications: Justification[] = [];
+const initialHistory: HistoryEntry[] = [];
 
 // Controle do ciclo de hidratação (usado pelo persist para liberar merges dependentes)
 let resolveHydration: (() => void) | null = null;
 let hydrationReady: Promise<void> = Promise.resolve();
 
-const recordLicenseAction = (
+const recordLicenseAction = async (
   action: Omit<LicenseAction, "id" | "timestamp">
 ) => {
-  if (typeof window === "undefined") return;
-  try {
-    saveLicenseAction({
-      ...action,
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error(
-      "[schoolLicenseStore] Falha ao registrar historico de licencas",
-      error
-    );
-  }
+  await saveLicenseAction({
+    ...action,
+    id: Date.now().toString(),
+    timestamp: new Date().toISOString(),
+  });
 };
 
 export const useSchoolLicenseStore = create<SchoolLicenseState>()(

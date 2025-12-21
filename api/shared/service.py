@@ -7,7 +7,8 @@ from typing import Dict, List
 from sqlalchemy import func, select
 
 from .db import get_session
-from .db_models import AuditLog, School, User
+from .db_models import AuditLog, School, User, Ticket
+from .model import Ticket as TicketModel # Importa o modelo de dados do frontend, se existir
 from .model import (
     OfficialUser,
     SchoolOverview,
@@ -21,6 +22,90 @@ DEFAULT_MAX_LICENSE_LIMIT = 2
 
 
 class DataProcessingService:
+    """Service layer que lê/escreve no Postgres."""
+
+    # --- Consultas de Tickets ---
+    def list_tickets(self) -> List[Ticket]:
+        """Lista todos os tickets."""
+        with get_session() as session:
+            tickets = session.execute(select(Ticket)).scalars().all()
+            return tickets
+
+    def create_ticket(self, ticket_data: dict) -> Ticket:
+        """Cria um novo ticket."""
+        with get_session() as session:
+            # Garante que o ID é uma string, como no frontend
+            if not ticket_data.get("id"):
+                raise ValueError("Ticket ID is required")
+            
+            # Remove chaves que não estão no modelo do DB
+            data_to_save = {k: v for k, v in ticket_data.items() if k in Ticket.__table__.columns}
+            
+            new_ticket = Ticket(**data_to_save)
+            session.add(new_ticket)
+            session.commit()
+            session.refresh(new_ticket)
+            return new_ticket
+
+    def update_ticket(self, ticket_id: str, updates: dict) -> Optional[Ticket]:
+        """Atualiza um ticket existente."""
+        with get_session() as session:
+            ticket = session.get(Ticket, ticket_id)
+            if not ticket:
+                return None
+
+            # Atualiza apenas os campos que existem no modelo do DB
+            for key, value in updates.items():
+                if key in Ticket.__table__.columns and key not in ["id", "created_at"]:
+                    setattr(ticket, key, value)
+            
+            session.commit()
+            session.refresh(ticket)
+            return ticket
+
+    # --- Consultas de Escolas e Usuários ---
+    """Service layer que lê/escreve no Postgres."""
+
+    # --- Consultas de Tickets ---
+    def list_tickets(self) -> List[Ticket]:
+        """Lista todos os tickets."""
+        with get_session() as session:
+            tickets = session.execute(select(Ticket)).scalars().all()
+            return tickets
+
+    def create_ticket(self, ticket_data: dict) -> Ticket:
+        """Cria um novo ticket."""
+        with get_session() as session:
+            # Garante que o ID é uma string, como no frontend
+            if not ticket_data.get("id"):
+                raise ValueError("Ticket ID is required")
+            
+            # Remove chaves que não estão no modelo do DB
+            data_to_save = {k: v for k, v in ticket_data.items() if k in Ticket.__table__.columns}
+            
+            new_ticket = Ticket(**data_to_save)
+            session.add(new_ticket)
+            session.commit()
+            session.refresh(new_ticket)
+            return new_ticket
+
+    def update_ticket(self, ticket_id: str, updates: dict) -> Optional[Ticket]:
+        """Atualiza um ticket existente."""
+        with get_session() as session:
+            ticket = session.get(Ticket, ticket_id)
+            if not ticket:
+                return None
+
+            # Atualiza apenas os campos que existem no modelo do DB
+            for key, value in updates.items():
+                if key in Ticket.__table__.columns and key not in ["id", "created_at"]:
+                    setattr(ticket, key, value)
+            
+            session.commit()
+            session.refresh(ticket)
+            return ticket
+
+    # --- Consultas de Escolas e Usuários ---
     """Service layer que lê/escreve no Postgres."""
 
     # --- Consultas ---

@@ -4,7 +4,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import { useTicketStore } from "./stores/ticketStore";
 import Header from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -54,7 +55,14 @@ const ProtectedShell = () => (
   </ProtectedRoute>
 );
 
-const App = () => (
+const App = () => {
+  const fetchTickets = useTicketStore((state) => state.fetchTickets);
+
+  useEffect(() => {
+    fetchTickets();
+  }, [fetchTickets]);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -134,5 +142,5 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
-
-export default App;
+	
+	export default App;
