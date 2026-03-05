@@ -4,13 +4,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, ReactNode, Suspense } from "react";
 import Header from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { useAuthStore } from "@/stores/authStore";
+import { isCanvaOnlyMode, isRestrictedToCoreViews } from "@/lib/accessPolicy";
 
 const queryClient = new QueryClient();
-const ENABLE_ONLY_CANVA = import.meta.env.VITE_ENABLE_ONLY_CANVA === "true";
 
 // Carregamento preguiçoso das páginas para deixar a navegação mais leve
 const Index = lazy(() => import("./pages/Index"));
@@ -54,85 +55,94 @@ const ProtectedShell = () => (
   </ProtectedRoute>
 );
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={<Skeleton className="h-screen w-full" />}>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route element={<ProtectedShell />}>
-              <Route
-                path="/dashboard"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <Index />}
-              />
-              <Route path="/dashboard/canva" element={<CanvaDashboard />} />
-              <Route path="/dashboard/canva/escolas" element={<CanvaDashboard />} />
-              <Route path="/dashboard/canva/usos" element={<CanvaDashboard />} />
-              <Route path="/dashboard/canva/modelos" element={<CanvaDashboard />} />
-              <Route path="/dashboard/canva/criadores" element={<CanvaDashboard />} />
-              <Route path="/dashboard/canva/usos/escolas" element={<CanvaDashboard />} />
-              <Route path="/dashboard/canva/custos" element={<CanvaDashboard />} />
-              <Route
-                path="/dashboard/vouchers"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <VoucherDashboard />}
-              />
-              <Route
-                path="/dashboard/vouchers-2026"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <Voucher2026Dashboard />}
-              />
-              <Route
-                path="/insights"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <InsightsAnalytics />}
-              />
-              <Route
-                path="/monitoring"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <MonitoringPortal />}
-              />
-              <Route
-                path="/tickets"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <TicketsPage />}
-              />
-              <Route
-                path="/admin"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AdminPage />}
-              />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route
-                path="/monitoria-agentes"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AgentMonitoringPage />}
-              />
-              <Route
-                path="/knowledge-base"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <KnowledgeBasePage />}
-              />
-              <Route
-                path="/saf/ativos"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AssetsPage />}
-              />
-              <Route
-                path="/saf/ativos/:assetId"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AssetDetailPage />}
-              />
-              <Route
-                path="/saf/ativos/:assetId/escola/:schoolId"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AssetSchoolPage />}
-              />
-              <Route
-                path="/access-control"
-                element={ENABLE_ONLY_CANVA ? <Navigate to="/dashboard/canva" replace /> : <AccessControl />}
-              />
-            </Route>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            {/* Sempre deixe as rotas novas acima do catch-all "*" */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const currentUserRole = useAuthStore((state) => state.currentUser?.role);
+  const canvaOnlyMode = isCanvaOnlyMode(currentUserRole);
+  const restrictToCoreViews = isRestrictedToCoreViews(currentUserRole);
+
+  const renderRestrictedRoute = (element: ReactNode) =>
+    restrictToCoreViews ? <Navigate to="/dashboard/canva" replace /> : element;
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<ProtectedShell />}>
+                <Route
+                  path="/dashboard"
+                  element={canvaOnlyMode ? <Navigate to="/dashboard/canva" replace /> : <Index />}
+                />
+                <Route path="/dashboard/canva" element={<CanvaDashboard />} />
+                <Route path="/dashboard/canva/escolas" element={<CanvaDashboard />} />
+                <Route path="/dashboard/canva/usos" element={<CanvaDashboard />} />
+                <Route path="/dashboard/canva/modelos" element={<CanvaDashboard />} />
+                <Route path="/dashboard/canva/criadores" element={<CanvaDashboard />} />
+                <Route path="/dashboard/canva/usos/escolas" element={<CanvaDashboard />} />
+                <Route path="/dashboard/canva/custos" element={<CanvaDashboard />} />
+                <Route
+                  path="/dashboard/vouchers"
+                  element={renderRestrictedRoute(<VoucherDashboard />)}
+                />
+                <Route
+                  path="/dashboard/vouchers-2026"
+                  element={renderRestrictedRoute(<Voucher2026Dashboard />)}
+                />
+                <Route
+                  path="/insights"
+                  element={renderRestrictedRoute(<InsightsAnalytics />)}
+                />
+                <Route
+                  path="/monitoring"
+                  element={renderRestrictedRoute(<MonitoringPortal />)}
+                />
+                <Route
+                  path="/tickets"
+                  element={renderRestrictedRoute(<TicketsPage />)}
+                />
+                <Route
+                  path="/admin"
+                  element={renderRestrictedRoute(<AdminPage />)}
+                />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route
+                  path="/monitoria-agentes"
+                  element={renderRestrictedRoute(<AgentMonitoringPage />)}
+                />
+                <Route
+                  path="/knowledge-base"
+                  element={renderRestrictedRoute(<KnowledgeBasePage />)}
+                />
+                <Route
+                  path="/saf/ativos"
+                  element={renderRestrictedRoute(<AssetsPage />)}
+                />
+                <Route
+                  path="/saf/ativos/:assetId"
+                  element={renderRestrictedRoute(<AssetDetailPage />)}
+                />
+                <Route
+                  path="/saf/ativos/:assetId/escola/:schoolId"
+                  element={renderRestrictedRoute(<AssetSchoolPage />)}
+                />
+                <Route
+                  path="/access-control"
+                  element={renderRestrictedRoute(<AccessControl />)}
+                />
+              </Route>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              {/* Sempre deixe as rotas novas acima do catch-all "*" */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

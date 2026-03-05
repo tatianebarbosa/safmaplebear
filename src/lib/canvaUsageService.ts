@@ -66,7 +66,13 @@ const normalizeValue = (value?: unknown) => {
 };
 
 const parseCsvText = (text: string): Record<string, string>[] => {
-  const delimiter = text.includes(';') ? ';' : text.includes(',') ? ',' : ';';
+  const delimiter = text.includes('\t')
+    ? '\t'
+    : text.includes(';')
+    ? ';'
+    : text.includes(',')
+    ? ','
+    : ';';
   const parsed = Papa.parse<Record<string, string>>(text, {
     header: true,
     skipEmptyLines: true,

@@ -3,8 +3,6 @@
   "Values": {
     "AzureWebJobsStorage": "",
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "CANVA_EMAIL": "seu_email@gmail.com",
-    "CANVA_PASSWORD": "sua_senha_aqui"
   },
   "ConnectionStrings": {}
 }

@@ -1,152 +1,60 @@
-# Integração de Dados do Canva
+# Integracao de Dados do Canva
 
-Este documento descreve como usar a funcionalidade de coleta automática de dados do Canva no projeto.
+Este documento descreve o fluxo atual do Canva no projeto: **importacao manual via CSV**.
 
-## Visão Geral
+## Visao Geral
 
-A integração permite que o sistema:
+O projeto usa os arquivos locais de dados atualizados por upload de CSV.
 
-1. **Coleta automaticamente** o número de usuários ativos do Canva
-2. **Armazena os dados** com data, hora e timestamp
-3. **Registra o histórico** de alterações
-4. **Permite reverter** alterações anteriores
-5. **Exibe os dados** em um dashboard
+Fluxo suportado:
 
-## Configuração
+1. Upload manual de arquivos CSV de uso do Canva
+2. Parsing e consolidacao dos dados no frontend
+3. Exibicao nos cards e graficos do dashboard
 
-### 1. Instalar Dependências
+## Configuracao
 
-```bash
-npm install puppeteer
-```
+Nao ha necessidade de credenciais do Canva no backend para o fluxo padrao.
 
-### 2. Configurar Variáveis de Ambiente
+No arquivo `.env.example` existe apenas o bloco de informacao de ingestao manual.
 
-Crie um arquivo `.env.local` na raiz do projeto com as seguintes variáveis:
+## Como usar
 
-```env
-REACT_APP_CANVA_EMAIL=tatianebarbosa20166@gmail.com
-REACT_APP_CANVA_PASSWORD=Tati2025@
-```
+O fluxo de atualizacao e feito em:
 
-**⚠️ AVISO DE SEGURANÇA:** Nunca commite o arquivo `.env.local` no repositório. Adicione-o ao `.gitignore`.
+1. Acesso ao dashboard de uso do Canva
+2. Upload dos arquivos CSV nos paineis de membros/modelos
+3. Refresh automatico dos graficos
 
-### 3. Usar o Componente de Exibição
-
-Importe o componente `CanvaDataDisplay` em qualquer página do seu projeto:
-
-```tsx
-import { CanvaDataDisplay } from '@/components/canva/CanvaDataDisplay';
-
-export default function Dashboard() {
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <CanvaDataDisplay />
-    </div>
-  );
-}
-```
-
-## Uso
-
-### Coleta Manual
-
-Clique no botão "Coletar Dados Agora" no componente `CanvaDataDisplay` para fazer uma coleta manual.
-
-### Coleta Automática (Cron Job)
-
-Para fazer a coleta automaticamente a cada hora, configure um cron job:
-
-```bash
-# Editar o crontab
-crontab -e
-
-# Adicionar a seguinte linha para executar a cada hora
-0 * * * * cd /caminho/para/safmaplebear && node scripts/canva-scraper.js
-```
-
-### API Backend (Opcional)
-
-Se você tiver um backend Node.js/Express, você pode criar endpoints para:
-
-1. **POST `/api/canva/coletar-dados`** - Faz a coleta de dados
-2. **GET `/api/canva/dados-recentes`** - Obtém os dados mais recentes
-3. **GET `/api/canva/historico`** - Obtém o histórico de alterações
-4. **POST `/api/canva/registrar-alteracao`** - Registra uma alteração manual
-5. **POST `/api/canva/reverter-alteracao/:id`** - Reverte uma alteração
+Nao ha componente dedicado `CanvaDataDisplay` no projeto atual.
 
 ## Estrutura de Dados
 
-### CanvaData
-
-```typescript
-interface CanvaData {
-  totalPessoas: number;        // Número de usuários ativos
-  dataAtualizacao: string;     // Data (ex: "07/11/2025")
-  horaAtualizacao: string;     // Hora (ex: "08:30:45")
-  timestamp: number;           // Timestamp em milissegundos
-}
-```
-
-### CanvaHistorico
-
-```typescript
-interface CanvaHistorico {
-  id: string;                  // ID único do registro
-  totalPessoas: number;        // Número de usuários ativos
-  dataAtualizacao: string;     // Data da alteração
-  horaAtualizacao: string;     // Hora da alteração
-  timestamp: number;           // Timestamp em milissegundos
-  mudanca: number;             // Diferença em relação ao registro anterior
-  usuarioAlteracao: string;    // Usuário que fez a alteração
-  descricaoAlteracao: string;  // Descrição da alteração
-}
-```
-
-## Arquivo de Dados
-
-Os dados são armazenados em `/data/canva-data.json`:
+### Arquivo `data/canva-data.json` (base consolidada)
 
 ```json
 {
   "totalPessoas": 836,
-  "dataAtualizacao": "07/11/2025",
-  "horaAtualizacao": "08:30:45",
-  "timestamp": 1730951445000,
-  "mudanca": 5,
-  "ultimaAtualizacao": "2025-11-07T08:30:45.000Z"
+  "designsCriados": 5707,
+  "designsCriadosCrescimento": 9,
+  "membrosAtivos": 498,
+  "membrosAtivosCrescimento": 4,
+  "totalPublicado": 10179,
+  "totalCompartilhado": 893,
+  "administradores": 11,
+  "alunos": 483,
+  "professores": 4,
+  "totalKits": 3,
+  "timestamp": 1730970645000,
+  "dataAtualizacao": "07/11/2025"
 }
 ```
 
-## Troubleshooting
+## Endpoint de Dados
 
-### Erro: "Não foi possível extrair o número de pessoas"
+- `GET /api/canva/dados-recentes`
+- `GET /api/canva/metricas/{tipo}`
 
-- Verifique se o login foi bem-sucedido
-- Verifique se a página do Canva mudou de estrutura
-- Tente executar o script manualmente para ver o erro completo
+## Observacoes
 
-### Erro: "Cloudflare Challenge"
-
-- O Canva pode estar bloqueando o acesso automatizado
-- Tente usar um proxy ou VPN
-- Considere usar a API do Canva se disponível
-
-### Erro: "2FA Required"
-
-- O Canva requer autenticação de dois fatores
-- Você precisará fazer o login manualmente ou usar um serviço que suporte 2FA
-
-## Próximos Passos
-
-1. Implementar a API Backend para armazenar dados em um banco de dados
-2. Implementar a autenticação 2FA automaticamente
-3. Adicionar notificações quando o número de pessoas mudar
-4. Integrar com o sistema de Histórico de Alterações
-
-## Referências
-
-- [Puppeteer Documentation](https://pptr.dev/)
-- [Canva API](https://www.canva.com/api/)
-- [Node.js Cron Jobs](https://www.npmjs.com/package/node-cron)
+Não existem mais endpoints de coleta automática, histórico ou reversão de upload no backend.

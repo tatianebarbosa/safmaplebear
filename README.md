@@ -26,7 +26,7 @@ npm install
 - `VITE_ADMIN_EMAIL`, `VITE_ADMIN_PASSWORD`, `VITE_ADMIN_NAME`, `VITE_ADMIN_ROLE`: login temporário do painel.
 - `VITE_MAX_LICENSES_PER_SCHOOL`: limite padrão por escola.
 - `VITE_ENABLE_ONLY_CANVA`: defina `true` para liberar apenas as rotas do painel Canva.
-3) Para usar o backend local, configure `api/local.settings.json` (Azure Functions) e as credenciais do Canva (`CANVA_EMAIL`, `CANVA_PASSWORD`, `CANVA_PERIODO`). Nunca versione credenciais reais.
+3) Para usar o backend local, configure `api/local.settings.json` (Azure Functions) apenas com as variáveis necessárias para autenticação JWT/Storage.
 
 ## Scripts úteis
 - `npm run dev`: sobe o Vite em modo desenvolvimento (http://localhost:5173).

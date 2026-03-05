@@ -2,24 +2,10 @@ import { Logos } from "@/assets/maplebear";
 import { cn } from "@/lib/utils";
 import { Facebook, Instagram, Youtube } from "lucide-react";
 import React from "react";
+import { useAuthStore } from "@/stores/authStore";
+import { isCanvaOnlyMode, isCoreViewsOnlyMode } from "@/lib/accessPolicy";
 
 interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
-
-const ENABLE_ONLY_CANVA = import.meta.env.VITE_ENABLE_ONLY_CANVA === "true";
-
-const navLinks = ENABLE_ONLY_CANVA
-  ? [
-      { label: "Canva", href: "/dashboard/canva" },
-      { label: "Usos", href: "/dashboard/canva/usos" },
-      { label: "Custos", href: "/dashboard/canva/custos" },
-    ]
-  : [
-      { label: "Canva", href: "/dashboard/canva" },
-      { label: "Vouchers", href: "/dashboard/vouchers" },
-      { label: "Ativos", href: "/saf/ativos" },
-      { label: "Tickets", href: "/tickets" },
-      { label: "Base de Conhecimento", href: "/knowledge-base" },
-    ];
 
 const socialLinks = [
   { label: "Facebook", href: "https://www.facebook.com/MapleBearBrasil", Icon: Facebook },
@@ -28,6 +14,25 @@ const socialLinks = [
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
+  const currentUserRole = useAuthStore((state) => state.currentUser?.role);
+  const canvaOnlyMode = isCanvaOnlyMode(currentUserRole);
+  const coreViewsOnlyMode = isCoreViewsOnlyMode(currentUserRole);
+
+  const navLinks = canvaOnlyMode
+    ? [{ label: "Canva", href: "/dashboard/canva" }]
+    : coreViewsOnlyMode
+      ? [
+          { label: "Inicio", href: "/dashboard" },
+          { label: "Canva", href: "/dashboard/canva" },
+        ]
+    : [
+        { label: "Canva", href: "/dashboard/canva" },
+        { label: "Vouchers", href: "/dashboard/vouchers" },
+        { label: "Ativos", href: "/saf/ativos" },
+        { label: "Tickets", href: "/tickets" },
+        { label: "Base de Conhecimento", href: "/knowledge-base" },
+      ];
+
   return (
     <footer
       className={cn(

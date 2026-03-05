@@ -70,7 +70,6 @@ import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as DatePicker } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
-import { canvaCollector } from "@/lib/canvaDataCollector";
 import { differenceInCalendarDays, format } from "date-fns";
 
 interface CanvaUsageDashboardProps {
@@ -693,15 +692,6 @@ export const CanvaUsageDashboard = ({
       const text = await readFileAsUtf8(file);
       const label = memberLabel.trim() || formatRangeLabel(memberDateRange) || undefined;
       await uploadMemberReport(file, applyMembersToAll ? "all" : memberUploadPeriod, text, label);
-      const summary = await canvaCollector.summarizeCsvContent(text);
-      if (summary) {
-        canvaCollector.registrarHistoricoUploadManual({
-          filename: file.name,
-          totalPessoas: summary.totalPessoas ?? 0,
-          designsCriados: summary.designsCriados ?? 0,
-          uploadType: "members",
-        });
-      }
       await loadDashboardData();
       toast.success("CSV de membros aplicado. Snapshot anterior preservado.");
     } catch (err) {
@@ -721,15 +711,6 @@ export const CanvaUsageDashboard = ({
       const text = await readFileAsUtf8(file);
       const label = modelLabel.trim() || formatRangeLabel(modelDateRange) || undefined;
       await uploadModelReport(file, applyModelsToAll ? "all" : modelUploadPeriod, text, label);
-      const summary = await canvaCollector.summarizeCsvContent(text);
-      if (summary) {
-        canvaCollector.registrarHistoricoUploadManual({
-          filename: file.name,
-          totalPessoas: summary.totalPessoas ?? 0,
-          designsCriados: summary.designsCriados ?? 0,
-          uploadType: "models",
-        });
-      }
       await loadDashboardData();
       toast.success("CSV de modelos aplicado. Snapshot anterior preservado.");
     } catch (err) {

@@ -24,6 +24,7 @@ import { authService } from "@/components/auth/AuthService";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/stores/authStore";
 import { useState } from "react";
+import { isCanvaOnlyMode, isCoreViewsOnlyMode } from "@/lib/accessPolicy";
 
 const MobileMenu = () => {
   const navigate = useNavigate();
@@ -32,15 +33,25 @@ const MobileMenu = () => {
   const { currentUser, hasRole } = useAuthStore();
   const [open, setOpen] = useState(false);
 
-  const showManagement = hasRole("Admin") || hasRole("Coordinator");
+  const isAdmin = hasRole("Admin");
+  const canvaOnlyMode = isCanvaOnlyMode(currentUser?.role);
+  const coreViewsOnlyMode = isCoreViewsOnlyMode(currentUser?.role);
+  const restrictToCoreViews = canvaOnlyMode || coreViewsOnlyMode;
 
-  const navItems = [
-    { label: "Incio", path: "/dashboard", icon: Home },
-    { label: "Canva", path: "/dashboard/canva", icon: Palette },
-    { label: "Vouchers", path: "/dashboard/vouchers", icon: Ticket },
-    { label: "Tickets", path: "/tickets", icon: Ticket },
-    { label: "Base de Conhecimento", path: "/knowledge-base", icon: BookOpenText },
-  ];
+  const navItems = canvaOnlyMode
+    ? [{ label: "Canva", path: "/dashboard/canva", icon: Palette }]
+    : coreViewsOnlyMode
+      ? [
+          { label: "Inicio", path: "/dashboard", icon: Home },
+          { label: "Canva", path: "/dashboard/canva", icon: Palette },
+        ]
+    : [
+        { label: "Inicio", path: "/dashboard", icon: Home },
+        { label: "Canva", path: "/dashboard/canva", icon: Palette },
+        { label: "Vouchers", path: "/dashboard/vouchers", icon: Ticket },
+        { label: "Tickets", path: "/tickets", icon: Ticket },
+        { label: "Base de Conhecimento", path: "/knowledge-base", icon: BookOpenText },
+      ];
 
   const handleLogout = () => {
     authService.logout();
@@ -153,7 +164,7 @@ const MobileMenu = () => {
           <Separator className="my-4" />
 
           {/* Gerenciamento (Admin) */}
-          {showManagement && (
+          {!restrictToCoreViews && isAdmin && (
             <>
               <Button
                 variant="ghost"

@@ -26,8 +26,7 @@ import { Logos } from "@/assets/maplebear";
 import { useAuthStore } from "@/stores/authStore";
 import NotificationBell from "@/components/layout/NotificationBell";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-
-const ENABLE_ONLY_CANVA = import.meta.env.VITE_ENABLE_ONLY_CANVA === "true";
+import { isCanvaOnlyMode, isCoreViewsOnlyMode } from "@/lib/accessPolicy";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -38,14 +37,22 @@ const Header = () => {
   const userEmail = localStorage.getItem("userEmail") || "admin@maplebear.com.br";
   const displayName = currentUser?.name || currentUser?.email || userEmail;
   const isCoordinator = currentUser?.role === "Coordinator";
+  const isAdmin = hasRole("Admin");
+  const canvaOnlyMode = isCanvaOnlyMode(currentUser?.role);
+  const coreViewsOnlyMode = isCoreViewsOnlyMode(currentUser?.role);
+  const restrictToCoreViews = canvaOnlyMode || coreViewsOnlyMode;
   const initials = useMemo(
     () => userEmail.split("@")[0].slice(0, 2).toUpperCase(),
     [userEmail]
   );
-  const showManagement = hasRole("Admin") || hasRole("Coordinator");
 
-  const navItems = ENABLE_ONLY_CANVA
+  const navItems = canvaOnlyMode
     ? [{ label: "Canva", path: "/dashboard/canva" }]
+    : coreViewsOnlyMode
+      ? [
+          { label: "Inicio", path: "/dashboard" },
+          { label: "Canva", path: "/dashboard/canva" },
+        ]
     : [
         { label: "Inicio", path: "/dashboard" },
         { label: "Canva", path: "/dashboard/canva" },
@@ -201,7 +208,7 @@ const Header = () => {
                 {displayName}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              {isCoordinator && (
+              {!restrictToCoreViews && isCoordinator && (
                 <>
                   <DropdownMenuItem onClick={() => navigate("/monitoria-agentes")}>
                     <User className="w-4 h-4 mr-2" />
@@ -210,22 +217,18 @@ const Header = () => {
                   <DropdownMenuSeparator />
                 </>
               )}
-              {!ENABLE_ONLY_CANVA && (
+              {!restrictToCoreViews && isAdmin && (
                 <>
                   <DropdownMenuItem onClick={() => navigate("/knowledge-base")}>
                     <BookOpenText className="w-4 h-4 mr-2" />
                     Base de Conhecimento
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  {showManagement && (
-                    <>
-                      <DropdownMenuItem onClick={() => navigate("/admin")}>
-                        <Grid className="w-4 h-4 mr-2" />
-                        Gerenciamento
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
+                  <DropdownMenuItem onClick={() => navigate("/admin")}>
+                    <Grid className="w-4 h-4 mr-2" />
+                    Gerenciamento
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                 </>
               )}
                 <DropdownMenuItem

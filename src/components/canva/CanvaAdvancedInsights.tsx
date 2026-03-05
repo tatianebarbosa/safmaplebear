@@ -6,26 +6,12 @@ import { filterRecentTimeSeries } from '@/lib/chartUtils';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar, ReferenceLine } from 'recharts';
 import { AlertTriangle, Activity, Sparkles, Database } from 'lucide-react';
 
-type HistoryEvent = {
-  id: number;
-  timestamp: string;
-  tipo: string;
-  descricao: string;
-  usuario: string;
-  status: string;
-  metadados?: {
-    periodo?: string;
-    usuarios_afetados?: number;
-  };
-};
-
 const numberFormatter = new Intl.NumberFormat('pt-BR');
 
 export const CanvaAdvancedInsights = () => {
   const [loading, setLoading] = useState(true);
   const [timeData, setTimeData] = useState<TimeSeriesPoint[]>([]);
   const [modelRanking, setModelRanking] = useState<ModelUsage[]>([]);
-  const [history, setHistory] = useState<HistoryEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,15 +19,13 @@ export const CanvaAdvancedInsights = () => {
       setLoading(true);
       setError(null);
       try {
-        const [{ timeSeries }, models, historyData] = await Promise.all([
+        const [{ timeSeries }, models] = await Promise.all([
           loadUsageReport('12m'),
           loadModelUsageRanking('12m'),
-          fetch('/data/canva_history.json').then((res) => res.json()),
         ]);
         const cleanedSeries = filterRecentTimeSeries(timeSeries);
         setTimeData(cleanedSeries);
         setModelRanking(models.slice(0, 5));
-        setHistory(historyData ?? []);
       } catch (err) {
         setError('Nao foi possivel carregar os dados avancados no momento.');
       } finally {
@@ -151,28 +135,13 @@ export const CanvaAdvancedInsights = () => {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="rounded-xl shadow-sm border-border/40">
           <CardHeader>
-            <CardTitle>Historico de Coletas & Automacao</CardTitle>
-            <CardDescription>Monitore quando os dados foram atualizados e por quem</CardDescription>
+            <CardTitle>Evolução de Uso</CardTitle>
+            <CardDescription>Visão consolidada do comportamento de consumo ao longo do ano</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {history.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhuma coleta registrada.</p>
-            ) : (
-              history.map((event) => (
-                <div key={event.id} className="rounded-xl border p-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{new Date(event.timestamp).toLocaleString('pt-BR')}</span>
-                    <span className="text-xs text-muted-foreground">{event.tipo}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">{event.descricao}</p>
-                  {event.metadados?.periodo && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Periodo: {event.metadados.periodo}  Usuarios: {event.metadados.usuarios_afetados}
-                    </p>
-                  )}
-                </div>
-              ))
-            )}
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              O painel prioriza os uploads manuais de CSV e a análise de uso por período consolidado.
+            </p>
           </CardContent>
         </Card>
 
@@ -209,7 +178,7 @@ export const CanvaAdvancedInsights = () => {
             <li>Reforcar campanhas nos clusters com menor participacao, usando o comparativo da distribuicao.</li>
             <li>Oferecer reconhecimento aos criadores e escolas com melhor momentum para manter o ritmo.</li>
             <li>Planejar novas artes com base nos modelos mais consumidos, garantindo variedade por cluster.</li>
-            <li>Monitorar eventos do historico de coletas para identificar lacunas de atualizacao.</li>
+            <li>Incluir revisão mensal dos uploads de CSV para manter os dados atualizados.</li>
           </ul>
         </CardContent>
       </Card>
