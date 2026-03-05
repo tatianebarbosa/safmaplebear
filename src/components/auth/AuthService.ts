@@ -1,8 +1,9 @@
 // src/components/auth/AuthService.ts
+import { clearPersistedAuthState, useAuthStore } from "@/stores/authStore";
 
 export const authService = {
   logout: () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userEmail");
+    clearPersistedAuthState();
+    useAuthStore.getState().setCurrentUser(null);
   },
 };

@@ -20,8 +20,20 @@ import type { Role, User } from "@/types/tickets";
 const mapRole = (role?: string): Role => {
   const normalized = (role ?? "").trim().toLowerCase();
   if (normalized === "admin") return "Admin";
-  if (normalized === "coord" || normalized === "coordinator") return "Coordinator";
-  if (normalized === "agent") return "Agent";
+  if (
+    normalized === "coord" ||
+    normalized === "coordinator" ||
+    normalized === "coordenador"
+  ) {
+    return "Coordinator";
+  }
+  if (
+    normalized === "agent" ||
+    normalized === "agente" ||
+    normalized === "user"
+  ) {
+    return "Agent";
+  }
 
   console.warn(`[auth] Papel desconhecido recebido: "${role}". Usando "Agent" como padro.`);
   return "Agent";

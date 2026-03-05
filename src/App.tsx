@@ -122,6 +122,10 @@ const App = () => {
                   element={renderRestrictedRoute(<AssetsPage />)}
                 />
                 <Route
+                  path="/dashboard/ativos"
+                  element={renderRestrictedRoute(<Navigate to="/saf/ativos" replace />)}
+                />
+                <Route
                   path="/saf/ativos/:assetId"
                   element={renderRestrictedRoute(<AssetDetailPage />)}
                 />

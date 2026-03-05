@@ -138,6 +138,7 @@ export const login = async (data: LoginData): Promise<LoginResponse> => {
  */
 export const saveAuthToken = (token: string) => {
   localStorage.setItem("authToken", token);
+  localStorage.setItem("saf_auth_token", token);
 };
 
 /**
@@ -145,7 +146,7 @@ export const saveAuthToken = (token: string) => {
  * @returns O token de autenticao ou null se no existir.
  */
 export const getAuthToken = (): string | null => {
-  return localStorage.getItem("authToken");
+  return localStorage.getItem("authToken") || localStorage.getItem("saf_auth_token");
 };
 
 /**
@@ -153,6 +154,7 @@ export const getAuthToken = (): string | null => {
  */
 export const removeAuthToken = () => {
   localStorage.removeItem("authToken");
+  localStorage.removeItem("saf_auth_token");
 };
 
 /**
@@ -192,6 +194,7 @@ export const getCurrentUser = (): {
 
 export const logout = () => {
   removeAuthToken();
+  localStorage.removeItem("userEmail");
   try {
     localStorage.removeItem("saf_current_user");
   } catch (e) {}
