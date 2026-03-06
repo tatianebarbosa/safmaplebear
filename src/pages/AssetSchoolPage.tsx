@@ -63,7 +63,7 @@ const AssetSchoolPage = () => {
       } catch (error) {
         toast({
           title: "Erro ao carregar escola",
-          description: "Confirme se o CSV de escolas est dispon?vel em public/data.",
+          description: "Confirme se o CSV de escolas est disponível em public/data.",
           variant: "destructive",
         });
       } finally {
@@ -257,7 +257,7 @@ const AssetSchoolPage = () => {
               <div className="text-lg font-semibold">{defaultSafOwner}</div>
             )}
             <p className="text-xs text-muted-foreground mt-2">
-              Sugerido como respons?vel ao criar novos registros, mas pode ser ajustado em cada contato.
+              Sugerido como responsável ao criar novos registros, mas pode ser ajustado em cada contato.
             </p>
           </CardContent>
         </Card>

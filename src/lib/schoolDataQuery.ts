@@ -501,7 +501,7 @@ export const buildSchoolSafSummary = (school: SchoolData): string => {
     ? matchedMember.fullName
     : responsavel;
 
-  const clusterLabel = cluster || 'N?o informado';
+  const clusterLabel = cluster || 'Não informado';
 
   return `Responsavel SAF: ${responsibleLabel}; Cluster: ${clusterLabel}`;
 };

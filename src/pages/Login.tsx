@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
 import { Logos } from "@/assets/maplebear";
-import { login, saveAuthToken, saveUser } from "@/services/authService";
+import { getUserFromToken, login, saveAuthToken } from "@/services/authService";
 import { useAuthStore } from "@/stores/authStore";
 import userService from "@/services/userService";
 import type { Role, User } from "@/types/tickets";
@@ -35,7 +35,7 @@ const mapRole = (role?: string): Role => {
     return "Agent";
   }
 
-  console.warn(`[auth] Papel desconhecido recebido: "${role}". Usando "Agent" como padro.`);
+  console.warn(`[auth] Papel desconhecido recebido: "${role}". Usando "Agent" como padrão.`);
   return "Agent";
 };
 
@@ -49,7 +49,7 @@ const Login = () => {
   const canSubmit =
     username.trim().length > 0 && password.trim().length > 0 && !isLoading;
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     const trimmedUsername = username.trim();
     const trimmedPassword = password.trim();
@@ -64,7 +64,6 @@ const Login = () => {
       });
       saveAuthToken(response.token);
       localStorage.setItem("userEmail", response.user.username);
-      saveUser(response.user);
       try {
         userService.logAction({
           actor: response.user.username,
@@ -76,12 +75,15 @@ const Login = () => {
       }
 
       const setCurrentUser = useAuthStore.getState().setCurrentUser;
-      const appUser: User = {
-        id: response.user.id ?? response.user.username,
-        name: response.user.username,
-        email: response.user.username,
-        role: mapRole(response.user.role),
-      };
+      const tokenUser = getUserFromToken(response.token);
+      const appUser: User = tokenUser
+        ? { ...tokenUser, name: tokenUser.name || response.user.username }
+        : {
+            id: response.user.id ?? response.user.username,
+            name: response.user.username,
+            email: response.user.username,
+            role: mapRole(response.user.role),
+          };
       setCurrentUser(appUser);
 
       toast({
@@ -134,7 +136,7 @@ const Login = () => {
                   htmlFor="username"
                   className="text-sm font-semibold text-foreground/90"
                 >
-                  Usuário ou E-mail
+                  Usuário ou e-mail
                 </Label>
                 <Input
                   id="username"

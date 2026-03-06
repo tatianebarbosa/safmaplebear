@@ -37,7 +37,7 @@ export interface Ticket {
   diasAberto: number; // p/ badge de SLA
   status: TicketStatus;
   observacao: string;
-  createdBy?: string; // nome do usu?rio logado que criou
+  createdBy?: string; // nome do usuário logado que criou
   createdAt: string; // ISO
   updatedAt: string; // ISO
   resolvedAt?: string | null; // ISO quando resolvido, null se aberto

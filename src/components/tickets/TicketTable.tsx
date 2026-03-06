@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { KeyboardEvent, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,10 +67,10 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
 
   const getSLABadge = (diasAberto: number) => {
     if (diasAberto >= 15) {
-      return <Badge variant="destructive" className="text-xs">Crtico</Badge>;
+      return <Badge variant="destructive" className="text-xs">Crítico</Badge>;
     }
     if (diasAberto >= 8) {
-      return <Badge variant="warning" className="text-xs">Ateno</Badge>;
+      return <Badge variant="warning" className="text-xs">Atenção</Badge>;
     }
     return <Badge variant="outline" className="text-xs">Normal</Badge>;
   };
@@ -97,33 +97,33 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
 
   const getDueDateInfo = (dueDate?: string) => {
     if (!dueDate) return { text: '-', variant: 'outline' as const };
-    
+
     const now = new Date();
     const due = new Date(dueDate);
     const diffDays = differenceInDays(due, now);
-    
+
     if (diffDays < 0) {
-      return { 
-        text: `Atrasado ${Math.abs(diffDays)}d`, 
-        variant: 'destructive' as const 
+      return {
+        text: `Atrasado ${Math.abs(diffDays)}d`,
+        variant: 'destructive' as const
       };
     }
     if (diffDays === 0) {
-      return { 
-        text: 'Vence hoje', 
-        variant: 'default' as const 
+      return {
+        text: 'Vence hoje',
+        variant: 'default' as const
       };
     }
     if (diffDays <= 3) {
-      return { 
-        text: `${diffDays}d`, 
-        variant: 'secondary' as const 
+      return {
+        text: `${diffDays}d`,
+        variant: 'secondary' as const
       };
     }
-    
-    return { 
-      text: format(due, 'dd/MM/yyyy'), 
-      variant: 'outline' as const 
+
+    return {
+      text: format(due, 'dd/MM/yyyy'),
+      variant: 'outline' as const
     };
   };
 
@@ -141,7 +141,7 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
     diasAberto: "Dias",
     status: "Status",
     dueDate: "Vencimento",
-    observacao: "Observacao",
+    observacao: "Observação",
   };
   const canonicalAgent = (agent: Agente): Agente => {
     if (agent === "Rafha") return "Rafhael";
@@ -288,7 +288,7 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
       }
       case "observacao": {
         updateTicket(ticket.id, { observacao: value });
-        registerHistory("Observacao atualizada", { observacao: ticket.observacao }, { observacao: value });
+        registerHistory("Observação atualizada", { observacao: ticket.observacao }, { observacao: value });
         break;
       }
       default:
@@ -370,6 +370,15 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
     justification.trim().length > 0 &&
     !inlineInvalidValue;
 
+  const onEditableCellKeyDown =
+    (ticket: Ticket, field: EditableField) =>
+    (event: KeyboardEvent) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openInlineEdit(ticket, field);
+      }
+    };
+
   if (tickets.length === 0) {
     return (
       <>
@@ -387,117 +396,148 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
     <>
       <Card>
         <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Ticket</TableHead>
-              <TableHead>Agente</TableHead>
-              <TableHead>Dias</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Vencimento</TableHead>
-              <TableHead>Observao</TableHead>
-              <TableHead>Atualizado</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tickets.map((ticket) => {
-              const canEdit = canEditTicket(ticket);
-              const dueDateInfo = getDueDateInfo(ticket.dueDate);
-              
-              return (
-                <TableRow key={ticket.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm font-bold">
-                        {ticket.id}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Ticket</TableHead>
+                <TableHead>Agente</TableHead>
+                <TableHead>Dias</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Vencimento</TableHead>
+                <TableHead>Observação</TableHead>
+                <TableHead>Atualizado</TableHead>
+                <TableHead className="w-12"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tickets.map((ticket) => {
+                const canEdit = canEditTicket(ticket);
+                const dueDateInfo = getDueDateInfo(ticket.dueDate);
+
+                return (
+                  <TableRow key={ticket.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-bold">
+                          {ticket.id}
+                        </span>
+                        {getSLABadge(ticket.diasAberto)}
+                      </div>
+                    </TableCell>
+
+                    <TableCell
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openInlineEdit(ticket, "agente")}
+                      onKeyDown={onEditableCellKeyDown(ticket, "agente")}
+                      className="cursor-pointer"
+                      title="Clique para editar agente"
+                    >
+                      <span className="font-medium">{getAgentDisplayName(ticket.agente)}</span>
+                    </TableCell>
+
+                    <TableCell
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openInlineEdit(ticket, "diasAberto")}
+                      onKeyDown={onEditableCellKeyDown(ticket, "diasAberto")}
+                      className="cursor-pointer"
+                      title="Clique para editar dias em aberto"
+                    >
+                      <span className="text-sm">{ticket.diasAberto}</span>
+                    </TableCell>
+
+                    <TableCell
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openInlineEdit(ticket, "status")}
+                      onKeyDown={onEditableCellKeyDown(ticket, "status")}
+                      className="cursor-pointer"
+                      title="Clique para editar status"
+                    >
+                      {getStatusBadge(ticket.status)}
+                    </TableCell>
+
+                    <TableCell
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openInlineEdit(ticket, "dueDate")}
+                      onKeyDown={onEditableCellKeyDown(ticket, "dueDate")}
+                      className="cursor-pointer"
+                      title="Clique para editar vencimento"
+                    >
+                      <Badge variant={dueDateInfo.variant} className="text-xs">
+                        {dueDateInfo.text}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell
+                      className="max-w-xs cursor-pointer"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openInlineEdit(ticket, "observacao")}
+                      onKeyDown={onEditableCellKeyDown(ticket, "observacao")}
+                      title="Clique para editar observação"
+                    >
+                      <p className="text-sm text-muted-foreground truncate">
+                        {ticket.observacao}
+                      </p>
+                    </TableCell>
+
+                    <TableCell>
+                      <span className="text-xs text-muted-foreground">
+                        {format(new Date(ticket.updatedAt), 'dd/MM/yyyy HH:mm')}
                       </span>
-                      {getSLABadge(ticket.diasAberto)}
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell
-                    onDoubleClick={() => openInlineEdit(ticket, "agente")}
-                    className="cursor-pointer"
-                    title="Duplo clique para editar agente"
-                  >
-                    <span className="font-medium">{getAgentDisplayName(ticket.agente)}</span>
-                  </TableCell>
-                  
-                  <TableCell
-                    onDoubleClick={() => openInlineEdit(ticket, "diasAberto")}
-                    className="cursor-pointer"
-                    title="Duplo clique para editar dias em aberto"
-                  >
-                    <span className="text-sm">{ticket.diasAberto}</span>
-                  </TableCell>
-                  
-                  <TableCell
-                    onDoubleClick={() => openInlineEdit(ticket, "status")}
-                    className="cursor-pointer"
-                    title="Duplo clique para editar status"
-                  >
-                    {getStatusBadge(ticket.status)}
-                  </TableCell>
-                  
-                  <TableCell
-                    onDoubleClick={() => openInlineEdit(ticket, "dueDate")}
-                    className="cursor-pointer"
-                    title="Duplo clique para editar vencimento"
-                  >
-                    <Badge variant={dueDateInfo.variant} className="text-xs">
-                      {dueDateInfo.text}
-                    </Badge>
-                  </TableCell>
-                  
-                  <TableCell
-                    className="max-w-xs cursor-pointer"
-                    onDoubleClick={() => openInlineEdit(ticket, "observacao")}
-                    title="Duplo clique para editar observacao"
-                  >
-                    <p className="text-sm text-muted-foreground truncate">
-                      {ticket.observacao}
-                    </p>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(ticket.updatedAt), 'dd/MM/yyyy HH:mm')}
-                    </span>
-                  </TableCell>
-                  
-                  <TableCell>
-                    {canEdit && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon-sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => onOpenDetails(ticket)}>
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Ver detalhes
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
-                          </DropdownMenuItem>
-                          {ticket.status !== 'Resolvido' && (
-                            <DropdownMenuItem onClick={() => handleResolve(ticket)}>
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Resolver
+                    </TableCell>
+
+                    <TableCell>
+                      {canEdit && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon-sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => onOpenDetails(ticket)}>
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              Ver detalhes
                             </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                            <DropdownMenuItem onClick={() => openInlineEdit(ticket, "status")}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar status
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openInlineEdit(ticket, "agente")}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar agente
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openInlineEdit(ticket, "observacao")}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar observação
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openInlineEdit(ticket, "diasAberto")}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar dias em aberto
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openInlineEdit(ticket, "dueDate")}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar vencimento
+                            </DropdownMenuItem>
+                            {ticket.status !== 'Resolvido' && (
+                              <DropdownMenuItem onClick={() => handleResolve(ticket)}>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Resolver
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
       <Dialog open={!!inlineEdit} onOpenChange={(open) => !open && closeInlineEdit()}>
@@ -507,7 +547,7 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
               {inlineEdit ? `Editar ${fieldLabels[inlineEdit.field]}` : "Editar campo"}
             </DialogTitle>
             <DialogDescription>
-              {inlineEdit ? `Ticket ${inlineEdit.ticket.id}. Informe o novo valor e a justificativa; tudo sera registrado.` : ""}
+              {inlineEdit ? `Ticket ${inlineEdit.ticket.id}. Informe o novo valor e a justificativa; tudo será registrado.` : ""}
             </DialogDescription>
           </DialogHeader>
 
@@ -517,7 +557,7 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
                 <Label>{fieldLabels[inlineEdit.field]}</Label>
                 {renderInlineInput()}
                 {inlineInvalidValue && (
-                  <p className="text-xs text-destructive">Informe um numero valido.</p>
+                  <p className="text-xs text-destructive">Informe um número válido.</p>
                 )}
               </div>
               <div className="space-y-2">
@@ -526,11 +566,11 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
                   value={justification}
                   onChange={(e) => setJustification(e.target.value)}
                   rows={4}
-                  placeholder="Explique o motivo da alteracao"
+                  placeholder="Explique o motivo da alteração"
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                A justificativa sera salva no historico e nas notas do ticket.
+                A justificativa será salva no histórico e nas notas do ticket.
               </p>
             </div>
           )}
@@ -540,7 +580,7 @@ export const TicketTable = ({ tickets, onOpenDetails }: TicketTableProps) => {
               Cancelar
             </Button>
             <Button onClick={handleInlineSave} disabled={!canConfirmInline}>
-              Salvar alteracao
+              Salvar alteração
             </Button>
           </DialogFooter>
         </DialogContent>

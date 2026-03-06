@@ -436,7 +436,7 @@ const CoordinatorAgentMonitoringTab = () => {
     moveTicket(pendingMove.ticket.id, pendingMove.status);
     addNoteToTicket(pendingMove.ticket.id, {
       id: `move-${Date.now()}`,
-      author: coordinator?.fullName || "Coorden?o",
+      author: coordinator?.fullName || "Coordenação",
       content: `Mudana para ${pendingMove.status}: ${justification}`,
       createdAt: new Date().toISOString(),
     });

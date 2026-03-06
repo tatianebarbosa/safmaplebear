@@ -1,9 +1,11 @@
 import { Logos } from "@/assets/maplebear";
+import { SPREADSHEET_LINKS, CRM_LINKS } from "@/config/links";
 import { cn } from "@/lib/utils";
-import { Facebook, Instagram, Youtube } from "lucide-react";
+import { ExternalLink, Facebook, Instagram, Youtube } from "lucide-react";
 import React from "react";
-import { useAuthStore } from "@/stores/authStore";
 import { isCanvaOnlyMode, isCoreViewsOnlyMode } from "@/lib/accessPolicy";
+import { Link } from "react-router-dom";
+import { getUserFromToken } from "@/services/authService";
 
 interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
 
@@ -14,10 +16,11 @@ const socialLinks = [
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
-  const currentUserRole = useAuthStore((state) => state.currentUser?.role);
-  const canvaOnlyMode = isCanvaOnlyMode(currentUserRole);
-  const coreViewsOnlyMode = isCoreViewsOnlyMode(currentUserRole);
+  const roleForPolicy = getUserFromToken()?.role;
+  const canvaOnlyMode = isCanvaOnlyMode(roleForPolicy);
+  const coreViewsOnlyMode = isCoreViewsOnlyMode(roleForPolicy);
 
+  const links = [...SPREADSHEET_LINKS, ...CRM_LINKS];
   const navLinks = canvaOnlyMode
     ? [{ label: "Canva", href: "/dashboard/canva" }]
     : coreViewsOnlyMode
@@ -26,6 +29,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           { label: "Canva", href: "/dashboard/canva" },
         ]
     : [
+        { label: "Inicio", href: "/dashboard" },
         { label: "Canva", href: "/dashboard/canva" },
         { label: "Vouchers", href: "/dashboard/vouchers" },
         { label: "Ativos", href: "/saf/ativos" },
@@ -68,12 +72,26 @@ export const Footer = ({ className, ...props }: FooterProps) => {
 
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold sm:gap-4">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
-              href={link.href}
+              to={link.href}
               className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-white transition-all duration-200 hover:-translate-y-[1px] hover:border-white/30 hover:bg-white/10 hover:text-white"
-              style={{ color: "#ffffff" }}
             >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {links.map((link) => (
+            <a
+              key={`${link.label}-${link.href}`}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:-translate-y-[1px] hover:border-white/30 hover:bg-white/10 hover:text-white"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
               {link.label}
             </a>
           ))}

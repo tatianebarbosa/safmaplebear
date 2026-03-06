@@ -7,7 +7,7 @@ const LICENSE_FILE = '/data/licencas_canva.csv';
 const MEMBER_FILE_MAP: Record<UsagePeriod, string> = {
   // Amostragem principal: novembro/2025
   nov2025: '/data/member-novembro2025.csv',
-  // Demais períodos (mantidos para histórico/compatibilidade)
+  // Demais perÃ­odos (mantidos para histÃ³rico/compatibilidade)
   '7d': '/data/member-7dias06.csv',
   '30d': '/data/member-activity_BAE6mf-7t28_1761620400_1764298799_pt-BR.csv',
   '3m': '/data/member-activity_BAE6mf-7t28_1750561200_1758596399_pt-BR.csv',
@@ -293,7 +293,7 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
   const periodFieldCandidates = ['ultima atividade', 'ltima atividade', 'last activity', 'periodo', 'period'];
   const schoolNameFieldCandidates = ['escola', 'school', 'organizacao', 'organization', 'instituicao', 'institution', 'campus', 'org name', 'organizational unit'];
   const schoolIdFieldCandidates = ['escola id', 'escolaid', 'school id', 'id escola', 'school'];
-  const emailFieldCandidates = ['e-mail', 'email', 'usu?rio', 'user email', 'user'];
+  const emailFieldCandidates = ['e-mail', 'email', 'usuário', 'user email', 'user'];
   const roleFieldCandidates = ['funcao', 'role', 'categoria', 'category', 'cargo'];
   const designsCreatedFields = ['designs criados', 'designs created', 'created designs', 'total designs'];
   const designsPublishedFields = ['designs publicados', 'designs published', 'publicado', 'publicados', 'published designs'];
@@ -351,7 +351,7 @@ export const loadUsageReport = async (period: UsagePeriod = DEFAULT_USAGE_PERIOD
     entry.stats.designsShared += shared;
     entry.stats.designsViewed += views;
     entry.creators.push({
-      name: findField(row, ['membro', 'member', 'nome', 'name', 'usu?rio']),
+      name: findField(row, ['membro', 'member', 'nome', 'name', 'usuário']),
       email,
       designs: designsCreated,
       published: designsPublished,

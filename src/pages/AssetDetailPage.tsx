@@ -32,7 +32,7 @@ const AssetDetailPage = () => {
       } catch (error) {
         toast({
           title: "Erro ao carregar escolas",
-          description: "Confirme os CSVs em public/data (escolas.csv e usu?rios_updated.csv).",
+          description: "Confirme os CSVs em public/data (escolas.csv e usuários_updated.csv).",
           variant: "destructive",
         });
       } finally {
@@ -121,7 +121,7 @@ const AssetDetailPage = () => {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Defina respons?veis para organizar os contatos deste ativo.</p>
+            <p className="text-sm text-muted-foreground">Defina responsáveis para organizar os contatos deste ativo.</p>
           )}
         </div>
         <div className="flex items-center gap-3">

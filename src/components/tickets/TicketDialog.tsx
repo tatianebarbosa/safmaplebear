@@ -63,7 +63,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
   };
 
   const defaultAgente = (ticket?.agente || currentUser?.agente || (currentUser?.name as Agente) || agentes[0]) as Agente;
-  const defaultCreatedBy = ticket?.createdBy || currentUser?.name || currentUser?.agente || "Usu?rio logado";
+  const defaultCreatedBy = ticket?.createdBy || currentUser?.name || currentUser?.agente || "Usuário logado";
   const creationMoment = useMemo(() => (ticket?.createdAt ? new Date(ticket.createdAt) : new Date()), [ticket]);
 
   const [formData, setFormData] = useState({
@@ -82,7 +82,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
   const canEditAgent = isAdmin() || isCoordinator();
   const canEditTicket = isAdmin() || isCoordinator() || isCreator;
   const isReadOnly = isEditing && !canEditTicket;
-  const createdByDisplay = getAgentDisplayName(formData.createdBy) || formData.createdBy || "Usu?rio";
+  const createdByDisplay = getAgentDisplayName(formData.createdBy) || formData.createdBy || "Usuário";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +93,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
     }
 
     if (isReadOnly) {
-      toast.error("Voce n?o pode editar este ticket. Apenas quem criou, coordenador ou admin podem editar.");
+      toast.error("Voce não pode editar este ticket. Apenas quem criou, coordenador ou admin podem editar.");
       return;
     }
 
@@ -105,7 +105,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
       id: ticketId,
       dueDate: formData.dueDate?.toISOString(),
       diasAberto: ticket?.diasAberto ?? 0,
-      createdBy: formData.createdBy || currentUser?.name || currentUser?.agente || "Usu?rio logado",
+      createdBy: formData.createdBy || currentUser?.name || currentUser?.agente || "Usuário logado",
       createdAt: ticket?.createdAt || new Date().toISOString(),
       updatedAt: ticket?.updatedAt || new Date().toISOString(),
     };
@@ -129,7 +129,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
     setFormData({
       id: "",
       agente: (currentUser?.agente as Agente) || "Joao",
-      createdBy: currentUser?.name || currentUser?.agente || "Usu?rio logado",
+      createdBy: currentUser?.name || currentUser?.agente || "Usuário logado",
       status: "Pendente",
       priority: "Media",
       observacao: "",
@@ -211,7 +211,7 @@ export const TicketDialog = ({ open, onOpenChange, ticket }: TicketDialogProps) 
                 <>
                   <Input value={getAgentDisplayName(formData.agente) || formData.agente} disabled />
                   {!canEditAgent && (
-                    <p className="text-xs text-muted-foreground">Assumido automaticamente pelo usu?rio logado.</p>
+                    <p className="text-xs text-muted-foreground">Assumido automaticamente pelo usuário logado.</p>
                   )}
                 </>
               )}

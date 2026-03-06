@@ -26,6 +26,18 @@ const agentes: Agente[] = [
   "Fernanda",
 ];
 
+const isEditableTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) return false;
+  const tagName = target.tagName.toLowerCase();
+  return (
+    tagName === "input" ||
+    tagName === "textarea" ||
+    tagName === "select" ||
+    tagName === "option" ||
+    (target.getAttribute("contenteditable") ?? "").toLowerCase() === "true"
+  );
+};
+
 const TicketsPage = () => {
   const [view, setView] = useState<"kanban" | "table">("kanban");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -46,6 +58,7 @@ const TicketsPage = () => {
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      if (isEditableTarget(e.target)) return;
       if (e.ctrlKey || e.metaKey) return;
 
       switch (e.key.toLowerCase()) {
@@ -131,7 +144,7 @@ const TicketsPage = () => {
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por ID ou observacao..."
+                placeholder="Buscar por ID ou observação..."
                 value={filters.search || ""}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                 className="pl-10"
@@ -219,7 +232,7 @@ const TicketsPage = () => {
       </div>
 
       <div className="text-xs text-muted-foreground">
-        <span className="font-medium">Atalhos:</span> N (novo)  K (kanban)  T (tabela)
+        <span className="font-medium">Atalhos:</span> N (novo) · K (kanban) · T (tabela)
       </div>
 
       <TicketDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />

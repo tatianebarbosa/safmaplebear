@@ -205,7 +205,7 @@ export function changePassword(
 
   const users = readUsers();
   const user = users.find((u) => u.id === id);
-  if (!user) throw new Error("Usu?rio n?o encontrado");
+  if (!user) throw new Error("Usuário não encontrado");
   user.password = trimmed;
   writeUsers(users);
   logAction({

@@ -107,8 +107,8 @@ export const AssetCreateDialog = ({
     if (!newOwner) return;
     if (owners.length >= 3) {
       toast({
-        title: "Limite de respons?veis",
-        description: "Adicione no mximo 3 respons?veis pelo ativo.",
+        title: "Limite de responsáveis",
+        description: "Adicione no mximo 3 responsáveis pelo ativo.",
         variant: "destructive",
       });
       return;
@@ -197,7 +197,7 @@ export const AssetCreateDialog = ({
     if (!trimmedName) {
       toast({
         title: "Informe um nome para o ativo",
-        description: "Ex.: Ativo Canva Novembro, Ativo Reajuste 2025, Ativo Licenças SLM+",
+        description: "Ex.: Ativo Canva Novembro, Ativo Reajuste 2025, Ativo LicenÃ§as SLM+",
         variant: "destructive",
       });
       return;

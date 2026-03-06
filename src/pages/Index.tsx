@@ -4,11 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
+import { isCoreViewsOnlyMode } from "@/lib/accessPolicy";
 import BannerECE2 from "@/assets/bannerinicial/ECE (2).png";
 import BannerECE from "@/assets/bannerinicial/ECE.png";
 import BannerELE from "@/assets/bannerinicial/ELE.png";
 import BannerHS from "@/assets/bannerinicial/HS.png";
 import BannerMY from "@/assets/bannerinicial/MY.png";
+import { getUserFromToken } from "@/services/authService";
 import {
   Activity,
   ArrowUpRight,
@@ -23,6 +25,9 @@ import {
 const Index = () => {
   const navigate = useNavigate();
   const [currentBanner, setCurrentBanner] = useState(0);
+  const [bannerAutoplay, setBannerAutoplay] = useState(true);
+  const roleForPolicy = getUserFromToken()?.role;
+  const coreViewsOnlyMode = isCoreViewsOnlyMode(roleForPolicy);
 
   const bannerImages = [
     { id: "ece2", src: BannerECE2, alt: "Banner ECE 2" },
@@ -33,35 +38,41 @@ const Index = () => {
   ];
 
   useEffect(() => {
-    if (!bannerImages.length) return;
+    if (!bannerImages.length || !bannerAutoplay) return;
+
     const interval = setInterval(() => {
       setCurrentBanner((prev) => (prev + 1) % bannerImages.length);
     }, 20000);
+
     return () => clearInterval(interval);
-  }, [bannerImages.length]);
+  }, [bannerImages.length, bannerAutoplay]);
 
   const quickActions = [
     {
       title: "Painel Canva",
-      description: "Governanca de licen?as, conformidade e uso em um so lugar.",
+      description: "Governança de licenças, conformidade e uso em um só lugar.",
       icon: <Palette className="w-5 h-5 text-primary" />,
       action: "Abrir Canva",
       path: "/dashboard/canva",
     },
-    {
-      title: "Tickets",
-      description: "Acompanhe chamados, status e priorizacoes da rede.",
-      icon: <Ticket className="w-5 h-5 text-primary" />,
-      action: "Ver tickets",
-      path: "/tickets",
-    },
-    {
-      title: "Base de Conhecimento",
-      description: "Playbooks, tutoriais e comunicados oficiais da SAF.",
-      icon: <BookOpen className="w-5 h-5 text-primary" />,
-      action: "Abrir base",
-      path: "/knowledge-base",
-    },
+    ...(coreViewsOnlyMode
+      ? []
+      : [
+          {
+            title: "Tickets",
+            description: "Acompanhe chamados, status e priorizações da rede.",
+            icon: <Ticket className="w-5 h-5 text-primary" />,
+            action: "Ver tickets",
+            path: "/tickets",
+          },
+          {
+            title: "Base de Conhecimento",
+            description: "Playbooks, tutoriais e comunicados oficiais da SAF.",
+            icon: <BookOpen className="w-5 h-5 text-primary" />,
+            action: "Abrir base",
+            path: "/knowledge-base",
+          },
+        ]),
   ];
 
   const highlightStats = [
@@ -74,11 +85,12 @@ const Index = () => {
     <div className="flex flex-col min-h-screen bg-background">
       <main className="flex-grow w-full">
         <section className="bg-muted/40 border-b border-border/60">
-          <div
-            className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
-            style={{ maxWidth: 650 }}
-          >
-            <div className="relative overflow-hidden rounded-xl border bg-card shadow-[var(--shadow-card)] h-[180px] sm:h-[220px] md:h-[260px]">
+          <div className="layout-wide mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div
+              className="relative overflow-hidden rounded-xl border bg-card shadow-[var(--shadow-card)] h-[180px] sm:h-[220px] md:h-[260px]"
+              onMouseEnter={() => setBannerAutoplay(false)}
+              onMouseLeave={() => setBannerAutoplay(true)}
+            >
               {bannerImages.map((banner, index) => (
                 <img
                   key={banner.id}
@@ -90,14 +102,26 @@ const Index = () => {
                   loading="lazy"
                 />
               ))}
+              <div className="absolute right-3 bottom-3 flex items-center gap-1.5">
+                {bannerImages.map((banner, index) => (
+                  <button
+                    key={banner.id}
+                    type="button"
+                    aria-label={`Exibir banner ${banner.alt}`}
+                    className={`h-2.5 w-2.5 rounded-full transition-all ${
+                      index === currentBanner
+                        ? "bg-primary scale-110"
+                        : "bg-white/70 hover:bg-white"
+                    }`}
+                    onClick={() => setCurrentBanner(index)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        <div
-          className="mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10 py-8 sm:py-10"
-          style={{ maxWidth: 650 }}
-        >
+        <div className="layout-wide mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10 py-8 sm:py-10">
           <section className="grid md:grid-cols-[1.05fr_0.95fr] gap-5 lg:gap-6 items-start">
             <Card className="rounded-xl border shadow-[var(--shadow-card)]">
               <CardContent className="p-6 sm:p-8 space-y-6">
@@ -110,7 +134,7 @@ const Index = () => {
                     Bem-vindo a central integrada da SAF
                   </h1>
                   <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
-                    Acompanhe licen?as Canva, tickets e conhecimento em um so lugar. Escolha para onde ir ou veja os destaques.
+                    Acompanhe licenças Canva, tickets e conhecimento em um só lugar. Escolha para onde ir ou veja os destaques.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -122,24 +146,28 @@ const Index = () => {
                     Ir para Canva
                     <ArrowUpRight className="w-4 h-4" />
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="gap-2 border-primary/40 text-primary hover:bg-primary/5"
-                    onClick={() => navigate("/tickets")}
-                  >
-                    Abrir tickets
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="gap-2 text-muted-foreground hover:text-foreground"
-                    onClick={() => navigate("/knowledge-base")}
-                  >
-                    Base de conhecimento
-                  </Button>
+                  {!coreViewsOnlyMode ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        className="gap-2 border-primary/40 text-primary hover:bg-primary/5"
+                        onClick={() => navigate("/tickets")}
+                      >
+                        Abrir tickets
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="gap-2 text-muted-foreground hover:text-foreground"
+                        onClick={() => navigate("/knowledge-base")}
+                      >
+                        Base de conhecimento
+                      </Button>
+                    </>
+                  ) : null}
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm uppercase tracking-wide text-muted-foreground">Resumo rapido</p>
+                    <p className="text-sm uppercase tracking-wide text-muted-foreground">Resumo rápido</p>
                     <Badge variant="secondary" className="bg-primary/10 text-primary border-none">
                       Hoje
                     </Badge>
@@ -194,7 +222,7 @@ const Index = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ShieldCheck className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-semibold text-foreground">Saude das licen?as</span>
+                      <span className="text-sm font-semibold text-foreground">Saúde das licenças</span>
                     </div>
                     <span className="text-sm font-semibold text-primary">79,6%</span>
                   </div>
@@ -202,7 +230,7 @@ const Index = () => {
                     <div className="h-full bg-primary rounded-full" style={{ width: "80%" }} />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Continue convidando usu?rios com dominio autorizado para elevar a conformidade.
+                    Continue convidando usuários com domínio autorizado para elevar a conformidade.
                   </p>
                 </div>
                 <div className="flex justify-end">
@@ -218,8 +246,8 @@ const Index = () => {
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm uppercase tracking-wide text-muted-foreground">Acesso rapido</p>
-                <h2 className="text-2xl font-bold text-foreground">O que voce precisa agora?</h2>
+                <p className="text-sm uppercase tracking-wide text-muted-foreground">Acesso rápido</p>
+                <h2 className="text-2xl font-bold text-foreground">O que você precisa agora?</h2>
               </div>
               <Badge variant="outline" className="rounded-full border-primary/30 text-primary bg-primary/5">
                 Curadoria SAF

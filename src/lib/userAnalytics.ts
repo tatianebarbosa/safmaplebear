@@ -109,7 +109,7 @@ export function getUsersBySchool(users: UserData[]): Map<string, UserData[]> {
 }
 
 export function getClusterSAFResponsibles(users: UserData[]): UserData[] {
-  // Filtrar usu?rios que podem ser respons?veis SAF baseado no email/funo
+  // Filtrar usuários que podem ser responsáveis SAF baseado no email/funo
   return users.filter(user => 
     user.email.includes('@seb.com.br') || 
     user.email.includes('@sebsa.com.br') ||
@@ -122,11 +122,11 @@ export function getClusterSAFResponsibles(users: UserData[]): UserData[] {
 
 export async function loadUserData(): Promise<UserData[]> {
   try {
-    const response = await fetch('/data/usu?rios_updated.csv');
+    const response = await fetch('/data/usuários_updated.csv');
     const csvContent = await response.text();
     return parseUsersCSV(csvContent);
   } catch (error) {
-    console.error('Erro ao carregar dados dos usu?rios:', error);
+    console.error('Erro ao carregar dados dos usuários:', error);
     return [];
   }
 }

@@ -164,11 +164,11 @@ export function generateUserReport(totalUsers: number, schoolData: any[]) {
   
   doc.autoTable({
     startY: 50,
-    head: [['Escola', 'Cluster', 'Usuários', 'Licenças Usadas', 'Licenças Total', 'Utilização']],
+    head: [['Escola', 'Cluster', 'UsuÃ¡rios', 'LicenÃ§as Usadas', 'LicenÃ§as Total', 'UtilizaÃ§Ã£o']],
     body: schoolUserData,
     styles: { fontSize: 8 },
     headStyles: { fillColor: [155, 89, 182] }
   });
   
-  doc.save(`relatorio_usu?rios_${new Date().toISOString().split('T')[0]}.pdf`);
+  doc.save(`relatorio_usuários_${new Date().toISOString().split('T')[0]}.pdf`);
 }

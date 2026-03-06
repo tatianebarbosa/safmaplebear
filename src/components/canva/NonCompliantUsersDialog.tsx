@@ -211,7 +211,7 @@ export const NonCompliantUsersDialog = ({
             <div className="rounded-lg border bg-muted/30 p-2 space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Filter className="h-4 w-4" />
-                <span>Filtrar por dom?nio</span>
+                <span>Filtrar por domínio</span>
                 {(searchTerm || domainFilter) && (
                   <Button size="sm" variant="ghost" onClick={handleClearFilters} className="h-8 px-2">
                     Limpar
@@ -220,7 +220,7 @@ export const NonCompliantUsersDialog = ({
               </div>
               <div className="flex max-h-20 flex-wrap gap-2 overflow-y-auto pr-1">
                 {topDomains.length === 0 && (
-                  <span className="text-xs text-muted-foreground">Nenhum dom?nio encontrado</span>
+                  <span className="text-xs text-muted-foreground">Nenhum domínio encontrado</span>
                 )}
                 {topDomains.map((domain) => (
                   <Button
@@ -244,7 +244,7 @@ export const NonCompliantUsersDialog = ({
               <div className="space-y-1 flex-1 min-w-[220px]">
                 <p className="text-sm font-semibold">Contato ativo com escolas</p>
                 <p className="text-xs text-muted-foreground">
-                  Envie um e-mail pedindo ajuste para manter apenas 2 licen?as.
+                  Envie um e-mail pedindo ajuste para manter apenas 2 licenças.
                 </p>
               </div>
               {schoolOptions.length > 0 && (
@@ -278,11 +278,11 @@ export const NonCompliantUsersDialog = ({
                   </Badge>
                 ))}
                 {selectedSchool.users.length > 4 && (
-                  <span className="text-[11px]">+{selectedSchool.users.length - 4} usu?rios</span>
+                  <span className="text-[11px]">+{selectedSchool.users.length - 4} usuários</span>
                 )}
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground">Nenhuma escola com usu?rios listados.</p>
+              <p className="text-xs text-muted-foreground">Nenhuma escola com usuários listados.</p>
             )}
           </div>
 
@@ -296,7 +296,7 @@ export const NonCompliantUsersDialog = ({
           <ScrollArea className="h-[320px] rounded-b-lg border">
             {filteredUsers.length === 0 ? (
               <div className="p-6 text-center text-sm text-muted-foreground">
-                Nenhum usu?rio corresponde aos filtros atuais.
+                Nenhum usuário corresponde aos filtros atuais.
               </div>
             ) : (
               <div className="divide-y">

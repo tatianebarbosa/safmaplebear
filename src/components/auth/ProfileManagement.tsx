@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DELAY_PROFILE_UPDATE } from "@/lib/constants";
 import { User, Users, Key, Trash2, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthStore } from "@/stores/authStore";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +59,8 @@ interface PendingUser {
 }
 
 const ProfileManagement = () => {
+  const authUser = useAuthStore((state) => state.currentUser);
+  const setAuthUser = useAuthStore((state) => state.setCurrentUser);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
   const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
@@ -75,26 +78,42 @@ const ProfileManagement = () => {
     confirmPassword: "",
   });
 
-  // Carregar dados do usu?rio atual e listas
+  const buildCurrentProfile = (): UserProfile | null => {
+    if (!authUser) return null;
+
+    const now = new Date().toISOString();
+    const role: UserProfile["role"] =
+      authUser.role === "Admin"
+        ? "admin"
+        : authUser.role === "Coordinator"
+          ? "maintenance"
+          : "user";
+
+    return {
+      id: authUser.id,
+      name: authUser.name,
+      email: authUser.email,
+      role,
+      status: "active",
+      createdAt: now,
+      lastLogin: now,
+      sessionExpiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+  };
+
+  // Carregar dados do usuário atual e listas
   useEffect(() => {
-    loadUserData();
+    const currentProfile = buildCurrentProfile();
+    setCurrentUser(currentProfile);
+    setFormData((prev) => ({
+      ...prev,
+      name: currentProfile?.name || "",
+      email: currentProfile?.email || "",
+    }));
+
     loadPendingUsers();
     loadAllUsers();
-  }, []);
-
-
-  const loadUserData = () => {
-    const userData = localStorage.getItem("saf_current_user");
-    if (userData) {
-      const user = JSON.parse(userData);
-      setCurrentUser(user);
-      setFormData({
-        ...formData,
-        name: user.name,
-        email: user.email,
-      });
-    }
-  };
+  }, [authUser]);
 
   const loadPendingUsers = () => {
     const pending = localStorage.getItem("saf_pending_users");
@@ -110,7 +129,7 @@ const ProfileManagement = () => {
     }
   };
 
-  // Verificar se dom?nio  permitido
+  // Verificar se domínio  permitido
   const isAllowedDomain = (email: string): boolean => {
     const allowedDomains = [
       "@maplebear.com.br",
@@ -132,7 +151,7 @@ const ProfileManagement = () => {
 
     if (!isAllowedDomain(formData.email)) {
       toast({
-        title: "Email n?o permitido",
+        title: "Email não permitido",
         description: "Use emails corporativos @maplebear, @mbcentral, @seb ou @sebsa",
         variant: "destructive",
       });
@@ -152,7 +171,13 @@ const ProfileManagement = () => {
     };
 
     setCurrentUser(updatedUser);
-    localStorage.setItem("saf_current_user", JSON.stringify(updatedUser));
+    if (authUser) {
+      setAuthUser({
+        ...authUser,
+        name: updatedUser.name,
+        email: updatedUser.email,
+      });
+    }
     localStorage.setItem("userEmail", formData.email);
 
     toast({
@@ -200,7 +225,7 @@ const ProfileManagement = () => {
     setIsPasswordOpen(false);
   };
 
-  // Aprovar usu?rio pendente
+  // Aprovar usuário pendente
   const approveUser = (userId: string) => {
     const user = pendingUsers.find((u) => u.id === userId);
     if (!user) return;
@@ -235,7 +260,7 @@ const ProfileManagement = () => {
     });
   };
 
-  // Negar usu?rio pendente
+  // Negar usuário pendente
   const [denyUserId, setDenyUserId] = useState<string | null>(null);
 
   const handleDenyUser = () => {
@@ -322,7 +347,7 @@ const ProfileManagement = () => {
         <div>
           <h1 className="text-3xl font-bold">Gerenciamento de Perfil</h1>
           <p className="text-muted-foreground">
-            Configure seu perfil e gerencie usu?rios
+            Configure seu perfil e gerencie usuários
           </p>
         </div>
       </div>
@@ -343,7 +368,7 @@ const ProfileManagement = () => {
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
-          {/* Perfil do usu?rio atual */}
+          {/* Perfil do usuário atual */}
           <Card>
             <CardHeader>
               <CardTitle>Informaes do Perfil</CardTitle>
@@ -517,14 +542,14 @@ const ProfileManagement = () => {
               <CardHeader>
                 <CardTitle>Usurios Pendentes de Aprovao</CardTitle>
                 <CardDescription>
-                  Analise e aprove novos usu?rios que solicitaram acesso
+                  Analise e aprove novos usuários que solicitaram acesso
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {pendingUsers.length === 0 ? (
                     <p className="text-center text-muted-foreground py-8">
-                      Nenhum usu?rio pendente de aprovao
+                      Nenhum usuário pendente de aprovao
                     </p>
                   ) : (
                     pendingUsers.map((user) => (
@@ -577,7 +602,7 @@ const ProfileManagement = () => {
                                   Tem certeza que deseja negar o acesso?
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Esta ao remover o usu?rio da lista de
+                                  Esta ao remover o usuário da lista de
                                   pendentes. Ele precisar refazer a
                                   solicitao.
                                 </AlertDialogDescription>
@@ -612,7 +637,7 @@ const ProfileManagement = () => {
                   <div>
                     <CardTitle>Usurios do Sistema</CardTitle>
                     <CardDescription>
-                      Gerencie todos os usu?rios ativos
+                      Gerencie todos os usuários ativos
                     </CardDescription>
                   </div>
                   <Dialog open={newUserOpen} onOpenChange={setNewUserOpen}>
@@ -626,7 +651,7 @@ const ProfileManagement = () => {
                       <DialogHeader>
                         <DialogTitle>Criar Novo Usurio</DialogTitle>
                         <DialogDescription>
-                          Adicione um novo usu?rio ao sistema
+                          Adicione um novo usuário ao sistema
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">

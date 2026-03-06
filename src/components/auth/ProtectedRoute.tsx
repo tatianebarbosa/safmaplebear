@@ -1,8 +1,13 @@
-// src/components/auth/ProtectedRoute.tsx
 import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isAuthenticated } from "@/services/authService";
+import {
+  clearAuthStateStorage,
+  getAuthToken,
+  getUserFromToken,
+  isAuthenticated,
+} from "@/services/authService";
+import { useAuthStore } from "@/stores/authStore";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -14,16 +19,25 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [isAuth, setIsAuth] = useState(false);
 
   useEffect(() => {
-    // Verificar autenticação de forma assíncrona
-    const checkAuth = () => {
-      setIsAuth(isAuthenticated());
-      setIsLoading(false);
-    };
+    const token = getAuthToken();
+    const valid = isAuthenticated();
 
-    // Simular pequeno delay para evitar flickering
-    const timer = setTimeout(checkAuth, 50);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!valid) {
+      clearAuthStateStorage();
+      useAuthStore.getState().setCurrentUser(null);
+      setIsAuth(false);
+      setIsLoading(false);
+      return;
+    }
+
+    const tokenUser = getUserFromToken(token);
+    if (tokenUser) {
+      useAuthStore.getState().setCurrentUser(tokenUser);
+    }
+
+    setIsAuth(Boolean(token && valid));
+    setIsLoading(false);
+  }, [location.pathname, location.search]);
 
   if (isLoading) {
     return <Skeleton className="h-screen w-full" />;

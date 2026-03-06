@@ -2,7 +2,7 @@
  * Hook customizado para auto-refresh de dados
  * 
  * Este hook implementa polling automtico para manter os dados
- * sincronizados sem necessidade de interveno manual do usu?rio.
+ * sincronizados sem necessidade de interveno manual do usuário.
  */
 
 import { useEffect, useRef, useCallback } from 'react';

@@ -112,7 +112,7 @@ const AssetsPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{assets.length}</div>
-            <p className="text-xs text-muted-foreground">Menus ativos dispon?veis</p>
+            <p className="text-xs text-muted-foreground">Menus ativos disponíveis</p>
           </CardContent>
         </Card>
         <Card>

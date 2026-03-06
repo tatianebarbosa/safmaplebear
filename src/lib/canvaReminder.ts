@@ -61,7 +61,7 @@ export const showCanvaSyncReminder = () => {
             Replique esta alterao no Canva agora
           </div>
           <div style="font-size: 15px; color: #475569; line-height: 1.4;">
-            Finalize esta mesma ao diretamente no Canva para manter licen?as e usu?rios alinhados.
+            Finalize esta mesma ao diretamente no Canva para manter licenças e usuários alinhados.
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@ export const showCanvaSyncReminder = () => {
 
   const closeButton = wrapper.querySelector<HTMLButtonElement>("[data-canva-close]");
   closeButton?.addEventListener("click", () => {
-    // Apenas fecha; nÃ£o redireciona para evitar perder o estado da tela.
+    // Apenas fecha; nÃƒÂ£o redireciona para evitar perder o estado da tela.
     closeModal();
   });
 
@@ -125,5 +125,5 @@ export const showCanvaSyncReminder = () => {
   document.addEventListener("keydown", onEsc);
   document.body.appendChild(wrapper);
 
-  // SÃ³ abre quando o usuÃ¡rio clicar em "Abrir Canva" (evita quebra de contexto/refresh).
+  // SÃƒÂ³ abre quando o usuÃƒÂ¡rio clicar em "Abrir Canva" (evita quebra de contexto/refresh).
 };

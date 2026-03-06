@@ -45,6 +45,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TruncatedText } from "@/components/ui/truncated-text";
 
 type CampaignKey = string;
 
@@ -191,16 +192,16 @@ const VoucherDashboard = () => {
     return statuses.sort();
   };
 
-  const getStatusBadgeColor = (status: string) => {
+  const getStatusBadgeClass = (status: string) => {
     switch (status.toLowerCase()) {
       case "ativa":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+        return "status-badge status-active";
       case "inativa":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+        return "status-badge status-inactive";
       case "implantando":
-        return "bg-primary-light/10 text-primary-dark border border-primary-light/20";
+        return "status-badge status-warning";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
+        return "status-badge border border-border text-muted-foreground";
     }
   };
 
@@ -307,10 +308,19 @@ const VoucherDashboard = () => {
     handleQuantityChange(schoolId, current + delta);
   };
 
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSelectedCluster("all");
+    setSelectedStatus("all");
+    setVoucherEligible("all");
+    setVoucherSent("all");
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="flex flex-col items-center justify-center gap-3 min-h-[60vh] text-center" role="status" aria-live="polite">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" aria-hidden="true" />
+        <p className="text-sm text-muted-foreground">Carregando dados dos vouchers...</p>
       </div>
     );
   }
@@ -320,24 +330,28 @@ const VoucherDashboard = () => {
 
   return (
     <div className="layout-wide w-full py-8 space-y-8">
-      <div className="rounded-2xl border bg-muted/40 p-6 shadow-sm">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="rounded-2xl border bg-muted/40 p-4 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
           <div className="space-y-1">
             <p className="text-sm font-semibold text-primary">Campanhas de voucher</p>
-            <h1 className="text-3xl font-bold">Vouchers SAF</h1>
-            <p className="text-muted-foreground">
+            <h1 className="heading-responsive-1">Vouchers SAF</h1>
+            <p className="text-muted-foreground max-w-2xl">
               Crie campanhas de voucher, selecione escolas e acompanhe entregas de cada iniciativa.
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button className="bg-destructive text-white hover:bg-destructive/90" onClick={openCampaignDialog}>
+          <div className="flex w-full sm:w-auto">
+            <Button
+              className="bg-destructive text-white hover:bg-destructive/90 btn-touch"
+              onClick={openCampaignDialog}
+              aria-label="Abrir modal para criar nova campanha"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Criar campanha
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        <div className="grid-responsive-3 mt-6">
           <Card className="border-dashed border-muted-foreground/20 shadow-none">
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
@@ -380,36 +394,57 @@ const VoucherDashboard = () => {
           </Card>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap mt-6">
-          <div className="inline-flex rounded-md border bg-background p-1 w-fit">
+        <div className="filters-responsive mt-6">
+          <div className="filter-item-responsive inline-flex rounded-md border bg-background p-1 w-fit overflow-x-auto">
             {campaigns.map((year) => (
               <Button
                 key={year}
                 variant={activeCampaign === year.toString() ? "secondary" : "ghost"}
                 size="sm"
-                className="rounded-sm"
+                className="rounded-sm btn-touch-sm"
                 onClick={() => handleSelectCampaign(year)}
+                aria-label={`Selecionar campanha ${getCampaignLabel(year)}`}
               >
                 {getCampaignLabel(year)}
               </Button>
             ))}
           </div>
-          <Button variant="outline" size="sm" onClick={openCampaignDialog}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={openCampaignDialog}
+            className="btn-touch-sm"
+            aria-label="Abrir formulário para nova campanha"
+          >
             + Nova campanha
           </Button>
-          <Button variant="outline" size="sm" onClick={() => loadData(activeCampaign)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => loadData(activeCampaign)}
+            className="btn-touch-sm"
+            aria-label="Atualizar lista de dados da campanha selecionada"
+          >
             Atualizar dados
           </Button>
-          <Button variant="outline" size="sm" onClick={() => exportVoucherReport(filteredSchools)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportVoucherReport(filteredSchools)}
+            className="btn-touch-sm"
+            aria-label="Exportar dados filtrados para CSV"
+            disabled={filteredSchools.length === 0}
+          >
             <Download className="w-4 h-4 mr-2" />
             Exportar CSV
           </Button>
-          <div className="ml-auto inline-flex rounded-md border bg-background p-1">
+          <div className="filter-item-responsive ml-0 sm:ml-auto inline-flex rounded-md border bg-background p-1">
             <Button
               size="sm"
               variant={viewMode === "cards" ? "secondary" : "ghost"}
-              className="rounded-sm"
+              className="rounded-sm btn-touch-sm"
               onClick={() => setViewMode("cards")}
+              aria-label="Visualizar escolas em cartões"
             >
               <Grid2x2 className="w-4 h-4 mr-1" />
               Cards
@@ -417,8 +452,9 @@ const VoucherDashboard = () => {
             <Button
               size="sm"
               variant={viewMode === "table" ? "secondary" : "ghost"}
-              className="rounded-sm"
+              className="rounded-sm btn-touch-sm"
               onClick={() => setViewMode("table")}
+              aria-label="Visualizar escolas em tabela"
             >
               <TableIcon className="w-4 h-4 mr-1" />
               Planilha
@@ -427,7 +463,7 @@ const VoucherDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="stats-grid">
         <StatsCard
           title="Escolas"
           value={stats.totalSchools.toString()}
@@ -449,24 +485,25 @@ const VoucherDashboard = () => {
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-4 items-end">
-            <div className="space-y-2">
+          <div className="filters-responsive">
+            <div className="space-y-2 filter-item-responsive">
               <Label htmlFor="search">Buscar</Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="search"
                   placeholder="Nome, ID ou codigo"
-                  className="pl-9 w-64"
+                  className="pl-9 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  aria-label="Filtrar escolas por nome, ID ou código"
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Cluster</Label>
+            <div className="space-y-2 filter-item-responsive">
+              <Label htmlFor="cluster-filter">Cluster</Label>
               <Select value={selectedCluster} onValueChange={setSelectedCluster}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger id="cluster-filter" className="w-full">
                   <SelectValue placeholder="Cluster" />
                 </SelectTrigger>
                 <SelectContent>
@@ -479,10 +516,10 @@ const VoucherDashboard = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
+            <div className="space-y-2 filter-item-responsive">
+              <Label htmlFor="status-filter">Status</Label>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger id="status-filter" className="w-full">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -495,10 +532,10 @@ const VoucherDashboard = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Elegível</Label>
+            <div className="space-y-2 filter-item-responsive">
+              <Label htmlFor="eligible-filter">Elegível</Label>
               <Select value={voucherEligible} onValueChange={setVoucherEligible}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger id="eligible-filter" className="w-full">
                   <SelectValue placeholder="Elegível" />
                 </SelectTrigger>
                 <SelectContent>
@@ -508,10 +545,10 @@ const VoucherDashboard = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Enviado</Label>
+            <div className="space-y-2 filter-item-responsive">
+              <Label htmlFor="sent-filter">Enviado</Label>
               <Select value={voucherSent} onValueChange={setVoucherSent}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger id="sent-filter" className="w-full">
                   <SelectValue placeholder="Enviado" />
                 </SelectTrigger>
                 <SelectContent>
@@ -530,17 +567,32 @@ const VoucherDashboard = () => {
           <CardTitle>Escolas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearFilters}
+              className="btn-touch-sm"
+              aria-label="Limpar filtros"
+            >
+              Limpar filtros
+            </Button>
+          </div>
           {viewMode === "cards" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid-responsive-3">
               {filteredSchools.map((school) => (
                 <Card key={school.id} className="shadow-sm">
                   <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between gap-3">
                       <div>
-                        <CardTitle className="text-lg">{school.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{school.cluster}</p>
+                        <CardTitle className="text-lg leading-snug">
+                          <TruncatedText text={school.name} maxWidth="100%" showTooltip lines={2} />
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          <TruncatedText text={school.cluster || ""} maxWidth="200px" showTooltip />
+                        </p>
                       </div>
-                      <Badge className={getStatusBadgeColor(school.status)}>{school.status}</Badge>
+                      <Badge className={getStatusBadgeClass(school.status)}>{school.status}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
@@ -558,8 +610,9 @@ const VoucherDashboard = () => {
                             type="button"
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8"
+                            className="icon-btn-touch-sm"
                             onClick={() => handleQuantityDelta(school.id, -1)}
+                            aria-label={`Diminuir quantidade de vouchers da escola ${school.name}`}
                           >
                             <Minus className="w-4 h-4" />
                           </Button>
@@ -574,8 +627,9 @@ const VoucherDashboard = () => {
                             type="button"
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8"
+                            className="icon-btn-touch-sm"
                             onClick={() => handleQuantityDelta(school.id, 1)}
+                            aria-label={`Aumentar quantidade de vouchers da escola ${school.name}`}
                           >
                             <Plus className="w-4 h-4" />
                           </Button>
@@ -584,7 +638,9 @@ const VoucherDashboard = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Código</span>
-                      <span>{school.voucherCode}</span>
+                      <span className="truncate">
+                        <TruncatedText text={school.voucherCode} maxWidth="140px" />
+                      </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Enviado</span>
@@ -592,13 +648,20 @@ const VoucherDashboard = () => {
                         {school.voucherSent ? "Sim" : "Não"}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">{school.observations || "Sem observações"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      <TruncatedText
+                        text={school.observations || "Sem observações"}
+                        maxWidth="100%"
+                        lines={3}
+                        showTooltip
+                      />
+                    </p>
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="border rounded-lg overflow-x-auto">
+            <div className="table-responsive">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -615,22 +678,31 @@ const VoucherDashboard = () => {
                   {filteredSchools.map((school) => (
                     <TableRow key={school.id}>
                       <TableCell>
-                        <div className="font-medium">{school.name}</div>
-                        <div className="text-xs text-muted-foreground">ID: {school.id}</div>
+                        <div className="font-medium">
+                          <TruncatedText text={school.name} maxWidth="260px" lines={2} />
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          <TruncatedText text={`ID: ${school.id}`} maxWidth="120px" />
+                        </div>
                       </TableCell>
-                      <TableCell>{school.cluster}</TableCell>
                       <TableCell>
-                        <Badge className={getStatusBadgeColor(school.status)}>{school.status}</Badge>
+                        <TruncatedText text={school.cluster} maxWidth="140px" />
                       </TableCell>
-                      <TableCell>{school.voucherCode}</TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadgeClass(school.status)}>{school.status}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <TruncatedText text={school.voucherCode} maxWidth="120px" />
+                      </TableCell>
                       <TableCell>
                         <div className="flex justify-end items-center gap-2">
                           <Button
                             type="button"
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8"
+                            className="icon-btn-touch-sm"
                             onClick={() => handleQuantityDelta(school.id, -1)}
+                            aria-label={`Diminuir quantidade de vouchers da escola ${school.name}`}
                           >
                             <Minus className="w-4 h-4" />
                           </Button>
@@ -645,8 +717,9 @@ const VoucherDashboard = () => {
                             type="button"
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8"
+                            className="icon-btn-touch-sm"
                             onClick={() => handleQuantityDelta(school.id, 1)}
+                            aria-label={`Aumentar quantidade de vouchers da escola ${school.name}`}
                           >
                             <Plus className="w-4 h-4" />
                           </Button>
@@ -669,7 +742,12 @@ const VoucherDashboard = () => {
             </div>
           )}
           {filteredSchools.length === 0 && (
-            <p className="text-center text-muted-foreground">Nenhum voucher encontrado.</p>
+            <div className="text-center text-muted-foreground py-6 space-y-3">
+              <p>Nenhum voucher encontrado para os filtros selecionados.</p>
+              <Button variant="outline" onClick={handleClearFilters} className="btn-touch-sm">
+                Limpar filtros
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

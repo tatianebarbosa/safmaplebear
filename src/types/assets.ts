@@ -12,7 +12,7 @@ export type AssetTeam =
   | "Outros";
 
 export type AssetChannel =
-  | "Ligação telefônica"
+  | "LigaÃ§Ã£o telefÃ´nica"
   | "E-mail"
   | "Mensagem no ticket"
   | "Mensagem no WhatsApp"
@@ -24,7 +24,7 @@ export type AssetStatus =
   | "Pendente"
   | "Em andamento"
   | "Concludo"
-  | "No concludo (sem contato / escola indispon?vel)";
+  | "No concludo (sem contato / escola indisponível)";
 
 export type AssetOutcome =
   | "Contato realizado, alinhamento concludo"
@@ -85,7 +85,7 @@ export const ASSET_TEAMS: AssetTeam[] = [
 ];
 
 export const ASSET_CHANNELS: AssetChannel[] = [
-  "Ligação telefônica",
+  "LigaÃ§Ã£o telefÃ´nica",
   "E-mail",
   "Mensagem no ticket",
   "Mensagem no WhatsApp",
@@ -98,7 +98,7 @@ export const ASSET_STATUSES: AssetStatus[] = [
   "Pendente",
   "Em andamento",
   "Concludo",
-  "No concludo (sem contato / escola indispon?vel)",
+  "No concludo (sem contato / escola indisponível)",
 ];
 
 export const ASSET_OUTCOMES: AssetOutcome[] = [

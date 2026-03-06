@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from "react";
+﻿import { useMemo, useState, useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { SchoolLicenseManagement } from "./SchoolLicenseManagement";
 import CanvaYearlyComparison from "./CanvaYearlyComparison";
 import { CanvaMetricsDisplay } from "./CanvaMetricsDisplay";
 import { CostManagementDashboard } from "./CostManagementDashboard";
+import { TruncatedText } from "@/components/ui/truncated-text";
 import { useSchoolLicenseStore } from "@/stores/schoolLicenseStore";
 import FloatingAIChat from "@/components/ai/FloatingAIChat";
 import { NonCompliantUsersDialog } from "./NonCompliantUsersDialog";
@@ -108,7 +109,7 @@ const CanvaDashboard = () => {
 
   const handleViewNonCompliantUsers = useCallback(() => {
     if (nonCompliantUserDetails.length === 0) {
-      toast.info("Carregue os dados oficiais para ver os detalhes dos usuarios nao conformes.");
+      toast.info("Carregue os dados oficiais para ver os detalhes dos usuários não conformes.");
       return;
     }
     setIsNonCompliantDialogOpen(true);
@@ -123,7 +124,7 @@ const CanvaDashboard = () => {
     try {
       window.sessionStorage?.setItem(TAB_STORAGE_KEY, activeTab);
     } catch (error) {
-      console.warn("Nao foi possivel salvar a aba ativa no sessionStorage", error);
+      console.warn("Não foi possível salvar a aba ativa no sessionStorage", error);
     }
   }, [activeTab]);
 
@@ -135,57 +136,69 @@ const CanvaDashboard = () => {
     }
   };
 
-  const containerStyle = useMemo(() => {
-    if (activeTab === "overview") return { maxWidth: 860 };
-    if (activeTab === "usage") return { maxWidth: 860 };
-    return { maxWidth: 920 };
+  const containerClass = useMemo(() => {
+    if (activeTab === "overview") return "max-w-[860px]";
+    if (activeTab === "usage") return "max-w-[860px]";
+    return "max-w-[920px]";
   }, [activeTab]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-[60vh]" role="status" aria-live="polite">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" aria-hidden="true"></div>
+          <span className="sr-only">Carregando dashboard do Canva</span>
+          <p className="text-sm text-muted-foreground">Carregando dashboard do Canva...</p>
+        </div>
       </div>
     );
   }
 
   if (!overviewData) {
     return (
-      <div className="text-center py-8">
-        <p className="text-sm text-muted-foreground">Erro ao carregar dados do Canva.</p>
-        <Button onClick={loadOfficialData} className="mt-4">
-          Tentar novamente
-        </Button>
+      <div className="text-center py-12 px-4" role="status" aria-live="polite">
+        <p className="text-sm text-muted-foreground">Não foi possível carregar os dados do Canva.</p>
+        <Button
+          type="button"
+          onClick={loadOfficialData}
+          className="mt-4 h-11 px-4"
+          aria-label="Recarregar dados do Canva"
+        >
+        Tentar novamente
+      </Button>
       </div>
     );
   }
 
   return (
     <div className="w-full pb-32 md:pb-40">
-      <div className="layout-wide space-y-6 mt-4" style={containerStyle}>
+      <div className={`layout-wide space-y-6 mt-4 px-1 ${containerClass}`}>
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="tabs-no-underline flex w-full max-w-3xl mx-auto overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50 justify-center gap-4 px-2">
+          <TabsList
+            className="tabs-no-underline flex w-full max-w-3xl mx-auto overflow-x-auto h-auto bg-transparent p-0 border-b border-border/50 justify-center gap-3 sm:gap-4 px-2"
+            aria-label="Navegação do painel Canva"
+          >
             <TabsTrigger
               value="overview"
-              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none h-11 px-3"
             >
-              Visao Geral
+              Visão Geral
             </TabsTrigger>
             <TabsTrigger
               value="schools"
-              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none h-11 px-3"
             >
               Escolas
             </TabsTrigger>
             <TabsTrigger
               value="usage"
-              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none h-11 px-3"
             >
               Usos
             </TabsTrigger>
             <TabsTrigger
               value="costs"
-              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+              className="whitespace-nowrap text-foreground data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none h-11 px-3"
             >
               Custos
             </TabsTrigger>
@@ -202,7 +215,7 @@ const CanvaDashboard = () => {
                         Alerta de Conformidade - Alto Risco
                       </CardTitle>
                       <CardDescription className="text-sm text-destructive">
-                        {resolvedNonCompliantCount} usuarios com dominios nao autorizados identificados
+                        {resolvedNonCompliantCount} usuários com domínios não autorizados identificados
                       </CardDescription>
                     </div>
                   </div>
@@ -211,21 +224,26 @@ const CanvaDashboard = () => {
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
                       {(resolvedDomainCounts || []).slice(0, 5).map(({ domain, count }) => (
-                        <span
+                    <span
                           key={domain}
                           className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive text-destructive-foreground"
                         >
-                          {domain} ({count})
+                          <TruncatedText text={`${domain} (${count})`} maxWidth="160px" showTooltip />
                         </span>
                       ))}
                       {(resolvedDomainCounts || []).length > 5 && (
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-muted text-muted-foreground">
-                          +{(resolvedDomainCounts || []).length - 5} dominios
+                          +{(resolvedDomainCounts || []).length - 5} domínios
                         </span>
                       )}
                     </div>
-                    <Button variant="destructive" size="sm" onClick={handleViewNonCompliantUsers} className="mt-4">
-                      Ver detalhes dos usuarios nao conformes
+                <Button
+                  variant="destructive"
+                  onClick={handleViewNonCompliantUsers}
+                  className="mt-4 h-11 px-4"
+                  aria-label="Ver detalhes dos usuários não conformes"
+                >
+                      Ver detalhes dos usuários não conformes
                     </Button>
                   </div>
                 </CardContent>
@@ -262,3 +280,5 @@ const CanvaDashboard = () => {
 };
 
 export default CanvaDashboard;
+
+

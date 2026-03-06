@@ -1,5 +1,11 @@
-// src/services/authService.ts
 import { z } from "zod";
+import {
+  getCurrentSessionUser as getCurrentSessionUserFromToken,
+  clearAuthState as clearAuthStateFromStorage,
+  getStoredAuthToken,
+  validateAuthToken,
+  getUserFromToken as getUserFromTokenFromSession,
+} from "@/lib/authSession";
 import userService from "@/services/userService";
 
 // Credenciais vlidas para modo desenvolvimento
@@ -12,7 +18,7 @@ const VALID_CREDENTIALS = [
 
 // Esquema de validao para o login
 const loginSchema = z.object({
-  username: z.string().min(1, "O nome de usu?rio  obrigatrio"),
+  username: z.string().min(1, "O nome de usuário  obrigatrio"),
   password: z.string().min(1, "A senha  obrigatria"),
 });
 
@@ -30,8 +36,8 @@ interface LoginResponse {
 }
 
 /**
- * Autentica o usu?rio (modo desenvolvimento - autenticao local)
- * @param data - Credenciais de login (usu?rio e senha).
+ * Autentica o usuário (modo desenvolvimento - autenticao local)
+ * @param data - Credenciais de login (usuário e senha).
  * @returns A resposta da API de login.
  */
 export const login = async (data: LoginData): Promise<LoginResponse> => {
@@ -109,7 +115,7 @@ export const login = async (data: LoginData): Promise<LoginResponse> => {
     })();
 
   if (!user) {
-    throw new Error("Credenciais inválidas");
+    throw new Error("Credenciais invalidas");
   }
 
   // Gera um token JWT simples
@@ -146,36 +152,59 @@ export const saveAuthToken = (token: string) => {
  * @returns O token de autenticao ou null se no existir.
  */
 export const getAuthToken = (): string | null => {
-  return localStorage.getItem("authToken") || localStorage.getItem("saf_auth_token");
+  return getStoredAuthToken();
 };
 
 /**
- * Remove o token de autenticao do localStorage.
+ * Remove o token e dados persistidos de autenticacao.
  */
 export const removeAuthToken = () => {
-  localStorage.removeItem("authToken");
-  localStorage.removeItem("saf_auth_token");
+  clearAuthStateFromStorage();
 };
 
 /**
- * Verifica se o usu?rio est autenticado.
- * @returns True se o usu?rio estiver autenticado, false caso contrrio.
+ * Limpa todo estado persistido de auth do cliente.
  */
-export const isAuthenticated = (): boolean => {
-  return getAuthToken() !== null;
+export const clearAuthStateStorage = () => {
+  clearAuthStateFromStorage();
 };
 
-// Save and read current user (development convenience)
-export const saveUser = (user: {
-  id: string;
-  username: string;
-  role: string;
-}) => {
-  try {
-    localStorage.setItem("saf_current_user", JSON.stringify(user));
-  } catch (e) {
-    console.warn("saveUser failed", e);
+/**
+ * Alias explÃ­cito solicitado para limpeza completa de estado.
+ */
+export const clearAuthState = () => {
+  clearAuthStateStorage();
+};
+
+/**
+ * Verifica se o token de autenticacao e valido.
+ */
+export { validateAuthToken };
+
+/**
+ * Extrai usuario do token atual (caso valido).
+ */
+export const getUserFromToken = (token?: string | null) =>
+  getUserFromTokenFromSession(token ?? getStoredAuthToken());
+
+/**
+ * Verifica se o usuário est autenticado.
+ * @returns True se o usuário estiver autenticado, false caso contrrio.
+ */
+export const isAuthenticated = (): boolean => {
+  const token = getAuthToken();
+  if (!token) {
+    clearAuthState();
+    return false;
   }
+
+  const isValid = validateAuthToken(token);
+  if (!isValid) {
+    clearAuthState();
+    return false;
+  }
+
+  return true;
 };
 
 export const getCurrentUser = (): {
@@ -183,19 +212,17 @@ export const getCurrentUser = (): {
   username: string;
   role: string;
 } | null => {
-  try {
-    const raw = localStorage.getItem("saf_current_user");
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) {
-    return null;
-  }
+  const sessionUser = getCurrentSessionUserFromToken();
+  if (!sessionUser) return null;
+
+  return {
+    id: sessionUser.id,
+    username: sessionUser.email,
+    role: sessionUser.role.toLowerCase(),
+  };
 };
 
 export const logout = () => {
-  removeAuthToken();
+  clearAuthStateStorage();
   localStorage.removeItem("userEmail");
-  try {
-    localStorage.removeItem("saf_current_user");
-  } catch (e) {}
 };

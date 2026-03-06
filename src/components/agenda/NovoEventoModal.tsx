@@ -129,7 +129,7 @@ export const NovoEventoModal = ({
               {invalidRange && (
                 <div className="flex items-center gap-2 text-xs text-destructive">
                   <AlertCircle className="w-3 h-3" />
-                  <span>Data final n?o pode ser anterior ao inicio.</span>
+                  <span>Data final não pode ser anterior ao inicio.</span>
                 </div>
               )}
             </div>
@@ -165,7 +165,7 @@ export const NovoEventoModal = ({
             </Button>
             <Button type="submit" className="gap-2" disabled={loading || !canSubmit}>
               <Save className="w-4 h-4" />
-              {editingEvent ? "Salvar alterações" : "Salvar evento"}
+              {editingEvent ? "Salvar alteraÃ§Ãµes" : "Salvar evento"}
             </Button>
           </DialogFooter>
         </form>

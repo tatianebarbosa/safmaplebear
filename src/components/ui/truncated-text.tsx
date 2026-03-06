@@ -67,7 +67,7 @@ interface TruncatedEmailProps {
 
 /**
  * Componente especializado para emails
- * Trunca mantendo visvel o dom?nio
+ * Trunca mantendo visvel o domínio
  */
 export const TruncatedEmail: React.FC<TruncatedEmailProps> = ({
   email,

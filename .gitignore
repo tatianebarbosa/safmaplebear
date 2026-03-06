@@ -8,6 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+node_modules/
+**/node_modules
 dist
 dist-ssr
 *.local
@@ -29,3 +31,16 @@ test_unit_data_service.py
 
 
 venv/
+.venv*
+api/.venv*
+
+# Arquivos de erro/diagnostico gerados em desenvolvimento
+build*.log
+build*.txt
+build.log
+build-errors.txt
+compilation_errors_summary.md
+tmp*.txt
+tmp*.log
+*.tmp
+*.tmp.*

@@ -2,25 +2,25 @@ const WINDOWS_1252_DECODER = new TextDecoder("windows-1252");
 const UTF8_DECODER = new TextDecoder("utf-8");
 
 const ENCODING_FIXES: Record<string, string> = {
-  "Adimpl?ncia": "Adimpl?ncia",
+  "Adimplência": "Adimplência",
   "Utiliza??o": "Utiliza??o",
   "Habilita??o": "Habilita??o",
   "Observa??o": "Observa??o",
-  "C?digo": "C?digo",
-  "Eleg?vel": "Eleg?vel",
-  "N?o": "N?o",
-  "Cama?ari": "Cama?ari",
+  "Código": "Código",
+  "Elegível": "Elegível",
+  "Não": "Não",
+  "Camaçari": "Camaçari",
   "Paul?nia": "Paul?nia",
   "Cambu?": "Cambu?",
-  "B?rbara": "B?rbara",
+  "Bárbara": "Bárbara",
   "orienta??es": "orienta??es",
   "Andr?": "Andr?",
-  "Jo?o": "Jo?o",
-  "Florian?polis": "Florian?polis",
-  "Goi?nia": "Goi?nia",
+  "João": "João",
+  "Florianópolis": "Florianópolis",
+  "Goiânia": "Goiânia",
   "Paran?": "Paran?",
-  "Ribeir?o": "Ribeir?o",
-  "S?o": "S?o",
+  "Ribeirão": "Ribeirão",
+  "São": "São",
 };
 
 export function decodeWindows1252(buffer: ArrayBuffer): string {
@@ -39,7 +39,7 @@ export async function fetchCsvWindows1252(path: string): Promise<string> {
 }
 
 function garbledScore(value: string): number {
-  const patterns = [/�/g, /Ã./g, /�/g];
+  const patterns = [/ï¿½/g, /Ãƒ./g, /ï¿½/g];
   return patterns.reduce((score, regex) => score + (value.match(regex)?.length || 0), 0);
 }
 

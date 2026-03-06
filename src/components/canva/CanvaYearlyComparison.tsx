@@ -1,4 +1,4 @@
-﻿import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -458,7 +458,7 @@ const CanvaYearlyComparison = () => {
       },
       {
         key: "engagement",
-        title: "Engajamento m?dio",
+        title: "Engajamento médio",
         value: source.baseTotals.engagement,
         prev: source.comparisonTotals.engagement,
         isRatio: true,

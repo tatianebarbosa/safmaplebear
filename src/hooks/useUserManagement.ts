@@ -70,7 +70,7 @@ export const useUserManagement = () => {
     if (formData.id) {
       // Edio
       updatedUsers = users.map(u => u.id === formData.id ? { ...u, ...formData } as User : u);
-      toast({ title: "Usurio Atualizado", description: `O usu?rio ${formData.name} foi atualizado com sucesso.` });
+      toast({ title: "Usurio Atualizado", description: `O usuário ${formData.name} foi atualizado com sucesso.` });
     } else {
       // Criao
       const newUser: User = {
@@ -81,7 +81,7 @@ export const useUserManagement = () => {
         createdAt: new Date().toISOString().split('T')[0],
       };
       updatedUsers = [...users, newUser];
-      toast({ title: "Usurio Criado", description: `O usu?rio ${formData.name} foi criado com sucesso.` });
+      toast({ title: "Usurio Criado", description: `O usuário ${formData.name} foi criado com sucesso.` });
     }
 
     setUsers(updatedUsers);
@@ -98,7 +98,7 @@ export const useUserManagement = () => {
     const updatedUsers = users.filter(u => u.id !== userId);
     setUsers(updatedUsers);
     saveUsers(updatedUsers);
-    toast({ title: "Usurio Excludo", description: "O usu?rio foi permanentemente removido.", variant: "destructive" });
+    toast({ title: "Usurio Excludo", description: "O usuário foi permanentemente removido.", variant: "destructive" });
     setIsLoading(false);
   };
 

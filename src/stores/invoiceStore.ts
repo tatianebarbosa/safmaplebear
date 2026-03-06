@@ -74,7 +74,7 @@ export const useInvoiceStore = create<InvoiceState>()(
     (set, get) => ({
       invoices: seedInvoices,
       deletionHistory: [],
-      annualBudget: 10000, // R$ 10.000 de orçamento anual
+      annualBudget: 10000, // R$ 10.000 de orÃ§amento anual
 
       addInvoice: (invoice) => set(state => ({
         invoices: [...state.invoices, { ...invoice, id: Date.now().toString() }]
@@ -121,8 +121,8 @@ export const useInvoiceStore = create<InvoiceState>()(
         const averageMonthly = totalYearCost / 12;
         const totalInvoices = yearInvoices.length;
         
-        // Calcular custo por licen?a (assumindo dados do sistema de licen?as)
-        const estimatedLicenses = 50; // Seria obtido do store de licen?as
+        // Calcular custo por licença (assumindo dados do sistema de licenças)
+        const estimatedLicenses = 50; // Seria obtido do store de licenças
         const costPerLicense = totalYearCost / estimatedLicenses;
 
         // Tendncia mensal
@@ -172,12 +172,12 @@ export const useInvoiceStore = create<InvoiceState>()(
 
         const alerts: BudgetAlert[] = [];
 
-        // Alerta de orçamento ultrapassado
+        // Alerta de orÃ§amento ultrapassado
         if (yearSpending > annualBudget) {
           alerts.push({
             id: 'over_budget',
             type: 'over_budget',
-            message: `Orçamento anual ultrapassado em R$ ${(yearSpending - annualBudget).toFixed(2)}`,
+            message: `OrÃ§amento anual ultrapassado em R$ ${(yearSpending - annualBudget).toFixed(2)}`,
             severity: 'high',
             amount: yearSpending,
             threshold: annualBudget
@@ -188,7 +188,7 @@ export const useInvoiceStore = create<InvoiceState>()(
           alerts.push({
             id: 'approaching_limit',
             type: 'approaching_limit',
-            message: `Usando ${((yearSpending / annualBudget) * 100).toFixed(1)}% do orçamento anual`,
+            message: `Usando ${((yearSpending / annualBudget) * 100).toFixed(1)}% do orÃ§amento anual`,
             severity: 'medium',
             amount: yearSpending,
             threshold: annualBudget

@@ -306,7 +306,7 @@ const InsightsAnalytics = () => {
             <div className="space-y-2">
               <h4 className="font-semibold text-primary">Usurios</h4>
               <p className="text-sm text-muted-foreground">
-                {((analyticsData.canvaUsers.active / analyticsData.canvaUsers.total) * 100).toFixed(1)}% dos usu?rios esto ativos. 
+                {((analyticsData.canvaUsers.active / analyticsData.canvaUsers.total) * 100).toFixed(1)}% dos usuários esto ativos. 
                 Crescimento de {analyticsData.trends.userGrowth}% no perodo.
               </p>
             </div>

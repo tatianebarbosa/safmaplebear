@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+﻿import { useEffect, useMemo, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Bell, AlertTriangle, Clock } from "lucide-react";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTicketStore } from "@/stores/ticketStore";
 import type { Ticket } from "@/types/tickets";
 import { fetchTicketsFromApi } from "@/lib/ticketService";
+import { TruncatedText } from "@/components/ui/truncated-text";
 
 type NotificationType = "overdue" | "critical";
 
@@ -54,17 +54,16 @@ const buildNotifications = (tickets: Ticket[]): NotificationItem[] => {
   });
 
   critical.forEach((ticket) => {
-    // Evita duplicar notificacao quando o ticket ja esta vencido
     if (items.some((item) => item.ticketId === ticket.id)) return;
     const responsavel = ticket.responsavel || ticket.agente;
 
     items.push({
       id: `critical-${ticket.id}`,
       ticketId: ticket.id,
-      title: `Ticket ${ticket.id} critico`,
+      title: `Ticket ${ticket.id} crítico`,
       description: `${ticket.diasAberto} dias em aberto com ${ticket.agente}.`,
       type: "critical",
-      meta: `${responsavel}  Coorden?o`,
+      meta: `${responsavel} · Coordenação`,
     });
   });
 
@@ -72,7 +71,6 @@ const buildNotifications = (tickets: Ticket[]): NotificationItem[] => {
 };
 
 const NotificationBell = () => {
-  const navigate = useNavigate();
   const tickets = useTicketStore((state) => state.tickets);
   const setTickets = useTicketStore((state) => state.setTickets);
   const logDueNotification = useTicketStore((state) => state.logDueNotification);
@@ -88,7 +86,6 @@ const NotificationBell = () => {
   const displayCount = unreadCount > 9 ? "9+" : `${unreadCount}`;
 
   useEffect(() => {
-    // Mantem apenas IDs que ainda existem
     setReadIds((prev) => {
       const next = new Set<string>();
       notifications.forEach((notification) => {
@@ -108,7 +105,7 @@ const NotificationBell = () => {
           setTickets(remoteTickets);
         }
       } catch (error) {
-        console.error("No foi possvel carregar tickets reais:", error);
+        console.error("Não foi possível carregar tickets reais:", error);
       }
     };
     loadTickets();
@@ -146,14 +143,14 @@ const NotificationBell = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="relative flex h-11 w-11 items-center justify-center rounded-full bg-transparent text-foreground shadow-none transition-transform hover:-translate-y-0.5"
-              aria-label={hasUnread ? `Notificacoes: ${displayCount} n?o lidas` : "Notificacoes"}
+              className="relative flex icon-btn-touch h-11 w-11 items-center justify-center rounded-full bg-transparent text-foreground shadow-none transition-transform hover:-translate-y-0.5"
+              aria-label={hasUnread ? `Notificações: ${displayCount} não lidas` : "Notificações"}
             >
               <Bell className="w-5 h-5" />
               {hasUnread && (
                 <span
                   aria-live="polite"
-                  className="absolute top-0 right-0 inline-flex h-5 min-w-[1.35rem] -translate-y-1/3 translate-x-1/3 items-center justify-center rounded-full bg-destructive px-1 text-[10px] leading-[1.1] font-bold text-white shadow-[0_4px_10px_rgba(204,19,22,0.35)]"
+                  className="absolute top-0 right-0 inline-flex h-5 min-w-[1.35rem] -translate-y-1/3 translate-x-1/3 items-center justify-center rounded-full bg-destructive px-1 text-[10px] leading-[1.1] font-bold text-destructive-foreground shadow-[0_4px_10px_rgba(204,19,22,0.35)]"
                 >
                   {displayCount}
                 </span>
@@ -162,7 +159,7 @@ const NotificationBell = () => {
           </PopoverTrigger>
         </TooltipTrigger>
         <TooltipContent side="bottom" sideOffset={8}>
-          Notificaes
+          Notificações
         </TooltipContent>
       </Tooltip>
       <PopoverContent
@@ -171,28 +168,31 @@ const NotificationBell = () => {
         sideOffset={4}
         alignOffset={-6}
         collisionPadding={4}
+        role="status"
+        aria-live="polite"
         style={{
           maxHeight: "72vh",
           width: "380px",
           maxWidth: "calc(100vw - 24px)",
         }}
-        className="origin-top-right flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-white p-0 shadow-[0_22px_48px_-18px_rgba(30,32,36,0.55)]"
+        className="origin-top-right flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-background p-0 shadow-[0_22px_48px_-18px_rgba(30,32,36,0.55)]"
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border/70 bg-white/90 backdrop-blur-sm">
-          <p className="text-sm font-semibold text-foreground">Notificaes</p>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/70 bg-background/90 backdrop-blur-sm">
+          <p className="text-sm font-semibold text-foreground">Notificações</p>
           <Badge
             variant="destructive"
             size="xs"
-            className="border-none bg-[#c1121f] text-white px-3 py-[4px] text-[11px] leading-[1.1] font-semibold uppercase tracking-wide shadow-[0_8px_18px_rgba(193,18,31,0.25)]"
+            className="border-none px-3 py-[4px] text-[11px] leading-[1.1] font-semibold uppercase tracking-wide shadow-[0_8px_18px_rgba(193,18,31,0.25)]"
           >
             {notifications.length ? `${notifications.length} ativas` : "Nenhuma"}
           </Badge>
         </div>
 
-        <div
-          className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pr-4"
-          style={{ scrollbarWidth: "thin", maxHeight: "calc(72vh - 120px)" }}
-        >
+          <div
+            className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pr-4"
+            style={{ scrollbarWidth: "thin", maxHeight: "calc(72vh - 120px)" }}
+            aria-live="polite"
+          >
           {notifications.length === 0 ? (
             <div className="px-4 py-10 text-center text-sm text-muted-foreground">
               Nenhum alerta no momento.
@@ -200,29 +200,35 @@ const NotificationBell = () => {
           ) : (
             notifications.map((notification) => {
               const isOverdue = notification.type === "overdue";
-              const statusLabel = isOverdue ? "VENCIDO" : "CRTICO";
+              const statusLabel = isOverdue ? "VENCIDO" : "CRÍTICO";
               const statusClasses = isOverdue
-                ? "bg-red-50 text-red-700 border border-red-200"
-                : "bg-amber-50 text-amber-700 border border-amber-200";
+                ? "bg-destructive-bg text-destructive border border-destructive/40"
+                : "bg-warning-bg text-warning border border-warning/40";
 
-              return (
+                return (
                 <article
                   key={notification.id}
-                  className="group relative flex gap-3 rounded-2xl border border-border/60 bg-white px-4 py-3.5 shadow-[0_12px_28px_-18px_rgba(0,0,0,0.24)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-18px_rgba(0,0,0,0.30)]"
+                  className="group relative flex gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3.5 shadow-[0_12px_28px_-18px_rgba(0,0,0,0.24)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-18px_rgba(0,0,0,0.30)]"
+                  aria-label={`${notification.title}. ${notification.description} ${notification.meta ? `Responsável: ${notification.meta}.` : ""}`}
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                     {isOverdue ? <Clock className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
                   </div>
                   <div className="flex-1 space-y-1.5">
                     <div className="flex items-start justify-between gap-3">
-                      <p className="text-sm font-semibold leading-snug text-foreground">{notification.title}</p>
+                      <p className="text-sm font-semibold leading-snug text-foreground">
+                        {notification.title}
+                      </p>
                       <span className={`inline-flex items-center rounded-full px-2.5 py-[3px] text-[10px] font-semibold uppercase tracking-wide ${statusClasses}`}>
                         {statusLabel}
                       </span>
                     </div>
                     <p className="text-xs leading-snug text-muted-foreground">{notification.description}</p>
                     <p className="text-xs leading-snug text-muted-foreground">
-                      Responsvel: {notification.meta ?? ""}
+                      <TruncatedText
+                        text={`Responsável: ${notification.meta ?? "Não informado"}`}
+                        maxWidth="220px"
+                      />
                     </p>
                   </div>
                 </article>
@@ -230,11 +236,11 @@ const NotificationBell = () => {
             })
           )}
         </div>
-
       </PopoverContent>
     </Popover>
   );
 };
 
 export default NotificationBell;
+
 

@@ -183,7 +183,7 @@ const extractClusterFromSchool = (schoolName: string): string => {
 export const loadCanvaData = async (period: '30d' | '3m' | '6m' | '12m' = '30d'): Promise<CanvaUser[]> => {
   try {
     // Load users mapping from CSV (updated file)
-    const usersResponse = await fetch('/data/usu?rios_canva_atualizados.csv');
+    const usersResponse = await fetch('/data/usuários_canva_atualizados.csv');
     const usersText = await usersResponse.text();
     const usersMapping = parseUsersCSV(usersText);
 
@@ -211,7 +211,7 @@ export const loadCanvaData = async (period: '30d' | '3m' | '6m' | '12m' = '30d')
 export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] => {
   const schoolMap = new Map<string, CanvaUser[]>();
 
-  // Agrupar usu?rios por escola
+  // Agrupar usuários por escola
   users.forEach(user => {
     const schoolKey = user.schoolId || 'unassigned';
     if (!schoolMap.has(schoolKey)) {
@@ -223,7 +223,7 @@ export const generateSchoolCanvaData = (users: CanvaUser[]): SchoolCanvaData[] =
   const schoolsData: SchoolCanvaData[] = [];
 
   schoolMap.forEach((schoolUsers, schoolId) => {
-    const schoolName = schoolUsers[0]?.school || 'Escola n?o definida';
+    const schoolName = schoolUsers[0]?.school || 'Escola não definida';
     const cluster = extractClusterFromSchool(schoolName);
     const nonCompliantUsers = schoolUsers.filter(u => !u.isCompliant);
     const licenseLimit = getMaxLicensesPerSchool();

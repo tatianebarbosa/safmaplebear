@@ -43,7 +43,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
 
   const notes = useMemo(() => ticket?.notes || [], [ticket]);
   const historyEntries = useMemo(() => ticket?.history || [], [ticket]);
-  // Permitir que qualquer usuário mova/edite; se necessário, ajuste aqui para futuras restrições
+  // Permitir que qualquer usuÃ¡rio mova/edite; se necessÃ¡rio, ajuste aqui para futuras restriÃ§Ãµes
   const canEdit = !!ticket && !!currentUser;
 
   useEffect(() => {
@@ -124,7 +124,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       const timestamp = new Date().toISOString();
       addHistoryEntry(ticket.id, {
         id: `${ticket.id}-hist-${Date.now()}`,
-        author: currentUser?.name || currentUser?.agente || "Usuário",
+        author: currentUser?.name || currentUser?.agente || "UsuÃ¡rio",
         action: historyAction,
         timestamp,
         before,
@@ -138,7 +138,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
       updateTicket(ticket.id, updates);
       addNoteToTicket(ticket.id, {
         id: `${ticket.id}-change-${Date.now()}`,
-        author: currentUser?.name || currentUser?.agente || "Usu?rio",
+        author: currentUser?.name || currentUser?.agente || "Usuário",
         content: `Atualizacoes: ${changes.join(" | ")}`,
         createdAt: new Date().toISOString(),
       });
@@ -159,7 +159,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
     if (!ticket || !note.trim()) return;
     addNoteToTicket(ticket.id, {
       id: `${ticket.id}-${Date.now()}`,
-      author: currentUser?.name || currentUser?.agente || "Usu?rio",
+      author: currentUser?.name || currentUser?.agente || "Usuário",
       content: note.trim(),
       createdAt: new Date().toISOString(),
     });
@@ -168,7 +168,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
 
   const handleRevert = (entryId: string) => {
     if (!ticket) return;
-    revertHistoryEntry(ticket.id, entryId, currentUser?.name || currentUser?.agente || "Usuário");
+    revertHistoryEntry(ticket.id, entryId, currentUser?.name || currentUser?.agente || "UsuÃ¡rio");
   };
 
   if (!ticket) return null;
@@ -345,7 +345,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                   <Clock3 className="h-4 w-4" />
-                  Histórico de alterações
+                  HistÃ³rico de alteraÃ§Ãµes
                 </div>
                 <Badge
                   variant="outline"
@@ -357,7 +357,7 @@ export const TicketDetailsDialog = ({ open, ticket, onOpenChange }: TicketDetail
               <Separator />
               <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
                 {historyEntries.length === 0 && (
-                  <p className="text-sm text-muted-foreground">Nenhuma alteração registrada.</p>
+                  <p className="text-sm text-muted-foreground">Nenhuma alteraÃ§Ã£o registrada.</p>
                 )}
                 {historyEntries.map((h) => (
                   <div key={h.id} className="rounded-md border border-border/60 bg-background p-2">

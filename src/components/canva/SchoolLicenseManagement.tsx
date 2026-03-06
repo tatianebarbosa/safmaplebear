@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -25,7 +25,8 @@ import { School } from "@/types/schoolLicense";
 import { toast } from "@/components/ui/sonner";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { useLicenseLimit } from "@/config/licenseLimits";
-import { cn } from "@/lib/utils";
+import { TruncatedText } from "@/components/ui/truncated-text";
+import { Label } from "@/components/ui/label";
 
 interface SchoolLicenseManagementProps {
   externalSearchTerm?: string;
@@ -385,50 +386,50 @@ export const SchoolLicenseManagement = ({
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-medium">Painel de escolas e licenças</h2>
-          <p className="text-sm text-muted-foreground">Gerencie usuários, licenças e conformidade das escolas</p>
+          <h2 className="text-xl font-medium">Painel de escolas e licenÃ§as</h2>
+          <p className="text-sm text-muted-foreground">Gerencie usuÃ¡rios, licenÃ§as e conformidade das escolas</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid-responsive-5">
         <StatsCard
           title="Total de Escolas"
           value={totalSchools.toString()}
-          description={`${activeSchools} com licenças ativas`}
+          description={`${activeSchools} com licenÃ§as ativas`}
           icon={<Building2 className="h-4 w-4" />}
           tooltip="Numero de escolas oficiais carregadas; considera todas as escolas sincronizadas."
         />
         <StatsCard
-          title="Licenças utilizadas"
+          title="LicenÃ§as utilizadas"
           value={`${usedLicenses}/${totalLicenses}`}
           description={
-            totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupação` : "Sem dados de licença"
+            totalLicenses > 0 ? `${((usedLicenses / totalLicenses) * 100).toFixed(1)}% ocupaÃ§Ã£o` : "Sem dados de licenÃ§a"
           }
           icon={<Users className="h-4 w-4" />}
-          tooltip="Soma de usuários licenciados em todas as escolas; percentual = usadas / total de licenças."
+          tooltip="Soma de usuÃ¡rios licenciados em todas as escolas; percentual = usadas / total de licenÃ§as."
         />
         <StatsCard
-          title="Licenças fora da política"
+          title="LicenÃ§as fora da polÃ­tica"
           value={nonCompliantUsersAll.toString()}
-          description="E-mails não conformes"
+          description="E-mails nÃ£o conformes"
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={nonCompliantUsersAll > 0 ? "destructive" : "default"}
-          tooltip="Total de usuários com e-mail fora da política. E-mails válidos: domínios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereço contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
+          tooltip="Total de usuÃ¡rios com e-mail fora da polÃ­tica. E-mails vÃ¡lidos: domÃ­nios aprovados (mbcentral.com.br, sebsa.com.br, seb.com.br), qualquer endereÃ§o contendo 'maplebear', ou que tenha nome de escola/identificador iniciado por 'mb'."
         />
         <StatsCard
           title="Escolas em Excesso"
           value={exceedingSchools.toString()}
-          description="licenças ultrapassadas"
+          description="licenÃ§as ultrapassadas"
           icon={<AlertTriangle className="h-4 w-4" />}
           variant={exceedingSchools > 0 ? "destructive" : "default"}
-          tooltip="Escolas acima do limite de licenças definido. Reveja estas unidades para redistribuir ou remover acessos."
+          tooltip="Escolas acima do limite de licenÃ§as definido. Reveja estas unidades para redistribuir ou remover acessos."
         />
         <StatsCard
-          title="Usuários sem escola"
+          title="UsuÃ¡rios sem escola"
           value={(unassignedUsers ?? 0).toString()}
-          description="Licenças sem vínculo"
+          description="LicenÃ§as sem vÃ­nculo"
           icon={<Users className="h-4 w-4" />}
-          tooltip="Licenças ativas sem vínculo a escola. Vincule ou remova para evitar consumo indevido."
+          tooltip="LicenÃ§as ativas sem vÃ­nculo a escola. Vincule ou remova para evitar consumo indevido."
         />
       </div>
 
@@ -437,108 +438,112 @@ export const SchoolLicenseManagement = ({
           <CardTitle className="text-base">Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex-1 min-w-[320px] relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Nome da escola, cluster, usuário, e-mail ou perfil (estudante, professor, administrador)"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setPage(1);
-                }}
-                className="h-10 pl-10 pr-4 text-sm rounded-md"
-              />
+          <div className="filters-responsive">
+            <div className="space-y-1.5 filter-item-responsive">
+              <Label htmlFor="license-school-search">Buscar</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="license-school-search"
+                  placeholder="Nome da escola, cluster, usuario, e-mail ou perfil"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setPage(1);
+                  }}
+                  className="pl-10 pr-4"
+                  aria-label="Buscar escolas, usuarios ou e-mail"
+                />
+              </div>
             </div>
 
-            <Select
-              value={clusterFilter}
-              onValueChange={(value) => {
-                setClusterFilter(value);
-                setPage(1);
-              }}
-            >
-              <SelectTrigger
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
-                )}
+            <div className="space-y-1.5 filter-item-responsive">
+              <Label htmlFor="license-cluster-filter">Cluster/Regiao</Label>
+              <Select
+                value={clusterFilter}
+                onValueChange={(value) => {
+                  setClusterFilter(value);
+                  setPage(1);
+                }}
               >
-                <SelectValue placeholder="Cluster/Região" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Implantacao">Implantação</SelectItem>
-                <SelectItem value="Alta Performance">Alta Performance</SelectItem>
-                <SelectItem value="Potente">Potente</SelectItem>
-                <SelectItem value="Desenvolvimento">Desenvolvimento</SelectItem>
-                <SelectItem value="Alerta">Alerta</SelectItem>
-              </SelectContent>
-            </Select>
+                <SelectTrigger id="license-cluster-filter" className="w-full">
+                  <SelectValue placeholder="Cluster/Regiao" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="Implantacao">Implantacao</SelectItem>
+                  <SelectItem value="Alta Performance">Alta Performance</SelectItem>
+                  <SelectItem value="Potente">Potente</SelectItem>
+                  <SelectItem value="Desenvolvimento">Desenvolvimento</SelectItem>
+                  <SelectItem value="Alerta">Alerta</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select
-              value={licenseFilter}
-              onValueChange={(value) => {
-                setLicenseFilter(value);
-                setPage(1);
-              }}
-            >
-              <SelectTrigger
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
-                )}
+            <div className="space-y-1.5 filter-item-responsive">
+              <Label htmlFor="license-status-filter">Status das licencas</Label>
+              <Select
+                value={licenseFilter}
+                onValueChange={(value) => {
+                  setLicenseFilter(value);
+                  setPage(1);
+                }}
               >
-                <SelectValue placeholder="Status das licenças" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Disponível">Disponível</SelectItem>
-                <SelectItem value="Completo">Completo</SelectItem>
-                <SelectItem value="Excedido">Excedido</SelectItem>
-              </SelectContent>
-            </Select>
+                <SelectTrigger id="license-status-filter" className="w-full">
+                  <SelectValue placeholder="Status das licencas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="Disponivel">Disponivel</SelectItem>
+                  <SelectItem value="Completo">Completo</SelectItem>
+                  <SelectItem value="Excedido">Excedido</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select
-              value={roleFilter}
-              onValueChange={(value) => {
-                setRoleFilter(value);
-                setPage(1);
-              }}
-            >
-              <SelectTrigger
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "h-10 w-[150px] px-4 text-sm rounded-md justify-between"
-                )}
+            <div className="space-y-1.5 filter-item-responsive">
+              <Label htmlFor="license-role-filter">Perfil do Usuario</Label>
+              <Select
+                value={roleFilter}
+                onValueChange={(value) => {
+                  setRoleFilter(value);
+                  setPage(1);
+                }}
               >
-                <SelectValue placeholder="Perfil do Usuário" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os perfis</SelectItem>
-                <SelectItem value="Estudante">Estudante</SelectItem>
-                <SelectItem value="Professor">Professor</SelectItem>
-                <SelectItem value="Administrador">Administrador</SelectItem>
-              </SelectContent>
-            </Select>
+                <SelectTrigger id="license-role-filter" className="w-full">
+                  <SelectValue placeholder="Perfil do Usuario" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os perfis</SelectItem>
+                  <SelectItem value="Estudante">Estudante</SelectItem>
+                  <SelectItem value="Professor">Professor</SelectItem>
+                  <SelectItem value="Administrador">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={handleClearFilters}
-              className="whitespace-nowrap h-10 text-sm px-4 rounded-md w-[150px]"
+              className="btn-touch-sm w-full"
+              aria-label="Limpar filtros aplicados"
             >
               <X className="h-4 w-4 mr-2" />
               Limpar Filtros
             </Button>
 
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={handleExport}
-              className="gap-2 h-10 text-sm px-3 rounded-md w-[150px]"
+              className="btn-touch-sm w-full"
+              aria-label="Exportar lista de escolas filtradas para CSV"
+              disabled={filteredSchools.length === 0}
             >
-              <Download className="h-4 w-4" />
+              <Download className="h-4 w-4 mr-2" />
               Exportar CSV
             </Button>
           </div>
@@ -549,7 +554,7 @@ export const SchoolLicenseManagement = ({
         <Card className="border border-border/50 shadow-sm">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Usuários encontrados</CardTitle>
+              <CardTitle className="text-base">UsuÃ¡rios encontrados</CardTitle>
               <p className="text-xs text-muted-foreground">
                 Mostrando {userMatches.length} resultados pelo filtro atual
               </p>
@@ -562,23 +567,24 @@ export const SchoolLicenseManagement = ({
                 className="rounded-lg border border-border/60 bg-slate-50/70 p-3 shadow-inner"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm font-semibold text-foreground truncate">{match.userName}</div>
+                  <TruncatedText text={match.userName} maxWidth="100%" lines={1} className="text-sm font-semibold text-foreground" />
                   {!match.isCompliant && (
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-destructive/10 text-destructive border border-destructive/40">
-                      Não conforme
+                      NÃ£o conforme
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground truncate">{match.email}</div>
+                <TruncatedText text={match.email} maxWidth="100%" lines={1} className="text-xs text-muted-foreground" />
                 <div className="text-xs text-foreground mt-1 flex flex-col gap-0.5">
-                  <span className="font-medium truncate">{match.schoolName}</span>
+                  <TruncatedText text={match.schoolName} maxWidth="100%" lines={1} className="font-medium" />
                   <span className="text-muted-foreground">
-                    {match.cluster || "Sem cluster"} {match.role ? `• ${match.role}` : ""}
+                    {match.cluster || "Sem cluster"} {match.role ? `â€¢ ${match.role}` : ""}
                   </span>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
+                  type="button"
                   className="mt-2 text-xs px-2"
                   onClick={() => {
                     setSelectedSchool(match.schoolId);
@@ -594,7 +600,7 @@ export const SchoolLicenseManagement = ({
       )}
 
       <div className="space-y-4">
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 [grid-auto-rows:minmax(360px,1fr)]">
+        <div className="grid-responsive-4">
           {visibleSchools.map((school) => (
             <SchoolLicenseCard
               key={school.id}
@@ -604,9 +610,12 @@ export const SchoolLicenseManagement = ({
             />
           ))}
         </div>
-        {filteredSchools.length === 0 && (
-          <div className="text-center py-10 text-sm text-muted-foreground">
-            Nenhuma escola encontrada com os filtros aplicados.
+      {filteredSchools.length === 0 && (
+          <div className="text-center py-10 text-sm text-muted-foreground space-y-3">
+            <p>Nenhuma escola encontrada com os filtros aplicados.</p>
+            <Button type="button" onClick={handleClearFilters} className="btn-touch-sm">
+              Limpar filtros
+            </Button>
           </div>
         )}
         {hasMultiplePages && (
@@ -619,8 +628,8 @@ export const SchoolLicenseManagement = ({
                   size="icon"
                   disabled={currentPage === 1}
                   onClick={() => goToPage(currentPage - 1)}
-                  className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-muted/70"
-                  aria-label="Voltar página"
+                  className="icon-btn-touch-sm rounded-full text-muted-foreground hover:text-primary hover:bg-muted/70"
+                  aria-label="Voltar pÃ¡gina"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -638,6 +647,7 @@ export const SchoolLicenseManagement = ({
                         handlePageSubmit();
                       }
                     }}
+                    aria-label="PÃ¡gina atual"
                     className="w-14 h-9 rounded-lg border border-border/70 bg-slate-50 text-center text-sm font-semibold tracking-tight px-2 py-1 appearance-none [appearance:textfield] [-moz-appearance:textfield] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-transparent"
                   />
                   <span className="text-sm text-muted-foreground">/</span>
@@ -649,8 +659,8 @@ export const SchoolLicenseManagement = ({
                   size="icon"
                   disabled={currentPage === totalPages}
                   onClick={() => goToPage(currentPage + 1)}
-                  className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-muted/70"
-                  aria-label="Avançar página"
+                  className="icon-btn-touch-sm rounded-full text-muted-foreground hover:text-primary hover:bg-muted/70"
+                  aria-label="AvanÃ§ar pÃ¡gina"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -669,4 +679,5 @@ export const SchoolLicenseManagement = ({
     </div>
   );
 };
+
 

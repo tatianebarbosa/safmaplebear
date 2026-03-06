@@ -5,7 +5,14 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  VITE_API_BASE_URL = "https://ep-still-leaf-ahbff0cx.apirest.c-3.us-east-1.aws.neon.tech/neondb/rest/v1"
+  # Controle de visibilidade de rotas/paginas por ambiente de permissÃ£o.
+  # MantÃ©m Ana/Não-admin com visÃ£o reduzida em produÃ§Ã£o por padrÃ£o.
+  VITE_CORE_VIEW_RESTRICTION = "production"
+  VITE_ENABLE_ONLY_CANVA = "false"
+  VITE_DEPLOY_ENV = "production"
+  # Ajuste para a URL real da Azure Function App (ex.: https://maplebearsaf.azurewebsites.net)
+  # Defina no dashboard do Netlify se diferente.
+  VITE_API_BASE_URL = "https://maplebearsaf.azurewebsites.net"
 
 [[redirects]]
   from = "/*"

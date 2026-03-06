@@ -12,6 +12,7 @@ import { UserDialog } from './UserDialog';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from "@/components/ui/sonner";
 import { showCanvaSyncReminder } from '@/lib/canvaReminder';
+import { TruncatedText } from "@/components/ui/truncated-text";
 
 interface SchoolLicenseCardProps {
   school: School;
@@ -89,7 +90,7 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
         <CardHeader className="px-4 pt-4 pb-2 space-y-2 bg-gradient-to-br from-white via-white to-slate-50/80">
           <div className="flex items-start justify-between gap-3">
             <CardTitle className="text-lg font-black leading-snug text-slate-900 break-words max-w-full">
-              {school.name}
+              <TruncatedText text={school.name} maxWidth="100%" lines={2} />
             </CardTitle>
           </div>
         </CardHeader>
@@ -170,10 +171,8 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
               >
                 <div className="flex items-center justify-between gap-3 py-1.5 px-2.5 rounded-[14px] hover:bg-white/80 transition border border-transparent hover:border-border/50">
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold truncate">{user.name}</div>
-                    <div className="text-xs text-muted-foreground truncate leading-snug">
-                      {user.email}
-                    </div>
+                    <TruncatedText text={user.name} maxWidth="100%" lines={1} className="text-sm font-semibold" />
+                    <TruncatedText text={user.email} maxWidth="100%" lines={1} className="text-xs text-muted-foreground leading-snug" />
                   </div>
                   {!user.isCompliant && (
                     <div className="flex items-center gap-2 shrink-0">
@@ -209,19 +208,21 @@ export const SchoolLicenseCard = ({ school, onViewDetails, onManage }: SchoolLic
               {(availableLicenses > 0 || isCentral) && (
                 <Button
                   size="sm"
+                  type="button"
                   variant="outline"
                   onClick={() => setShowAddUserDialog(true)}
-                  className="w-full justify-center rounded-full border-border/60 shadow-sm font-semibold text-foreground bg-muted hover:bg-muted/80"
+                  className="btn-touch-sm w-full justify-center rounded-full border-border/60 shadow-sm font-semibold text-foreground bg-muted hover:bg-muted/80"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Adicionar licença
                 </Button>
               )}
               <Button
+                type="button"
                 size="sm"
                 variant="default"
                 onClick={() => handleManageSchool()}
-                className="w-full justify-center rounded-full border-border/60 shadow-sm font-semibold hover:border-foreground/40 hover:bg-foreground/5"
+                className="btn-touch-sm w-full justify-center rounded-full border-border/60 shadow-sm font-semibold hover:border-foreground/40 hover:bg-foreground/5"
               >
                 <Settings className="h-4 w-4 mr-2" />
                 Gerenciar

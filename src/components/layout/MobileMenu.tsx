@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+﻿import { useLocation, useNavigate } from "react-router-dom";
 import {
   Sheet,
   SheetContent,
@@ -25,30 +25,34 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/stores/authStore";
 import { useState } from "react";
 import { isCanvaOnlyMode, isCoreViewsOnlyMode } from "@/lib/accessPolicy";
+import { getUserFromToken } from "@/services/authService";
 
 const MobileMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { currentUser, hasRole } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const [open, setOpen] = useState(false);
 
-  const isAdmin = hasRole("Admin");
-  const canvaOnlyMode = isCanvaOnlyMode(currentUser?.role);
-  const coreViewsOnlyMode = isCoreViewsOnlyMode(currentUser?.role);
+  const roleForPolicy = getUserFromToken()?.role;
+  const roleForPolicyLower = String(roleForPolicy || "").toLowerCase();
+  const canvaOnlyMode = isCanvaOnlyMode(roleForPolicy);
+  const coreViewsOnlyMode = isCoreViewsOnlyMode(roleForPolicy);
   const restrictToCoreViews = canvaOnlyMode || coreViewsOnlyMode;
+  const canShowAdminManagement = !restrictToCoreViews && roleForPolicyLower === "admin";
 
   const navItems = canvaOnlyMode
     ? [{ label: "Canva", path: "/dashboard/canva", icon: Palette }]
     : coreViewsOnlyMode
-      ? [
-          { label: "Inicio", path: "/dashboard", icon: Home },
-          { label: "Canva", path: "/dashboard/canva", icon: Palette },
-        ]
+    ? [
+        { label: "Início", path: "/dashboard", icon: Home },
+        { label: "Canva", path: "/dashboard/canva", icon: Palette },
+      ]
     : [
-        { label: "Inicio", path: "/dashboard", icon: Home },
+        { label: "Início", path: "/dashboard", icon: Home },
         { label: "Canva", path: "/dashboard/canva", icon: Palette },
         { label: "Vouchers", path: "/dashboard/vouchers", icon: Ticket },
+        { label: "Ativos", path: "/saf/ativos", icon: FileSpreadsheet },
         { label: "Tickets", path: "/tickets", icon: Ticket },
         { label: "Base de Conhecimento", path: "/knowledge-base", icon: BookOpenText },
       ];
@@ -59,7 +63,7 @@ const MobileMenu = () => {
 
     toast({
       title: "Logout realizado",
-      description: "Voc foi desconectado com sucesso",
+      description: "Você foi desconectado com sucesso",
     });
 
     navigate("/login");
@@ -72,12 +76,12 @@ const MobileMenu = () => {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
+              <SheetTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden rounded-full h-11 w-11"
-          aria-label="Abrir menu de navegao"
+          className="md:hidden icon-btn-touch"
+          aria-label="Abrir menu de navegação"
         >
           <Menu className="w-6 h-6" />
         </Button>
@@ -90,7 +94,7 @@ const MobileMenu = () => {
         </SheetHeader>
 
         <div className="mt-6 flex flex-col gap-2">
-          {/* Navegao Principal */}
+          {/* Navegação Principal */}
           <div className="space-y-1">
             {navItems.map((item) => {
               const isActive = location.pathname.startsWith(item.path);
@@ -100,6 +104,7 @@ const MobileMenu = () => {
                   key={item.label}
                   variant="ghost"
                   data-active={isActive}
+                  aria-label={`Ir para ${item.label}`}
                   className={[
                     "menu-underline w-full justify-start h-12 text-base font-semibold bg-transparent rounded-none transition-colors hover:bg-transparent",
                     isActive
@@ -121,19 +126,20 @@ const MobileMenu = () => {
           {/* Links Externos */}
           <div className="space-y-1">
             <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              Links Rpidos
+              Links Rápidos
             </p>
             {SPREADSHEET_LINKS.map((item) => (
-              <Button
-                key={item.href}
-                variant="ghost"
-                className="w-full justify-start h-11 text-sm"
-                asChild
-              >
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Button
+                  key={item.href}
+                  variant="ghost"
+                  className="w-full justify-start h-11 text-sm"
+                  asChild
+                  aria-label={`Abrir link rápido: ${item.label}`}
+                >
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
                 >
                   <FileSpreadsheet className="w-4 h-4 mr-3 text-muted-foreground" />
@@ -142,16 +148,17 @@ const MobileMenu = () => {
               </Button>
             ))}
             {CRM_LINKS.map((item) => (
-              <Button
-                key={item.href}
-                variant="ghost"
-                className="w-full justify-start h-11 text-sm"
-                asChild
-              >
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Button
+                  key={item.href}
+                  variant="ghost"
+                  className="w-full justify-start h-11 text-sm"
+                  asChild
+                  aria-label={`Abrir link rápido: ${item.label}`}
+                >
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
                 >
                   <ExternalLink className="w-4 h-4 mr-3 text-muted-foreground" />
@@ -164,16 +171,17 @@ const MobileMenu = () => {
           <Separator className="my-4" />
 
           {/* Gerenciamento (Admin) */}
-          {!restrictToCoreViews && isAdmin && (
+          {canShowAdminManagement && (
             <>
-              <Button
-                variant="ghost"
-                data-active={location.pathname.startsWith("/admin")}
-                className={[
-                  "menu-underline w-full justify-start h-12 text-base font-semibold bg-transparent rounded-none transition-colors hover:bg-transparent",
-                  location.pathname.startsWith("/admin")
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                <Button
+                  variant="ghost"
+                  data-active={location.pathname.startsWith("/admin")}
+                  aria-label="Abrir painel de gerenciamento"
+                  className={[
+                    "menu-underline w-full justify-start h-12 text-base font-semibold bg-transparent rounded-none transition-colors hover:bg-transparent",
+                    location.pathname.startsWith("/admin")
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                 ].join(" ")}
                 aria-current={location.pathname.startsWith("/admin") ? "page" : undefined}
                 onClick={() => handleNavigation("/admin")}
@@ -189,6 +197,7 @@ const MobileMenu = () => {
           <Button
             variant="ghost"
             className="w-full justify-start h-12 text-base font-semibold text-destructive hover:text-destructive hover:bg-destructive/10"
+            aria-label="Sair da sessão"
             onClick={handleLogout}
           >
             <LogOut className="w-5 h-5 mr-3" />
@@ -201,3 +210,6 @@ const MobileMenu = () => {
 };
 
 export default MobileMenu;
+
+
+

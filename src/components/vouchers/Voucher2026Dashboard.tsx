@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/components/ui/sonner";
 import { Calendar, School, TrendingUp, Download, FileText, Search, Gift } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
+import { TruncatedText } from "@/components/ui/truncated-text";
 import { 
   Voucher2026,
   Voucher2026Exception,
@@ -103,12 +104,16 @@ const Voucher2026Dashboard = () => {
     return consultants.sort();
   };
 
-  const getStatusBadgeColor = (status: string) => {
+  const getStatusBadgeClass = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'ativa': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'inativa': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'operando': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+      case "ativa":
+        return "status-badge status-active";
+      case "inativa":
+        return "status-badge status-inactive";
+      case "operando":
+        return "status-badge status-warning";
+      default:
+        return "status-badge";
     }
   };
 
@@ -152,8 +157,12 @@ const Voucher2026Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center h-64" role="status" aria-live="polite">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary" aria-hidden="true"></div>
+          <p className="sr-only">Carregando dados da campanha 2026</p>
+          <p className="text-sm text-muted-foreground">Carregando vouchers...</p>
+        </div>
       </div>
     );
   }
@@ -168,20 +177,31 @@ const Voucher2026Dashboard = () => {
                 <Calendar className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold">Vouchers Campanha {activeCampaign}</h1>
+                <p className="text-sm text-primary font-semibold">Campanha ativa</p>
+                <h1 className="heading-responsive-1">Vouchers {activeCampaign}</h1>
                 <p className="text-muted-foreground">Gerenciamento da campanha de vouchers Canva {activeCampaign}</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" type="button" className="btn-touch-sm">
                 <FileText className="w-4 h-4 mr-2" />
-                Relatrio PDF
+                Relatório PDF
               </Button>
-              <Button variant="outline" size="sm" onClick={() => exportVoucher2026Report(filteredVouchers)}>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={() => exportVoucher2026Report(filteredVouchers)}
+                disabled={filteredVouchers.length === 0}
+                className="btn-touch-sm"
+                aria-label="Exportar relatório de vouchers 2026 em CSV"
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Exportar CSV
               </Button>
-              <Button size="sm" onClick={() => loadData(activeCampaign)}>Atualizar Dados</Button>
+              <Button size="sm" type="button" className="btn-touch-sm" onClick={() => loadData(activeCampaign)} aria-label={`Recarregar dados da campanha ${activeCampaign}`}>
+                Atualizar Dados
+              </Button>
             </div>
           </div>
 
@@ -218,7 +238,13 @@ const Voucher2026Dashboard = () => {
               >
                 Parcelamento
               </button>
-              <Button variant="ghost" size="sm" className="ml-auto" onClick={handleAddCampaign}>
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                className="ml-auto btn-touch-sm"
+                onClick={handleAddCampaign}
+              >
                 + Nova campanha
               </Button>
             </div>
@@ -227,7 +253,7 @@ const Voucher2026Dashboard = () => {
 
         {activeSection === "vouchers" && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid-responsive-4">
               <StatsCard
                 title="Total de Escolas"
                 value={stats.totalSchools.toString()}
@@ -235,7 +261,7 @@ const Voucher2026Dashboard = () => {
                 icon={<School className="h-4 w-4" />}
               />
               <StatsCard
-                title="Escolas Elegveis"
+                title="Escolas Elegíveis"
                 value={stats.eligibleSchools.toString()}
                 trend={{ value: stats.deliveryRate, isPositive: stats.deliveryRate > 80 }}
                 icon={<Gift className="h-4 w-4" />}
@@ -256,14 +282,22 @@ const Voucher2026Dashboard = () => {
               <CardContent className="p-6 space-y-6">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Buscar vouchers</Label>
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="filters-responsive">
                     <Input
-                      placeholder="Nome, ID ou cdigo do voucher..."
+                      placeholder="Nome, ID ou código do voucher..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="h-10 sm:max-w-md"
+                      className="filter-item-responsive h-11"
+                      aria-label="Buscar vouchers da campanha"
                     />
-                    <Button variant="outline" size="icon" className="h-10 w-10" onClick={applyFilters}>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      type="button"
+                      className="filter-item-responsive icon-btn-touch"
+                      onClick={applyFilters}
+                      aria-label="Executar busca"
+                    >
                       <Search className="w-4 h-4" />
                     </Button>
                   </div>
@@ -271,8 +305,8 @@ const Voucher2026Dashboard = () => {
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-muted-foreground">Filtros</Label>
-                  <div className="flex flex-wrap gap-3">
-                    <div className="min-w-[140px]">
+                  <div className="filters-responsive">
+                    <div className="filter-item-responsive">
                       <Select value={selectedCluster} onValueChange={setSelectedCluster}>
                         <SelectTrigger className="h-9 text-sm">
                           <SelectValue placeholder="Cluster" />
@@ -286,7 +320,7 @@ const Voucher2026Dashboard = () => {
                       </Select>
                     </div>
 
-                    <div className="min-w-[130px]">
+                    <div className="filter-item-responsive">
                       <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                         <SelectTrigger className="h-9 text-sm">
                           <SelectValue placeholder="Status" />
@@ -300,20 +334,20 @@ const Voucher2026Dashboard = () => {
                       </Select>
                     </div>
 
-                    <div className="min-w-[120px]">
+                    <div className="filter-item-responsive">
                       <Select value={voucherEligible} onValueChange={setVoucherEligible}>
                         <SelectTrigger className="h-9 text-sm">
-                          <SelectValue placeholder="Elegvel" />
+                          <SelectValue placeholder="Elegível" />
                         </SelectTrigger>
                         <SelectContent className="bg-background border shadow-md">
                           <SelectItem value="all">Todos</SelectItem>
-                          <SelectItem value="true">Elegveis</SelectItem>
-                          <SelectItem value="false">No Elegveis</SelectItem>
+                          <SelectItem value="true">Elegíveis</SelectItem>
+                          <SelectItem value="false">Não Elegíveis</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <div className="min-w-[120px]">
+                    <div className="filter-item-responsive">
                       <Select value={voucherSent} onValueChange={setVoucherSent}>
                         <SelectTrigger className="h-9 text-sm">
                           <SelectValue placeholder="Enviado" />
@@ -321,12 +355,12 @@ const Voucher2026Dashboard = () => {
                         <SelectContent className="bg-background border shadow-md">
                           <SelectItem value="all">Todos</SelectItem>
                           <SelectItem value="true">Enviados</SelectItem>
-                          <SelectItem value="false">No Enviados</SelectItem>
+                          <SelectItem value="false">Não Enviados</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <div className="min-w-[170px]">
+                    <div className="filter-item-responsive">
                       <Select value={safConsultant} onValueChange={setSafConsultant}>
                         <SelectTrigger className="h-9 text-sm">
                           <SelectValue placeholder="Consultor" />
@@ -344,16 +378,18 @@ const Voucher2026Dashboard = () => {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid-responsive-3">
               {filteredVouchers.map((voucher) => (
                 <Card key={voucher.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="text-lg leading-tight">{voucher.name}</CardTitle>
+                        <CardTitle className="text-lg leading-tight">
+                          <TruncatedText text={voucher.name} maxWidth="100%" lines={2} />
+                        </CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">ID: {voucher.id}</p>
                       </div>
-                      <Badge className={getStatusBadgeColor(voucher.status)}>
+                      <Badge className={getStatusBadgeClass(voucher.status)}>
                         {voucher.status}
                       </Badge>
                     </div>
@@ -363,7 +399,7 @@ const Voucher2026Dashboard = () => {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Cluster</p>
-                        <p className="font-semibold">{voucher.cluster}</p>
+                        <TruncatedText text={voucher.cluster} maxWidth="180px" lines={1} />
                       </div>
                       <div>
                         <p className="text-muted-foreground">Qtd. Vouchers</p>
@@ -375,20 +411,20 @@ const Voucher2026Dashboard = () => {
                       </div>
                       <div>
                         <p className="text-muted-foreground">Consultor SAF</p>
-                        <p className="font-semibold text-xs">{voucher.safConsultant}</p>
+                        <TruncatedText text={voucher.safConsultant || ""} maxWidth="180px" lines={1} className="text-xs" />
                       </div>
                     </div>
 
                     {voucher.voucherCode && (
                       <div>
-                        <p className="text-sm text-muted-foreground">Cdigo do Voucher</p>
-                        <code className="text-sm bg-muted px-2 py-1 rounded">{voucher.voucherCode}</code>
+                        <p className="text-sm text-muted-foreground">Código do Voucher</p>
+                        <TruncatedText text={voucher.voucherCode} maxWidth="100%" lines={1} />
                       </div>
                     )}
 
                     <div className="flex flex-wrap gap-2">
                       <Badge variant={voucher.voucherEligible ? "default" : "secondary"}>
-                        {voucher.voucherEligible ? "Elegvel" : "No Elegvel"}
+                        {voucher.voucherEligible ? "Elegível" : "Não Elegível"}
                       </Badge>
                       {voucher.voucherSent && (
                         <Badge variant="outline" className="bg-green-50 text-green-700">
@@ -404,7 +440,7 @@ const Voucher2026Dashboard = () => {
 
                     {voucher.observations && (
                       <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
-                        {voucher.observations}
+                        <TruncatedText text={voucher.observations} maxWidth="100%" lines={3} showTooltip />
                       </div>
                     )}
                   </CardContent>
@@ -459,7 +495,7 @@ const Voucher2026Dashboard = () => {
             <CardContent className="space-y-3">
               {installments.length === 0 && <p className="text-sm text-muted-foreground">Nenhum registro de parcelamento para esta campanha.</p>}
               {installments.length > 0 && (
-                <div className="overflow-auto rounded-lg border border-border/70">
+                <div className="table-responsive rounded-lg border border-border/70">
                   <table className="min-w-full text-sm">
                     <thead className="bg-muted/70 text-left">
                       <tr>

@@ -72,7 +72,7 @@ export function sanitizeForCSV(text: string): string {
  * @param filename - Nome do arquivo (sem extenso)
  * @param delimiter - Delimitador do CSV (padro: ponto-e-vrgula)
  * @example 
- * downloadCSV([['Nome', 'Email'], ['Joo', 'joao@email.com']], 'usu?rios')
+ * downloadCSV([['Nome', 'Email'], ['Joo', 'joao@email.com']], 'usuários')
  */
 export function downloadCSV(
   data: string[][], 
@@ -90,7 +90,7 @@ export function downloadCSV(
  * @param filename - Nome do arquivo (sem extenso)
  * @param pretty - Se true, formata o JSON com indentao
  * @example 
- * downloadJSON({ name: 'Joo', age: 30 }, 'usu?rio')
+ * downloadJSON({ name: 'Joo', age: 30 }, 'usuário')
  */
 export function downloadJSON(
   data: any, 

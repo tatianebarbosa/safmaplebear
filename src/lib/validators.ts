@@ -1,5 +1,5 @@
 /**
- * Utilitrios de validao para email, CPF, dom?nios e compliance
+ * Utilitrios de validao para email, CPF, domínios e compliance
  * Centraliza lgica duplicada encontrada em mltiplos componentes
  */
 
@@ -8,7 +8,7 @@
 // ============================================================================
 
 /**
- * Lista de dom?nios corporativos permitidos
+ * Lista de domínios corporativos permitidos
  */
 export const ALLOWED_DOMAINS = [
   'mbcentral.com.br',
@@ -18,7 +18,7 @@ export const ALLOWED_DOMAINS = [
 ] as const;
 
 /**
- * Lista de dom?nios compliance para Canva
+ * Lista de domínios compliance para Canva
  */
 export const COMPLIANT_DOMAINS = [
   'maplebear.com.br',
@@ -59,7 +59,7 @@ const hasMapleBearSchoolIdentifier = (localPart: string): boolean => {
  * Valida o formato de um endereo de email
  * @param email - Email a ser validado
  * @returns true se o email  vlido, false caso contrrio
- * @example validateEmail("usu?rio@exemplo.com") // true
+ * @example validateEmail("usuário@exemplo.com") // true
  * @example validateEmail("email-invalido") // false
  */
 export function validateEmail(email: string): boolean {
@@ -72,10 +72,10 @@ export function validateEmail(email: string): boolean {
 }
 
 /**
- * Extrai o dom?nio de um endereo de email
- * @param email - Email do qual extrair o dom?nio
+ * Extrai o domínio de um endereo de email
+ * @param email - Email do qual extrair o domínio
  * @returns Domnio do email ou string vazia se invlido
- * @example getEmailDomain("usu?rio@exemplo.com") // "exemplo.com"
+ * @example getEmailDomain("usuário@exemplo.com") // "exemplo.com"
  */
 export function getEmailDomain(email: string): string {
   if (!email || typeof email !== 'string') {
@@ -87,10 +87,10 @@ export function getEmailDomain(email: string): string {
 }
 
 /**
- * Extrai o nome de usu?rio de um endereo de email
+ * Extrai o nome de usuário de um endereo de email
  * @param email - Email do qual extrair o nome
- * @returns Nome de usu?rio do email
- * @example getEmailUsername("usu?rio@exemplo.com") // "usu?rio"
+ * @returns Nome de usuário do email
+ * @example getEmailUsername("usuário@exemplo.com") // "usuário"
  */
 export function getEmailUsername(email: string): string {
   if (!email || typeof email !== 'string') {
@@ -102,11 +102,11 @@ export function getEmailUsername(email: string): string {
 }
 
 /**
- * Verifica se um email pertence a um dom?nio permitido
+ * Verifica se um email pertence a um domínio permitido
  * @param email - Email a ser verificado
- * @returns true se o dom?nio  permitido, false caso contrrio
- * @example isAllowedDomain("usu?rio@mbcentral.com.br") // true
- * @example isAllowedDomain("usu?rio@gmail.com") // false
+ * @returns true se o domínio  permitido, false caso contrrio
+ * @example isAllowedDomain("usuário@mbcentral.com.br") // true
+ * @example isAllowedDomain("usuário@gmail.com") // false
  */
 export function isAllowedDomain(email: string): boolean {
   if (!validateEmail(email)) {
@@ -118,11 +118,11 @@ export function isAllowedDomain(email: string): boolean {
 }
 
 /**
- * Verifica se um email est em compliance (dom?nios Maplebear/SEB)
+ * Verifica se um email est em compliance (domínios Maplebear/SEB)
  * @param email - Email a ser verificado
  * @returns true se o email est em compliance, false caso contrrio
- * @example isCompliantEmail("usu?rio@maplebear.com.br") // true
- * @example isCompliantEmail("usu?rio@gmail.com") // false
+ * @example isCompliantEmail("usuário@maplebear.com.br") // true
+ * @example isCompliantEmail("usuário@gmail.com") // false
  */
 export function isCompliantEmail(email: string): boolean {
   if (!validateEmail(email)) {
@@ -147,27 +147,27 @@ export function isCompliantEmail(email: string): boolean {
  * Retorna a razo pela qual um email no est em compliance
  * @param email - Email a ser verificado
  * @returns Mensagem descrevendo o problema de compliance
- * @example getNonComplianceReason("usu?rio@gmail.com") 
+ * @example getNonComplianceReason("usuário@gmail.com") 
  * // "Domnio no autorizado: gmail.com"
  */
 export function getNonComplianceReason(email: string): string {
   if (!email || typeof email !== 'string') {
-    return 'Email não fornecido';
+    return 'Email nÃ£o fornecido';
   }
   
   if (!validateEmail(email)) {
-    return 'Formato de email inválido';
+    return 'Formato de email invÃ¡lido';
   }
   
   const domain = getEmailDomain(email);
   const localPart = getEmailUsername(email);
   
   if (!domain) {
-    return 'Email inválido';
+    return 'Email invÃ¡lido';
   }
   
   if (!isCorporateDomain(domain)) {
-    return `Domínio não autorizado: ${domain}`;
+    return `DomÃ­nio nÃ£o autorizado: ${domain}`;
   }
 
   if (isMapleBearDomain(domain) && !hasMapleBearSchoolIdentifier(localPart)) {
@@ -178,14 +178,14 @@ export function getNonComplianceReason(email: string): string {
     return 'Email em compliance';
   }
   
-  return 'Email fora da política';
+  return 'Email fora da polÃ­tica';
 }
 
 /**
- * Verifica se um email pertence ao dom?nio Maplebear
+ * Verifica se um email pertence ao domínio Maplebear
  * @param email - Email a ser verificado
  * @returns true se o email  @maplebear.com.br
- * @example isMaplebearEmail("usu?rio@maplebear.com.br") // true
+ * @example isMaplebearEmail("usuário@maplebear.com.br") // true
  */
 export function isMaplebearEmail(email: string): boolean {
   const domain = getEmailDomain(email);
@@ -193,10 +193,10 @@ export function isMaplebearEmail(email: string): boolean {
 }
 
 /**
- * Verifica se um email pertence aos dom?nios SEB
+ * Verifica se um email pertence aos domínios SEB
  * @param email - Email a ser verificado
  * @returns true se o email  @seb.com.br ou @sebsa.com.br
- * @example isSEBEmail("usu?rio@seb.com.br") // true
+ * @example isSEBEmail("usuário@seb.com.br") // true
  */
 export function isSEBEmail(email: string): boolean {
   const domain = getEmailDomain(email);
