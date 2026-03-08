@@ -28,7 +28,6 @@ import { useAuthStore } from "@/stores/authStore";
 import NotificationBell from "@/components/layout/NotificationBell";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { isCanvaOnlyMode, isCoreViewsOnlyMode } from "@/lib/accessPolicy";
-import MobileMenu from "@/components/layout/MobileMenu";
 import { getUserFromToken } from "@/services/authService";
 import {
   Popover,
@@ -164,7 +163,6 @@ const Header = () => {
       <div className="w-full px-4 py-3 md:px-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-5">
           <div className="flex items-center gap-6">
-            <MobileMenu />
             <div className="flex items-center gap-1.5">
               <div className="shrink-0 p-0">
                 <img
@@ -174,7 +172,7 @@ const Header = () => {
                 />
               </div>
             </div>
-            <nav className="hidden md:flex items-center gap-2">
+            <nav className="flex items-center gap-2 overflow-x-auto whitespace-nowrap">
               {navItems.map((item) => {
                 const isActive =
                   item.path === "/dashboard"
