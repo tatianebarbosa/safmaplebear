@@ -172,7 +172,7 @@ const Header = () => {
                 />
               </div>
             </div>
-            <nav className="flex items-center gap-2 overflow-x-auto whitespace-nowrap">
+            <nav className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {navItems.map((item) => {
                 const isActive =
                   item.path === "/dashboard"
