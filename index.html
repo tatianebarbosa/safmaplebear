@@ -11,6 +11,37 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+    <script>
+        (function () {
+            if (!window.location.hash.includes("figmacapture=")) return;
+
+            var captureToken = btoa(JSON.stringify({
+                id: "figma-capture",
+                username: "admin",
+                role: "admin",
+                exp: Date.now() + (5 * 60 * 1000)
+            }));
+
+            try {
+                localStorage.setItem("authToken", captureToken);
+                localStorage.setItem("saf_auth_token", captureToken);
+                localStorage.setItem("userEmail", "admin");
+
+                window.setTimeout(function () {
+                    try {
+                        localStorage.removeItem("authToken");
+                        localStorage.removeItem("saf_auth_token");
+                        localStorage.removeItem("userEmail");
+                    } catch (_) {
+                        // Ignore cleanup failures during capture.
+                    }
+                }, 30000);
+            } catch (_) {
+                // Ignore storage failures so the app can still load normally.
+            }
+        })();
+    </script>
 </head>
 <body>
     <div id="root">

@@ -1,0 +1,65 @@
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[2m21:01:17[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:01:17[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:29:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:29:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:30:10[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:30:10[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:32:11[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:32:11[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:35:34[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:35:34[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:36:09[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:36:18[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:36:18[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:36:23[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:36:40[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:36:40[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tickets[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)

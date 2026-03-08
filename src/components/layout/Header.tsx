@@ -28,6 +28,7 @@ import { useAuthStore } from "@/stores/authStore";
 import NotificationBell from "@/components/layout/NotificationBell";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { isCanvaOnlyMode, isCoreViewsOnlyMode } from "@/lib/accessPolicy";
+import MobileMenu from "@/components/layout/MobileMenu";
 import { getUserFromToken } from "@/services/authService";
 import {
   Popover,
@@ -159,11 +160,12 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-slate-50/95 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.35)] backdrop-blur">
+    <header className="sticky top-0 z-40 w-full bg-background shadow-[0_10px_20px_-12px_rgba(0,0,0,0.25)]">
       <div className="w-full px-4 py-3 md:px-6">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-5">
+          <div className="flex items-center gap-6">
+            <MobileMenu />
+            <div className="flex items-center gap-1.5">
               <div className="shrink-0 p-0">
                 <img
                   src={Logos.SAF}
@@ -172,136 +174,7 @@ const Header = () => {
                 />
               </div>
             </div>
-
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Tooltip>
-                <Popover open={searchOpen} onOpenChange={setSearchOpen}>
-                  <TooltipTrigger asChild>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-full icon-btn-touch text-slate-700 hover:bg-white hover:text-slate-950"
-                        aria-label="Abrir busca rápida"
-                        type="button"
-                      >
-                        <Search className="w-5 h-5" />
-                      </Button>
-                    </PopoverTrigger>
-                  </TooltipTrigger>
-                  <PopoverContent
-                    align="end"
-                    side="bottom"
-                    sideOffset={8}
-                    className="w-80 p-3"
-                  >
-                    <div className="space-y-2">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground">Busca rápida</p>
-                      <Input
-                        value={searchQuery}
-                        aria-label="Pesquisar páginas, links e relatórios"
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                        placeholder="Procure por páginas, links e relatórios"
-                        autoFocus
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1">
-                      {searchMatches.length === 0 ? (
-                        <p className="px-2 py-2 text-xs text-muted-foreground">Nenhum item encontrado.</p>
-                      ) : (
-                        searchMatches.slice(0, 12).map((item) => (
-                          <Button
-                            key={`${item.label}-${item.href}`}
-                            type="button"
-                            variant="ghost"
-                            className="h-11 w-full justify-between text-sm"
-                            aria-label={`Abrir ${item.label}`}
-                            onClick={() =>
-                              item.isExternal
-                                ? window.open(item.href, "_blank", "noopener,noreferrer")
-                                : handleSearchNavigate(item.href)
-                            }
-                          >
-                            <span className="truncate">{item.label}</span>
-                            <span className="text-xs text-muted-foreground">{item.section}</span>
-                          </Button>
-                        ))
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <TooltipContent side="bottom" sideOffset={8}>
-                  Buscar
-                </TooltipContent>
-              </Tooltip>
-              <NotificationBell />
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full icon-btn-touch bg-primary text-primary-foreground"
-                    aria-label={`Abrir menu da conta de ${displayName}`}
-                    type="button"
-                  >
-                    <Avatar className="w-10 h-10">
-                      <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  side="bottom"
-                  sideOffset={8}
-                  collisionPadding={12}
-                  className="w-52 rounded-xl shadow-[0_18px_34px_-18px_rgba(30,32,36,0.4)] right-0 translate-x-0"
-                >
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
-                    <User className="w-4 h-4 mr-2" />
-                    {displayName}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {!restrictToCoreViews && isCoordinator && (
-                    <>
-                      <DropdownMenuItem onClick={() => navigate("/monitoria-agentes")}>
-                        <User className="w-4 h-4 mr-2" />
-                        Monitoria de Agentes
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-                  {!restrictToCoreViews && isAdmin && (
-                    <>
-                      <DropdownMenuItem onClick={() => navigate("/knowledge-base")}>
-                        <BookOpenText className="w-4 h-4 mr-2" />
-                        Base de Conhecimento
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => navigate("/admin")}>
-                        <Grid className="w-4 h-4 mr-2" />
-                        Gerenciamento
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="text-destructive"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-
-          <div className="-mx-1 overflow-x-auto px-1 pb-1">
-            <nav className="flex min-w-max items-center gap-2">
+            <nav className="hidden md:flex items-center gap-2">
               {navItems.map((item) => {
                 const isActive =
                   item.path === "/dashboard"
@@ -316,10 +189,11 @@ const Header = () => {
                     data-active={isActive}
                     aria-label={`Ir para ${item.label}`}
                     className={[
-                      "h-10 rounded-full px-4 text-sm transition-colors",
+                      "menu-underline px-2 py-2 h-11 text-sm bg-transparent rounded-none transition-colors hover:bg-transparent relative",
+                      "after:absolute after:left-1 after:right-1 after:-bottom-1 after:h-[3px] after:rounded-full after:transition-colors after:duration-150",
                       isActive
-                        ? "bg-white text-primary shadow-sm ring-1 ring-primary/10"
-                        : "text-slate-700 hover:bg-white hover:text-slate-950",
+                        ? "text-primary font-semibold after:bg-primary"
+                        : "text-muted-foreground/80 hover:text-foreground font-medium after:bg-transparent hover:after:bg-primary/50",
                     ].join(" ")}
                     onClick={() => navigate(item.path)}
                     aria-current={isActive ? "page" : undefined}
@@ -335,10 +209,10 @@ const Header = () => {
                     size="sm"
                     type="button"
                     aria-label="Abrir links úteis"
-                    className="group h-10 gap-1.5 rounded-full px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-white hover:text-slate-950"
+                    className="menu-underline group px-0 py-2 h-11 gap-1.5 rounded-none bg-transparent text-sm font-semibold text-muted-foreground transition-colors hover:bg-transparent hover:text-foreground"
                   >
                     Links
-                    <ChevronDown className="w-3 h-3 text-slate-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                    <ChevronDown className="w-3 h-3 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
@@ -377,6 +251,132 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </nav>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Tooltip>
+              <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+                <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full icon-btn-touch"
+                      aria-label="Abrir busca rápida"
+                      type="button"
+                    >
+                      <Search className="w-5 h-5" />
+                    </Button>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <PopoverContent
+                  align="end"
+                  side="bottom"
+                  sideOffset={8}
+                  className="w-80 p-3"
+                >
+                  <div className="space-y-2">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Busca rápida</p>
+                    <Input
+                      value={searchQuery}
+                      aria-label="Pesquisar páginas, links e relatórios"
+                      onChange={(event) => setSearchQuery(event.target.value)}
+                      placeholder="Procure por páginas, links e relatórios"
+                      autoFocus
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1">
+                    {searchMatches.length === 0 ? (
+                      <p className="px-2 py-2 text-xs text-muted-foreground">Nenhum item encontrado.</p>
+                    ) : (
+                      searchMatches.slice(0, 12).map((item) => (
+                      <Button
+                        key={`${item.label}-${item.href}`}
+                        type="button"
+                        variant="ghost"
+                        className="w-full justify-between h-11 text-sm"
+                        aria-label={`Abrir ${item.label}`}
+                        onClick={() =>
+                          item.isExternal
+                            ? window.open(item.href, "_blank", "noopener,noreferrer")
+                            : handleSearchNavigate(item.href)
+                        }
+                          >
+                          <span className="truncate">{item.label}</span>
+                          <span className="text-muted-foreground text-xs">{item.section}</span>
+                        </Button>
+                      ))
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+          <TooltipContent side="bottom" sideOffset={8}>
+            Buscar
+          </TooltipContent>
+            </Tooltip>
+            <NotificationBell />
+
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                  className="rounded-full icon-btn-touch bg-primary text-primary-foreground"
+                    aria-label={`Abrir menu da conta de ${displayName}`}
+                    type="button"
+                  >
+                    <Avatar className="w-10 h-10">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+                </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                side="bottom"
+                sideOffset={8}
+                collisionPadding={12}
+                className="w-52 rounded-xl shadow-[0_18px_34px_-18px_rgba(30,32,36,0.4)] right-0 translate-x-0"
+              >
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <User className="w-4 h-4 mr-2" />
+                  {displayName}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {!restrictToCoreViews && isCoordinator && (
+                  <>
+                    <DropdownMenuItem onClick={() => navigate("/monitoria-agentes")}>
+                      <User className="w-4 h-4 mr-2" />
+                      Monitoria de Agentes
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                {!restrictToCoreViews && isAdmin && (
+                  <>
+                    <DropdownMenuItem onClick={() => navigate("/knowledge-base")}>
+                      <BookOpenText className="w-4 h-4 mr-2" />
+                      Base de Conhecimento
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/admin")}>
+                      <Grid className="w-4 h-4 mr-2" />
+                      Gerenciamento
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
