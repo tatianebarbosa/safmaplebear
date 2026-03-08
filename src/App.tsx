@@ -41,6 +41,8 @@ const LazyAssetsPage = lazy(() => import("@/pages/AssetsPage"));
 const LazyAssetDetailPage = lazy(() => import("@/pages/AssetDetailPage"));
 const LazyAssetSchoolPage = lazy(() => import("@/pages/AssetSchoolPage"));
 const LazyAccessControl = lazy(() => import("@/components/auth/AccessControl"));
+const LazyLinksPage = lazy(() => import("@/pages/LinksPage"));
+const LazyFigmaMenusPage = lazy(() => import("@/pages/FigmaSiteRouteFramesPage"));
 
 // ====== Layout protegido: cabecalho, rota filha e rodape ======
 const ProtectedShell = () => (
@@ -75,6 +77,7 @@ const App = () => {
           <Suspense fallback={<Skeleton className="h-screen w-full" />}>
             <Routes>
               <Route path="/login" element={<LazyLogin />} />
+              <Route path="/figma/menus" element={<LazyFigmaMenusPage />} />
               {/* Bloco protegido: sÃ³ entra aqui apÃ³s autenticaÃ§Ã£o */}
               <Route element={<ProtectedShell />}>
                 <Route
@@ -145,6 +148,7 @@ const App = () => {
                   path="/knowledge-base"
                   element={renderRestrictedRoute(<LazyKnowledgeBasePage />)}
                 />
+                <Route path="/links" element={<LazyLinksPage />} />
                 <Route
                   path="/saf/ativos"
                   element={renderRestrictedRoute(<LazyAssetsPage />)}

@@ -107,6 +107,7 @@ const VoucherDashboard = () => {
   const [customAdjustments, setCustomAdjustments] = useState<Record<string, number>>({});
   const navigate = useNavigate();
   const location = useLocation();
+  const isFigmaCapture = new URLSearchParams(location.search).get("figmaCapture") === "1";
   const queryYear = new URLSearchParams(location.search).get("year");
   const [activeCampaign, setActiveCampaign] = useState<string>(queryYear || "2025");
   const [campaigns, setCampaigns] = useState<CampaignKey[]>(() => getStoredCampaignKeys());
@@ -161,9 +162,13 @@ const VoucherDashboard = () => {
       const adjustedSchools = applyAdjustments(data.schools, storedAdjustments);
       setSchools(adjustedSchools);
       setExceptions(data.exceptions);
-      toast.success("Dados dos vouchers carregados!");
+      if (!isFigmaCapture) {
+        toast.success("Dados dos vouchers carregados!");
+      }
     } catch (error) {
-      toast.error("Erro ao carregar dados dos vouchers");
+      if (!isFigmaCapture) {
+        toast.error("Erro ao carregar dados dos vouchers");
+      }
     } finally {
       setLoading(false);
     }

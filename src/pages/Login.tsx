@@ -107,22 +107,20 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-8 sm:px-6">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         <Card className="bg-card/95 border border-border/60 shadow-lg rounded-xl">
-          <CardHeader className="text-center space-y-3 pb-4 pt-7 px-5 sm:px-6">
+          <CardHeader className="text-center space-y-2.5 pb-4 pt-6 px-5 sm:px-6">
             <div className="flex justify-center">
-              <div className="flex items-center justify-center rounded-2xl bg-primary/5 px-4 py-3">
-                <img
-                  src={Logos.SAFAlt}
-                  alt="Maple Bear SAF"
-                  className="object-contain drop-shadow-sm mx-auto"
-                  style={{
-                    height: "128px",
-                    maxWidth: "300px",
-                    width: "auto",
-                  }}
-                />
-              </div>
+              <img
+                src={Logos.SAF}
+                alt="Maple Bear SAF"
+                className="object-contain drop-shadow-sm mx-auto"
+                style={{
+                  height: "88px",
+                  maxWidth: "240px",
+                  width: "auto",
+                }}
+              />
             </div>
             <div className="space-y-0">
               <CardTitle className="text-3xl sm:text-4xl font-bold text-primary tracking-tight leading-tight">

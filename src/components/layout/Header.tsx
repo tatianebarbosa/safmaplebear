@@ -28,6 +28,7 @@ import { useAuthStore } from "@/stores/authStore";
 import NotificationBell from "@/components/layout/NotificationBell";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { isCanvaOnlyMode, isCoreViewsOnlyMode } from "@/lib/accessPolicy";
+import MobileMenu from "@/components/layout/MobileMenu";
 import { getUserFromToken } from "@/services/authService";
 import {
   Popover,
@@ -59,6 +60,15 @@ const Header = () => {
   const canvaOnlyMode = isCanvaOnlyMode(roleForPolicy);
   const coreViewsOnlyMode = isCoreViewsOnlyMode(roleForPolicy);
   const restrictToCoreViews = canvaOnlyMode || coreViewsOnlyMode;
+  const isLinksActive =
+    location.pathname === "/links" || location.pathname.startsWith("/links/");
+  const routeAliases: Record<string, string[]> = {
+    "/dashboard": ["/"],
+    "/dashboard/canva": ["/canva"],
+    "/dashboard/vouchers": ["/vouchers"],
+    "/saf/ativos": ["/ativos"],
+    "/knowledge-base": ["/knowledge"],
+  };
   const initials = useMemo(
     () => (userEmail || currentUser?.name || "US").replace(/^(.{1,2}).*$/, "$1").toUpperCase(),
     [userEmail, currentUser?.name]
@@ -163,6 +173,7 @@ const Header = () => {
       <div className="w-full px-4 py-3 md:px-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-5">
           <div className="flex items-center gap-6">
+            <MobileMenu />
             <div className="flex items-center gap-1.5">
               <div className="shrink-0 p-0">
                 <img
@@ -172,12 +183,15 @@ const Header = () => {
                 />
               </div>
             </div>
-            <nav className="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <nav className="hidden md:flex items-center gap-2">
               {navItems.map((item) => {
-                const isActive =
-                  item.path === "/dashboard"
-                    ? location.pathname === "/dashboard"
-                    : location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+                const aliases = routeAliases[item.path] || [];
+                const candidates = [item.path, ...aliases];
+                const isActive = candidates.some((candidate) =>
+                  candidate === "/"
+                    ? location.pathname === "/"
+                    : location.pathname === candidate || location.pathname.startsWith(`${candidate}/`)
+                );
                 return (
                   <Button
                     key={item.label}
@@ -207,10 +221,20 @@ const Header = () => {
                     size="sm"
                     type="button"
                     aria-label="Abrir links úteis"
-                    className="menu-underline group px-0 py-2 h-11 gap-1.5 rounded-none bg-transparent text-sm font-semibold text-muted-foreground transition-colors hover:bg-transparent hover:text-foreground"
+                    className={[
+                      "menu-underline group px-0 py-2 h-11 gap-1.5 rounded-none bg-transparent text-sm transition-colors hover:bg-transparent",
+                      isLinksActive
+                        ? "font-semibold text-primary"
+                        : "font-semibold text-muted-foreground hover:text-foreground",
+                    ].join(" ")}
                   >
                     Links
-                    <ChevronDown className="w-3 h-3 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                    <ChevronDown
+                      className={[
+                        "w-3 h-3 transition-transform duration-200 group-data-[state=open]:rotate-180",
+                        isLinksActive ? "text-primary" : "text-muted-foreground",
+                      ].join(" ")}
+                    />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
